@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <link href="img/favicon.ico" rel="shortcut icon"/>
+    <title>Financial Data Lookup</title>
+</head>
+<body>
+
+    <div class="navbar">
+        <img src="img/poseidon.png" alt="Poseidon Capital Ltd." class="logo">
+        <div class="navbar-links">
+            <a href="/home">首頁</a>
+            <a href="/login">登入</a>
+        </div>
+    </div>
+
+
+    <h1>Financial Data</h1>
+    <input type="text" id="stockSymbol" placeholder="輸入美股代碼">
+    <button onclick="fetchStock()">確定</button>
+    <p id="outputSymbol" data-last-symbol="">現在查詢的是：</p>
+
+
+    <div>
+    <h2>財務收入 Income Statement</h2>
+    <label for="period">選擇時段：</label>
+    <select id="period">
+        <option value="annual">Annual</option>
+        <option value="quarter">Quarter</option>
+    </select>
+    <button onclick="fetchIncomeStatement()">載入報表</button>
+    <div class="scroll-container">
+        <table id="IncomeStatementTable" border="1" style="width: 100%; border-collapse: collapse;">
+        <div id="incomeStatementContainer"></div>
+        </table>
+    </div>
+    </div>
+
+
+    <div>
+        <h2>法說會逐字稿 Earnings Call Transcript</h2>
+        <input type="number" id="yearInput" placeholder="輸入年分">
+        <input type="number" id="quarterInput" placeholder="輸入季度">
+        <button onclick="fetchEarningsCallTranscript()">載入逐字稿</button>
+        <div id="earningsCallTranscriptContainer"></div>
+        <button id="expandButton" style="display:none;" onclick="expandIncomeStatement()">Read More</button>
+        <button id="collapseButton" style="display:none;" onclick="collapseIncomeStatement()">Read Less</button>
+    </div>
+
+    <div>
+        <h2>法說會日曆 Earnings Call Calendar</h2>
+        <input type="date" id="fromDate" placeholder="From Date">
+        <input type="date" id="toDate" placeholder="To Date">
+        <button onclick="fetchEarningsCallCalendar()">載入日曆</button>
+        <div id="earningsCallCalendarContainer"></div>
+    </div>
+
+    <div>
+        <h2>歷史獲利和未來獲利 Historical and Future Earnings</h2>
+        <input type="date" id="fromDate_1" placeholder="From Date">
+        <input type="date" id="toDate_1" placeholder="To Date">
+        <button onclick="fetch_historical_earning_calendar()">載入日曆</button>
+        <div class="scroll-container">
+        <table id="historical_earning_calendarTable" border="1" style="width: 100%; border-collapse: collapse;">
+        <div id="historical_earning_calendar"></div>
+        </table>
+        </div>
+    </div>
+
+    <div>
+        <h2>股利發放日期</h2>
+        <input type="date" id="fromDate_2" placeholder="From Date">
+        <input type="date" id="toDate_2" placeholder="To Date">
+        <button onclick="fetch_stock_dividend_calendar()">載入日曆</button>
+        <div id="stock_dividend_calendar"></div>
+    </div>
+
+    <div>
+    <h2>內部人交易 Insider Trades </h2>
+
+    <button onclick="fetchInsiderTrades()">載入表格</button>
+    <div class="scroll-container" >
+    <table id="Insider_Trades_Table" border="1" style="width: 100%; border-collapse: collapse;">
+        <tbody id="Insider_Trades"></tbody>
+    </table>
+    </div>
+    </div>
+
+
+
+    <script src="main.js"></script>
+</body>
+</html>
