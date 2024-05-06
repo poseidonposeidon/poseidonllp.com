@@ -14,8 +14,11 @@ input, button {
     border-radius: 5px; /* 圆角边框 */
 }
 button {
-    color: white;
     background-color: #8b5e3c; /* 暗棕色按钮 */
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px; /* 圆角边框 */
     cursor: pointer; /* 鼠标悬停时指针形状 */
 }
 button:hover {
@@ -106,4 +109,12 @@ th {
 /* 確保链接宽度相同 */
 .navbar-links a {
     width: 100px; /* 或其他適合的固定寬度 */
+}
+
+.container {
+    background-color: #eae0d5; /* 容器背景色 */
+    margin: 20px auto; /* 自動水平居中 */
+    padding: 15px;
+    border-radius: 5px; /* 圓角邊框 */
+    text-align: center; /* 文本居中 */
 }

@@ -17,7 +17,7 @@ document.getElementById('google-login-btn').addEventListener('click', function()
 function initGoogleAuth() {
     gapi.load('auth2', function() {
         gapi.auth2.init({
-            client_id: '您的 Google 項目的客戶端 ID'
+        client_id: '測試測試'
         });
     });
 }
