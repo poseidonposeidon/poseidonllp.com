@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, session
+from flask import Flask, request, jsonify, send_from_directory
 import whisper
 from opencc import OpenCC
 from deep_translator import GoogleTranslator
@@ -8,6 +8,7 @@ from flask_cors import CORS
 import tempfile
 import torch
 from concurrent.futures import ThreadPoolExecutor
+import uuid
 
 # 禁用 FP16 使用 FP32
 os.environ["WHISPER_DISABLE_F16"] = "1"
@@ -29,6 +30,9 @@ cc = OpenCC('s2twp')
 # 创建线程池执行器
 executor = ThreadPoolExecutor(max_workers=4)
 
+# 用于存储进度信息的全局变量
+progress_dict = {}
+
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
@@ -46,21 +50,23 @@ def transcribe_handler():
         if file.filename == '':
             return jsonify({"error": "文件名为空"}), 400
         if file and file.filename.endswith((".mp3", ".m4a", ".mp4", ".mov")):
-            session['progress'] = 0
+            # 创建一个唯一的任务 ID
+            task_id = str(uuid.uuid4())
+            progress_dict[task_id] = 0
             # 使用线程池异步处理转录请求
-            future = executor.submit(transcribe_audio, file)
-            transcription_result = future.result()
-            return jsonify({"text": transcription_result})
+            executor.submit(transcribe_audio, file, task_id)
+            return jsonify({"task_id": task_id})
         return jsonify({"error": "无效的文件格式"}), 400
     except Exception as e:
         print(f"Error in transcribe_handler: {e}")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/progress')
-def progress():
-    return jsonify({"progress": session.get('progress', 0)})
+@app.route('/progress/<task_id>')
+def progress(task_id):
+    progress = progress_dict.get(task_id, 0)
+    return jsonify({"progress": progress})
 
-def transcribe_audio(file):
+def transcribe_audio(file, task_id):
     try:
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_path = temp_file.name
@@ -88,14 +94,14 @@ def transcribe_audio(file):
             transcriptions.append(f"{start_formatted}-{end_formatted}: {transcription_traditional}")
 
             # 更新进度
-            session['progress'] = int(((i + 1) / total_segments) * 100)
+            progress_dict[task_id] = int(((i + 1) / total_segments) * 100)
 
         os.remove(temp_path)  # 删除临时文件
-        session['progress'] = 100  # 设置为 100%，表示完成
+        progress_dict[task_id] = 100  # 设置为 100%，表示完成
         return "\n".join(transcriptions)
     except Exception as e:
         print(f"Error in transcribe_audio: {e}")
-        raise
+        progress_dict[task_id] = 0  # 如果出现错误，重置进度
 
 def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
