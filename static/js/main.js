@@ -517,7 +517,6 @@ function displayInsiderTrades(data) {
 let transcriptionText = "";
 let uploadedFileName = "";
 let progressInterval;
-let taskId = "";
 
 function uploadAudio() {
     const fileInput = document.getElementById('audioFile');
@@ -540,7 +539,9 @@ function uploadAudio() {
     progressContainer.style.display = 'block';
     progressBar.style.width = '0%';
 
-    // 發送文件並獲取任務 ID
+    // 開始輪詢進度
+    progressInterval = setInterval(updateProgress, 500);
+
     fetch('http://127.0.0.1:5000/transcribe', {
         method: 'POST',
         body: formData
@@ -552,9 +553,11 @@ function uploadAudio() {
             return response.json();
         })
         .then(data => {
-            taskId = data.task_id;
-            // 開始輪詢進度
-            progressInterval = setInterval(updateProgress, 500);
+            clearInterval(progressInterval); // 停止輪詢
+            progressBar.style.width = '100%'; // 確保進度條達到100%
+            console.log(data);
+            displayTranscription(data);
+            document.getElementById('downloadBtn').classList.remove('hidden');
         })
         .catch(error => {
             clearInterval(progressInterval); // 停止輪詢
@@ -564,21 +567,11 @@ function uploadAudio() {
 }
 
 function updateProgress() {
-    fetch(`http://127.0.0.1:5000/progress/${taskId}`)
+    fetch('http://127.0.0.1:5000/progress')
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
             progressBar.style.width = data.progress + '%';
-            if (data.progress === 100) {
-                clearInterval(progressInterval); // 停止輪詢
-                fetch(`http://127.0.0.1:5000/transcription_result/${taskId}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        displayTranscription(data);
-                        document.getElementById('downloadBtn').classList.remove('hidden');
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
         })
         .catch(error => console.error('Error:', error));
 }
