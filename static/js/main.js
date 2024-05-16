@@ -512,4 +512,121 @@ function displayInsiderTrades(data) {
     htmlContent += '</table>';
 
     table.innerHTML = htmlContent;
+    }
+////////////////////////////錄音檔轉文字/////////////////////////////
+let transcriptionText = "";
+let uploadedFileName = "";
+let progressInterval;
+
+function uploadAudio() {
+    const fileInput = document.getElementById('audioFile');
+    const file = fileInput.files[0];
+    uploadedFileName = file.name;
+
+    if (!file) {
+        alert('請選擇一個檔案！');
+        return;
+    }
+
+    // 清除之前的結果
+    clearPreviousResult();
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const progressBar = document.getElementById('progress-bar');
+    const progressContainer = document.getElementById('progress-container');
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
+
+    // 開始輪詢進度
+    progressInterval = setInterval(updateProgress, 500);
+
+    fetch('http://127.0.0.1:5000/transcribe', {
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            clearInterval(progressInterval); // 停止輪詢
+            progressBar.style.width = '100%'; // 確保進度條達到100%
+            console.log(data);
+            displayTranscription(data);
+            document.getElementById('downloadBtn').classList.remove('hidden');
+        })
+        .catch(error => {
+            clearInterval(progressInterval); // 停止輪詢
+            console.error('Error:', error);
+            alert('錯誤發生，請檢查網絡連接或服務器狀態！');
+        });
+}
+
+function updateProgress() {
+    fetch('http://127.0.0.1:5000/progress')
+        .then(response => response.json())
+        .then(data => {
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = data.progress + '%';
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function clearPreviousResult() {
+    const container = document.getElementById('transcriptionResult');
+    container.innerHTML = '';  // 清空先前的結果
+
+    // 隱藏下載和閱讀更多按鈕
+    document.getElementById('downloadBtn').classList.add('hidden');
+    document.getElementById('readMoreBtn').classList.add('hidden');
+    document.getElementById('readLessBtn').classList.add('hidden');
+    container.style.maxHeight = '200px';
+}
+
+function displayTranscription(data) {
+    const container = document.getElementById('transcriptionResult');
+    const progressContainer = document.getElementById('progress-container');
+    const readMoreBtn = document.getElementById('readMoreBtn');
+    const readLessBtn = document.getElementById('readLessBtn');
+    progressContainer.style.display = 'none';
+    container.innerHTML = '';  // 清空先前的結果
+    if (data.error) {
+        container.innerHTML = `<p>錯誤: ${data.error}</p>`;
+    } else {
+        transcriptionText = data.text || "無轉寫內容";
+        container.innerHTML = `<p>${transcriptionText.replace(/\n/g, '<br>')}</p>`;
+        if (container.scrollHeight > container.clientHeight) {
+            readMoreBtn.classList.remove('hidden');
+        } else {
+            readMoreBtn.classList.add('hidden');
+        }
+        readLessBtn.classList.add('hidden');
+    }
+}
+
+function toggleReadMore() {
+    const container = document.getElementById('transcriptionResult');
+    const readMoreBtn = document.getElementById('readMoreBtn');
+    const readLessBtn = document.getElementById('readLessBtn');
+    if (readMoreBtn.classList.contains('hidden')) {
+        container.style.maxHeight = '200px';
+        readMoreBtn.classList.remove('hidden');
+        readLessBtn.classList.add('hidden');
+    } else {
+        container.style.maxHeight = 'none';
+        readMoreBtn.classList.add('hidden');
+        readLessBtn.classList.remove('hidden');
+    }
+}
+
+function downloadTranscription() {
+    const blob = new Blob([transcriptionText], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = uploadedFileName.replace(/\.[^/.]+$/, "") + ".txt"; // 將文件名的擴展名改為 .txt
+    a.click();
 }

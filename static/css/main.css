@@ -110,11 +110,40 @@ th {
 .navbar-links a {
     width: 100px; /* 或其他適合的固定寬度 */
 }
-
 .container {
     background-color: #eae0d5; /* 容器背景色 */
     margin: 20px auto; /* 自動水平居中 */
     padding: 15px;
     border-radius: 5px; /* 圓角邊框 */
     text-align: center; /* 文本居中 */
+}
+
+#progress-container {
+    width: 70%; /* 設置進度條的寬度 */
+    margin: 20px auto; /* 使進度條居中顯示，並設置外邊距 */
+    background-color: #f3f3f3;
+    border-radius: 15px; /* 設置圓角 */
+    overflow: hidden; /* 隱藏超出範圍的內容 */
+    display: none;
+    height: 30px; /* 設置固定高度 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影效果 */
+    position: relative; /* 設置相對定位 */
+}
+#progress-bar {
+    width: 0;
+    height: 60%; /* 調整進度條高度 */
+    background-color: #4caf50;
+    border-radius: 15px; /* 設置圓角 */
+    transition: width 0.4s ease; /* 添加過渡效果 */
+    position: absolute; /* 設置絕對定位 */
+    left: 0; /* 讓進度條從左邊開始 */
+    top: 20%; /* 讓進度條從容器的中間開始 */
+}
+#transcriptionResult {
+    margin-top: 20px;
+    max-height: 200px;
+    overflow: hidden;
+}
+.hidden {
+    display: none;
 }
