@@ -7,6 +7,7 @@ import datetime
 from flask_cors import CORS
 import tempfile
 import torch
+import uuid
 
 # 禁用 FP16 使用 FP32
 os.environ["WHISPER_DISABLE_F16"] = "1"
@@ -42,26 +43,36 @@ def transcribe_handler():
         if file.filename == '':
             return jsonify({"error": "文件名為空"}), 400
         if file and file.filename.endswith((".mp3", ".m4a", ".mp4", ".mov")):
-            session['progress'] = 0
-            transcription_result = transcribe_audio(file)
-            return jsonify({"text": transcription_result})
+            session_id = str(uuid.uuid4())  # 生成唯一 session ID
+            session[session_id] = 0
+            transcription_result = transcribe_audio(file, session_id)
+            return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID
         return jsonify({"error": "無效的文件格式"}), 400
     except Exception as e:
         print(f"Error in transcribe_handler: {e}")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/progress')
-def progress():
-    return jsonify({"progress": session.get('progress', 0)})
+@app.route('/progress/<session_id>')
+def progress(session_id):
+    if session_id in session:
+        progress = session.get(session_id, 0)  # 獲取特定 session ID 的進度
+        return jsonify({"progress": progress})
+    else:
+        return jsonify({"error": "Session ID not found"}), 404
 
-def transcribe_audio(file):
+
+def transcribe_audio(file, session_id):
     try:
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_path = temp_file.name
             file.save(temp_path)
 
+        print(f"Transcribing file at {temp_path}")  # 添加日誌
+
         # 語音識別
         result = model.transcribe(temp_path)
+        print(f"Transcription result: {result}")  # 添加日誌
+
         segments = result['segments']
         total_segments = len(segments)
         transcriptions = []
@@ -81,15 +92,15 @@ def transcribe_audio(file):
 
             transcriptions.append(f"{start_formatted}-{end_formatted}: {transcription_traditional}")
 
-            # 更新進度
-            session['progress'] = int(((i + 1) / total_segments) * 100)
+            session[session_id] = int(((i + 1) / total_segments) * 100)  # 更新特定 session ID 的進度
 
-        os.remove(temp_path)  # 刪除臨時文件
-        session['progress'] = 100  # 設置為 100%，表示完成
+        os.remove(temp_path)
+        session[session_id] = 100
         return "\n".join(transcriptions)
     except Exception as e:
         print(f"Error in transcribe_audio: {e}")
         raise
+
 
 def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)

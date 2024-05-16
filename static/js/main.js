@@ -516,6 +516,7 @@ function displayInsiderTrades(data) {
 ////////////////////////////錄音檔轉文字/////////////////////////////
 let transcriptionText = "";
 let uploadedFileName = "";
+let sessionID = "";  // 新增 sessionID 變量
 let progressInterval;
 
 function uploadAudio() {
@@ -528,7 +529,6 @@ function uploadAudio() {
         return;
     }
 
-    // 清除之前的結果
     clearPreviousResult();
 
     const formData = new FormData();
@@ -539,7 +539,6 @@ function uploadAudio() {
     progressContainer.style.display = 'block';
     progressBar.style.width = '0%';
 
-    // 開始輪詢進度
     progressInterval = setInterval(updateProgress, 500);
 
     fetch('http://127.0.0.1:5000/transcribe', {
@@ -558,6 +557,7 @@ function uploadAudio() {
             console.log(data);
             displayTranscription(data);
             document.getElementById('downloadBtn').classList.remove('hidden');
+            sessionID = data.sessionID;  // 保存 session ID
         })
         .catch(error => {
             clearInterval(progressInterval); // 停止輪詢
@@ -567,7 +567,7 @@ function uploadAudio() {
 }
 
 function updateProgress() {
-    fetch('http://127.0.0.1:5000/progress')
+    fetch(`http://127.0.0.1:5000/progress/${sessionID}`)  // 在進度請求中傳遞 session ID
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
