@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, render_template, session
+from flask import Flask, request, jsonify, send_from_directory, session
 import whisper
 from opencc import OpenCC
 from deep_translator import GoogleTranslator
@@ -27,7 +27,11 @@ cc = OpenCC('s2twp')
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return send_from_directory('.', 'index.html')
+
+@app.route('/login')
+def login():
+    return send_from_directory('.', 'login.html')
 
 @app.route('/transcribe', methods=['POST'])
 def transcribe_handler():
