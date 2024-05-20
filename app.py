@@ -3,18 +3,17 @@ import whisper
 from opencc import OpenCC
 from deep_translator import GoogleTranslator
 import os
-import datetime
-from flask_cors import CORS
 import tempfile
 import torch
 import uuid
+from flask_cors import CORS
 
 # 禁用 FP16 使用 FP32
 os.environ["WHISPER_DISABLE_F16"] = "1"
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'  # 用於 session
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})  # 配置 CORS
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -60,7 +59,6 @@ def progress(session_id):
     else:
         return jsonify({"error": "Session ID not found"}), 404
 
-
 def transcribe_audio(file, session_id):
     try:
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
@@ -71,7 +69,7 @@ def transcribe_audio(file, session_id):
 
         # 語音識別
         result = model.transcribe(temp_path)
-        print(f"Transcription result: {result}")  # 添加日誌
+        #print(f"Transcription result: {result}")  # 添加日誌
 
         segments = result['segments']
         total_segments = len(segments)
@@ -100,7 +98,6 @@ def transcribe_audio(file, session_id):
     except Exception as e:
         print(f"Error in transcribe_audio: {e}")
         raise
-
 
 def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
