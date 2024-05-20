@@ -1,3 +1,7 @@
+document.getElementById('stockSymbol').addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
+});
+
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
     const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol'); // 获取上一次的股票代码
@@ -38,7 +42,6 @@ function fetchIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer');
 }
 
-
 function displayIncomeStatement(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
@@ -52,36 +55,84 @@ function displayIncomeStatement(data, container) {
     let rows = {
         date: ['Date'],
         symbol: ['Symbol'],
-        totalRevenue: ['Total Revenue'],
+        reportedCurrency: ['Reported Currency'],
+        cik: ['CIK'],
+        fillingDate: ['Filling Date'],
+        acceptedDate: ['Accepted Date'],
+        calendarYear: ['Calendar Year'],
+        period: ['Period'],
+        revenue: ['Revenue'],
         costOfRevenue: ['Cost of Revenue'],
         grossProfit: ['Gross Profit'],
+        grossProfitRatio: ['Gross Profit Ratio'],
         researchAndDevelopmentExpenses: ['Research and Development Expenses'],
+        generalAndAdministrativeExpenses: ['General and Administrative Expenses'],
+        sellingAndMarketingExpenses: ['Selling and Marketing Expenses'],
         sellingGeneralAndAdministrativeExpenses: ['Selling, General and Administrative Expenses'],
+        otherExpenses: ['Other Expenses'],
+        operatingExpenses: ['Operating Expenses'],
+        costAndExpenses: ['Cost and Expenses'],
+        interestIncome: ['Interest Income'],
         interestExpense: ['Interest Expense'],
+        depreciationAndAmortization: ['Depreciation and Amortization'],
+        ebitda: ['EBITDA'],
+        ebitdaratio: ['EBITDA Ratio'],
         operatingIncome: ['Operating Income'],
+        operatingIncomeRatio: ['Operating Income Ratio'],
+        totalOtherIncomeExpensesNet: ['Total Other Income Expenses Net'],
         incomeBeforeTax: ['Income Before Tax'],
+        incomeBeforeTaxRatio: ['Income Before Tax Ratio'],
+        incomeTaxExpense: ['Income Tax Expense'],
         netIncome: ['Net Income'],
         netIncomeRatio: ['Net Income Ratio'],
         eps: ['EPS'],
-        link: ['Report Link']
+        epsdiluted: ['EPS Diluted'],
+        weightedAverageShsOut: ['Weighted Average Shares Outstanding'],
+        weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
+        link: ['Report Link'],
+        finalLink: ['Final Link']
     };
 
     // 填充行数据
     data.forEach(entry => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
-        rows.totalRevenue.push(formatNumber(entry.revenue));
+        rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
+        rows.cik.push(entry.cik || 'N/A');
+        rows.fillingDate.push(entry.fillingDate || 'N/A');
+        rows.acceptedDate.push(entry.acceptedDate || 'N/A');
+        rows.calendarYear.push(entry.calendarYear || 'N/A');
+        rows.period.push(entry.period || 'N/A');
+        rows.revenue.push(formatNumber(entry.revenue));
         rows.costOfRevenue.push(formatNumber(entry.costOfRevenue));
         rows.grossProfit.push(formatNumber(entry.grossProfit));
+        rows.grossProfitRatio.push(entry.grossProfitRatio ? (entry.grossProfitRatio * 100).toFixed(2) + '%' : 'N/A');
         rows.researchAndDevelopmentExpenses.push(formatNumber(entry.researchAndDevelopmentExpenses));
+        rows.generalAndAdministrativeExpenses.push(formatNumber(entry.generalAndAdministrativeExpenses));
+        rows.sellingAndMarketingExpenses.push(formatNumber(entry.sellingAndMarketingExpenses));
         rows.sellingGeneralAndAdministrativeExpenses.push(formatNumber(entry.sellingGeneralAndAdministrativeExpenses));
+        rows.otherExpenses.push(formatNumber(entry.otherExpenses));
+        rows.operatingExpenses.push(formatNumber(entry.operatingExpenses));
+        rows.costAndExpenses.push(formatNumber(entry.costAndExpenses));
+        rows.interestIncome.push(formatNumber(entry.interestIncome));
         rows.interestExpense.push(formatNumber(entry.interestExpense));
+        rows.depreciationAndAmortization.push(formatNumber(entry.depreciationAndAmortization));
+        rows.ebitda.push(formatNumber(entry.ebitda));
+        rows.ebitdaratio.push(entry.ebitdaratio ? (entry.ebitdaratio * 100).toFixed(2) + '%' : 'N/A');
         rows.operatingIncome.push(formatNumber(entry.operatingIncome));
+        rows.operatingIncomeRatio.push(entry.operatingIncomeRatio ? (entry.operatingIncomeRatio * 100).toFixed(2) + '%' : 'N/A');
+        rows.totalOtherIncomeExpensesNet.push(formatNumber(entry.totalOtherIncomeExpensesNet));
         rows.incomeBeforeTax.push(formatNumber(entry.incomeBeforeTax));
+        rows.incomeBeforeTaxRatio.push(entry.incomeBeforeTaxRatio ? (entry.incomeBeforeTaxRatio * 100).toFixed(2) + '%' : 'N/A');
+        rows.incomeTaxExpense.push(formatNumber(entry.incomeTaxExpense));
         rows.netIncome.push(formatNumber(entry.netIncome));
         rows.netIncomeRatio.push(entry.netIncomeRatio ? (entry.netIncomeRatio * 100).toFixed(2) + '%' : 'N/A');
         rows.eps.push(entry.eps || 'N/A');
+        rows.epsdiluted.push(entry.epsdiluted || 'N/A');
+        rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
+        rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
         rows.link.push(`<a href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
     // 构建 HTML 表格
@@ -100,12 +151,6 @@ function displayIncomeStatement(data, container) {
     if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
 }
 
-
-
-function formatNumber(value) {
-    // Check if the value is numeric and format it, otherwise return 'N/A'
-    return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
-}
 function fetchData_IncomeStatement(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
@@ -128,6 +173,357 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId) {
             container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
         });
 }
+
+function formatNumber(value) {
+    // Check if the value is numeric and format it, otherwise return 'N/A'
+    return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
+}
+
+//////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
+function fetchBalanceSheet() {
+    stockSymbol = fetchStock();
+    const period = document.getElementById('period_2').value;  // 獲取選擇的時段
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainer');
+}
+
+function displayBalanceSheet(data, container) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<p>Data not available.</p>';
+        const expandButton = document.getElementById('expandButton_Balance');
+        if (expandButton) expandButton.style.display = 'none'; // 隐藏按钮
+        const collapseButton = document.getElementById('collapseButton_Balance');
+        if (collapseButton) collapseButton.style.display = 'none';
+        return;
+    }
+
+    let rows = {
+        date: ['Date'],
+        symbol: ['Symbol'],
+        reportedCurrency: ['Reported Currency'],
+        cik: ['CIK'],
+        fillingDate: ['Filling Date'],
+        acceptedDate: ['Accepted Date'],
+        calendarYear: ['Calendar Year'],
+        period: ['Period'],
+        cashAndCashEquivalents: ['Cash and Cash Equivalents'],
+        shortTermInvestments: ['Short Term Investments'],
+        cashAndShortTermInvestments: ['Cash and Short Term Investments'],
+        netReceivables: ['Net Receivables'],
+        inventory: ['Inventory'],
+        otherCurrentAssets: ['Other Current Assets'],
+        totalCurrentAssets: ['Total Current Assets'],
+        propertyPlantEquipmentNet: ['Property Plant Equipment Net'],
+        goodwill: ['Goodwill'],
+        intangibleAssets: ['Intangible Assets'],
+        goodwillAndIntangibleAssets: ['Goodwill and Intangible Assets'],
+        longTermInvestments: ['Long Term Investments'],
+        taxAssets: ['Tax Assets'],
+        otherNonCurrentAssets: ['Other Non-Current Assets'],
+        totalNonCurrentAssets: ['Total Non-Current Assets'],
+        otherAssets: ['Other Assets'],
+        totalAssets: ['Total Assets'],
+        accountPayables: ['Account Payables'],
+        shortTermDebt: ['Short Term Debt'],
+        taxPayables: ['Tax Payables'],
+        deferredRevenue: ['Deferred Revenue'],
+        otherCurrentLiabilities: ['Other Current Liabilities'],
+        totalCurrentLiabilities: ['Total Current Liabilities'],
+        longTermDebt: ['Long Term Debt'],
+        deferredRevenueNonCurrent: ['Deferred Revenue Non-Current'],
+        deferredTaxLiabilitiesNonCurrent: ['Deferred Tax Liabilities Non-Current'],
+        otherNonCurrentLiabilities: ['Other Non-Current Liabilities'],
+        totalNonCurrentLiabilities: ['Total Non-Current Liabilities'],
+        otherLiabilities: ['Other Liabilities'],
+        capitalLeaseObligations: ['Capital Lease Obligations'],
+        totalLiabilities: ['Total Liabilities'],
+        preferredStock: ['Preferred Stock'],
+        commonStock: ['Common Stock'],
+        retainedEarnings: ['Retained Earnings'],
+        accumulatedOtherComprehensiveIncomeLoss: ['Accumulated Other Comprehensive Income Loss'],
+        othertotalStockholdersEquity: ['Other Total Stockholders Equity'],
+        totalStockholdersEquity: ['Total Stockholders Equity'],
+        totalEquity: ['Total Equity'],
+        totalLiabilitiesAndStockholdersEquity: ['Total Liabilities and Stockholders Equity'],
+        minorityInterest: ['Minority Interest'],
+        totalLiabilitiesAndTotalEquity: ['Total Liabilities and Total Equity'],
+        totalInvestments: ['Total Investments'],
+        totalDebt: ['Total Debt'],
+        netDebt: ['Net Debt'],
+        link: ['Report Link'],
+        finalLink: ['Final Link']
+    };
+
+    // 填充行数据
+    data.forEach(entry => {
+        rows.date.push(entry.date || 'N/A');
+        rows.symbol.push(entry.symbol || 'N/A');
+        rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
+        rows.cik.push(entry.cik || 'N/A');
+        rows.fillingDate.push(entry.fillingDate || 'N/A');
+        rows.acceptedDate.push(entry.acceptedDate || 'N/A');
+        rows.calendarYear.push(entry.calendarYear || 'N/A');
+        rows.period.push(entry.period || 'N/A');
+        rows.cashAndCashEquivalents.push(formatNumber(entry.cashAndCashEquivalents));
+        rows.shortTermInvestments.push(formatNumber(entry.shortTermInvestments));
+        rows.cashAndShortTermInvestments.push(formatNumber(entry.cashAndShortTermInvestments));
+        rows.netReceivables.push(formatNumber(entry.netReceivables));
+        rows.inventory.push(formatNumber(entry.inventory));
+        rows.otherCurrentAssets.push(formatNumber(entry.otherCurrentAssets));
+        rows.totalCurrentAssets.push(formatNumber(entry.totalCurrentAssets));
+        rows.propertyPlantEquipmentNet.push(formatNumber(entry.propertyPlantEquipmentNet));
+        rows.goodwill.push(formatNumber(entry.goodwill));
+        rows.intangibleAssets.push(formatNumber(entry.intangibleAssets));
+        rows.goodwillAndIntangibleAssets.push(formatNumber(entry.goodwillAndIntangibleAssets));
+        rows.longTermInvestments.push(formatNumber(entry.longTermInvestments));
+        rows.taxAssets.push(formatNumber(entry.taxAssets));
+        rows.otherNonCurrentAssets.push(formatNumber(entry.otherNonCurrentAssets));
+        rows.totalNonCurrentAssets.push(formatNumber(entry.totalNonCurrentAssets));
+        rows.otherAssets.push(formatNumber(entry.otherAssets));
+        rows.totalAssets.push(formatNumber(entry.totalAssets));
+        rows.accountPayables.push(formatNumber(entry.accountPayables));
+        rows.shortTermDebt.push(formatNumber(entry.shortTermDebt));
+        rows.taxPayables.push(formatNumber(entry.taxPayables));
+        rows.deferredRevenue.push(formatNumber(entry.deferredRevenue));
+        rows.otherCurrentLiabilities.push(formatNumber(entry.otherCurrentLiabilities));
+        rows.totalCurrentLiabilities.push(formatNumber(entry.totalCurrentLiabilities));
+        rows.longTermDebt.push(formatNumber(entry.longTermDebt));
+        rows.deferredRevenueNonCurrent.push(formatNumber(entry.deferredRevenueNonCurrent));
+        rows.deferredTaxLiabilitiesNonCurrent.push(formatNumber(entry.deferredTaxLiabilitiesNonCurrent));
+        rows.otherNonCurrentLiabilities.push(formatNumber(entry.otherNonCurrentLiabilities));
+        rows.totalNonCurrentLiabilities.push(formatNumber(entry.totalNonCurrentLiabilities));
+        rows.otherLiabilities.push(formatNumber(entry.otherLiabilities));
+        rows.capitalLeaseObligations.push(formatNumber(entry.capitalLeaseObligations));
+        rows.totalLiabilities.push(formatNumber(entry.totalLiabilities));
+        rows.preferredStock.push(formatNumber(entry.preferredStock));
+        rows.commonStock.push(formatNumber(entry.commonStock));
+        rows.retainedEarnings.push(formatNumber(entry.retainedEarnings));
+        rows.accumulatedOtherComprehensiveIncomeLoss.push(formatNumber(entry.accumulatedOtherComprehensiveIncomeLoss));
+        rows.othertotalStockholdersEquity.push(formatNumber(entry.othertotalStockholdersEquity));
+        rows.totalStockholdersEquity.push(formatNumber(entry.totalStockholdersEquity));
+        rows.totalEquity.push(formatNumber(entry.totalEquity));
+        rows.totalLiabilitiesAndStockholdersEquity.push(formatNumber(entry.totalLiabilitiesAndStockholdersEquity));
+        rows.minorityInterest.push(formatNumber(entry.minorityInterest));
+        rows.totalLiabilitiesAndTotalEquity.push(formatNumber(entry.totalLiabilitiesAndTotalEquity));
+        rows.totalInvestments.push(formatNumber(entry.totalInvestments));
+        rows.totalDebt.push(formatNumber(entry.totalDebt));
+        rows.netDebt.push(formatNumber(entry.netDebt));
+        rows.link.push(`<a href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
+    });
+
+    // 构建 HTML 表格
+    let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
+    Object.keys(rows).forEach(key => {
+        htmlContent += `<tr><th>${rows[key][0]}</th>`;
+        rows[key].slice(1).forEach(value => {
+            htmlContent += `<td>${value}</td>`;
+        });
+        htmlContent += '</tr>';
+    });
+    htmlContent += '</table>';
+
+    container.innerHTML = htmlContent;
+    const expandButton = document.getElementById('expandButton_Balance');
+    if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
+}
+
+function fetchData_BalanceSheet(apiUrl, callback, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '<p>Loading...</p>';
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            // 檢查回應資料是否為 undefined 或非陣列
+            if (data === undefined || !Array.isArray(data)) {
+                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
+            } else {
+                if (data.length > 0) {
+                    callback(data, container);  // 修改這裡以傳遞整個數據陣列
+                } else {
+                    container.innerHTML = '<p>No data found for this symbol.</p>';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data: ', error);
+            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
+        });
+}
+
+function formatNumber(value) {
+    // Check if the value is numeric and format it, otherwise return 'N/A'
+    return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
+}
+
+
+
+///////////////////////////////////現金流表Cashflow///////////////
+function fetchCashflow() {
+    const stockSymbol = fetchStock();
+    const period = document.getElementById('period_3').value;  // 獲取選擇的時段
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainer');
+}
+
+function displayCashflow(data, container) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<p>Data not available.</p>';
+        const expandButton = document.getElementById('expandButton_Cashflow');
+        if (expandButton) expandButton.style.display = 'none'; // 隐藏按钮
+        const collapseButton = document.getElementById('collapseButton_Cashflow');
+        if (collapseButton) collapseButton.style.display = 'none';
+        return;
+    }
+
+    let rows = {
+        date: ['Date'],
+        symbol: ['Symbol'],
+        reportedCurrency: ['Reported Currency'],
+        cik: ['CIK'],
+        fillingDate: ['Filling Date'],
+        acceptedDate: ['Accepted Date'],
+        calendarYear: ['Calendar Year'],
+        period: ['Period'],
+        netIncome: ['Net Income'],
+        depreciationAndAmortization: ['Depreciation and Amortization'],
+        deferredIncomeTax: ['Deferred Income Tax'],
+        stockBasedCompensation: ['Stock Based Compensation'],
+        changeInWorkingCapital: ['Change in Working Capital'],
+        accountsReceivables: ['Accounts Receivables'],
+        inventory: ['Inventory'],
+        accountsPayables: ['Accounts Payables'],
+        otherWorkingCapital: ['Other Working Capital'],
+        otherNonCashItems: ['Other Non-Cash Items'],
+        netCashProvidedByOperatingActivities: ['Net Cash Provided by Operating Activities'],
+        investmentsInPropertyPlantAndEquipment: ['Investments in Property Plant and Equipment'],
+        acquisitionsNet: ['Acquisitions Net'],
+        purchasesOfInvestments: ['Purchases of Investments'],
+        salesMaturitiesOfInvestments: ['Sales/Maturities of Investments'],
+        otherInvestingActivites: ['Other Investing Activities'],
+        netCashUsedForInvestingActivites: ['Net Cash Used for Investing Activities'],
+        debtRepayment: ['Debt Repayment'],
+        commonStockIssued: ['Common Stock Issued'],
+        commonStockRepurchased: ['Common Stock Repurchased'],
+        dividendsPaid: ['Dividends Paid'],
+        otherFinancingActivites: ['Other Financing Activities'],
+        netCashUsedProvidedByFinancingActivities: ['Net Cash Used/Provided by Financing Activities'],
+        effectOfForexChangesOnCash: ['Effect of Forex Changes on Cash'],
+        netChangeInCash: ['Net Change in Cash'],
+        cashAtEndOfPeriod: ['Cash at End of Period'],
+        cashAtBeginningOfPeriod: ['Cash at Beginning of Period'],
+        operatingCashFlow: ['Operating Cash Flow'],
+        capitalExpenditure: ['Capital Expenditure'],
+        freeCashFlow: ['Free Cash Flow'],
+        link: ['Report Link'],
+        finalLink: ['Final Link']
+    };
+
+    // 填充行数据
+    data.forEach(entry => {
+        rows.date.push(entry.date || 'N/A');
+        rows.symbol.push(entry.symbol || 'N/A');
+        rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
+        rows.cik.push(entry.cik || 'N/A');
+        rows.fillingDate.push(entry.fillingDate || 'N/A');
+        rows.acceptedDate.push(entry.acceptedDate || 'N/A');
+        rows.calendarYear.push(entry.calendarYear || 'N/A');
+        rows.period.push(entry.period || 'N/A');
+        rows.netIncome.push(formatNumber(entry.netIncome));
+        rows.depreciationAndAmortization.push(formatNumber(entry.depreciationAndAmortization));
+        rows.deferredIncomeTax.push(formatNumber(entry.deferredIncomeTax));
+        rows.stockBasedCompensation.push(formatNumber(entry.stockBasedCompensation));
+        rows.changeInWorkingCapital.push(formatNumber(entry.changeInWorkingCapital));
+        rows.accountsReceivables.push(formatNumber(entry.accountsReceivables));
+        rows.inventory.push(formatNumber(entry.inventory));
+        rows.accountsPayables.push(formatNumber(entry.accountsPayables));
+        rows.otherWorkingCapital.push(formatNumber(entry.otherWorkingCapital));
+        rows.otherNonCashItems.push(formatNumber(entry.otherNonCashItems));
+        rows.netCashProvidedByOperatingActivities.push(formatNumber(entry.netCashProvidedByOperatingActivities));
+        rows.investmentsInPropertyPlantAndEquipment.push(formatNumber(entry.investmentsInPropertyPlantAndEquipment));
+        rows.acquisitionsNet.push(formatNumber(entry.acquisitionsNet));
+        rows.purchasesOfInvestments.push(formatNumber(entry.purchasesOfInvestments));
+        rows.salesMaturitiesOfInvestments.push(formatNumber(entry.salesMaturitiesOfInvestments));
+        rows.otherInvestingActivites.push(formatNumber(entry.otherInvestingActivites));
+        rows.netCashUsedForInvestingActivites.push(formatNumber(entry.netCashUsedForInvestingActivites));
+        rows.debtRepayment.push(formatNumber(entry.debtRepayment));
+        rows.commonStockIssued.push(formatNumber(entry.commonStockIssued));
+        rows.commonStockRepurchased.push(formatNumber(entry.commonStockRepurchased));
+        rows.dividendsPaid.push(formatNumber(entry.dividendsPaid));
+        rows.otherFinancingActivites.push(formatNumber(entry.otherFinancingActivites));
+        rows.netCashUsedProvidedByFinancingActivities.push(formatNumber(entry.netCashUsedProvidedByFinancingActivities));
+        rows.effectOfForexChangesOnCash.push(formatNumber(entry.effectOfForexChangesOnCash));
+        rows.netChangeInCash.push(formatNumber(entry.netChangeInCash));
+        rows.cashAtEndOfPeriod.push(formatNumber(entry.cashAtEndOfPeriod));
+        rows.cashAtBeginningOfPeriod.push(formatNumber(entry.cashAtBeginningOfPeriod));
+        rows.operatingCashFlow.push(formatNumber(entry.operatingCashFlow));
+        rows.capitalExpenditure.push(formatNumber(entry.capitalExpenditure));
+        rows.freeCashFlow.push(formatNumber(entry.freeCashFlow));
+        rows.link.push(`<a href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
+    });
+
+    // 构建 HTML 表格
+    let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
+    Object.keys(rows).forEach(key => {
+        htmlContent += `<tr><th>${rows[key][0]}</th>`;
+        rows[key].slice(1).forEach(value => {
+            htmlContent += `<td>${value}</td>`;
+        });
+        htmlContent += '</tr>';
+    });
+    htmlContent += '</table>';
+
+    container.innerHTML = htmlContent;
+    const expandButton = document.getElementById('expandButton_Cashflow');
+    if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
+}
+
+function fetchData_Cashflow(apiUrl, callback, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '<p>Loading...</p>';
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            // 檢查回應資料是否為 undefined 或非陣列
+            if (data === undefined || !Array.isArray(data)) {
+                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
+            } else {
+                if (data.length > 0) {
+                    callback(data, container);  // 修改這裡以傳遞整個數據陣列
+                } else {
+                    container.innerHTML = '<p>No data found for this symbol.</p>';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data: ', error);
+            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
+        });
+}
+
+function formatNumber(value) {
+    // Check if the value is numeric and format it, otherwise return 'N/A'
+    return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
+}
+
+
+
+
 
 //////////////法說會逐字稿 Earnings Call Transcript/////////////////
 function fetchEarningsCallTranscript() {

@@ -19,7 +19,7 @@
 
 
     <h1>Financial Data</h1>
-    <input type="text" id="stockSymbol" placeholder="輸入美股代碼">
+    <input type="text" id="stockSymbol" placeholder="輸入美股代碼" pattern="[A-Z]*">
     <button onclick="fetchStock()">確定</button>
     <p id="outputSymbol" data-last-symbol="">現在查詢的是：</p>
 
@@ -38,6 +38,36 @@
         </table>
     </div>
     </div>
+
+
+    <div>
+        <h2>資產負債表 Balance Sheet Statements</h2>
+        <label for="period_2">選擇時段：</label>
+        <select id="period_2">
+            <option value="annual">Annual</option>
+            <option value="quarter">Quarter</option>
+        </select>
+        <button onclick="fetchBalanceSheet()">載入報表</button>
+        <div class="scroll-container">
+            <table id="balanceSheetTable" border="1" style="width: 100%; border-collapse: collapse;">
+                <div id="balanceSheetContainer"></div>
+            </table>
+        </div>
+    </div>
+
+    <div>
+        <h2>現金流表 Cashflow Sheet Statements</h2>
+        <label for="period_3">選擇時段：</label>
+        <select id="period_3">
+            <option value="annual">Annual</option>
+            <option value="quarter">Quarter</option>
+        </select>
+        <button onclick="fetchCashflow()">載入報表</button>
+        <div class="scroll-container">
+            <div id="cashflowContainer"></div>
+        </div>
+    </div>
+
 
 
     <div>
