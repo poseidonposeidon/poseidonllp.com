@@ -104,5 +104,7 @@ def format_time(seconds):
     minutes, seconds = divmod(remainder, 60)
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
+# if __name__ == '__main__':
+#     app.run(debug=True, port=5000)
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+   app.run(host='0.0.0.0', port=5000)
