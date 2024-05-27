@@ -937,7 +937,7 @@ function uploadAudio() {
 
     progressInterval = setInterval(updateProgress, 500);
 
-    fetch('https://cf49-114-37-199-17.ngrok-free.app/transcribe', {
+    fetch('https://698b-114-37-199-17.ngrok-free.app/transcribe', {
         method: 'POST',
         body: formData
     })
@@ -963,7 +963,7 @@ function uploadAudio() {
 }
 
 function updateProgress() {
-    fetch(`https://cf49-114-37-199-17.ngrok-free.app/progress/${sessionID}`)
+    fetch(`https://698b-114-37-199-17.ngrok-free.app/progress/${sessionID}`)
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
