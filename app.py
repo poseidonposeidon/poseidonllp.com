@@ -7,11 +7,13 @@ import tempfile
 import torch
 import uuid
 from flask_cors import CORS
+from werkzeug.utils import secure_filename
 
 # 禁用 FP16 使用 FP32
 os.environ["WHISPER_DISABLE_F16"] = "1"
 
 app = Flask(__name__)
+app.config['MAX_CONTENT_LENGTH'] = 200 * 1024 * 1024  # 設置為200MB
 app.secret_key = 'supersecretkey'  # 用於 session
 CORS(app, resources={r"/*": {"origins": "*"}})  # 配置 CORS
 
@@ -24,6 +26,11 @@ model = whisper.load_model("large-v2").to(device)
 translator = GoogleTranslator(source='auto', target='zh-TW')
 # 簡體轉繁體轉換器
 cc = OpenCC('s2twp')
+
+@app.before_request
+def log_request_info():
+    ip_address = request.remote_addr
+    # print(f"New request from IP: {ip_address}")
 
 @app.route('/')
 def index():
@@ -51,7 +58,7 @@ def transcribe_handler():
         print(f"Error in transcribe_handler: {e}")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/progress/<session_id>')
+@app.route('/progress/<session_id>', methods=['GET'])
 def progress(session_id):
     if session_id in session:
         progress = session.get(session_id, 0)  # 獲取特定 session ID 的進度
@@ -61,6 +68,7 @@ def progress(session_id):
 
 def transcribe_audio(file, session_id):
     try:
+        filename = secure_filename(file.filename)
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_path = temp_file.name
             file.save(temp_path)
@@ -69,7 +77,6 @@ def transcribe_audio(file, session_id):
 
         # 語音識別
         result = model.transcribe(temp_path)
-        #print(f"Transcription result: {result}")  # 添加日誌
 
         segments = result['segments']
         total_segments = len(segments)
@@ -104,7 +111,5 @@ def format_time(seconds):
     minutes, seconds = divmod(remainder, 60)
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
-# if __name__ == '__main__':
-#     app.run(debug=True, port=5000)
 if __name__ == '__main__':
-   app.run(host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000)

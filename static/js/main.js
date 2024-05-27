@@ -937,7 +937,7 @@ function uploadAudio() {
 
     progressInterval = setInterval(updateProgress, 500);
 
-    fetch('http://127.0.0.1:5000/transcribe', {
+    fetch('https://cf49-114-37-199-17.ngrok-free.app/transcribe', {
         method: 'POST',
         body: formData
     })
@@ -963,7 +963,7 @@ function uploadAudio() {
 }
 
 function updateProgress() {
-    fetch(`http://127.0.0.1:5000/progress/${sessionID}`)  // 在進度請求中傳遞 session ID
+    fetch(`https://cf49-114-37-199-17.ngrok-free.app/progress/${sessionID}`)
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
