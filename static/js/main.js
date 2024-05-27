@@ -912,7 +912,7 @@ function displayInsiderTrades(data) {
 ////////////////////////////錄音檔轉文字/////////////////////////////
 let transcriptionText = "";
 let uploadedFileName = "";
-let sessionID = "";  // 新增 sessionID 變量
+let sessionID = "";
 let progressInterval;
 
 function uploadAudio() {
@@ -935,9 +935,9 @@ function uploadAudio() {
     progressContainer.style.display = 'block';
     progressBar.style.width = '0%';
 
-    progressInterval = setInterval(updateProgress, 500);
+    progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
 
-    fetch('https://698b-114-37-199-17.ngrok-free.app/transcribe', {
+    fetch('https://698b-114-37-199-17.ngrok-free.app/transcribe', {  // 確認使用了正確的URL和端口
         method: 'POST',
         body: formData
     })
@@ -963,7 +963,7 @@ function uploadAudio() {
 }
 
 function updateProgress() {
-    fetch(`https://698b-114-37-199-17.ngrok-free.app/progress/${sessionID}`)
+    fetch(`https://698b-114-37-199-17.ngrok-free.app/progress/${sessionID}`)  // 確認使用了正確的URL和sessionID
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
@@ -1026,3 +1026,4 @@ function downloadTranscription() {
     a.download = uploadedFileName.replace(/\.[^/.]+$/, "") + ".txt"; // 將文件名的擴展名改為 .txt
     a.click();
 }
+
