@@ -937,7 +937,7 @@ function uploadAudio() {
 
     progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
 
-    fetch('http://api.poseidonllp.com:8084/transcribe', {  // 更新為新的 ngrok URL
+    fetch('http://api.poseidonllp.com:8084/transcribe', {
         method: 'POST',
         body: formData
     })
@@ -960,6 +960,7 @@ function uploadAudio() {
             console.error('Error:', error);
             alert('錯誤發生，請檢查網絡連接或服務器狀態！');
         });
+
 }
 
 function updateProgress() {
