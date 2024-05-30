@@ -937,7 +937,7 @@ function uploadAudio() {
 
     progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
 
-    fetch('https://api.poseidonllp.com/transcribe', {  // 使用標準的 HTTPS 端口
+    fetch('https://www.poseidonllp.com/transcribe', {  // 使用正確的 HTTPS 端口
         method: 'POST',
         body: formData
     })
@@ -963,7 +963,7 @@ function uploadAudio() {
 }
 
 function updateProgress() {
-    fetch(`https://api.poseidonllp.com/progress/${sessionID}`)  // 使用標準的 HTTPS 端口
+    fetch(`https://www.poseidonllp.com/progress/${sessionID}`)  // 使用正確的 HTTPS 端口
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');

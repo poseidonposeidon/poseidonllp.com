@@ -10,6 +10,7 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from flask import copy_current_request_context
+from flask_talisman import Talisman
 
 # 禁用 FP16 使用 FP32
 os.environ["WHISPER_DISABLE_F16"] = "1"
@@ -18,6 +19,7 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 設置為500MB
 app.secret_key = 'supersecretkey'  # 用於 session
 CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)  # 配置 CORS
+Talisman(app)
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -26,9 +28,7 @@ model = whisper.load_model("large-v2").to(device)
 
 # 初始化翻譯器
 translator = GoogleTranslator(source='auto', target='zh-TW')
-# 簡體轉繁體轉換器
 cc = OpenCC('s2twp')
-
 executor = ThreadPoolExecutor(max_workers=4)
 
 @app.before_request
