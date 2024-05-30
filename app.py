@@ -65,7 +65,7 @@ def transcribe_handler():
 
             future = executor.submit(transcribe_and_store, file, session_id)
             try:
-                transcription_result = future.result(timeout=300)  # 設置超時時間為300秒
+                transcription_result = future.result(timeout=3600)  # 設置超時時間為1200秒
             except FuturesTimeoutError:
                 return jsonify({"error": "轉錄超時"}), 500
             return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID
