@@ -937,7 +937,7 @@ function uploadAudio() {
 
     progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
 
-    fetch('http://api.poseidonllp.com:8084/transcribe', {
+    fetch('https://api.poseidonllp.com:8084/transcribe', {
         method: 'POST',
         body: formData
     })
@@ -964,7 +964,7 @@ function uploadAudio() {
 }
 
 function updateProgress() {
-    fetch(`http://api.poseidonllp.com:8084/progress/${sessionID}`)  // 更新為新的 ngrok URL
+    fetch(`https://api.poseidonllp.com:8084/progress/${sessionID}`)  // 更新為新的 ngrok URL
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
