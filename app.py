@@ -17,7 +17,7 @@ os.environ["WHISPER_DISABLE_F16"] = "1"
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 設置為500MB
 app.secret_key = 'supersecretkey'  # 用於 session
-CORS(app, resources={r"/*": {"origins": "*"}})  # 配置 CORS
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)  # 配置 CORS
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -34,7 +34,7 @@ executor = ThreadPoolExecutor(max_workers=4)
 @app.before_request
 def log_request_info():
     ip_address = request.remote_addr
-    # print(f"New request from IP: {ip_address}")
+    print(f"New request from IP: {ip_address}")
 
 @app.route('/')
 def index():
@@ -65,7 +65,7 @@ def transcribe_handler():
 
             future = executor.submit(transcribe_and_store, file, session_id)
             try:
-                transcription_result = future.result(timeout=3600)  # 設置超時時間為1200秒
+                transcription_result = future.result(timeout=3600)  # 設置超時時間為3600秒
             except FuturesTimeoutError:
                 return jsonify({"error": "轉錄超時"}), 500
             return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID

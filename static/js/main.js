@@ -937,7 +937,7 @@ function uploadAudio() {
 
     progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
 
-    fetch('https://api.poseidonllp.com:8084/transcribe', {
+    fetch('https://api.poseidonllp.com/transcribe', {  // 使用標準的 HTTPS 端口
         method: 'POST',
         body: formData
     })
@@ -960,11 +960,10 @@ function uploadAudio() {
             console.error('Error:', error);
             alert('錯誤發生，請檢查網絡連接或服務器狀態！');
         });
-
 }
 
 function updateProgress() {
-    fetch(`https://api.poseidonllp.com:8084/progress/${sessionID}`)  // 更新為新的 ngrok URL
+    fetch(`https://api.poseidonllp.com/progress/${sessionID}`)  // 使用標準的 HTTPS 端口
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
