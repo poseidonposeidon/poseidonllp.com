@@ -124,11 +124,9 @@
         <input type="file" id="audioFile" accept="audio/*">
         <button onclick="uploadAudio()">上傳錄音檔</button>
         <button id="downloadBtn" class="hidden" onclick="downloadTranscription()">下載文字檔</button>
-        <div id="upload-progress-container" style="display: none;">
-            <div id="upload-progress-bar" style="width: 0%; height: 20px; background-color: #4caf50;"></div>
-        </div>
-        <div id="progress-container" style="display: none;">
-            <div id="progress-bar" style="width: 0%; height: 20px; background-color: #4caf50;"></div>
+        <div id="progress-container" style="display: none; text-align: center;">
+            <div class="loader"></div>
+            <p id="progress-text">轉檔中...</p>
         </div>
         <div class="scroll-container" id="transcriptionResult">
             <!-- 轉寫結果將顯示在這裡 -->

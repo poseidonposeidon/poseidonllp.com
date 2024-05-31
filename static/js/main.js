@@ -930,32 +930,17 @@ function uploadAudio() {
     const formData = new FormData();
     formData.append('file', file);
 
-    const progressBar = document.getElementById('progress-bar');
     const progressContainer = document.getElementById('progress-container');
-    const uploadProgressBar = document.getElementById('upload-progress-bar');
-    const uploadProgressContainer = document.getElementById('upload-progress-container');
 
     progressContainer.style.display = 'block';
-    progressBar.style.width = '0%';
-
-    uploadProgressContainer.style.display = 'block';
-    uploadProgressBar.style.width = '0%';
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "https://eaa5-114-37-169-177.ngrok-free.app/transcribe", true);
 
-    xhr.upload.onprogress = function (event) {
-        if (event.lengthComputable) {
-            const percentComplete = (event.loaded / event.total) * 100;
-            uploadProgressBar.style.width = percentComplete + '%';
-        }
-    };
-
     xhr.onload = function () {
         if (xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
-            clearInterval(progressInterval);
-            uploadProgressContainer.style.display = 'none'; // 隱藏上傳進度條
+            progressContainer.style.display = 'none'; // 隱藏進度條動畫
             displayTranscription(response);
             document.getElementById('downloadBtn').classList.remove('hidden');
             sessionID = response.sessionID;
@@ -966,7 +951,7 @@ function uploadAudio() {
     };
 
     xhr.onerror = function () {
-        clearInterval(progressInterval);
+        progressContainer.style.display = 'none'; // 隱藏進度條動畫
         alert('錯誤發生，請檢查網絡連接或服務器狀態！');
         console.error('上傳錯誤', xhr.statusText);
     };
@@ -982,8 +967,6 @@ function updateProgress() {
     fetch(`https://eaa5-114-37-169-177.ngrok-free.app/progress/${sessionID}`)
         .then(response => response.json())
         .then(data => {
-            const progressBar = document.getElementById('progress-bar');
-            progressBar.style.width = data.progress + '%';
             if (data.progress === 100) {
                 clearInterval(progressInterval);
             }
