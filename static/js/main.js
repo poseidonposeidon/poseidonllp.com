@@ -941,8 +941,6 @@ function uploadAudio() {
     uploadProgressContainer.style.display = 'block';
     uploadProgressBar.style.width = '0%';
 
-    progressInterval = setInterval(updateProgress, 1000); // 縮短間隔時間至1秒
-
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "https://eaa5-114-37-169-177.ngrok-free.app/transcribe", true);
 
@@ -955,12 +953,13 @@ function uploadAudio() {
 
     xhr.onload = function () {
         if (xhr.status === 200) {
+            const response = JSON.parse(xhr.responseText);
             clearInterval(progressInterval);
             uploadProgressContainer.style.display = 'none'; // 隱藏上傳進度條
-            const response = JSON.parse(xhr.responseText);
             displayTranscription(response);
             document.getElementById('downloadBtn').classList.remove('hidden');
             sessionID = response.sessionID;
+            startTranscriptionProgress();
         } else {
             alert('上傳失敗，請重試');
         }
@@ -975,12 +974,19 @@ function uploadAudio() {
     xhr.send(formData);
 }
 
+function startTranscriptionProgress() {
+    progressInterval = setInterval(updateProgress, 1000);
+}
+
 function updateProgress() {
     fetch(`https://eaa5-114-37-169-177.ngrok-free.app/progress/${sessionID}`)
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
             progressBar.style.width = data.progress + '%';
+            if (data.progress === 100) {
+                clearInterval(progressInterval);
+            }
         })
         .catch(error => console.error('Error:', error));
 }
@@ -1039,4 +1045,3 @@ function downloadTranscription() {
     a.download = uploadedFileName.replace(/\.[^/.]+$/, "") + ".txt"; // 將文件名的擴展名改為 .txt
     a.click();
 }
-
