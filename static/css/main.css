@@ -134,6 +134,17 @@ th {
     100% { transform: rotate(360deg); }
 }
 
+#upload-progress-bar {
+    height: 20px;
+    background-color: #4caf50;
+}
+
+#upload-progress-text, #transcription-progress-text {
+    margin-top: 10px;
+    font-size: 18px;
+    color: #333;
+}
+
 #progress-text {
     margin-top: 20px;
     font-size: 18px;

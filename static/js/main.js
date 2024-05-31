@@ -930,19 +930,28 @@ function uploadAudio() {
     const formData = new FormData();
     formData.append('file', file);
 
-    const progressContainer = document.getElementById('progress-container');
+    const uploadProgressContainer = document.getElementById('upload-progress-container');
+    const uploadProgressBar = document.getElementById('upload-progress-bar');
+    const transcriptionProgressContainer = document.getElementById('transcription-progress-container');
 
-    progressContainer.style.display = 'block';
+    uploadProgressContainer.style.display = 'block';
+    uploadProgressBar.style.width = '0%';
 
     const xhr = new XMLHttpRequest();
     xhr.open("POST", "https://eaa5-114-37-169-177.ngrok-free.app/transcribe", true);
 
+    xhr.upload.onprogress = function (event) {
+        if (event.lengthComputable) {
+            const percentComplete = (event.loaded / event.total) * 100;
+            uploadProgressBar.style.width = percentComplete + '%';
+        }
+    };
+
     xhr.onload = function () {
         if (xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
-            progressContainer.style.display = 'none'; // 隱藏進度條動畫
-            displayTranscription(response);
-            document.getElementById('downloadBtn').classList.remove('hidden');
+            uploadProgressContainer.style.display = 'none'; // 隱藏上傳進度條
+            transcriptionProgressContainer.style.display = 'block'; // 顯示轉檔動畫
             sessionID = response.sessionID;
             startTranscriptionProgress();
         } else {
@@ -951,7 +960,7 @@ function uploadAudio() {
     };
 
     xhr.onerror = function () {
-        progressContainer.style.display = 'none'; // 隱藏進度條動畫
+        uploadProgressContainer.style.display = 'none'; // 隱藏上傳進度條
         alert('錯誤發生，請檢查網絡連接或服務器狀態！');
         console.error('上傳錯誤', xhr.statusText);
     };
@@ -969,6 +978,8 @@ function updateProgress() {
         .then(data => {
             if (data.progress === 100) {
                 clearInterval(progressInterval);
+                document.getElementById('transcription-progress-container').style.display = 'none'; // 隱藏轉檔動畫
+                displayTranscription(data);
             }
         })
         .catch(error => console.error('Error:', error));
@@ -987,16 +998,14 @@ function clearPreviousResult() {
 
 function displayTranscription(data) {
     const container = document.getElementById('transcriptionResult');
-    const progressContainer = document.getElementById('progress-container');
-    const readMoreBtn = document.getElementById('readMoreBtn');
-    const readLessBtn = document.getElementById('readLessBtn');
-    progressContainer.style.display = 'none';
     container.innerHTML = '';  // 清空先前的結果
     if (data.error) {
         container.innerHTML = `<p>錯誤: ${data.error}</p>`;
     } else {
         transcriptionText = data.text || "無轉寫內容";
         container.innerHTML = `<p>${transcriptionText.replace(/\n/g, '<br>')}</p>`;
+        const readMoreBtn = document.getElementById('readMoreBtn');
+        const readLessBtn = document.getElementById('readLessBtn');
         if (container.scrollHeight > container.clientHeight) {
             readMoreBtn.classList.remove('hidden');
         } else {
