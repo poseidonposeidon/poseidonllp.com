@@ -930,70 +930,44 @@ function uploadAudio() {
     const formData = new FormData();
     formData.append('file', file);
 
-    const uploadProgressContainer = document.getElementById('upload-progress-container');
-    const uploadProgressBar = document.getElementById('upload-progress-bar');
-    const transcriptionProgressContainer = document.getElementById('transcription-progress-container');
+    const progressBar = document.getElementById('progress-bar');
+    const progressContainer = document.getElementById('progress-container');
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
 
-    uploadProgressContainer.style.display = 'block';
-    uploadProgressBar.style.width = '0%';
+    progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
 
-    const xhr = new XMLHttpRequest();
-    xhr.open("POST", "https://eaa5-114-37-169-177.ngrok-free.app/transcribe", true);
-
-    xhr.upload.onprogress = function (event) {
-        if (event.lengthComputable) {
-            const percentComplete = (event.loaded / event.total) * 100;
-            uploadProgressBar.style.width = percentComplete + '%';
-        }
-    };
-
-    xhr.onload = function () {
-        if (xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            if (response.error) {
-                alert(response.error);
-                return;
+    fetch('https://8...content-available-to-author-only...e.app/transcribe', {  // 更新為新的 ngrok URL
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
             }
-            uploadProgressContainer.style.display = 'none'; // 隱藏上傳進度條
-            transcriptionProgressContainer.style.display = 'block'; // 顯示轉檔動畫
-            sessionID = response.sessionID;
-            startTranscriptionProgress();
-        } else {
-            alert('上傳失敗，請重試');
-        }
-    };
-
-    xhr.onerror = function () {
-        uploadProgressContainer.style.display = 'none'; // 隱藏上傳進度條
-        alert('錯誤發生，請檢查網絡連接或服務器狀態！');
-        console.error('上傳錯誤', xhr.statusText);
-    };
-
-    xhr.send(formData);
-}
-
-function startTranscriptionProgress() {
-    progressInterval = setInterval(updateProgress, 1000);
+            return response.json();
+        })
+        .then(data => {
+            clearInterval(progressInterval); // 停止輪詢
+            progressBar.style.width = '100%'; // 確保進度條達到100%
+            console.log(data);
+            displayTranscription(data);
+            document.getElementById('downloadBtn').classList.remove('hidden');
+            sessionID = data.sessionID;  // 保存 session ID
+        })
+        .catch(error => {
+            clearInterval(progressInterval); // 停止輪詢
+            console.error('Error:', error);
+            alert('錯誤發生，請檢查網絡連接或服務器狀態！');
+        });
 }
 
 function updateProgress() {
-    fetch(`https://eaa5-114-37-169-177.ngrok-free.app/progress/${sessionID}`)
+    fetch(`https://8...content-available-to-author-only...e.app/progress/${sessionID}`)  // 更新為新的 ngrok URL
         .then(response => response.json())
         .then(data => {
-            if (data.progress === 100) {
-                clearInterval(progressInterval);
-                fetchTranscriptionResult();
-            }
-        })
-        .catch(error => console.error('Error:', error));
-}
-
-function fetchTranscriptionResult() {
-    fetch(`https://eaa5-114-37-169-177.ngrok-free.app/transcription-result/${sessionID}`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('transcription-progress-container').style.display = 'none'; // 隱藏轉檔動畫
-            displayTranscription(data);
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = data.progress + '%';
         })
         .catch(error => console.error('Error:', error));
 }
@@ -1011,14 +985,16 @@ function clearPreviousResult() {
 
 function displayTranscription(data) {
     const container = document.getElementById('transcriptionResult');
+    const progressContainer = document.getElementById('progress-container');
+    const readMoreBtn = document.getElementById('readMoreBtn');
+    const readLessBtn = document.getElementById('readLessBtn');
+    progressContainer.style.display = 'none';
     container.innerHTML = '';  // 清空先前的結果
     if (data.error) {
         container.innerHTML = `<p>錯誤: ${data.error}</p>`;
     } else {
         transcriptionText = data.text || "無轉寫內容";
         container.innerHTML = `<p>${transcriptionText.replace(/\n/g, '<br>')}</p>`;
-        const readMoreBtn = document.getElementById('readMoreBtn');
-        const readLessBtn = document.getElementById('readLessBtn');
         if (container.scrollHeight > container.clientHeight) {
             readMoreBtn.classList.remove('hidden');
         } else {
