@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, session
+from flask import Flask, request, jsonify, send_from_directory, session
 import whisper
 from opencc import OpenCC
 from deep_translator import GoogleTranslator
@@ -32,6 +32,10 @@ cc = OpenCC('s2twp')
 
 executor = ThreadPoolExecutor(max_workers=4)
 
+@app.before_request
+def log_request_info():
+    ip_address = request.remote_addr
+
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
@@ -43,42 +47,44 @@ def login():
 @app.route('/transcribe', methods=['POST'])
 def transcribe_handler():
     try:
-        if 'file' not in request.files or 'chunkNumber' not in request.form or 'totalChunks' not in request.form or 'fileName' not in request.form:
-            return jsonify({"error": "缺少必要的參數"}), 400
-
+        if 'file' not in request.files:
+            return jsonify({"error": "沒有上傳文件"}), 400
         file = request.files['file']
-        chunk_number = int(request.form['chunkNumber'])
-        total_chunks = int(request.form['totalChunks'])
-        file_name = secure_filename(request.form['fileName'])
+        chunk_number = int(request.form.get('chunkNumber'))
+        total_chunks = int(request.form.get('totalChunks'))
+        file_name = request.form.get('fileName')
+        is_first_chunk = request.form.get('isFirstChunk') == 'true'
+        is_last_chunk = request.form.get('isLastChunk') == 'true'
 
-        if chunk_number == 1:
-            session_id = str(uuid.uuid4())
-            session['session_id'] = session_id
-            session['file_path'] = tempfile.mktemp()
-        else:
-            session_id = session.get('session_id')
-            if not session_id:
-                return jsonify({"error": "Session ID not found"}), 400
+        if file.filename == '':
+            return jsonify({"error": "文件名為空"}), 400
+        if file and file.filename.endswith((".mp3", ".m4a", ".mp4", ".mov")):
+            if file.content_length > app.config['MAX_CONTENT_LENGTH']:
+                return jsonify({"error": "文件大小超過限制"}), 400
 
-        file_path = session['file_path']
+            session_id = str(uuid.uuid4())  # 生成唯一 session ID
+            session[session_id] = 0
 
-        with open(file_path, 'ab') as f:
-            f.write(file.read())
+            temp_dir = os.path.join(tempfile.gettempdir(), session_id)
+            os.makedirs(temp_dir, exist_ok=True)
 
-        if chunk_number == total_chunks:
-            @copy_current_request_context
-            def transcribe_and_store(file_path, session_id):
-                return transcribe_audio(file_path, session_id)
+            chunk_path = os.path.join(temp_dir, f"{file_name}.part{chunk_number}")
+            file.save(chunk_path)
 
-            future = executor.submit(transcribe_and_store, file_path, session_id)
-            try:
-                transcription_result = future.result(timeout=3600)  # 設置超時時間為3600秒
-            except FuturesTimeoutError:
-                return jsonify({"error": "轉錄超時"}), 500
-            return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID
+            if is_last_chunk:
+                @copy_current_request_context
+                def transcribe_and_store(file_name, temp_dir, session_id):
+                    return transcribe_audio(file_name, temp_dir, session_id)
 
-        return jsonify({"sessionID": session_id}), 200
+                future = executor.submit(transcribe_and_store, file_name, temp_dir, session_id)
+                try:
+                    transcription_result = future.result(timeout=3600)  # 設置超時時間為3600秒
+                except FuturesTimeoutError:
+                    return jsonify({"error": "轉錄超時"}), 500
+                return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID
 
+            return jsonify({"message": "Chunk received", "sessionID": session_id})
+        return jsonify({"error": "無效的文件格式"}), 400
     except Exception as e:
         print(f"Error in transcribe_handler: {e}")
         return jsonify({"error": str(e)}), 500
@@ -91,12 +97,18 @@ def progress(session_id):
     else:
         return jsonify({"error": "Session ID not found"}), 404
 
-def transcribe_audio(file_path, session_id):
+def transcribe_audio(file_name, temp_dir, session_id):
     try:
-        print(f"Transcribing file at {file_path}")  # 添加日誌
+        temp_path = os.path.join(temp_dir, file_name)
+        with open(temp_path, 'wb') as f:
+            for part in sorted(os.listdir(temp_dir)):
+                with open(os.path.join(temp_dir, part), 'rb') as part_file:
+                    f.write(part_file.read())
+
+        print(f"Transcribing file at {temp_path}")  # 添加日誌
 
         # 語音識別
-        result = model.transcribe(file_path)
+        result = model.transcribe(temp_path)
 
         segments = result['segments']
         total_segments = len(segments)
@@ -119,8 +131,8 @@ def transcribe_audio(file_path, session_id):
 
             session[session_id] = int(((i + 1) / total_segments) * 100)  # 更新特定 session ID 的進度
 
+        os.remove(temp_path)
         session[session_id] = 100
-        os.remove(file_path)  # 刪除臨時文件
         return "\n".join(transcriptions)
     except Exception as e:
         print(f"Error in transcribe_audio: {e}")

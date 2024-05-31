@@ -927,7 +927,7 @@ async function uploadAudio() {
 
     clearPreviousResult();
 
-    const chunkSize = 5 * 1024 * 1024;  // 每個分塊5MB
+    const chunkSize = 5 * 1024 * 1024;  // 每個分塊 5MB
     const totalChunks = Math.ceil(file.size / chunkSize);
 
     for (let i = 0; i < totalChunks; i++) {
@@ -942,10 +942,10 @@ async function uploadAudio() {
         formData.append('fileName', uploadedFileName);
 
         if (i === 0) {
-            formData.append('isFirstChunk', 'true');  // 注意：這裡是字符串
+            formData.append('isFirstChunk', true);
         }
         if (i === totalChunks - 1) {
-            formData.append('isLastChunk', 'true');  // 注意：這裡是字符串
+            formData.append('isLastChunk', true);
         }
 
         await fetch('https://eaa5-114-37-169-177.ngrok-free.app/transcribe', {
@@ -969,6 +969,16 @@ async function uploadAudio() {
             return;
         });
     }
+}
+
+function updateProgress() {
+    fetch(`https://eaa5-114-37-169-177.ngrok-free.app/progress/${sessionID}`)
+        .then(response => response.json())
+        .then(data => {
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = data.progress + '%';
+        })
+        .catch(error => console.error('Error:', error));
 }
 
 function clearPreviousResult() {
@@ -1000,6 +1010,21 @@ function displayTranscription(data) {
             readMoreBtn.classList.add('hidden');
         }
         readLessBtn.classList.add('hidden');
+    }
+}
+
+function toggleReadMore() {
+    const container = document.getElementById('transcriptionResult');
+    const readMoreBtn = document.getElementById('readMoreBtn');
+    const readLessBtn = document.getElementById('readLessBtn');
+    if (readMoreBtn.classList.contains('hidden')) {
+        container.style.maxHeight = '200px';
+        readMoreBtn.classList.remove('hidden');
+        readLessBtn.classList.add('hidden');
+    } else {
+        container.style.maxHeight = 'none';
+        readMoreBtn.classList.add('hidden');
+        readLessBtn.classList.remove('hidden');
     }
 }
 
