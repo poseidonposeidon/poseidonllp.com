@@ -937,7 +937,7 @@ function uploadAudio() {
 
     progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
 
-    fetch('https://www.poseidonllp.com/transcribe', {  // 使用正確的 HTTPS 端口
+    fetch('https://d42c-114-37-169-177.ngrok-free.app//transcribe', {  // 更新為新的 ngrok URL
         method: 'POST',
         body: formData
     })
@@ -963,7 +963,7 @@ function uploadAudio() {
 }
 
 function updateProgress() {
-    fetch(`https://www.poseidonllp.com/progress/${sessionID}`)  // 使用正確的 HTTPS 端口
+    fetch(`https://d42c-114-37-169-177.ngrok-free.app//progress/${sessionID}`)  // 更新為新的 ngrok URL
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
@@ -1026,4 +1026,3 @@ function downloadTranscription() {
     a.download = uploadedFileName.replace(/\.[^/.]+$/, "") + ".txt"; // 將文件名的擴展名改為 .txt
     a.click();
 }
-

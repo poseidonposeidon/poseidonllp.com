@@ -10,7 +10,6 @@ from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from flask import copy_current_request_context
-from flask_talisman import Talisman
 
 # 禁用 FP16 使用 FP32
 os.environ["WHISPER_DISABLE_F16"] = "1"
@@ -18,8 +17,7 @@ os.environ["WHISPER_DISABLE_F16"] = "1"
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 設置為500MB
 app.secret_key = 'supersecretkey'  # 用於 session
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=True)  # 配置 CORS
-Talisman(app)
+CORS(app, resources={r"/*": {"origins": "*"}})  # 配置 CORS
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -28,13 +26,15 @@ model = whisper.load_model("large-v2").to(device)
 
 # 初始化翻譯器
 translator = GoogleTranslator(source='auto', target='zh-TW')
+# 簡體轉繁體轉換器
 cc = OpenCC('s2twp')
+
 executor = ThreadPoolExecutor(max_workers=4)
 
 @app.before_request
 def log_request_info():
     ip_address = request.remote_addr
-    print(f"New request from IP: {ip_address}")
+    # print(f"New request from IP: {ip_address}")
 
 @app.route('/')
 def index():
@@ -65,7 +65,7 @@ def transcribe_handler():
 
             future = executor.submit(transcribe_and_store, file, session_id)
             try:
-                transcription_result = future.result(timeout=3600)  # 設置超時時間為3600秒
+                transcription_result = future.result(timeout=3600)  # 設置超時時間為1200秒
             except FuturesTimeoutError:
                 return jsonify({"error": "轉錄超時"}), 500
             return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID
