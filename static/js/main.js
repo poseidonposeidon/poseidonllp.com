@@ -937,11 +937,16 @@ function uploadAudio() {
 
     progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
 
-    fetch('https://eaa5-114-37-169-177.ngrok-free.app/transcribe', {  // 更新為新的 ngrok URL
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 1800000);  // 設置超時為30分鐘
+
+    fetch('https://eaa5-114-37-169-177.ngrok-free.app/transcribe', {
         method: 'POST',
-        body: formData
+        body: formData,
+        signal: controller.signal
     })
         .then(response => {
+            clearTimeout(timeoutId);  // 清除超時
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
@@ -961,6 +966,7 @@ function uploadAudio() {
             alert('錯誤發生，請檢查網絡連接或服務器狀態！');
         });
 }
+
 
 function updateProgress() {
     fetch(`https://eaa5-114-37-169-177.ngrok-free.app/progress/${sessionID}`)  // 更新為新的 ngrok URL
