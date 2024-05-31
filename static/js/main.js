@@ -942,10 +942,10 @@ async function uploadAudio() {
         formData.append('fileName', uploadedFileName);
 
         if (i === 0) {
-            formData.append('isFirstChunk', true);
+            formData.append('isFirstChunk', 'true');  // 注意：這裡是字符串
         }
         if (i === totalChunks - 1) {
-            formData.append('isLastChunk', true);
+            formData.append('isLastChunk', 'true');  // 注意：這裡是字符串
         }
 
         await fetch('https://eaa5-114-37-169-177.ngrok-free.app/transcribe', {
@@ -965,7 +965,7 @@ async function uploadAudio() {
             }
         }).catch(error => {
             console.error('Error:', error);
-            alert('錯誤發生，請檢查網絡連接或伺服器狀態！');
+            alert('錯誤發生，請檢查網絡連接或服務器狀態！');
             return;
         });
     }

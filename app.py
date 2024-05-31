@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, session
+from flask import Flask, request, jsonify, session
 import whisper
 from opencc import OpenCC
 from deep_translator import GoogleTranslator
@@ -32,10 +32,6 @@ cc = OpenCC('s2twp')
 
 executor = ThreadPoolExecutor(max_workers=4)
 
-@app.before_request
-def log_request_info():
-    ip_address = request.remote_addr
-
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
@@ -47,25 +43,29 @@ def login():
 @app.route('/transcribe', methods=['POST'])
 def transcribe_handler():
     try:
-        if 'file' not in request.files:
-            return jsonify({"error": "沒有上傳文件"}), 400
+        if 'file' not in request.files or 'chunkNumber' not in request.form or 'totalChunks' not in request.form or 'fileName' not in request.form:
+            return jsonify({"error": "缺少必要的參數"}), 400
+
         file = request.files['file']
         chunk_number = int(request.form['chunkNumber'])
         total_chunks = int(request.form['totalChunks'])
-        file_name = request.form['fileName']
-        is_first_chunk = request.form.get('isFirstChunk', 'false') == 'true'
-        is_last_chunk = request.form.get('isLastChunk', 'false') == 'true'
+        file_name = secure_filename(request.form['fileName'])
 
-        session_id = str(uuid.uuid4())  # 生成唯一 session ID
-        session[session_id] = 0
+        if chunk_number == 1:
+            session_id = str(uuid.uuid4())
+            session['session_id'] = session_id
+            session['file_path'] = tempfile.mktemp()
+        else:
+            session_id = session.get('session_id')
+            if not session_id:
+                return jsonify({"error": "Session ID not found"}), 400
 
-        upload_dir = tempfile.gettempdir()  # 暫存目錄
-        file_path = os.path.join(upload_dir, f"{session_id}_{file_name}")
+        file_path = session['file_path']
 
         with open(file_path, 'ab') as f:
             f.write(file.read())
 
-        if is_last_chunk:
+        if chunk_number == total_chunks:
             @copy_current_request_context
             def transcribe_and_store(file_path, session_id):
                 return transcribe_audio(file_path, session_id)
@@ -75,10 +75,10 @@ def transcribe_handler():
                 transcription_result = future.result(timeout=3600)  # 設置超時時間為3600秒
             except FuturesTimeoutError:
                 return jsonify({"error": "轉錄超時"}), 500
-
-            os.remove(file_path)  # 刪除臨時文件
             return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID
-        return jsonify({"sessionID": session_id})
+
+        return jsonify({"sessionID": session_id}), 200
+
     except Exception as e:
         print(f"Error in transcribe_handler: {e}")
         return jsonify({"error": str(e)}), 500
@@ -120,6 +120,7 @@ def transcribe_audio(file_path, session_id):
             session[session_id] = int(((i + 1) / total_segments) * 100)  # 更新特定 session ID 的進度
 
         session[session_id] = 100
+        os.remove(file_path)  # 刪除臨時文件
         return "\n".join(transcriptions)
     except Exception as e:
         print(f"Error in transcribe_audio: {e}")
