@@ -915,7 +915,7 @@ let uploadedFileName = "";
 let sessionID = "";
 let progressInterval;
 
-function uploadAudio() {
+async function uploadAudio() {
     const fileInput = document.getElementById('audioFile');
     const file = fileInput.files[0];
     uploadedFileName = file.name;
@@ -927,55 +927,48 @@ function uploadAudio() {
 
     clearPreviousResult();
 
-    const formData = new FormData();
-    formData.append('file', file);
+    const chunkSize = 5 * 1024 * 1024;  // 每個分塊5MB
+    const totalChunks = Math.ceil(file.size / chunkSize);
 
-    const progressBar = document.getElementById('progress-bar');
-    const progressContainer = document.getElementById('progress-container');
-    progressContainer.style.display = 'block';
-    progressBar.style.width = '0%';
+    for (let i = 0; i < totalChunks; i++) {
+        const start = i * chunkSize;
+        const end = Math.min(start + chunkSize, file.size);
+        const chunk = file.slice(start, end);
 
-    progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
+        const formData = new FormData();
+        formData.append('file', chunk);
+        formData.append('chunkNumber', i + 1);
+        formData.append('totalChunks', totalChunks);
+        formData.append('fileName', uploadedFileName);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1800000);  // 設置超時為30分鐘
+        if (i === 0) {
+            formData.append('isFirstChunk', true);
+        }
+        if (i === totalChunks - 1) {
+            formData.append('isLastChunk', true);
+        }
 
-    fetch('https://eaa5-114-37-169-177.ngrok-free.app/transcribe', {
-        method: 'POST',
-        body: formData,
-        signal: controller.signal
-    })
-        .then(response => {
-            clearTimeout(timeoutId);  // 清除超時
+        await fetch('https://eaa5-114-37-169-177.ngrok-free.app/transcribe', {
+            method: 'POST',
+            body: formData
+        }).then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
             return response.json();
-        })
-        .then(data => {
-            clearInterval(progressInterval); // 停止輪詢
-            progressBar.style.width = '100%'; // 確保進度條達到100%
-            console.log(data);
-            displayTranscription(data);
-            document.getElementById('downloadBtn').classList.remove('hidden');
-            sessionID = data.sessionID;  // 保存 session ID
-        })
-        .catch(error => {
-            clearInterval(progressInterval); // 停止輪詢
+        }).then(data => {
+            if (data.sessionID) {
+                sessionID = data.sessionID;
+            }
+            if (data.text) {
+                displayTranscription(data);
+            }
+        }).catch(error => {
             console.error('Error:', error);
-            alert('錯誤發生，請檢查網絡連接或服務器狀態！');
+            alert('錯誤發生，請檢查網絡連接或伺服器狀態！');
+            return;
         });
-}
-
-
-function updateProgress() {
-    fetch(`https://eaa5-114-37-169-177.ngrok-free.app/progress/${sessionID}`)  // 更新為新的 ngrok URL
-        .then(response => response.json())
-        .then(data => {
-            const progressBar = document.getElementById('progress-bar');
-            progressBar.style.width = data.progress + '%';
-        })
-        .catch(error => console.error('Error:', error));
+    }
 }
 
 function clearPreviousResult() {
@@ -1007,21 +1000,6 @@ function displayTranscription(data) {
             readMoreBtn.classList.add('hidden');
         }
         readLessBtn.classList.add('hidden');
-    }
-}
-
-function toggleReadMore() {
-    const container = document.getElementById('transcriptionResult');
-    const readMoreBtn = document.getElementById('readMoreBtn');
-    const readLessBtn = document.getElementById('readLessBtn');
-    if (readMoreBtn.classList.contains('hidden')) {
-        container.style.maxHeight = '200px';
-        readMoreBtn.classList.remove('hidden');
-        readLessBtn.classList.add('hidden');
-    } else {
-        container.style.maxHeight = 'none';
-        readMoreBtn.classList.add('hidden');
-        readLessBtn.classList.remove('hidden');
     }
 }
 
