@@ -937,7 +937,7 @@ function uploadAudio() {
 
     progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
 
-    fetch('https://d42c-114-37-169-177.ngrok-free.app//transcribe', {  // 更新為新的 ngrok URL
+    fetch('https://eaa5-114-37-169-177.ngrok-free.app/transcribe', {  // 更新為新的 ngrok URL
         method: 'POST',
         body: formData
     })
@@ -963,7 +963,7 @@ function uploadAudio() {
 }
 
 function updateProgress() {
-    fetch(`https://d42c-114-37-169-177.ngrok-free.app//progress/${sessionID}`)  // 更新為新的 ngrok URL
+    fetch(`https://eaa5-114-37-169-177.ngrok-free.app/progress/${sessionID}`)  // 更新為新的 ngrok URL
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
