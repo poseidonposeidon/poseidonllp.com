@@ -65,14 +65,22 @@ def transcribe_handler():
 
             future = executor.submit(transcribe_and_store, file, session_id)
             try:
-                transcription_result = future.result(timeout=3600)  # 設置超時時間為1200秒
+                transcription_result = future.result(timeout=3600)  # 設置超時時間為3600秒
             except FuturesTimeoutError:
                 return jsonify({"error": "轉錄超時"}), 500
-            return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID
+            return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID 和轉寫結果
         return jsonify({"error": "無效的文件格式"}), 400
     except Exception as e:
         print(f"Error in transcribe_handler: {e}")
         return jsonify({"error": str(e)}), 500
+
+@app.route('/transcription-result/<session_id>', methods=['GET'])
+def transcription_result(session_id):
+    if session_id in session:
+        result = session.get(session_id, "")
+        return jsonify({"text": result})
+    else:
+        return jsonify({"error": "Session ID not found"}), 404
 
 @app.route('/progress/<session_id>', methods=['GET'])
 def progress(session_id):

@@ -950,6 +950,10 @@ function uploadAudio() {
     xhr.onload = function () {
         if (xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
+            if (response.error) {
+                alert(response.error);
+                return;
+            }
             uploadProgressContainer.style.display = 'none'; // 隱藏上傳進度條
             transcriptionProgressContainer.style.display = 'block'; // 顯示轉檔動畫
             sessionID = response.sessionID;
@@ -978,9 +982,18 @@ function updateProgress() {
         .then(data => {
             if (data.progress === 100) {
                 clearInterval(progressInterval);
-                document.getElementById('transcription-progress-container').style.display = 'none'; // 隱藏轉檔動畫
-                displayTranscription(data);
+                fetchTranscriptionResult();
             }
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function fetchTranscriptionResult() {
+    fetch(`https://eaa5-114-37-169-177.ngrok-free.app/transcription-result/${sessionID}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('transcription-progress-container').style.display = 'none'; // 隱藏轉檔動畫
+            displayTranscription(data);
         })
         .catch(error => console.error('Error:', error));
 }
