@@ -915,7 +915,7 @@ let uploadedFileName = "";
 let sessionID = "";
 let progressInterval;
 
-async function uploadAudio() {
+function uploadAudio() {
     const fileInput = document.getElementById('audioFile');
     const file = fileInput.files[0];
     uploadedFileName = file.name;
@@ -927,52 +927,43 @@ async function uploadAudio() {
 
     clearPreviousResult();
 
-    const chunkSize = 5 * 1024 * 1024;  // 每個分塊 5MB
-    const totalChunks = Math.ceil(file.size / chunkSize);
+    const formData = new FormData();
+    formData.append('file', file);
 
-    for (let i = 0; i < totalChunks; i++) {
-        const start = i * chunkSize;
-        const end = Math.min(start + chunkSize, file.size);
-        const chunk = file.slice(start, end);
+    const progressBar = document.getElementById('progress-bar');
+    const progressContainer = document.getElementById('progress-container');
+    progressContainer.style.display = 'block';
+    progressBar.style.width = '0%';
 
-        const formData = new FormData();
-        formData.append('file', chunk);
-        formData.append('chunkNumber', i + 1);
-        formData.append('totalChunks', totalChunks);
-        formData.append('fileName', uploadedFileName);
+    progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
 
-        if (i === 0) {
-            formData.append('isFirstChunk', true);
-        }
-        if (i === totalChunks - 1) {
-            formData.append('isLastChunk', true);
-        }
-
-        await fetch('https://eaa5-114-37-169-177.ngrok-free.app/transcribe', {
-            method: 'POST',
-            body: formData
-        }).then(response => {
+    fetch('https://eaa5-114-37-169-177.ngrok-free.app/transcribe', {  // 更新為新的 ngrok URL
+        method: 'POST',
+        body: formData
+    })
+        .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
             }
             return response.json();
-        }).then(data => {
-            if (data.sessionID) {
-                sessionID = data.sessionID;
-            }
-            if (data.text) {
-                displayTranscription(data);
-            }
-        }).catch(error => {
+        })
+        .then(data => {
+            clearInterval(progressInterval); // 停止輪詢
+            progressBar.style.width = '100%'; // 確保進度條達到100%
+            console.log(data);
+            displayTranscription(data);
+            document.getElementById('downloadBtn').classList.remove('hidden');
+            sessionID = data.sessionID;  // 保存 session ID
+        })
+        .catch(error => {
+            clearInterval(progressInterval); // 停止輪詢
             console.error('Error:', error);
             alert('錯誤發生，請檢查網絡連接或服務器狀態！');
-            return;
         });
-    }
 }
 
 function updateProgress() {
-    fetch(`https://eaa5-114-37-169-177.ngrok-free.app/progress/${sessionID}`)
+    fetch(`https://eaa5-114-37-169-177.ngrok-free.app/progress/${sessionID}`)  // 更新為新的 ngrok URL
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
