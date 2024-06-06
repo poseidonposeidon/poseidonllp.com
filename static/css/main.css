@@ -181,3 +181,29 @@ th {
 #transcription-progress-text {
     margin-top: 20px;
 }
+#upload-progress-container {
+    width: 70%; /* 設置進度條的寬度 */
+    margin: 20px auto; /* 使進度條居中顯示，並設置外邊距 */
+    background-color: #f3f3f3;
+    border-radius: 15px; /* 設置圓角 */
+    overflow: hidden; /* 隱藏超出範圍的內容 */
+    display: none;
+    height: 30px; /* 設置固定高度 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影效果 */
+    position: relative; /* 設置相對定位 */
+}
+#upload-progress-bar {
+    width: 0;
+    height: 60%; /* 調整進度條高度 */
+    background-color: #4caf50;
+    border-radius: 15px; /* 設置圓角 */
+    transition: width 0.4s ease; /* 添加過渡效果 */
+    position: absolute; /* 設置絕對定位 */
+    left: 0; /* 讓進度條從左邊開始 */
+    top: 20%; /* 讓進度條從容器的中間開始 */
+}
+#upload-progress-text {
+    margin-top: 20px;
+    font-size: 18px;
+    color: #333;
+}

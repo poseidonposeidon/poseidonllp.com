@@ -10,7 +10,7 @@ app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 設置為500MB
 CORS(app, resources={r"/*": {"origins": "*"}})  # 配置 CORS
 
 # 設置FTP伺服器信息
-FTP_HOST = '127.0.0.1'
+FTP_HOST = '114.32.65.180'
 FTP_USER = 'Henry'
 FTP_PASS = '123456'
 
