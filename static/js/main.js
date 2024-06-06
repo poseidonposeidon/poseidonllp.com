@@ -964,7 +964,7 @@ function uploadToFTP() {
     uploadProgressContainer.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://192.168.0.100:5000/upload_to_ftp', true);
+    xhr.open('POST', 'http://114.32.65.180:5000/upload_to_ftp', true);
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
@@ -978,23 +978,22 @@ function uploadToFTP() {
         if (xhr.status === 200) {
             uploadProgressContainer.style.display = 'none';
             const response = JSON.parse(xhr.responseText);
-            alert(response.message || '文件已成功上傳到FTP伺服器');
+            document.getElementById('upload-result').innerText = response.message || '文件已成功上傳到FTP伺服器';
             location.reload();  // 重新加載頁面以更新文件列表
         } else {
             uploadProgressContainer.style.display = 'none';
             const response = JSON.parse(xhr.responseText);
-            alert('上傳失敗，請重試！' + (response.error ? '\n' + response.error : ''));
+            document.getElementById('upload-result').innerText = '上傳失敗，請重試！' + (response.error ? '\n' + response.error : '');
         }
     };
 
     xhr.onerror = function () {
         uploadProgressContainer.style.display = 'none';
-        alert('上傳失敗，請重試！');
+        document.getElementById('upload-result').innerText = '上傳失敗，請重試！';
     };
 
     xhr.send(formData);
 }
-
 
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
