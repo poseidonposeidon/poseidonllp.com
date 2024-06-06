@@ -7,7 +7,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 設置為500MB
-CORS(app, resources={r"/*": {"origins": "*"}})  # 配置 CORS
+CORS(app, resources={r"/*": {"origins": "https://www.poseidonllp.com"}})  # 只允許特定域名訪問
 
 # 設置FTP伺服器信息
 FTP_HOST = '114.32.65.180'

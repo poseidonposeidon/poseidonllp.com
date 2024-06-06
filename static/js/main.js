@@ -995,7 +995,6 @@ function uploadToFTP() {
     xhr.send(formData);
 }
 
-
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
     const filename = select.value;
@@ -1007,7 +1006,6 @@ function transcribeFromFTP() {
 
     clearPreviousResult();
 
-    document.getElementById('transcription-progress-container').style.display = 'block';
     document.getElementById('transcription-progress-container').style.display = 'block';
 
     fetch('http://114.32.65.180:5000/transcribe_from_ftp', {  // 使用轉錄的Flask伺服器URL
