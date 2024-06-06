@@ -978,22 +978,23 @@ function uploadToFTP() {
         if (xhr.status === 200) {
             uploadProgressContainer.style.display = 'none';
             const response = JSON.parse(xhr.responseText);
-            document.getElementById('upload-result').innerText = response.message || '文件已成功上傳到FTP伺服器';
+            alert(response.message || '文件已成功上傳到FTP伺服器');
             location.reload();  // 重新加載頁面以更新文件列表
         } else {
             uploadProgressContainer.style.display = 'none';
             const response = JSON.parse(xhr.responseText);
-            document.getElementById('upload-result').innerText = '上傳失敗，請重試！' + (response.error ? '\n' + response.error : '');
+            alert('上傳失敗，請重試！' + (response.error ? '\n' + response.error : ''));
         }
     };
 
     xhr.onerror = function () {
         uploadProgressContainer.style.display = 'none';
-        document.getElementById('upload-result').innerText = '上傳失敗，請重試！';
+        alert('上傳失敗，請重試！');
     };
 
     xhr.send(formData);
 }
+
 
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
@@ -1006,6 +1007,7 @@ function transcribeFromFTP() {
 
     clearPreviousResult();
 
+    document.getElementById('transcription-progress-container').style.display = 'block';
     document.getElementById('transcription-progress-container').style.display = 'block';
 
     fetch('http://114.32.65.180:5000/transcribe_from_ftp', {  // 使用轉錄的Flask伺服器URL
