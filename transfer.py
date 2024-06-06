@@ -14,7 +14,7 @@ translator = GoogleTranslator(source='auto', target='zh-TW')
 # 指定路徑
 directory_path = r"C:\Users\User\Desktop\錄音檔"
 processed_directory = r"C:\Users\User\Desktop\錄音檔(已轉檔)"
-output_directory = r"C:\Users\User\Desktop\法說會逐字稿"
+output_directory = r"C:\Users\User\Desktop\法說會逐字稿\0603"
 
 # 獲取所有符合條件的文件
 files = [f for f in os.listdir(directory_path) if f.endswith((".mp3", ".m4a", ".mp4", ".mov"))]

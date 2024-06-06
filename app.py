@@ -9,6 +9,7 @@ import uuid
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+from ftplib import FTP
 from flask import copy_current_request_context
 
 # 禁用 FP16 使用 FP32
@@ -31,6 +32,11 @@ cc = OpenCC('s2twp')
 
 executor = ThreadPoolExecutor(max_workers=4)
 
+# 設置FTP伺服器信息
+FTP_HOST = '127.0.0.1'
+FTP_USER = 'Henry'
+FTP_PASS = '123456'
+
 @app.before_request
 def log_request_info():
     ip_address = request.remote_addr
@@ -40,36 +46,63 @@ def log_request_info():
 def index():
     return send_from_directory('.', 'index.html')
 
-@app.route('/login')
-def login():
-    return send_from_directory('.', 'login.html')
-
-@app.route('/transcribe', methods=['POST'])
-def transcribe_handler():
+@app.route('/upload_to_ftp', methods=['POST'])
+def upload_to_ftp():
     try:
         if 'file' not in request.files:
             return jsonify({"error": "沒有上傳文件"}), 400
         file = request.files['file']
         if file.filename == '':
             return jsonify({"error": "文件名為空"}), 400
-        if file and file.filename.endswith((".mp3", ".m4a", ".mp4", ".mov")):
-            if file.content_length > app.config['MAX_CONTENT_LENGTH']:
-                return jsonify({"error": "文件大小超過限制"}), 400
+        if file:
+            filename = secure_filename(file.filename)
+            file.save(filename)
 
-            session_id = str(uuid.uuid4())  # 生成唯一 session ID
-            session[session_id] = 0
+            ftp = FTP(FTP_HOST)
+            ftp.login(FTP_USER, FTP_PASS)
+            with open(filename, 'rb') as f:
+                ftp.storbinary(f'STOR {filename}', f)
+            ftp.quit()
 
-            @copy_current_request_context
-            def transcribe_and_store(file, session_id):
-                return transcribe_audio(file, session_id)
+            os.remove(filename)  # 上傳完成後刪除本地文件
+            return jsonify({"message": "文件已成功上傳到FTP伺服器"})
+        return jsonify({"error": "無效的文件"}), 400
+    except Exception as e:
+        print(f"Error in upload_to_ftp: {e}")
+        return jsonify({"error": str(e)}), 500
 
-            future = executor.submit(transcribe_and_store, file, session_id)
-            try:
-                transcription_result = future.result(timeout=3600)  # 設置超時時間為1200秒
-            except FuturesTimeoutError:
-                return jsonify({"error": "轉錄超時"}), 500
-            return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID
-        return jsonify({"error": "無效的文件格式"}), 400
+@app.route('/list_files', methods=['GET'])
+def list_files():
+    try:
+        ftp = FTP(FTP_HOST)
+        ftp.login(FTP_USER, FTP_PASS)
+        files = ftp.nlst()
+        ftp.quit()
+        return jsonify({"files": files})
+    except Exception as e:
+        print(f"Error in list_files: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/transcribe_from_ftp', methods=['POST'])
+def transcribe_handler():
+    try:
+        if 'filename' not in request.json:
+            return jsonify({"error": "沒有指定文件名"}), 400
+        filename = request.json['filename']
+
+        session_id = str(uuid.uuid4())  # 生成唯一 session ID
+        session[session_id] = 0
+
+        @copy_current_request_context
+        def transcribe_and_store(filename, session_id):
+            return transcribe_audio_from_ftp(filename, session_id)
+
+        future = executor.submit(transcribe_and_store, filename, session_id)
+        try:
+            transcription_result = future.result(timeout=3600)  # 設置超時時間為3600秒
+        except FuturesTimeoutError:
+            return jsonify({"error": "轉錄超時"}), 500
+        return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID
     except Exception as e:
         print(f"Error in transcribe_handler: {e}")
         return jsonify({"error": str(e)}), 500
@@ -82,12 +115,16 @@ def progress(session_id):
     else:
         return jsonify({"error": "Session ID not found"}), 404
 
-def transcribe_audio(file, session_id):
+def transcribe_audio_from_ftp(filename, session_id):
     try:
-        filename = secure_filename(file.filename)
+        ftp = FTP(FTP_HOST)
+        ftp.login(FTP_USER, FTP_PASS)
+
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_path = temp_file.name
-            file.save(temp_path)
+            ftp.retrbinary(f'RETR {filename}', temp_file.write)
+
+        ftp.quit()
 
         print(f"Transcribing file at {temp_path}")  # 添加日誌
 
@@ -119,7 +156,7 @@ def transcribe_audio(file, session_id):
         session[session_id] = 100
         return "\n".join(transcriptions)
     except Exception as e:
-        print(f"Error in transcribe_audio: {e}")
+        print(f"Error in transcribe_audio_from_ftp: {e}")
         raise
 
 def format_time(seconds):

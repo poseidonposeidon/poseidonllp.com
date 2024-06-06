@@ -908,39 +908,14 @@ function displayInsiderTrades(data) {
     htmlContent += '</table>';
 
     table.innerHTML = htmlContent;
-    }
+}
 ////////////////////////////錄音檔轉文字/////////////////////////////
 let transcriptionText = "";
-let uploadedFileName = "";
 let sessionID = "";
 let progressInterval;
 
-function uploadAudio() {
-    const fileInput = document.getElementById('audioFile');
-    const file = fileInput.files[0];
-    uploadedFileName = file.name;
-
-    if (!file) {
-        alert('請選擇一個檔案！');
-        return;
-    }
-
-    clearPreviousResult();
-
-    const formData = new FormData();
-    formData.append('file', file);
-
-    const progressBar = document.getElementById('progress-bar');
-    const progressContainer = document.getElementById('progress-container');
-    progressContainer.style.display = 'block';
-    progressBar.style.width = '0%';
-
-    progressInterval = setInterval(updateProgress, 1000);  // 縮短間隔時間至1秒
-
-    fetch('https://8...content-available-to-author-only...e.app/transcribe', {  // 更新為新的 ngrok URL
-        method: 'POST',
-        body: formData
-    })
+document.addEventListener("DOMContentLoaded", function() {
+    fetch('http://192.168.0.195:5001/list_files')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
@@ -948,22 +923,101 @@ function uploadAudio() {
             return response.json();
         })
         .then(data => {
-            clearInterval(progressInterval); // 停止輪詢
-            progressBar.style.width = '100%'; // 確保進度條達到100%
-            console.log(data);
-            displayTranscription(data);
-            document.getElementById('downloadBtn').classList.remove('hidden');
-            sessionID = data.sessionID;  // 保存 session ID
+            const select = document.getElementById('ftpFileSelect');
+            select.innerHTML = '';  // 清空之前的選項
+            if (data.files && data.files.length > 0) {
+                data.files.forEach(file => {
+                    const option = document.createElement('option');
+                    option.value = file;
+                    option.textContent = file;
+                    select.appendChild(option);
+                });
+            } else {
+                const option = document.createElement('option');
+                option.textContent = "無可用文件";
+                option.disabled = true;
+                select.appendChild(option);
+            }
         })
         .catch(error => {
-            clearInterval(progressInterval); // 停止輪詢
             console.error('Error:', error);
-            alert('錯誤發生，請檢查網絡連接或服務器狀態！');
+            document.getElementById('upload-result').innerText = '錯誤發生，請檢查網絡連接或服務器狀態！\n' + error;
+        });
+});
+
+function uploadToFTP() {
+    const fileInput = document.getElementById('audioFile');
+    const file = fileInput.files[0];
+
+    if (!file) {
+        document.getElementById('upload-result').innerText = '請選擇一個檔案！';
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', file);
+
+    fetch('http://192.168.0.195:5001/upload_to_ftp', {  // 使用FTP上傳的Flask伺服器URL
+        method: 'POST',
+        body: formData
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                document.getElementById('upload-result').innerText = data.message;  // 更新結果顯示
+                location.reload();  // 重新加載頁面以更新文件列表
+            } else {
+                console.error('Error:', data.error);
+                document.getElementById('upload-result').innerText = '錯誤發生，請檢查網絡連接或服務器狀態！\n' + data.error;
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            document.getElementById('upload-result').innerText = '錯誤發生，請檢查網絡連接或服務器狀態！\n' + error;
+        });
+}
+
+function transcribeFromFTP() {
+    const select = document.getElementById('ftpFileSelect');
+    const filename = select.value;
+
+    if (!filename) {
+        document.getElementById('upload-result').innerText = '請選擇FTP上的文件！';
+        return;
+    }
+
+    clearPreviousResult();
+
+    document.getElementById('transcription-progress-container').style.display = 'block';
+
+    fetch('http://192.168.0.195:5000/transcribe_from_ftp', {  // 使用轉錄的Flask伺服器URL
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ filename: filename })
+    })
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('transcription-progress-container').style.display = 'none';
+            if (data.text) {
+                displayTranscription(data);
+                document.getElementById('downloadBtn').classList.remove('hidden');
+                sessionID = data.sessionID;  // 保存 session ID
+            } else {
+                console.error('Error:', data.error);
+                document.getElementById('upload-result').innerText = '轉錄失敗，請重試！\n' + data.error;
+            }
+        })
+        .catch(error => {
+            document.getElementById('transcription-progress-container').style.display = 'none';
+            console.error('Error:', error);
+            document.getElementById('upload-result').innerText = '錯誤發生，請檢查網絡連接或服務器狀態！\n' + error;
         });
 }
 
 function updateProgress() {
-    fetch(`https://8...content-available-to-author-only...e.app/progress/${sessionID}`)  // 更新為新的 ngrok URL
+    fetch(`http://192.168.0.195:5000/progress/${sessionID}`)  // 使用轉錄的Flask伺服器URL
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
@@ -985,10 +1039,8 @@ function clearPreviousResult() {
 
 function displayTranscription(data) {
     const container = document.getElementById('transcriptionResult');
-    const progressContainer = document.getElementById('progress-container');
     const readMoreBtn = document.getElementById('readMoreBtn');
     const readLessBtn = document.getElementById('readLessBtn');
-    progressContainer.style.display = 'none';
     container.innerHTML = '';  // 清空先前的結果
     if (data.error) {
         container.innerHTML = `<p>錯誤: ${data.error}</p>`;
@@ -1023,6 +1075,6 @@ function downloadTranscription() {
     const blob = new Blob([transcriptionText], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = uploadedFileName.replace(/\.[^/.]+$/, "") + ".txt"; // 將文件名的擴展名改為 .txt
+    a.download = sessionID + ".txt"; // 使用 session ID 作為文件名
     a.click();
 }
