@@ -918,7 +918,7 @@ document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
-    fetch('https://114.32.65.180:5001/list_files')
+    fetch('https://114.32.65.180/ftp/list_files')  // 注意這裡的 URL 使用了 Nginx 代理的路徑
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
@@ -974,7 +974,7 @@ function uploadToFTP() {
     uploadProgressContainer.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://114.32.65.180:5000/upload_to_ftp', true);
+    xhr.open('POST', 'https://114.32.65.180/upload_to_ftp', true);  // 注意這裡的 URL 使用了 Nginx 代理的路徑
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
@@ -1018,7 +1018,7 @@ function transcribeFromFTP() {
 
     document.getElementById('transcription-progress-container').style.display = 'block';
 
-    fetch('https://114.32.65.180:5000/transcribe_from_ftp', {  // 使用轉錄的Flask伺服器URL
+    fetch('https://114.32.65.180/transcribe_from_ftp', {  // 注意這裡的 URL 使用了 Nginx 代理的路徑
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1045,7 +1045,7 @@ function transcribeFromFTP() {
 }
 
 function updateProgress() {
-    fetch(`https://114.32.65.180:5000/progress/${sessionID}`)  // 使用轉錄的Flask伺服器URL
+    fetch(`https://114.32.65.180/progress/${sessionID}`)  // 注意這裡的 URL 使用了 Nginx 代理的路徑
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');

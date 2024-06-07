@@ -75,13 +75,21 @@ def list_files():
         ftp.connect(FTP_HOST)
         ftp.login(FTP_USER, FTP_PASS)
         ftp.set_pasv(True)
+
+        # 列出所有文件和文件夾
         files = ftp.nlst()
+
+        # 過濾掉 `ssl` 文件夾
+        filtered_files = [file for file in files if file != 'ssl']
+
         ftp.quit()
-        files_decoded = [urllib.parse.unquote(f) for f in files]
+
+        # 確保文件名以UTF-8格式進行解碼
+        files_decoded = [urllib.parse.unquote(f) for f in filtered_files]
         return jsonify({"files": files_decoded})
     except Exception as e:
         print(f"Error in list_files: {e}")
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001, ssl_context=('C:/openssl/cert.pem', 'C:/openssl/key.pem'))
+    app.run(debug=True, host='0.0.0.0', port=5001)  # 確保 port 為 5001

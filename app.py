@@ -81,6 +81,7 @@ def upload_to_ftp():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+
 @app.route('/list_files', methods=['GET'])
 def list_files():
     try:
@@ -187,4 +188,4 @@ def format_time(seconds):
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000, ssl_context=('C:/openssl/cert.pem', 'C:/openssl/key.pem'))
+    app.run(debug=True, host='0.0.0.0', port=5000)
