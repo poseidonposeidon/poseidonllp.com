@@ -47,39 +47,39 @@ def log_request_info():
 def index():
     return send_from_directory('.', 'index.html')
 
-@app.route('/upload_to_ftp', methods=['POST'])
-def upload_to_ftp():
-    try:
-        if 'file' not in request.files:
-            return jsonify({"error": "沒有上傳文件"}), 400
-        file = request.files['file']
-        if file.filename == '':
-            return jsonify({"error": "文件名為空"}), 400
-        if file:
-            filename = secure_filename(file.filename)
-            # 確保文件名以UTF-8格式進行編碼
-            filename_encoded = urllib.parse.quote(filename)
-            file.save(filename)
-
-            ftp = FTP()
-            ftp.set_debuglevel(0)  # 禁用詳細的調試日誌
-            try:
-                ftp.connect(FTP_HOST)
-                ftp.login(FTP_USER, FTP_PASS)
-                ftp.set_pasv(True)  # 啟用被動模式
-                with open(filename, 'rb') as f:
-                    ftp.storbinary(f'STOR %s' % filename_encoded, f)
-                ftp.quit()
-            except Exception as e:
-                return jsonify({"error": f"FTP上傳失敗: {e}"}), 500
-            finally:
-                ftp.close()
-                os.remove(filename)  # 上傳完成後刪除本地文件
-
-            return jsonify({"message": f"文件 {filename} 已成功上傳到FTP伺服器"}), 200
-        return jsonify({"error": "無效的文件"}), 400
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
+# @app.route('/upload_to_ftp', methods=['POST'])
+# def upload_to_ftp():
+#     try:
+#         if 'file' not in request.files:
+#             return jsonify({"error": "沒有上傳文件"}), 400
+#         file = request.files['file']
+#         if file.filename == '':
+#             return jsonify({"error": "文件名為空"}), 400
+#         if file:
+#             filename = secure_filename(file.filename)
+#             # 確保文件名以UTF-8格式進行編碼
+#             filename_encoded = urllib.parse.quote(filename)
+#             file.save(filename)
+#
+#             ftp = FTP()
+#             ftp.set_debuglevel(0)  # 禁用詳細的調試日誌
+#             try:
+#                 ftp.connect(FTP_HOST)
+#                 ftp.login(FTP_USER, FTP_PASS)
+#                 ftp.set_pasv(True)  # 啟用被動模式
+#                 with open(filename, 'rb') as f:
+#                     ftp.storbinary(f'STOR %s' % filename_encoded, f)
+#                 ftp.quit()
+#             except Exception as e:
+#                 return jsonify({"error": f"FTP上傳失敗: {e}"}), 500
+#             finally:
+#                 ftp.close()
+#                 os.remove(filename)  # 上傳完成後刪除本地文件
+#
+#             return jsonify({"message": f"文件 {filename} 已成功上傳到FTP伺服器"}), 200
+#         return jsonify({"error": "無效的文件"}), 400
+#     except Exception as e:
+#         return jsonify({"error": str(e)}), 500
 
 
 @app.route('/list_files', methods=['GET'])

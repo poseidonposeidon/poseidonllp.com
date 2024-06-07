@@ -918,7 +918,7 @@ document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
-    fetch('https://114.32.65.180/ftp/list_files')  // 注意這裡的 URL 使用了 Nginx 代理的路徑
+    fetch('https://114.32.65.180/list_files')  // 注意这里的 URL 使用了 Flask 服务器的路径
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
@@ -928,10 +928,10 @@ function fetchFileList() {
         .then(data => {
             console.log("File list fetched successfully:", data);
             const select = document.getElementById('ftpFileSelect');
-            select.innerHTML = '';  // 清空之前的選項
+            select.innerHTML = '';  // 清空之前的选项
             if (data.files && data.files.length > 0) {
                 const defaultOption = document.createElement('option');
-                defaultOption.textContent = "選擇FTP上的文件";
+                defaultOption.textContent = "选择FTP上的文件";
                 defaultOption.disabled = true;
                 defaultOption.selected = true;
                 select.appendChild(defaultOption);
@@ -944,14 +944,14 @@ function fetchFileList() {
                 });
             } else {
                 const option = document.createElement('option');
-                option.textContent = "無可用文件";
+                option.textContent = "无可用文件";
                 option.disabled = true;
                 select.appendChild(option);
             }
         })
         .catch(error => {
             console.error('Error fetching file list:', error);
-            document.getElementById('upload-result').innerText = '錯誤發生，請檢查網絡連接或服務器狀態！\n' + error;
+            document.getElementById('upload-result').innerText = '错误发生，请检查网络连接或服务器状态！\n' + error;
         });
 }
 
@@ -960,7 +960,7 @@ function uploadToFTP() {
     const file = fileInput.files[0];
 
     if (!file) {
-        alert('請選擇一個檔案！');
+        alert('请选择一个文件！');
         return;
     }
 
@@ -974,13 +974,13 @@ function uploadToFTP() {
     uploadProgressContainer.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://114.32.65.180/ftp/upload_to_ftp', true);  // 使用 Nginx 代理的 URL
+    xhr.open('POST', 'https://114.32.65.180/upload_to_ftp', true);  // 更新 URL
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
             const percentComplete = (event.loaded / event.total) * 100;
             uploadProgressBar.style.width = percentComplete + '%';
-            uploadProgressText.textContent = '文件上傳中... ' + Math.round(percentComplete) + '%';
+            uploadProgressText.textContent = '文件上传中... ' + Math.round(percentComplete) + '%';
         }
     };
 
@@ -988,18 +988,17 @@ function uploadToFTP() {
         uploadProgressContainer.style.display = 'none';
         if (xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
-            alert(response.message || '文件已成功上傳到伺服器');
-            fetchFileList();  // 手動刷新文件列表
-            fileInput.value = '';  // 清空文件選擇器
+            alert(response.message || '文件已成功上传到服务器');
+            fetchFileList();
+            fileInput.value = '';
         } else {
-            const response = JSON.parse(xhr.responseText);
-            alert('上傳失敗，請重試！' + (response.error ? '\n' + response.error : ''));
+            alert('上传失败，请重试！');
         }
     };
 
     xhr.onerror = function () {
         uploadProgressContainer.style.display = 'none';
-        alert('上傳失敗，請重試！');
+        alert('上传失败，请重试！');
     };
 
     xhr.send(formData);
@@ -1010,7 +1009,7 @@ function transcribeFromFTP() {
     const filename = select.value;
 
     if (!filename) {
-        document.getElementById('upload-result').innerText = '請選擇FTP上的文件！';
+        document.getElementById('upload-result').innerText = '请选择FTP上的文件！';
         return;
     }
 
@@ -1018,7 +1017,7 @@ function transcribeFromFTP() {
 
     document.getElementById('transcription-progress-container').style.display = 'block';
 
-    fetch('https://114.32.65.180/transcribe_from_ftp', {  // 注意這裡的 URL 使用了 Nginx 代理的路徑
+    fetch('https://114.32.65.180/transcribe_from_ftp', {  // 更新 URL
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1034,18 +1033,18 @@ function transcribeFromFTP() {
                 sessionID = data.sessionID;  // 保存 session ID
             } else {
                 console.error('Error:', data.error);
-                document.getElementById('upload-result').innerText = '轉錄失敗，請重試！\n' + data.error;
+                document.getElementById('upload-result').innerText = '转录失败，请重试！\n' + data.error;
             }
         })
         .catch(error => {
             document.getElementById('transcription-progress-container').style.display = 'none';
             console.error('Error:', error);
-            document.getElementById('upload-result').innerText = '錯誤發生，請檢查網絡連接或服務器狀態！\n' + error;
+            document.getElementById('upload-result').innerText = '错误发生，请检查网络连接或服务器状态！\n' + error;
         });
 }
 
 function updateProgress() {
-    fetch(`https://114.32.65.180/progress/${sessionID}`)  // 注意這裡的 URL 使用了 Nginx 代理的路徑
+    fetch(`https://114.32.65.180/progress/${sessionID}`)  // 更新 URL
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
@@ -1056,9 +1055,9 @@ function updateProgress() {
 
 function clearPreviousResult() {
     const container = document.getElementById('transcriptionResult');
-    container.innerHTML = '';  // 清空先前的結果
+    container.innerHTML = '';  // 清空先前的结果
 
-    // 隱藏下載和閱讀更多按鈕
+    // 隐藏下载和阅读更多按钮
     document.getElementById('downloadBtn').classList.add('hidden');
     document.getElementById('readMoreBtn').classList.add('hidden');
     document.getElementById('readLessBtn').classList.add('hidden');
@@ -1069,11 +1068,11 @@ function displayTranscription(data) {
     const container = document.getElementById('transcriptionResult');
     const readMoreBtn = document.getElementById('readMoreBtn');
     const readLessBtn = document.getElementById('readLessBtn');
-    container.innerHTML = '';  // 清空先前的結果
+    container.innerHTML = '';  // 清空先前的结果
     if (data.error) {
-        container.innerHTML = `<p>錯誤: ${data.error}</p>`;
+        container.innerHTML = `<p>错误: ${data.error}</p>`;
     } else {
-        transcriptionText = data.text || "無轉寫內容";
+        transcriptionText = data.text || "无转写内容";
         container.innerHTML = `<p>${transcriptionText.replace(/\n/g, '<br>')}</p>`;
         if (container.scrollHeight > container.clientHeight) {
             readMoreBtn.classList.remove('hidden');
@@ -1103,6 +1102,6 @@ function downloadTranscription() {
     const blob = new Blob([transcriptionText], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = sessionID + ".txt"; // 使用 session ID 作為文件名
+    a.download = sessionID + ".txt"; // 使用 session ID 作为文件名
     a.click();
 }
