@@ -17,12 +17,6 @@ FTP_HOST = '114.32.65.180'
 FTP_USER = 'Henry'
 FTP_PASS = '123456'
 
-def compress_file(filename):
-    compressed_filename = f"{filename}.zip"
-    with zipfile.ZipFile(compressed_filename, 'w') as zipf:
-        zipf.write(filename, compress_type=zipfile.ZIP_DEFLATED)
-    return compressed_filename
-
 @app.route('/upload_to_ftp', methods=['POST'])
 def upload_to_ftp():
     try:
@@ -54,7 +48,6 @@ def upload_to_ftp():
         return jsonify({"error": "無效的文件"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 @app.route('/list_files', methods=['GET'])
 def list_files():
