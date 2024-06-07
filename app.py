@@ -19,7 +19,7 @@ os.environ["WHISPER_DISABLE_F16"] = "1"
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 設置為500MB
 app.secret_key = 'supersecretkey'  # 用於 session
-CORS(app, resources={r"/*": {"origins": "https://www.poseidonllp.com"}})  # 只允許特定域名訪問
+CORS(app, resources={r"/*": {"origins": "*"}})  # 允許所有來源
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -80,7 +80,6 @@ def upload_to_ftp():
         return jsonify({"error": "無效的文件"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
 
 @app.route('/list_files', methods=['GET'])
 def list_files():
@@ -188,4 +187,4 @@ def format_time(seconds):
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    app.run(debug=True, host='0.0.0.0', port=5000, ssl_context=('C:/openssl/cert.pem', 'C:/openssl/key.pem'))

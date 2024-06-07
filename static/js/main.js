@@ -914,8 +914,11 @@ let transcriptionText = "";
 let sessionID = "";
 let progressInterval;
 
-document.addEventListener("DOMContentLoaded", function() {
-    fetch('http://114.32.65.180:5001/list_files')
+document.addEventListener("DOMContentLoaded", fetchFileList);
+
+function fetchFileList() {
+    console.log("Fetching file list from server...");
+    fetch('https://114.32.65.180:5001/list_files')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
@@ -923,9 +926,16 @@ document.addEventListener("DOMContentLoaded", function() {
             return response.json();
         })
         .then(data => {
+            console.log("File list fetched successfully:", data);
             const select = document.getElementById('ftpFileSelect');
             select.innerHTML = '';  // 清空之前的選項
             if (data.files && data.files.length > 0) {
+                const defaultOption = document.createElement('option');
+                defaultOption.textContent = "選擇FTP上的文件";
+                defaultOption.disabled = true;
+                defaultOption.selected = true;
+                select.appendChild(defaultOption);
+
                 data.files.forEach(file => {
                     const option = document.createElement('option');
                     option.value = file;
@@ -940,10 +950,10 @@ document.addEventListener("DOMContentLoaded", function() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error fetching file list:', error);
             document.getElementById('upload-result').innerText = '錯誤發生，請檢查網絡連接或服務器狀態！\n' + error;
         });
-});
+}
 
 function uploadToFTP() {
     const fileInput = document.getElementById('audioFile');
@@ -964,7 +974,7 @@ function uploadToFTP() {
     uploadProgressContainer.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://114.32.65.180:5000/upload_to_ftp', true);
+    xhr.open('POST', 'https://114.32.65.180:5000/upload_to_ftp', true);
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
@@ -975,13 +985,13 @@ function uploadToFTP() {
     };
 
     xhr.onload = function () {
+        uploadProgressContainer.style.display = 'none';
         if (xhr.status === 200) {
-            uploadProgressContainer.style.display = 'none';
             const response = JSON.parse(xhr.responseText);
-            alert(response.message || '文件已成功上傳到FTP伺服器');
-            location.reload();  // 重新加載頁面以更新文件列表
+            alert(response.message || '文件已成功上傳到伺服器');
+            fetchFileList();  // 手動刷新文件列表
+            fileInput.value = '';  // 清空文件選擇器
         } else {
-            uploadProgressContainer.style.display = 'none';
             const response = JSON.parse(xhr.responseText);
             alert('上傳失敗，請重試！' + (response.error ? '\n' + response.error : ''));
         }
@@ -1008,7 +1018,7 @@ function transcribeFromFTP() {
 
     document.getElementById('transcription-progress-container').style.display = 'block';
 
-    fetch('http://114.32.65.180:5000/transcribe_from_ftp', {  // 使用轉錄的Flask伺服器URL
+    fetch('https://114.32.65.180:5000/transcribe_from_ftp', {  // 使用轉錄的Flask伺服器URL
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1035,7 +1045,7 @@ function transcribeFromFTP() {
 }
 
 function updateProgress() {
-    fetch(`http://114.32.65.180:5000/progress/${sessionID}`)  // 使用轉錄的Flask伺服器URL
+    fetch(`https://114.32.65.180:5000/progress/${sessionID}`)  // 使用轉錄的Flask伺服器URL
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');

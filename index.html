@@ -120,7 +120,6 @@
 </div>
 
 <div>
-
     <h2>錄音檔轉文字</h2>
     <input type="file" id="audioFile" accept="audio/*">
     <button onclick="uploadToFTP()">上傳錄音檔到FTP</button>
@@ -133,7 +132,7 @@
         <div id="upload-progress-bar" style="width: 0%; height: 20px; background-color: #4caf50;"></div>
         <p id="upload-progress-text">文件上傳中...</p>
     </div>
-    <div id="transcription-progress-container" class="center-content">
+    <div id="transcription-progress-container" style="display: none; text-align: center;">
         <div>
             <div class="loader"></div>
             <p id="transcription-progress-text">轉檔中...</p>
