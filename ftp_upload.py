@@ -10,7 +10,7 @@ import time
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 設置為500MB
 app.config['UPLOAD_TIMEOUT'] = 3600  # 設置超時為1小時（單位：秒）
-CORS(app, resources={r"/*": {"origins": "*"}})  # 允許所有來源
+CORS(app, resources={r"/*": {"origins": "https://www.poseidonllp.com"}})  # 允許指定來源
 
 # 設置FTP伺服器信息
 FTP_HOST = '114.32.65.180'
@@ -22,15 +22,6 @@ def compress_file(filename):
     with zipfile.ZipFile(compressed_filename, 'w') as zipf:
         zipf.write(filename, compress_type=zipfile.ZIP_DEFLATED)
     return compressed_filename
-
-def retry_on_failure(func, retries=3, delay=5):
-    for i in range(retries):
-        try:
-            return func()
-        except Exception as e:
-            print(f"Retrying due to error: {e}")
-            time.sleep(delay)
-    raise Exception("Max retries reached")
 
 @app.route('/upload_to_ftp', methods=['POST'])
 def upload_to_ftp():
