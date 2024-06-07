@@ -918,7 +918,7 @@ document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
-    fetch('https://114.32.65.180/list_files')  // 使用 Flask 伺服器的 URL
+    fetch('https://114.32.65.180/ftp/list_files')  // 使用 Flask 伺服器的 URL
         .then(response => {
             if (!response.ok) {
                 throw new Error('網絡響應不正確 ' + response.statusText);
