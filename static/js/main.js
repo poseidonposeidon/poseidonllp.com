@@ -974,7 +974,7 @@ function uploadToFTP() {
     uploadProgressContainer.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://114.32.65.180/upload_to_ftp', true);  // 注意這裡的 URL 使用了 Nginx 代理的路徑
+    xhr.open('POST', 'https://www.poseidonllp.com/ftp/upload_to_ftp', true);  // 使用 Nginx 代理的 URL
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {

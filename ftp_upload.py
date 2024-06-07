@@ -8,11 +8,11 @@ import zipfile
 import time
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 設置為500MB
-app.config['UPLOAD_TIMEOUT'] = 3600  # 設置超時為1小時（單位：秒）
-CORS(app, resources={r"/*": {"origins": "*"}})  # 允許所有來源
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 设置为500MB
+app.config['UPLOAD_TIMEOUT'] = 3600  # 设置超时为1小时（单位：秒）
+CORS(app, resources={r"/*": {"origins": "*"}})  # 允许所有来源
 
-# 設置FTP伺服器信息
+# 设置FTP服务器信息
 FTP_HOST = '114.32.65.180'
 FTP_USER = 'Henry'
 FTP_PASS = '123456'
@@ -36,34 +36,34 @@ def retry_on_failure(func, retries=3, delay=5):
 def upload_to_ftp():
     try:
         if 'file' not in request.files:
-            return jsonify({"error": "沒有上傳文件"}), 400
+            return jsonify({"error": "没有上传文件"}), 400
         file = request.files['file']
         if file.filename == '':
-            return jsonify({"error": "文件名為空"}), 400
+            return jsonify({"error": "文件名为空"}), 400
         if file:
             filename = secure_filename(file.filename)
-            # 確保文件名以UTF-8格式進行編碼
+            # 确保文件名以UTF-8格式进行编码
             filename_encoded = urllib.parse.quote(filename)
             compressed_filename = compress_file(filename)
             file.save(compressed_filename)
 
             ftp = FTP()
-            ftp.set_debuglevel(0)  # 禁用詳細的調試日誌
+            ftp.set_debuglevel(0)  # 禁用详细的调试日志
             try:
                 ftp.connect(FTP_HOST, timeout=3600)
                 ftp.login(FTP_USER, FTP_PASS)
-                ftp.set_pasv(True)  # 啟用被動模式
+                ftp.set_pasv(True)  # 启用被动模式
                 with open(compressed_filename, 'rb') as f:
                     retry_on_failure(lambda: ftp.storbinary(f'STOR {filename_encoded}.zip', f))
                 ftp.quit()
             except Exception as e:
-                return jsonify({"error": f"FTP上傳失敗: {e}"}), 500
+                return jsonify({"error": f"FTP上传失败: {e}"}), 500
             finally:
                 ftp.close()
-                os.remove(compressed_filename)  # 上傳完成後刪除本地文件
+                os.remove(compressed_filename)  # 上传完成后删除本地文件
 
-            return jsonify({"message": f"文件 {filename} 已成功上傳到FTP伺服器"})
-        return jsonify({"error": "無效的文件"}), 400
+            return jsonify({"message": f"文件 {filename} 已成功上传到FTP服务器"})
+        return jsonify({"error": "无效的文件"}), 400
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
@@ -76,15 +76,15 @@ def list_files():
         ftp.login(FTP_USER, FTP_PASS)
         ftp.set_pasv(True)
 
-        # 列出所有文件和文件夾
+        # 列出所有文件和文件夹
         files = ftp.nlst()
 
-        # 過濾掉 `ssl` 文件夾
+        # 过滤掉 `ssl` 文件夹
         filtered_files = [file for file in files if file != 'ssl']
 
         ftp.quit()
 
-        # 確保文件名以UTF-8格式進行解碼
+        # 确保文件名以UTF-8格式进行解码
         files_decoded = [urllib.parse.unquote(f) for f in filtered_files]
         return jsonify({"files": files_decoded})
     except Exception as e:
@@ -92,4 +92,4 @@ def list_files():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port=5001)  # 確保 port 為 5001
+    app.run(debug=True, host='0.0.0.0', port=5001)  # 确保 port 为 5001
