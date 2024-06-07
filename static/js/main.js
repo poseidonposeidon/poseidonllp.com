@@ -918,7 +918,7 @@ document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
-    fetch('https://114.32.65.180/ftp/list_files')  // 使用 Flask 伺服器的 URL
+    fetch('https://114.32.65.180/ftp/list_files')  // 確認這個 URL
         .then(response => {
             if (!response.ok) {
                 throw new Error('網絡響應不正確 ' + response.statusText);
@@ -974,7 +974,7 @@ function uploadToFTP() {
     uploadProgressContainer.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://114.32.65.180/ftp/upload_to_ftp', true);  // 更新 URL
+    xhr.open('POST', 'https://114.32.65.180/ftp/upload_to_ftp', true);  // 確認這個 URL
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {

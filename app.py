@@ -125,6 +125,7 @@ def transcribe_audio_from_ftp(filename, session_id):
         print(f"Error in transcribe_audio_from_ftp: {e}")
         raise
 
+
 def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
