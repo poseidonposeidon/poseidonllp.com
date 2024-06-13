@@ -990,13 +990,23 @@ function uploadToFTP() {
         uploadProgressContainer.style.display = 'none';
         uploadProgressText.style.display = 'none';
         if (xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            alert(response.message || '檔案已成功上傳到伺服器');
-            fetchFileList();  // 手動刷新文件列表
-            fileInput.value = '';  // 清空文件選擇器
+            try {
+                const response = JSON.parse(xhr.responseText);
+                alert(response.message || '檔案已成功上傳到伺服器');
+                fetchFileList();  // 手動刷新文件列表
+                fileInput.value = '';  // 清空文件選擇器
+            } catch (error) {
+                console.error('無法解析響應:', error);
+                alert('無法解析伺服器響應');
+            }
         } else {
-            const response = JSON.parse(xhr.responseText);
-            alert('上傳失敗，請重試！' + (response.error ? '\n' + response.error : ''));
+            try {
+                const response = JSON.parse(xhr.responseText);
+                alert('上傳失敗，請重試！' + (response.error ? '\n' + response.error : ''));
+            } catch (error) {
+                console.error('無法解析錯誤響應:', error);
+                alert('上傳失敗，請重試！');
+            }
         }
     };
 
