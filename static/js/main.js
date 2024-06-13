@@ -918,24 +918,22 @@ document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
-    fetch('https://114.32.65.180/ftp/list_files')  // 確認這個 URL
+    fetch('http://114.32.65.180:5001/list_files')
         .then(response => {
             if (!response.ok) {
-                throw new Error('網絡響應不正確 ' + response.statusText);
+                throw new Error('Network response was not ok ' + response.statusText);
             }
             return response.json();
         })
         .then(data => {
-            console.log("文件列表獲取成功:", data);
+            console.log("File list fetched successfully:", data);
             const select = document.getElementById('ftpFileSelect');
+            if (!select) {
+                console.error('Element with id "ftpFileSelect" not found');
+                return;
+            }
             select.innerHTML = '';  // 清空之前的選項
             if (data.files && data.files.length > 0) {
-                const defaultOption = document.createElement('option');
-                defaultOption.textContent = "選擇FTP上的文件";
-                defaultOption.disabled = true;
-                defaultOption.selected = true;
-                select.appendChild(defaultOption);
-
                 data.files.forEach(file => {
                     const option = document.createElement('option');
                     option.value = file;
@@ -950,8 +948,11 @@ function fetchFileList() {
             }
         })
         .catch(error => {
-            console.error('獲取文件列表時發生錯誤:', error);
-            document.getElementById('upload-result').innerText = '錯誤發生，請檢查網絡連接或服務器狀態！\n' + error;
+            console.error('Error fetching file list:', error);
+            const uploadResult = document.getElementById('upload-result');
+            if (uploadResult) {
+                uploadResult.innerText = '錯誤發生，請檢查網絡連接或伺服器狀態！\n' + error;
+            }
         });
 }
 
@@ -960,7 +961,7 @@ function uploadToFTP() {
     const file = fileInput.files[0];
 
     if (!file) {
-        alert('請選擇一個文件！');
+        alert('請選擇一個檔案！');
         return;
     }
 
@@ -972,32 +973,36 @@ function uploadToFTP() {
     const uploadProgressText = document.getElementById('upload-progress-text');
 
     uploadProgressContainer.style.display = 'block';
+    uploadProgressText.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://114.32.65.180/ftp/upload_to_ftp', true);  // 確認這個 URL
+    xhr.open('POST', 'http://114.32.65.180:5000/upload_to_ftp', true);
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
             const percentComplete = (event.loaded / event.total) * 100;
             uploadProgressBar.style.width = percentComplete + '%';
-            uploadProgressText.textContent = '文件上傳中... ' + Math.round(percentComplete) + '%';
+            uploadProgressText.textContent = '檔案上傳中... ' + Math.round(percentComplete) + '%';
         }
     };
 
     xhr.onload = function () {
         uploadProgressContainer.style.display = 'none';
+        uploadProgressText.style.display = 'none';
         if (xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
-            alert(response.message || '文件已成功上傳到伺服器');
-            fetchFileList();
-            fileInput.value = '';
+            alert(response.message || '檔案已成功上傳到伺服器');
+            fetchFileList();  // 手動刷新文件列表
+            fileInput.value = '';  // 清空文件選擇器
         } else {
-            alert('上傳失敗，請重試！');
+            const response = JSON.parse(xhr.responseText);
+            alert('上傳失敗，請重試！' + (response.error ? '\n' + response.error : ''));
         }
     };
 
     xhr.onerror = function () {
         uploadProgressContainer.style.display = 'none';
+        uploadProgressText.style.display = 'none';
         alert('上傳失敗，請重試！');
     };
 
@@ -1009,7 +1014,10 @@ function transcribeFromFTP() {
     const filename = select.value;
 
     if (!filename) {
-        document.getElementById('upload-result').innerText = '請選擇FTP上的文件！';
+        const uploadResult = document.getElementById('upload-result');
+        if (uploadResult) {
+            uploadResult.innerText = '請選擇FTP上的檔案！';
+        }
         return;
     }
 
@@ -1017,7 +1025,7 @@ function transcribeFromFTP() {
 
     document.getElementById('transcription-progress-container').style.display = 'block';
 
-    fetch('https://114.32.65.180/transcribe_from_ftp', {  // 使用 Flask 伺服器的 URL
+    fetch('http://114.32.65.180:5000/transcribe_from_ftp', {  // 使用轉錄的Flask伺服器URL
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1032,25 +1040,31 @@ function transcribeFromFTP() {
                 document.getElementById('downloadBtn').classList.remove('hidden');
                 sessionID = data.sessionID;  // 保存 session ID
             } else {
-                console.error('轉錄失敗:', data.error);
-                document.getElementById('upload-result').innerText = '轉錄失敗，請重試！\n' + data.error;
+                console.error('Error:', data.error);
+                const uploadResult = document.getElementById('upload-result');
+                if (uploadResult) {
+                    uploadResult.innerText = '轉錄失敗，請重試！\n' + data.error;
+                }
             }
         })
         .catch(error => {
             document.getElementById('transcription-progress-container').style.display = 'none';
-            console.error('錯誤發生:', error);
-            document.getElementById('upload-result').innerText = '錯誤發生，請檢查網絡連接或服務器狀態！\n' + error;
+            console.error('Error:', error);
+            const uploadResult = document.getElementById('upload-result');
+            if (uploadResult) {
+                uploadResult.innerText = '錯誤發生，請檢查網絡連接或伺服器狀態！\n' + error;
+            }
         });
 }
 
 function updateProgress() {
-    fetch(`https://114.32.65.180/progress/${sessionID}`)  // 使用 Flask 伺服器的 URL
+    fetch(`http://114.32.65.180:5000/progress/${sessionID}`)  // 使用轉錄的Flask伺服器URL
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
             progressBar.style.width = data.progress + '%';
         })
-        .catch(error => console.error('錯誤發生:', error));
+        .catch(error => console.error('Error:', error));
 }
 
 function clearPreviousResult() {

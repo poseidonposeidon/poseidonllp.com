@@ -124,14 +124,16 @@
     <input type="file" id="audioFile" accept="audio/*">
     <button onclick="uploadToFTP()">上傳錄音檔到FTP</button>
     <select id="ftpFileSelect">
-        <option value="" disabled selected>選擇FTP上的文件</option>
+        <option value="" disabled selected>選擇FTP上的檔案</option>
     </select>
     <button onclick="transcribeFromFTP()">轉檔</button>
     <button id="downloadBtn" class="hidden" onclick="downloadTranscription()">下載文字檔</button>
-    <div id="upload-progress-container" style="display: none; text-align: center;">
-        <div id="upload-progress-bar" style="width: 0%; height: 20px; background-color: #4caf50;"></div>
-        <p id="upload-progress-text">文件上傳中...</p>
+
+    <div id="upload-progress-container" style="display: none;">
+        <div id="upload-progress-bar"></div>
     </div>
+    <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">檔案上傳中...</p>
+
     <div id="transcription-progress-container" style="display: none; text-align: center;">
         <div>
             <div class="loader"></div>
@@ -141,9 +143,8 @@
     <div class="scroll-container" id="transcriptionResult">
         <!-- 轉寫結果將顯示在這裡 -->
     </div>
-    <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">Read More</button>
-    <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
-
+    <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">閱讀更多</button>
+    <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">閱讀更少</button>
 
 </div>
 
