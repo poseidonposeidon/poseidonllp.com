@@ -17,7 +17,7 @@ import urllib.parse
 os.environ["WHISPER_DISABLE_F16"] = "1"
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 設置為500MB
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 1024  # 設置為1024MB
 app.secret_key = 'supersecretkey'  # 用於 session
 CORS(app, resources={r"/*": {"origins": "*"}})
 

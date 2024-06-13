@@ -7,7 +7,7 @@ import urllib.parse
 import tempfile
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 設置為500MB
+app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 1024  # 設置為1024MB
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # 設置FTP伺服器信息
