@@ -914,7 +914,7 @@ document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
-    fetch('https://www.poseidonllp.com/ftp/list_files')  // 使用你的公開域名
+    fetch('https://www.poseidonllp.com/list_files')  // 正確的 API 路徑
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
@@ -951,6 +951,7 @@ function fetchFileList() {
             }
         });
 }
+
 
 function uploadToFTP() {
     const fileInput = document.getElementById('audioFile');
