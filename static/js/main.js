@@ -910,15 +910,11 @@ function displayInsiderTrades(data) {
     table.innerHTML = htmlContent;
 }
 ////////////////////////////錄音檔轉文字/////////////////////////////
-let transcriptionText = "";
-let sessionID = "";
-let progressInterval;
-
 document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
-    fetch('https://114.32.65.180/ftp/list_files')
+    fetch('https://www.poseidonllp.com/ftp/list_files')  // 使用你的公開域名
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
@@ -976,7 +972,7 @@ function uploadToFTP() {
     uploadProgressText.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://114.32.65.180/ftp/upload_to_ftp', true);
+    xhr.open('POST', 'https://www.poseidonllp.com/ftp/upload_to_ftp', true);  // 使用你的公開域名
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
@@ -990,14 +986,21 @@ function uploadToFTP() {
         uploadProgressContainer.style.display = 'none';
         uploadProgressText.style.display = 'none';
         if (xhr.status === 200) {
-            try {
-                const response = JSON.parse(xhr.responseText);
-                alert(response.message || '檔案已成功上傳到伺服器');
-                fetchFileList();  // 手動刷新文件列表
-                fileInput.value = '';  // 清空文件選擇器
-            } catch (error) {
-                console.error('無法解析響應:', error);
-                alert('無法解析伺服器響應');
+            // 檢查回應的 Content-Type 標頭
+            const contentType = xhr.getResponseHeader('Content-Type');
+            if (contentType && contentType.includes('application/json')) {
+                try {
+                    const response = JSON.parse(xhr.responseText);
+                    alert(response.message || '檔案已成功上傳到伺服器');
+                    fetchFileList();  // 手動刷新文件列表
+                    fileInput.value = '';  // 清空文件選擇器
+                } catch (error) {
+                    console.error('無法解析響應:', error);
+                    alert('無法解析伺服器響應');
+                }
+            } else {
+                // 如果回應類型不是 JSON，則直接顯示回應文本
+                alert('伺服器回應:\n' + xhr.responseText);
             }
         } else {
             try {
@@ -1035,14 +1038,19 @@ function transcribeFromFTP() {
 
     document.getElementById('transcription-progress-container').style.display = 'block';
 
-    fetch('https://114.32.65.180/transcribe_from_ftp', {  // 使用轉錄的Flask伺服器URL
+    fetch('https://www.poseidonllp.com/transcribe_from_ftp', {  // 使用你的公開域名
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({ filename: filename })
     })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                return response.text().then(text => { throw new Error(text); });
+            }
+            return response.json();
+        })
         .then(data => {
             document.getElementById('transcription-progress-container').style.display = 'none';
             if (data.text) {
@@ -1068,7 +1076,7 @@ function transcribeFromFTP() {
 }
 
 function updateProgress() {
-    fetch(`https://114.32.65.180/progress/${sessionID}`)  // 使用轉錄的Flask伺服器URL
+    fetch(`https://www.poseidonllp.com/progress/${sessionID}`)  // 使用你的公開域名
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
@@ -1129,3 +1137,4 @@ function downloadTranscription() {
     a.download = sessionID + ".txt"; // 使用 session ID 作為文件名
     a.click();
 }
+

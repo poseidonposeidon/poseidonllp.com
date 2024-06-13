@@ -1,24 +1,25 @@
-from flask import Flask, request, jsonify, send_from_directory, session
+from flask import Flask, request, jsonify, send_from_directory, session ,copy_current_request_context
+from flask_cors import CORS
+from ftplib import FTP
+from werkzeug.utils import secure_filename
+from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+import tempfile
+import os
+import urllib.parse
+import uuid
 import whisper
 from opencc import OpenCC
 from deep_translator import GoogleTranslator
-import os
-import tempfile
 import torch
-import uuid
-from flask_cors import CORS
-from werkzeug.utils import secure_filename
-from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
-from ftplib import FTP
-from flask import copy_current_request_context
-import urllib.parse
 
 # 禁用 FP16 使用 FP32
 os.environ["WHISPER_DISABLE_F16"] = "1"
 
 app = Flask(__name__)
-app.config['MAX_CONTENT_LENGTH'] = 1024 * 1024 * 1024  # 設置為1024MB
+app.config['MAX_CONTENT_LENGTH'] = 2048 * 1024 * 1024  # 設置為2048MB
 app.secret_key = 'supersecretkey'  # 用於 session
+
+# 啟用 CORS，允許來自任何來源的請求
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
@@ -41,7 +42,7 @@ FTP_PASS = '123456'
 @app.before_request
 def log_request_info():
     ip_address = request.remote_addr
-    # print(f"New request from IP: {ip_address}")
+    print(f"New request from IP: {ip_address}")
 
 @app.route('/')
 def index():
@@ -61,24 +62,36 @@ def upload_to_ftp():
                 temp_path = temp_file.name
                 file.save(temp_path)
 
-            ftp = FTP()
-            ftp.set_debuglevel(0)  # 禁用詳細的調試日誌
-            try:
-                ftp.connect(FTP_HOST)
-                ftp.login(FTP_USER, FTP_PASS)
-                ftp.set_pasv(True)  # 啟用被動模式
-                with open(temp_path, 'rb') as f:
-                    ftp.storbinary(f'STOR %s' % urllib.parse.quote(filename), f)
-                ftp.quit()
-            except Exception as e:
-                return jsonify({"error": f"FTP上傳失敗: {e}"}), 500
-            finally:
-                ftp.close()
-                os.remove(temp_path)  # 上傳完成後刪除本地文件
+            def upload():
+                try:
+                    ftp = FTP()
+                    ftp.set_debuglevel(0)  # 禁用詳細的調試日誌
+                    ftp.connect(FTP_HOST)
+                    ftp.login(FTP_USER, FTP_PASS)
+                    ftp.set_pasv(True)  # 啟用被動模式
 
-            return jsonify({"message": f"文件 {filename} 已成功上傳到FTP伺服器"}), 200
+                    # 切換到“錄音檔”資料夾
+                    ftp.cwd('錄音檔')
+
+                    with open(temp_path, 'rb') as f:
+                        ftp.storbinary(f'STOR %s' % urllib.parse.quote(filename), f)
+                    ftp.quit()
+                except Exception as e:
+                    print(f"FTP上傳失敗: {e}")
+                    return jsonify({"error": f"FTP上傳失敗: {e}"}), 500
+                finally:
+                    ftp.close()
+                    os.remove(temp_path)  # 上傳完成後刪除本地文件
+                return jsonify({"message": f"文件 {filename} 已成功上傳到FTP伺服器"}), 200
+
+            future = executor.submit(upload)
+            try:
+                return future.result(timeout=6000)  # 設置超時時間為6000秒
+            except FuturesTimeoutError:
+                return jsonify({"error": "上傳超時"}), 500
         return jsonify({"error": "無效的文件"}), 400
     except Exception as e:
+        print(f"上傳過程中出錯: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/list_files', methods=['GET'])
@@ -89,15 +102,16 @@ def list_files():
         ftp.connect(FTP_HOST)
         ftp.login(FTP_USER, FTP_PASS)
         ftp.set_pasv(True)  # 啟用被動模式
+
+        # 切換到「錄音檔」資料夾
+        ftp.cwd('錄音檔')
+
+        # 列出「錄音檔」資料夾中的檔案
         files = ftp.nlst()
         ftp.quit()
 
-        # 過濾掉不需要顯示的資料夾
-        excluded_directories = ['ssl']
-        files_filtered = [file for file in files if not any(file.startswith(dir) for dir in excluded_directories)]
-
         # 確保文件名以UTF-8格式進行解碼
-        files_decoded = [urllib.parse.unquote(f) for f in files_filtered]
+        files_decoded = [urllib.parse.unquote(f) for f in files]
         return jsonify({"files": files_decoded})
     except Exception as e:
         print(f"Error in list_files: {e}")  # 添加日誌
@@ -119,33 +133,36 @@ def transcribe_handler():
 
         future = executor.submit(transcribe_and_store, filename, session_id)
         try:
-            transcription_result = future.result(timeout=3600)  # 設置超時時間為3600秒
+            transcription_result = future.result(timeout=6000)  # 設置超時時間為6000秒
         except FuturesTimeoutError:
             return jsonify({"error": "轉錄超時"}), 500
+        except Exception as e:
+            print(f"轉錄過程中出錯: {e}")
+            return jsonify({"error": str(e)}), 500
         return jsonify({"text": transcription_result, "sessionID": session_id})  # 返回 session ID
     except Exception as e:
         print(f"Error in transcribe_handler: {e}")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/progress/<session_id>', methods=['GET'])
-def progress(session_id):
-    if session_id in session:
-        progress = session.get(session_id, 0)  # 獲取特定 session ID 的進度
-        return jsonify({"progress": progress})
-    else:
-        return jsonify({"error": "Session ID not found"}), 404
-
 def transcribe_audio_from_ftp(filename, session_id):
     try:
         ftp = FTP()
-        ftp.set_debuglevel(0)  # 禁用詳細的調試日誌
+        ftp.set_debuglevel(1)  # 打開詳細的調試日誌
         ftp.connect(FTP_HOST)
         ftp.login(FTP_USER, FTP_PASS)
         ftp.set_pasv(True)  # 啟用被動模式
 
+        # 切換到「錄音檔」資料夾
+        ftp.cwd('錄音檔')
+
         with tempfile.NamedTemporaryFile(delete=False) as temp_file:
             temp_path = temp_file.name
-            ftp.retrbinary(f'RETR {filename}', temp_file.write)
+            print(f"Downloading file: {filename} to {temp_path}")  # 添加日誌
+            try:
+                ftp.retrbinary(f'RETR {filename}', temp_file.write)
+            except Exception as e:
+                print(f"Error downloading file: {e}")
+                raise
 
         print(f"Transcribing file at {temp_path}")  # 添加日誌
 
@@ -178,13 +195,16 @@ def transcribe_audio_from_ftp(filename, session_id):
 
         # 刪除 FTP 中的檔案
         filename_encoded = urllib.parse.quote(filename)
-        ftp.delete(filename_encoded)
+        try:
+            ftp.delete(filename_encoded)
+        except Exception as e:
+            print(f"Error deleting file from FTP: {e}")
         ftp.quit()
 
         return "\n".join(transcriptions)
     except Exception as e:
         print(f"Error in transcribe_audio_from_ftp: {e}")
-        raise
+        return f"{{'error': '{str(e)}'}}"  # 返回詳細的錯誤信息
 
 def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
