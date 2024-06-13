@@ -30,6 +30,51 @@ div {
     border-radius: 5px; /* 圓角邊框 */
 }
 
+/* Navbar 样式 */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #f3f3f3; /* 輕灰色背景 */
+    padding: 10px 20px; /* 上下10px，左右20px的填充 */
+    border-radius: 10px; /* 设置边框圆角 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
+    margin: 20px; /* 外边距 */
+}
+
+/* Logo 图片样式 */
+.logo {
+    height: 50px; /* 设置一个适当的高度 */
+    width: auto; /* 宽度自适应 */
+}
+
+/* 导航链接容器样式 */
+.navbar-links {
+    display: flex;
+    align-items: center;
+    height: 100%; /* 确保对齐 */
+}
+
+/* 链接样式 */
+.navbar-links a {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 中心对齐文本 */
+    text-decoration: none;
+    color: black;
+    background-color: #ffffff; /* 白色背景 */
+    margin: 0 10px; /* 左右边距 */
+    padding: 8px 16px; /* 上下左右填充 */
+    border-radius: 5px;
+    transition: all 0.3s ease; /* 平滑过渡效果 */
+}
+
+/* 链接悬停样式 */
+.navbar-links a:hover {
+    color: #0056b3;
+    background-color: #e6e6e6; /* 悬停背景色 */
+}
+
 #progress-container {
     width: 70%; /* 設置進度條的寬度 */
     margin: 20px auto; /* 使進度條居中顯示，並設置外邊距 */

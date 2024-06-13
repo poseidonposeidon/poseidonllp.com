@@ -918,7 +918,7 @@ document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
-    fetch('http://114.32.65.180:5001/list_files')
+    fetch('https://114.32.65.180:5001/list_files')  // 更新為 HTTPS
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
@@ -976,7 +976,7 @@ function uploadToFTP() {
     uploadProgressText.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'http://114.32.65.180:5000/upload_to_ftp', true);
+    xhr.open('POST', 'https://114.32.65.180:5000/upload_to_ftp', true);  // 更新為 HTTPS
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
@@ -1025,7 +1025,7 @@ function transcribeFromFTP() {
 
     document.getElementById('transcription-progress-container').style.display = 'block';
 
-    fetch('http://114.32.65.180:5000/transcribe_from_ftp', {  // 使用轉錄的Flask伺服器URL
+    fetch('https://114.32.65.180:5000/transcribe_from_ftp', {  // 使用 HTTPS
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1058,7 +1058,7 @@ function transcribeFromFTP() {
 }
 
 function updateProgress() {
-    fetch(`http://114.32.65.180:5000/progress/${sessionID}`)  // 使用轉錄的Flask伺服器URL
+    fetch(`https://114.32.65.180:5000/progress/${sessionID}`)  // 使用 HTTPS
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
