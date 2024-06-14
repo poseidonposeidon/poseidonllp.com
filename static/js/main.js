@@ -914,7 +914,7 @@ document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
-    fetch('https://www.poseidonllp.com/list_files')  // 正確的 API 路徑
+    fetch('https://api.poseidonllp.com/list_files')  // 正確的 API 路徑
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
