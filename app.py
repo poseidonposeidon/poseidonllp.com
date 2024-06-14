@@ -11,6 +11,7 @@ import whisper
 from opencc import OpenCC
 from deep_translator import GoogleTranslator
 import torch
+import subprocess
 
 # 禁用 FP16 使用 FP32
 os.environ["WHISPER_DISABLE_F16"] = "1"
@@ -18,7 +19,7 @@ os.environ["WHISPER_DISABLE_F16"] = "1"
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 2048 * 1024 * 1024  # 設置為2048MB
 app.secret_key = 'supersecretkey'  # 用於 session
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": {"origins": ["https://www.poseidonllp.com"]}})
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -55,12 +56,15 @@ def upload_to_ftp():
         return jsonify({"error": "文件名為空"}), 400
 
     filename = secure_filename(file.filename)
-    with tempfile.NamedTemporaryFile(delete=False, mode='wb') as temp_file:
-        temp_path = temp_file.name
-        # 將文件內容轉換為 Big5 編碼並寫入臨時文件
-        file_content = file.read()
-        file_content_big5 = file_content.decode('utf-8').encode('big5', errors='ignore')
-        temp_file.write(file_content_big5)
+    temp_path = tempfile.mktemp()  # 生成臨時文件路徑
+
+    try:
+        with open(temp_path, 'wb') as temp_file:
+            # 直接保存上傳文件，不進行編碼轉換
+            file.save(temp_file)
+    except Exception as e:
+        print(f"文件保存失敗: {e}")
+        return jsonify({"error": f"文件保存失敗: {e}"}), 500
 
     def upload():
         try:
@@ -165,17 +169,16 @@ def transcribe_audio_from_ftp(filename, session_id):
 
         print(f"Transcribing file at {temp_path}")  # 添加日誌
 
-        # 將下載的文件內容從 Big5 轉換回 UTF-8
-        with open(temp_path, 'rb') as f:
-            file_content_big5 = f.read()
-            file_content_utf8 = file_content_big5.decode('big5', errors='ignore').encode('utf-8')
+        # 確認音頻格式是否符合要求，如果需要轉換為 wav 格式
+        converted_path = tempfile.mktemp(suffix=".wav")
+        try:
+            subprocess.run(['ffmpeg', '-i', temp_path, '-ar', '16000', '-ac', '1', converted_path], check=True)
+        except subprocess.CalledProcessError as e:
+            print(f"音頻轉換失敗: {e}")
+            raise
 
-        with tempfile.NamedTemporaryFile(delete=False, mode='wb') as utf8_file:
-            utf8_path = utf8_file.name
-            utf8_file.write(file_content_utf8)
-
-        # 語音識別
-        result = model.transcribe(utf8_path)
+        # 使用 Whisper 模型轉錄音頻
+        result = model.transcribe(converted_path)
 
         segments = result['segments']
         total_segments = len(segments)
@@ -200,7 +203,7 @@ def transcribe_audio_from_ftp(filename, session_id):
 
         # 刪除臨時文件
         os.remove(temp_path)
-        os.remove(utf8_path)
+        os.remove(converted_path)
 
         # 刪除 FTP 中的檔案
         filename_encoded = urllib.parse.quote(filename)

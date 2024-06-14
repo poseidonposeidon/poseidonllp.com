@@ -914,7 +914,7 @@ document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
-    fetch('https://api.poseidonllp.com/list_files')  // 正確的 API 路徑
+    fetch('https://api.poseidonllp.com/list_files')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);
@@ -952,7 +952,6 @@ function fetchFileList() {
         });
 }
 
-
 function uploadToFTP() {
     const fileInput = document.getElementById('audioFile');
     const file = fileInput.files[0];
@@ -973,7 +972,7 @@ function uploadToFTP() {
     uploadProgressText.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://api.poseidonllp.com/upload_to_ftp', true);  // 使用你的公開域名
+    xhr.open('POST', 'https://api.poseidonllp.com/upload_to_ftp', true);
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
@@ -987,7 +986,6 @@ function uploadToFTP() {
         uploadProgressContainer.style.display = 'none';
         uploadProgressText.style.display = 'none';
         if (xhr.status === 200) {
-            // 檢查回應的 Content-Type 標頭
             const contentType = xhr.getResponseHeader('Content-Type');
             if (contentType && contentType.includes('application/json')) {
                 try {
@@ -1000,7 +998,6 @@ function uploadToFTP() {
                     alert('無法解析伺服器響應');
                 }
             } else {
-                // 如果回應類型不是 JSON，則直接顯示回應文本
                 alert('伺服器回應:\n' + xhr.responseText);
             }
         } else {
@@ -1039,7 +1036,7 @@ function transcribeFromFTP() {
 
     document.getElementById('transcription-progress-container').style.display = 'block';
 
-    fetch('https://api.poseidonllp.com/transcribe_from_ftp', {  // 使用你的公開域名
+    fetch('https://api.poseidonllp.com/transcribe_from_ftp', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1077,7 +1074,7 @@ function transcribeFromFTP() {
 }
 
 function updateProgress() {
-    fetch(`https://api.poseidonllp.com/progress/${sessionID}`)  // 使用你的公開域名
+    fetch(`https://api.poseidonllp.com/progress/${sessionID}`)
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
@@ -1135,7 +1132,6 @@ function downloadTranscription() {
     const blob = new Blob([transcriptionText], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = sessionID + ".txt"; // 使用 session ID 作為文件名
+    a.download = sessionID + ".txt";
     a.click();
 }
-
