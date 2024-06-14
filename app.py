@@ -22,7 +22,6 @@ app.secret_key = 'supersecretkey'  # 用於 session
 
 # 允許特定的域名
 CORS(app, resources={r"/*": {"origins": "*"}})
-
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {device}")
