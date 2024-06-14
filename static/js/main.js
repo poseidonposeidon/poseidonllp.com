@@ -973,7 +973,7 @@ function uploadToFTP() {
     uploadProgressText.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://www.poseidonllp.com/ftp/upload_to_ftp', true);  // 使用你的公開域名
+    xhr.open('POST', 'https://api.poseidonllp.com/upload_to_ftp', true);  // 使用你的公開域名
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
@@ -1039,7 +1039,7 @@ function transcribeFromFTP() {
 
     document.getElementById('transcription-progress-container').style.display = 'block';
 
-    fetch('https://www.poseidonllp.com/transcribe_from_ftp', {  // 使用你的公開域名
+    fetch('https://api.poseidonllp.com/transcribe_from_ftp', {  // 使用你的公開域名
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1077,7 +1077,7 @@ function transcribeFromFTP() {
 }
 
 function updateProgress() {
-    fetch(`https://www.poseidonllp.com/progress/${sessionID}`)  // 使用你的公開域名
+    fetch(`https://api.poseidonllp.com/progress/${sessionID}`)  // 使用你的公開域名
         .then(response => response.json())
         .then(data => {
             const progressBar = document.getElementById('progress-bar');
