@@ -914,7 +914,11 @@ document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
-    fetch('https://api.poseidonllp.com/list_files')
+    fetch('https://api.poseidonllp.com/list_files', {
+        method: 'GET',
+        mode: 'cors',  // 設置 CORS 模式
+        credentials: 'include'  // 包含憑據（如有需要）
+    })
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok ' + response.statusText);

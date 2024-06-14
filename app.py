@@ -19,7 +19,9 @@ os.environ["WHISPER_DISABLE_F16"] = "1"
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 2048 * 1024 * 1024  # 設置為2048MB
 app.secret_key = 'supersecretkey'  # 用於 session
-CORS(app, resources={r"/*": {"origins": ["https://www.poseidonllp.com"]}})
+
+# 允許特定的域名
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
