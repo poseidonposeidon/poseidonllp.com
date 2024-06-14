@@ -21,11 +21,11 @@ app.config['MAX_CONTENT_LENGTH'] = 2048 * 1024 * 1024  # 設置為2048MB
 app.secret_key = 'supersecretkey'  # 用於 session
 
 # 允許特定的域名
-CORS(app, resources={r"/*": {"origins": "*"}})
+# CORS(app, resources={r"/*": {"origins": "*"}})
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"Using device: {device}")
-model = whisper.load_model("large-v2").to(device)
+model = whisper.load_model("large-v3").to(device)
 
 # 初始化翻譯器
 translator = GoogleTranslator(source='auto', target='zh-TW')
