@@ -48,49 +48,50 @@ def index():
 
 @app.route('/upload_to_ftp', methods=['POST'])
 def upload_to_ftp():
+    if 'file' not in request.files:
+        return jsonify({"error": "沒有上傳文件"}), 400
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({"error": "文件名為空"}), 400
+
+    filename = secure_filename(file.filename)
+    with tempfile.NamedTemporaryFile(delete=False, mode='wb') as temp_file:
+        temp_path = temp_file.name
+        # 將文件內容轉換為 Big5 編碼並寫入臨時文件
+        file_content = file.read()
+        file_content_big5 = file_content.decode('utf-8').encode('big5', errors='ignore')
+        temp_file.write(file_content_big5)
+
+    def upload():
+        try:
+            ftp = FTP()
+            ftp.set_debuglevel(0)  # 禁用詳細的調試日誌
+            ftp.connect(FTP_HOST)
+            ftp.login(FTP_USER, FTP_PASS)
+            ftp.set_pasv(True)  # 啟用被動模式
+
+            # 切換到“錄音檔”資料夾
+            ftp.cwd('錄音檔')
+
+            with open(temp_path, 'rb') as f:
+                ftp.storbinary(f'STOR %s' % urllib.parse.quote(filename), f)
+            ftp.quit()
+            os.remove(temp_path)  # 上傳完成後刪除本地文件
+            return {"message": f"文件 {filename} 已成功上傳到FTP伺服器"}
+        except Exception as e:
+            print(f"FTP上傳失敗: {e}")
+            os.remove(temp_path)  # 在失敗時也刪除文件
+            return {"error": f"FTP上傳失敗: {e}"}
+
+    future = executor.submit(upload)
     try:
-        if 'file' not in request.files:
-            return jsonify({"error": "沒有上傳文件"}), 400
-        file = request.files['file']
-        if file.filename == '':
-            return jsonify({"error": "文件名為空"}), 400
-        if file:
-            filename = secure_filename(file.filename)
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                temp_path = temp_file.name
-                file.save(temp_path)
-
-            def upload():
-                try:
-                    ftp = FTP()
-                    ftp.set_debuglevel(0)  # 禁用詳細的調試日誌
-                    ftp.connect(FTP_HOST)
-                    ftp.login(FTP_USER, FTP_PASS)
-                    ftp.set_pasv(True)  # 啟用被動模式
-
-                    # 切換到“錄音檔”資料夾
-                    ftp.cwd('錄音檔')
-
-                    with open(temp_path, 'rb') as f:
-                        ftp.storbinary(f'STOR %s' % urllib.parse.quote(filename), f)
-                    ftp.quit()
-                except Exception as e:
-                    print(f"FTP上傳失敗: {e}")
-                    return jsonify({"error": f"FTP上傳失敗: {e}"}), 500
-                finally:
-                    ftp.close()
-                    os.remove(temp_path)  # 上傳完成後刪除本地文件
-                return jsonify({"message": f"文件 {filename} 已成功上傳到FTP伺服器"}), 200
-
-            future = executor.submit(upload)
-            try:
-                return future.result(timeout=6000)  # 設置超時時間為6000秒
-            except FuturesTimeoutError:
-                return jsonify({"error": "上傳超時"}), 500
-        return jsonify({"error": "無效的文件"}), 400
-    except Exception as e:
-        print(f"上傳過程中出錯: {e}")
-        return jsonify({"error": str(e)}), 500
+        result = future.result(timeout=6000)  # 設置超時時間為6000秒
+        if "error" in result:
+            return jsonify(result), 500
+        else:
+            return jsonify(result), 200
+    except FuturesTimeoutError:
+        return jsonify({"error": "上傳超時"}), 500
 
 @app.route('/list_files', methods=['GET'])
 def list_files():
@@ -164,8 +165,17 @@ def transcribe_audio_from_ftp(filename, session_id):
 
         print(f"Transcribing file at {temp_path}")  # 添加日誌
 
+        # 將下載的文件內容從 Big5 轉換回 UTF-8
+        with open(temp_path, 'rb') as f:
+            file_content_big5 = f.read()
+            file_content_utf8 = file_content_big5.decode('big5', errors='ignore').encode('utf-8')
+
+        with tempfile.NamedTemporaryFile(delete=False, mode='wb') as utf8_file:
+            utf8_path = utf8_file.name
+            utf8_file.write(file_content_utf8)
+
         # 語音識別
-        result = model.transcribe(temp_path)
+        result = model.transcribe(utf8_path)
 
         segments = result['segments']
         total_segments = len(segments)
@@ -188,8 +198,9 @@ def transcribe_audio_from_ftp(filename, session_id):
 
             session[session_id] = int(((i + 1) / total_segments) * 100)  # 更新特定 session ID 的進度
 
+        # 刪除臨時文件
         os.remove(temp_path)
-        session[session_id] = 100
+        os.remove(utf8_path)
 
         # 刪除 FTP 中的檔案
         filename_encoded = urllib.parse.quote(filename)
