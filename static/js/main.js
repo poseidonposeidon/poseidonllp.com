@@ -1182,7 +1182,7 @@ function downloadTextFile() {
         return;
     }
     const a = document.createElement('a');
-    a.href = `https://api.poseidonllp.com/錄音文字檔/${encodeURIComponent(textFileName)}`;
+    a.href = `https://api.poseidonllp.com/Text_File/${encodeURIComponent(textFileName)}`;
     a.download = textFileName;
     a.click();
 }

@@ -138,7 +138,7 @@ def list_text_files():
         ftp.connect(FTP_HOST)
         ftp.login(FTP_USER, FTP_PASS)
         ftp.set_pasv(True)
-        ftp.cwd('錄音文字檔')
+        ftp.cwd('Text_File')
 
         text_files = ftp.nlst()
         text_files_decoded = [urllib.parse.unquote(f) for f in text_files]
@@ -237,7 +237,7 @@ def transcribe_audio_from_ftp(filename, session_id):
         with tempfile.NamedTemporaryFile(delete=False) as text_file:
             text_file.write("\n".join(transcriptions).encode('utf-8'))
 
-        ftp.cwd('/錄音文字檔')
+        ftp.cwd('/Text_File')
         with open(text_file.name, 'rb') as f:
             ftp.storbinary(f'STOR {urllib.parse.quote(text_filename)}', f)
 
