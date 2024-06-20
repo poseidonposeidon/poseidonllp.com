@@ -910,14 +910,16 @@ function displayInsiderTrades(data) {
     table.innerHTML = htmlContent;
 }
 ////////////////////////////錄音檔轉文字/////////////////////////////
+let originalFileNames = {};
+
 document.addEventListener("DOMContentLoaded", fetchFileList);
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
     fetch('https://api.poseidonllp.com/list_files', {
         method: 'GET',
-        mode: 'cors',  // 設置 CORS 模式
-        credentials: 'include'  // 包含憑據
+        mode: 'cors',
+        credentials: 'include'
     })
         .then(response => {
             if (!response.ok) {
@@ -934,10 +936,13 @@ function fetchFileList() {
             }
             select.innerHTML = '';  // 清空之前的選項
             if (data.files && data.files.length > 0) {
-                data.files.forEach(file => {
+                data.files.forEach(fileInfo => {
+                    const encodedFileName = fileInfo.encoded;
+                    const originalFileName = fileInfo.original;
+                    originalFileNames[encodedFileName] = originalFileName;
                     const option = document.createElement('option');
-                    option.value = file;
-                    option.textContent = file;
+                    option.value = encodedFileName;
+                    option.textContent = originalFileName;
                     select.appendChild(option);
                 });
             } else {
@@ -956,18 +961,6 @@ function fetchFileList() {
         });
 }
 
-function updateQueueCount(count) {
-    const waitingCount = document.getElementById('waiting-count');
-    const waitingNumber = document.getElementById('waiting-number');
-    if (count > 0) {
-        waitingCount.style.display = 'block';
-        waitingNumber.textContent = count;
-    } else {
-        waitingCount.style.display = 'none';
-    }
-}
-
-
 function uploadToFTP() {
     const fileInput = document.getElementById('audioFile');
     const file = fileInput.files[0];
@@ -979,6 +972,7 @@ function uploadToFTP() {
 
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('originalFileName', file.name);  // 傳遞原始文件名
 
     const uploadProgressContainer = document.getElementById('upload-progress-container');
     const uploadProgressBar = document.getElementById('upload-progress-bar');
@@ -1035,11 +1029,13 @@ function uploadToFTP() {
 
     xhr.send(formData);
 }
+
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
-    const filename = select.value;
+    const encodedFilename = select.value;
+    const originalFilename = originalFileNames[encodedFilename];
 
-    if (!filename) {
+    if (!encodedFilename) {
         const uploadResult = document.getElementById('upload-result');
         if (uploadResult) {
             uploadResult.innerText = '請選擇FTP上的檔案！';
@@ -1056,7 +1052,7 @@ function transcribeFromFTP() {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ filename: filename })
+        body: JSON.stringify({ filename: encodedFilename })
     })
         .then(response => {
             if (!response.ok) {
@@ -1077,7 +1073,6 @@ function transcribeFromFTP() {
                     uploadResult.innerText = '轉錄失敗，請重試！\n' + data.error;
                 }
             }
-            updateQueueCount(data.queueCount); // 更新等待數量
         })
         .catch(error => {
             document.getElementById('transcription-progress-container').style.display = 'none';
@@ -1088,17 +1083,6 @@ function transcribeFromFTP() {
             }
         });
 }
-
-
-// function updateProgress() {
-//     fetch(`https://api.poseidonllp.com/progress/${sessionID}`)
-//         .then(response => response.json())
-//         .then(data => {
-//             const progressBar = document.getElementById('progress-bar');
-//             progressBar.style.width = data.progress + '%';
-//         })
-//         .catch(error => console.error('Error:', error));
-// }
 
 function clearPreviousResult() {
     const container = document.getElementById('transcriptionResult');
@@ -1146,9 +1130,10 @@ function toggleReadMore() {
 }
 
 function downloadTranscription() {
+    const decodedFileName = decodeURIComponent(sessionID + ".txt");
     const blob = new Blob([transcriptionText], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = sessionID + ".txt";
+    a.download = decodedFileName;
     a.click();
 }
