@@ -911,6 +911,7 @@ function displayInsiderTrades(data) {
 }
 ////////////////////////////錄音檔轉文字/////////////////////////////
 let originalFileNames = {};
+let currentOriginalFileName = '';  // 添加這一行來保存當前文件的原始文件名
 
 document.addEventListener("DOMContentLoaded", fetchFileList);
 
@@ -1033,7 +1034,7 @@ function uploadToFTP() {
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
     const encodedFilename = select.value;
-    const originalFilename = originalFileNames[encodedFilename];
+    currentOriginalFileName = originalFileNames[encodedFilename];  // 保存原始文件名
 
     if (!encodedFilename) {
         const uploadResult = document.getElementById('upload-result');
@@ -1130,7 +1131,7 @@ function toggleReadMore() {
 }
 
 function downloadTranscription() {
-    const decodedFileName = decodeURIComponent(sessionID + ".txt");
+    const decodedFileName = currentOriginalFileName.replace(/\.[^/.]+$/, "") + ".txt";  // 使用原始文件名並替換擴展名
     const blob = new Blob([transcriptionText], { type: 'text/plain' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);

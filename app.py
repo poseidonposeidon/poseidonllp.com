@@ -12,7 +12,7 @@ from opencc import OpenCC
 from deep_translator import GoogleTranslator
 import torch
 import subprocess
-import io  # 添加此行以解決 'Unresolved reference 'io'' 錯誤
+import io
 
 # 禁用 FP16 使用 FP32
 os.environ["WHISPER_DISABLE_F16"] = "1"
@@ -148,13 +148,13 @@ def transcribe_handler():
 
         future = executor.submit(transcribe_and_store, filename, session_id)
         try:
-            transcription_result = future.result(timeout=6000)
+            transcription_result, original_filename = future.result(timeout=6000)
         except FuturesTimeoutError:
             return jsonify({"error": "轉錄超時"}), 500
         except Exception as e:
             print(f"轉錄過程中出錯: {e}")
             return jsonify({"error": str(e)}), 500
-        return jsonify({"text": transcription_result, "sessionID": session_id})
+        return jsonify({"text": transcription_result, "sessionID": session_id, "originalFilename": original_filename})
     except Exception as e:
         print(f"Error in transcribe_handler: {e}")
         return jsonify({"error": str(e)}), 500
@@ -174,6 +174,17 @@ def transcribe_audio_from_ftp(filename, session_id):
 
         with open(temp_path, 'wb') as temp_file:
             ftp.retrbinary(f'RETR {decoded_filename}', temp_file.write)
+
+        # 读取原始文件名
+        original_filename = decoded_filename
+        try:
+            meta_file_path = tempfile.mktemp()
+            with open(meta_file_path, 'wb') as meta_file:
+                ftp.retrbinary(f'RETR {decoded_filename}.meta', meta_file.write)
+            with open(meta_file_path, 'r', encoding='utf-8') as meta_file:
+                original_filename = meta_file.read().strip()
+        except Exception:
+            pass  # 如果 .meta 文件不存在或出錯，保持文件名為編碼的狀態
 
         converted_path = tempfile.mktemp(suffix=".wav")
         try:
@@ -214,10 +225,10 @@ def transcribe_audio_from_ftp(filename, session_id):
             print(f"Error deleting file from FTP: {e}")
         ftp.quit()
 
-        return "\n".join(transcriptions)
+        return "\n".join(transcriptions), original_filename
     except Exception as e:
         print(f"Error in transcribe_audio_from_ftp: {e}")
-        return f"{{'error': '{str(e)}'}}"
+        return f"{{'error': '{str(e)}'}}", original_filename
 
 def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
