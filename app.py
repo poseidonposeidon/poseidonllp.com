@@ -24,7 +24,7 @@ app.secret_key = 'supersecretkey'  # 用於 session
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"Using device: {device}")
+print(f"使用設備: {device}")
 model = whisper.load_model("large-v3").to(device)
 
 # 初始化翻譯器
@@ -42,7 +42,7 @@ FTP_PASS = '123456'
 @app.before_request
 def log_request_info():
     ip_address = request.remote_addr
-    print(f"New request from IP: {ip_address}")
+    print(f"來自IP的新請求: {ip_address}")
 
 @app.route('/')
 def index():
@@ -58,7 +58,6 @@ def upload_to_ftp():
         return jsonify({"error": "文件名為空"}), 400
 
     filename = secure_filename(file.filename)
-    # 將文件名用 UTF-8 編碼
     filename_encoded = urllib.parse.quote(filename, safe='', encoding='utf-8')
     original_filename_encoded = urllib.parse.quote(original_filename, safe='', encoding='utf-8')
 
@@ -82,7 +81,6 @@ def upload_to_ftp():
 
             with open(temp_path, 'rb') as f:
                 ftp.storbinary(f'STOR {filename_encoded}', f)
-                # 保存原始文件名到 .meta 文件中
                 ftp.storbinary(f'STOR {filename_encoded}.meta', io.BytesIO(original_filename.encode('utf-8')))
             ftp.quit()
             os.remove(temp_path)
@@ -116,7 +114,7 @@ def list_files():
         files_decoded = []
         for file in files:
             if not file.endswith('.meta'):
-                original_filename = file  # 默認使用編碼的文件名
+                original_filename = file
                 meta_file = f"{file}.meta"
                 try:
                     with tempfile.NamedTemporaryFile() as temp_file:
@@ -124,12 +122,30 @@ def list_files():
                         temp_file.seek(0)
                         original_filename = temp_file.read().decode('utf-8')
                 except Exception:
-                    pass  # 如果 .meta 文件不存在或出錯，保持文件名為編碼的狀態
+                    pass
                 files_decoded.append({"encoded": file, "original": original_filename})
         ftp.quit()
         return jsonify({"files": files_decoded})
     except Exception as e:
-        print(f"Error in list_files: {e}")
+        print(f"列出文件錯誤: {e}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/list_text_files', methods=['GET'])
+def list_text_files():
+    try:
+        ftp = FTP()
+        ftp.set_debuglevel(0)
+        ftp.connect(FTP_HOST)
+        ftp.login(FTP_USER, FTP_PASS)
+        ftp.set_pasv(True)
+        ftp.cwd('錄音文字檔')
+
+        text_files = ftp.nlst()
+        text_files_decoded = [urllib.parse.unquote(f) for f in text_files]
+        ftp.quit()
+        return jsonify({"files": text_files_decoded})
+    except Exception as e:
+        print(f"列出文字文件錯誤: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/transcribe_from_ftp', methods=['POST'])
@@ -156,7 +172,7 @@ def transcribe_handler():
             return jsonify({"error": str(e)}), 500
         return jsonify({"text": transcription_result, "sessionID": session_id, "originalFilename": original_filename})
     except Exception as e:
-        print(f"Error in transcribe_handler: {e}")
+        print(f"轉錄處理錯誤: {e}")
         return jsonify({"error": str(e)}), 500
 
 def transcribe_audio_from_ftp(filename, session_id):
@@ -168,14 +184,12 @@ def transcribe_audio_from_ftp(filename, session_id):
         ftp.set_pasv(True)
         ftp.cwd('錄音檔')
 
-        # 解碼文件名以用 UTF-8 處理
         decoded_filename = urllib.parse.unquote(filename, encoding='utf-8')
         temp_path = tempfile.mktemp()
 
         with open(temp_path, 'wb') as temp_file:
             ftp.retrbinary(f'RETR {decoded_filename}', temp_file.write)
 
-        # 读取原始文件名
         original_filename = decoded_filename
         try:
             meta_file_path = tempfile.mktemp()
@@ -184,7 +198,7 @@ def transcribe_audio_from_ftp(filename, session_id):
             with open(meta_file_path, 'r', encoding='utf-8') as meta_file:
                 original_filename = meta_file.read().strip()
         except Exception:
-            pass  # 如果 .meta 文件不存在或出錯，保持文件名為編碼的狀態
+            pass
 
         converted_path = tempfile.mktemp(suffix=".wav")
         try:
@@ -219,15 +233,25 @@ def transcribe_audio_from_ftp(filename, session_id):
         os.remove(temp_path)
         os.remove(converted_path)
 
+        text_filename = original_filename.replace(' ', '_').replace('.', '_') + ".txt"
+        with tempfile.NamedTemporaryFile(delete=False) as text_file:
+            text_file.write("\n".join(transcriptions).encode('utf-8'))
+
+        ftp.cwd('/錄音文字檔')
+        with open(text_file.name, 'rb') as f:
+            ftp.storbinary(f'STOR {urllib.parse.quote(text_filename)}', f)
+
+        os.remove(text_file.name)
+
         try:
             ftp.delete(urllib.parse.quote(filename, encoding='utf-8'))
         except Exception as e:
-            print(f"Error deleting file from FTP: {e}")
+            print(f"刪除FTP文件錯誤: {e}")
         ftp.quit()
 
         return "\n".join(transcriptions), original_filename
     except Exception as e:
-        print(f"Error in transcribe_audio_from_ftp: {e}")
+        print(f"轉錄音頻錯誤: {e}")
         return f"{{'error': '{str(e)}'}}", original_filename
 
 def format_time(seconds):

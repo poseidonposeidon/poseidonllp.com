@@ -911,9 +911,12 @@ function displayInsiderTrades(data) {
 }
 ////////////////////////////錄音檔轉文字/////////////////////////////
 let originalFileNames = {};
-let currentOriginalFileName = '';  // 添加這一行來保存當前文件的原始文件名
+let currentOriginalFileName = '';
 
-document.addEventListener("DOMContentLoaded", fetchFileList);
+document.addEventListener("DOMContentLoaded", () => {
+    fetchFileList();
+    fetchTextFileList();
+});
 
 function fetchFileList() {
     console.log("Fetching file list from server...");
@@ -962,6 +965,50 @@ function fetchFileList() {
         });
 }
 
+function fetchTextFileList() {
+    console.log("Fetching text file list from server...");
+    fetch('https://api.poseidonllp.com/list_text_files', {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include'
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Text file list fetched successfully:", data);
+            const select = document.getElementById('textFileSelect');
+            if (!select) {
+                console.error('Element with id "textFileSelect" not found');
+                return;
+            }
+            select.innerHTML = '';  // 清空之前的選項
+            if (data.files && data.files.length > 0) {
+                data.files.forEach(fileName => {
+                    const option = document.createElement('option');
+                    option.value = fileName;
+                    option.textContent = fileName;
+                    select.appendChild(option);
+                });
+            } else {
+                const option = document.createElement('option');
+                option.textContent = "無可用文件";
+                option.disabled = true;
+                select.appendChild(option);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching text file list:', error);
+            const uploadResult = document.getElementById('upload-result');
+            if (uploadResult) {
+                uploadResult.innerText = '錯誤發生，請檢查網絡連接或伺服器狀態！\n' + error;
+            }
+        });
+}
+
 function uploadToFTP() {
     const fileInput = document.getElementById('audioFile');
     const file = fileInput.files[0];
@@ -973,7 +1020,7 @@ function uploadToFTP() {
 
     const formData = new FormData();
     formData.append('file', file);
-    formData.append('originalFileName', file.name);  // 傳遞原始文件名
+    formData.append('originalFileName', file.name);
 
     const uploadProgressContainer = document.getElementById('upload-progress-container');
     const uploadProgressBar = document.getElementById('upload-progress-bar');
@@ -1034,7 +1081,7 @@ function uploadToFTP() {
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
     const encodedFilename = select.value;
-    currentOriginalFileName = originalFileNames[encodedFilename];  // 保存原始文件名
+    currentOriginalFileName = originalFileNames[encodedFilename];
 
     if (!encodedFilename) {
         const uploadResult = document.getElementById('upload-result');
@@ -1065,8 +1112,7 @@ function transcribeFromFTP() {
             document.getElementById('transcription-progress-container').style.display = 'none';
             if (data.text) {
                 displayTranscription(data);
-                document.getElementById('downloadBtn').classList.remove('hidden');
-                sessionID = data.sessionID;  // 保存 session ID
+                fetchTextFileList();  // 轉檔完成後刷新文字文件列表
             } else {
                 console.error('Error:', data.error);
                 const uploadResult = document.getElementById('upload-result');
@@ -1089,8 +1135,6 @@ function clearPreviousResult() {
     const container = document.getElementById('transcriptionResult');
     container.innerHTML = '';  // 清空先前的結果
 
-    // 隱藏下載和閱讀更多按鈕
-    document.getElementById('downloadBtn').classList.add('hidden');
     document.getElementById('readMoreBtn').classList.add('hidden');
     document.getElementById('readLessBtn').classList.add('hidden');
     container.style.maxHeight = '200px';
@@ -1130,11 +1174,15 @@ function toggleReadMore() {
     }
 }
 
-function downloadTranscription() {
-    const decodedFileName = currentOriginalFileName.replace(/\.[^/.]+$/, "") + ".txt";  // 使用原始文件名並替換擴展名
-    const blob = new Blob([transcriptionText], { type: 'text/plain' });
+function downloadTextFile() {
+    const select = document.getElementById('textFileSelect');
+    const textFileName = select.value;
+    if (!textFileName) {
+        alert('請選擇一個文字檔！');
+        return;
+    }
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = decodedFileName;
+    a.href = `https://api.poseidonllp.com/錄音文字檔/${encodeURIComponent(textFileName)}`;
+    a.download = textFileName;
     a.click();
 }

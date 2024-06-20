@@ -168,3 +168,11 @@ div {
     margin-top: 10px;
     display: none;
 }
+
+/* 用於將元素排列成一行的容器 */
+.inline-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 元素之間的間距 */
+    margin-top: 10px; /* 與上一部分保持間距 */
+}
