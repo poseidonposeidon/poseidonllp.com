@@ -956,6 +956,18 @@ function fetchFileList() {
         });
 }
 
+function updateQueueCount(count) {
+    const waitingCount = document.getElementById('waiting-count');
+    const waitingNumber = document.getElementById('waiting-number');
+    if (count > 0) {
+        waitingCount.style.display = 'block';
+        waitingNumber.textContent = count;
+    } else {
+        waitingCount.style.display = 'none';
+    }
+}
+
+
 function uploadToFTP() {
     const fileInput = document.getElementById('audioFile');
     const file = fileInput.files[0];
@@ -1023,7 +1035,6 @@ function uploadToFTP() {
 
     xhr.send(formData);
 }
-
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
     const filename = select.value;
@@ -1066,6 +1077,7 @@ function transcribeFromFTP() {
                     uploadResult.innerText = '轉錄失敗，請重試！\n' + data.error;
                 }
             }
+            updateQueueCount(data.queueCount); // 更新等待數量
         })
         .catch(error => {
             document.getElementById('transcription-progress-container').style.display = 'none';
@@ -1077,15 +1089,16 @@ function transcribeFromFTP() {
         });
 }
 
-function updateProgress() {
-    fetch(`https://api.poseidonllp.com/progress/${sessionID}`)
-        .then(response => response.json())
-        .then(data => {
-            const progressBar = document.getElementById('progress-bar');
-            progressBar.style.width = data.progress + '%';
-        })
-        .catch(error => console.error('Error:', error));
-}
+
+// function updateProgress() {
+//     fetch(`https://api.poseidonllp.com/progress/${sessionID}`)
+//         .then(response => response.json())
+//         .then(data => {
+//             const progressBar = document.getElementById('progress-bar');
+//             progressBar.style.width = data.progress + '%';
+//         })
+//         .catch(error => console.error('Error:', error));
+// }
 
 function clearPreviousResult() {
     const container = document.getElementById('transcriptionResult');
