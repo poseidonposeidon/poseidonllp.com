@@ -1181,8 +1181,9 @@ function downloadTextFile() {
         alert('請選擇一個文字檔！');
         return;
     }
+    const encodedFileName = encodeURIComponent(textFileName);
     const a = document.createElement('a');
-    a.href = `https://api.poseidonllp.com/Text_File/${encodeURIComponent(textFileName)}`;
+    a.href = `/download_text_file/${encodedFileName}`;
     a.download = textFileName;
     a.click();
 }

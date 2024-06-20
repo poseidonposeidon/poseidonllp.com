@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, send_from_directory, session, copy_current_request_context
+from flask import Flask, request, jsonify, send_file, send_from_directory, session, copy_current_request_context
 from flask_cors import CORS
 from ftplib import FTP
 from werkzeug.utils import secure_filename
@@ -258,6 +258,40 @@ def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
     return f"{int(hours):02}:{int(minutes):02}:{int(seconds):02}"
+
+@app.route('/download_text_file/<filename>', methods=['GET'])
+def download_text_file(filename):
+    try:
+        ftp = FTP()
+        ftp.connect(FTP_HOST)
+        ftp.login(FTP_USER, FTP_PASS)
+        ftp.set_pasv(True)
+        ftp.cwd('Text_File')
+
+        decoded_filename = urllib.parse.unquote(filename)
+        local_filename = tempfile.mktemp()
+
+        print(f"正在下載: {decoded_filename} 到本地: {local_filename}")
+
+        files = ftp.nlst()
+        if decoded_filename not in files:
+            raise FileNotFoundError(f"文件 {decoded_filename} 不存在於 FTP 伺服器上。")
+
+        with open(local_filename, 'wb') as f:
+            ftp.retrbinary(f'RETR {decoded_filename}', f.write)
+
+        ftp.quit()
+        return send_file(local_filename, as_attachment=True, download_name=decoded_filename)
+    except FileNotFoundError as e:
+        print(f"文件未找到錯誤: {e}")
+        return jsonify({"error": str(e)}), 404
+    except Exception as e:
+        print(f"下載文字文件錯誤: {e}")
+        return jsonify({"error": str(e)}), 500
+
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
