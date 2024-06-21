@@ -1179,7 +1179,7 @@ function downloadTextFile() {
     const select = document.getElementById('textFileSelect');
     const textFileName = select.value;
     if (!textFileName) {
-        alert('請選擇一個文字檔！');
+        alert('請選擇一個文字檔案！');
         return;
     }
     const encodedFileName = encodeURIComponent(textFileName);
@@ -1191,9 +1191,31 @@ function downloadTextFile() {
 
     const downloadUrl = `${apiUrl}/download_text_file/${encodedFileName}`;
 
-    // 創建和點擊下載鏈接
-    const a = document.createElement('a');
-    a.href = downloadUrl;
-    a.download = textFileName;
-    a.click();
+    console.log("開始下載文件：", downloadUrl);
+
+    // 使用 fetch 進行 API 呼叫
+    fetch(downloadUrl, {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include'
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('網絡響應不正常：' + response.statusText);
+            }
+            return response.blob();
+        })
+        .then(blob => {
+            console.log("文件下載成功，處理 Blob 數據...");
+            const downloadLink = document.createElement('a');
+            downloadLink.href = URL.createObjectURL(blob);
+            downloadLink.download = textFileName; // 使用解碼後的文件名作為下載名
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        })
+        .catch(error => {
+            console.error('下載文件時出錯：', error);
+            alert('下載失敗，請檢查網絡連接或伺服器狀態！\n' + error);
+        });
 }
