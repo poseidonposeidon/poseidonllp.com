@@ -1183,8 +1183,17 @@ function downloadTextFile() {
         return;
     }
     const encodedFileName = encodeURIComponent(textFileName);
+
+    // 根據當前域名生成正確的 API URL
+    const apiUrl = window.location.origin.includes('api')
+        ? window.location.origin
+        : 'https://api.poseidonllp.com';
+
+    const downloadUrl = `${apiUrl}/download_text_file/${encodedFileName}`;
+
+    // 創建和點擊下載鏈接
     const a = document.createElement('a');
-    a.href = `/download_text_file/${encodedFileName}`;
+    a.href = downloadUrl;
     a.download = textFileName;
     a.click();
 }
