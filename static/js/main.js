@@ -1010,12 +1010,24 @@ function fetchTextFileList() {
         });
 }
 
+function showAlert(message) {
+    const alertBox = document.getElementById('error-alert');
+    const alertMessage = document.getElementById('error-message');
+    alertMessage.textContent = message;
+    alertBox.style.display = 'block';
+
+    // 在3秒後隱藏提示框
+    setTimeout(() => {
+        alertBox.style.display = 'none';
+    }, 3000);
+}
+
 function uploadToFTP() {
     const fileInput = document.getElementById('audioFile');
     const file = fileInput.files[0];
 
     if (!file) {
-        alert('請選擇一個檔案！');
+        showAlert('請選擇一個檔案！');
         return;
     }
 
@@ -1049,25 +1061,25 @@ function uploadToFTP() {
             if (contentType && contentType.includes('application/json')) {
                 try {
                     const response = JSON.parse(xhr.responseText);
-                    alert(response.message || '檔案已成功上傳到伺服器');
+                    showAlert(response.message || '檔案已成功上傳到伺服器');
                     fetchFileList();  // 手動刷新文件列表
                     fileInput.value = '';  // 清空文件選擇器
                 } catch (error) {
                     console.error('無法解析響應:', error);
-                    alert('無法解析伺服器響應');
+                    showAlert('無法解析伺服器響應');
                 }
             } else {
-                alert('伺服器回應:\n' + xhr.responseText);
+                showAlert('伺服器回應:\n' + xhr.responseText);
             }
         } else if (xhr.status === 503) {
-            alert('另一個轉檔過程正在進行中，請稍後再試');
+            showAlert('另一個轉檔過程正在進行中，請稍後再試');
         } else {
             try {
                 const response = JSON.parse(xhr.responseText);
-                alert('上傳失敗，請重試！' + (response.error ? '\n' + response.error : ''));
+                showAlert('上傳失敗，請重試！' + (response.error ? '\n' + response.error : ''));
             } catch (error) {
                 console.error('無法解析錯誤響應:', error);
-                alert('上傳失敗，請重試！');
+                showAlert('上傳失敗，請重試！');
             }
         }
     };
@@ -1075,12 +1087,11 @@ function uploadToFTP() {
     xhr.onerror = function () {
         uploadProgressContainer.style.display = 'none';
         uploadProgressText.style.display = 'none';
-        alert('上傳失敗，請重試！');
+        showAlert('上傳失敗，請重試！');
     };
 
     xhr.send(formData);
 }
-
 
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
@@ -1132,7 +1143,7 @@ function transcribeFromFTP() {
         .catch(error => {
             document.getElementById('transcription-progress-container').style.display = 'none';
             console.error('錯誤:', error);
-            alert(error.message || '錯誤發生，請檢查網絡連接或伺服器狀態！\n' + error);
+            showAlert(error.message || '錯誤發生，請檢查網絡連接或伺服器狀態！\n' + error);
             const uploadResult = document.getElementById('upload-result');
             if (uploadResult) {
                 uploadResult.innerText = '錯誤發生，請檢查網絡連接或伺服器狀態！\n' + error;
