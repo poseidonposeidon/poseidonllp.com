@@ -21,7 +21,6 @@ app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 2048 * 1024 * 1024  # 設置為2048MB
 app.secret_key = 'supersecretkey'  # 用於 session
 
-
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
 print(f"使用設備: {device}")
@@ -82,6 +81,11 @@ def upload_to_ftp():
             with open(temp_path, 'rb') as f:
                 ftp.storbinary(f'STOR {filename_encoded}', f)
                 ftp.storbinary(f'STOR {filename_encoded}.meta', io.BytesIO(original_filename.encode('utf-8')))
+
+            # 在“Text_File”資料夾創建一份 meta 文件
+            ftp.cwd('/Text_File')
+            ftp.storbinary(f'STOR {filename_encoded}.meta', io.BytesIO(original_filename.encode('utf-8')))
+
             ftp.quit()
             os.remove(temp_path)
             return {"message": f"文件 {original_filename} 已成功上傳到FTP伺服器"}
@@ -141,7 +145,7 @@ def list_text_files():
         ftp.cwd('Text_File')
 
         text_files = ftp.nlst()
-        text_files_decoded = [urllib.parse.unquote(f) for f in text_files]
+        text_files_decoded = [urllib.parse.unquote(f) for f in text_files if not f.endswith('.meta')]  # 過濾掉 .meta 文件
         ftp.quit()
         return jsonify({"files": text_files_decoded})
     except Exception as e:
@@ -252,7 +256,7 @@ def transcribe_audio_from_ftp(filename, session_id):
         return "\n".join(transcriptions), original_filename
     except Exception as e:
         print(f"轉錄音頻錯誤: {e}")
-        return f"{{'error': '{str(e)}'}}", original_filename
+        return f"{{'error': '{str(e)}')}}", original_filename
 
 def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
@@ -271,24 +275,34 @@ def download_text_file(filename):
         decoded_filename = urllib.parse.unquote(filename)
         local_filename = tempfile.mktemp()
 
-        print(f"正在下載: {decoded_filename} 到本地: {local_filename}")
+        # 嘗試獲取 .meta 檔案中的原始文件名
+        original_filename = decoded_filename
+        try:
+            meta_file_path = tempfile.mktemp()
+            with open(meta_file_path, 'wb') as meta_file:
+                ftp.retrbinary(f'RETR {decoded_filename}.meta', meta_file.write)
+            with open(meta_file_path, 'r', encoding='utf-8') as meta_file:
+                original_filename = meta_file.read().strip()
+        except Exception as e:
+            print(f"無法讀取 .meta 檔案: {e}")
 
+        # 確認文件是否存在於 FTP 伺服器上
         files = ftp.nlst()
-        if decoded_filename not in files:
+        if decoded_filename not in files and original_filename not in files:
             raise FileNotFoundError(f"文件 {decoded_filename} 不存在於 FTP 伺服器上。")
 
+        # 下載原始文件名的文件
         with open(local_filename, 'wb') as f:
-            ftp.retrbinary(f'RETR {decoded_filename}', f.write)
+            ftp.retrbinary(f'RETR {urllib.parse.quote(original_filename)}', f.write)
 
         ftp.quit()
-        return send_file(local_filename, as_attachment=True, download_name=decoded_filename)
+        return send_file(local_filename, as_attachment=True, download_name=original_filename)
     except FileNotFoundError as e:
         print(f"文件未找到錯誤: {e}")
         return jsonify({"error": str(e)}), 404
     except Exception as e:
         print(f"下載文字文件錯誤: {e}")
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

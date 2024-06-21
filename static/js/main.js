@@ -988,10 +988,12 @@ function fetchTextFileList() {
             select.innerHTML = '';  // 清空之前的選項
             if (data.files && data.files.length > 0) {
                 data.files.forEach(fileName => {
-                    const option = document.createElement('option');
-                    option.value = fileName;
-                    option.textContent = fileName;
-                    select.appendChild(option);
+                    if (!fileName.endsWith('.meta')) {  // 過濾掉 .meta 文件
+                        const option = document.createElement('option');
+                        option.value = fileName;
+                        option.textContent = fileName;
+                        select.appendChild(option);
+                    }
                 });
             } else {
                 const option = document.createElement('option');
@@ -1008,6 +1010,7 @@ function fetchTextFileList() {
             }
         });
 }
+
 
 function uploadToFTP() {
     const fileInput = document.getElementById('audioFile');
