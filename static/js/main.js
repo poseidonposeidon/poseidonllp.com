@@ -942,7 +942,7 @@ function fetchFileList() {
             if (data.files && data.files.length > 0) {
                 data.files.forEach(fileInfo => {
                     const encodedFileName = fileInfo.encoded;
-                    const originalFileName = fileInfo.original;
+                    const originalFileName = decodeURIComponent(fileInfo.original);
                     originalFileNames[encodedFileName] = originalFileName;
                     const option = document.createElement('option');
                     option.value = encodedFileName;
@@ -988,12 +988,11 @@ function fetchTextFileList() {
             select.innerHTML = '';  // 清空之前的選項
             if (data.files && data.files.length > 0) {
                 data.files.forEach(fileName => {
-                    if (!fileName.endsWith('.meta')) {  // 過濾掉 .meta 文件
-                        const option = document.createElement('option');
-                        option.value = fileName;
-                        option.textContent = fileName;
-                        select.appendChild(option);
-                    }
+                    const decodedFileName = decodeURIComponent(fileName);
+                    const option = document.createElement('option');
+                    option.value = fileName;
+                    option.textContent = decodedFileName;
+                    select.appendChild(option);
                 });
             } else {
                 const option = document.createElement('option');
@@ -1010,7 +1009,6 @@ function fetchTextFileList() {
             }
         });
 }
-
 
 function uploadToFTP() {
     const fileInput = document.getElementById('audioFile');
