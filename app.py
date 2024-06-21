@@ -282,45 +282,28 @@ def format_time(seconds):
 @app.route('/download_text_file/<filename>', methods=['GET'])
 def download_text_file(filename):
     try:
-        ftp = FTP()
-        ftp.connect(FTP_HOST)
+        ftp = FTP(FTP_HOST)
         ftp.login(FTP_USER, FTP_PASS)
         ftp.set_pasv(True)
-        ftp.cwd('/Text_File')
+        ftp.cwd('Text_File')
 
-        # 確保使用原始文件名，不帶 .txt 後綴
-        decoded_filename = urllib.parse.unquote(filename).replace('.txt', '')
+        # 解碼 URL 編碼的文件名
+        decoded_filename = urllib.parse.unquote(filename, encoding='utf-8')
         local_filename = tempfile.mktemp()
 
-        # 嘗試從 .meta 文件中讀取原始檔名
-        original_filename = decoded_filename
-        try:
-            meta_file_path = tempfile.mktemp()
-            meta_file_name = f'{decoded_filename}.meta'
-            with open(meta_file_path, 'wb') as meta_file:
-                ftp.retrbinary(f"RETR {urllib.parse.quote(meta_file_name, encoding='utf-8')}", meta_file.write)
-            with open(meta_file_path, 'r', encoding='utf-8') as meta_file:
-                original_filename = meta_file.read().strip() + ".txt"  # 添加 .txt 後綴
-        except Exception as e:
-            print(f"無法讀取 .meta 文件: {e}")
-
-        # 確認文件是否存在於 FTP 伺服器上
-        files = ftp.nlst()
-        if original_filename not in files:
-            raise FileNotFoundError(f"文件 {original_filename} 不存在於 FTP 伺服器上。")
-
-        # 下載原始文件名的文件
+        # 嘗試從 FTP 下載文件
         with open(local_filename, 'wb') as f:
-            ftp.retrbinary(f"RETR {urllib.parse.quote(original_filename, encoding='utf-8')}", f.write)
+            ftp.retrbinary(f"RETR {urllib.parse.quote(decoded_filename, encoding='utf-8')}", f.write)
 
         ftp.quit()
-        return send_file(local_filename, as_attachment=True, download_name=original_filename)
+        return send_file(local_filename, as_attachment=True, download_name=decoded_filename)
     except FileNotFoundError as e:
         print(f"文件未找到錯誤: {e}")
         return jsonify({"error": str(e)}), 404
     except Exception as e:
         print(f"下載文字文件錯誤: {e}")
         return jsonify({"error": str(e)}), 500
+
 
 
 @app.route('/copy_meta_to_file', methods=['POST'])
