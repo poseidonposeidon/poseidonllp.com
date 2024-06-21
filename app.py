@@ -13,6 +13,7 @@ from deep_translator import GoogleTranslator
 import torch
 import subprocess
 import io
+from threading import Lock
 
 # 禁用 FP16 使用 FP32
 os.environ["WHISPER_DISABLE_F16"] = "1"
@@ -20,6 +21,7 @@ os.environ["WHISPER_DISABLE_F16"] = "1"
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 2048 * 1024 * 1024  # 設置為2048MB
 app.secret_key = 'supersecretkey'  # 用於 session
+
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -37,6 +39,9 @@ executor = ThreadPoolExecutor(max_workers=4)
 FTP_HOST = '114.32.65.180'
 FTP_USER = 'Henry'
 FTP_PASS = '123456'
+
+# 創建全局的 Lock
+lock = Lock()
 
 @app.before_request
 def log_request_info():
@@ -99,8 +104,11 @@ def upload_to_ftp():
             os.remove(temp_path)
             return {"error": f"FTP上傳失敗: {e}"}
 
-    future = executor.submit(upload)
+    if not lock.acquire(blocking=False):
+        return jsonify({"error": "另一個轉檔過程正在進行中，請稍後再試"}), 503
+
     try:
+        future = executor.submit(upload)
         result = future.result(timeout=6000)
         if "error" in result:
             return jsonify(result), 500
@@ -110,7 +118,8 @@ def upload_to_ftp():
         return jsonify({"error": "上傳超時"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
-
+    finally:
+        lock.release()
 
 @app.route('/list_files', methods=['GET'])
 def list_files():
@@ -142,7 +151,6 @@ def list_files():
         print(f"列出文件錯誤: {e}")
         return jsonify({"error": str(e)}), 500
 
-
 @app.route('/list_text_files', methods=['GET'])
 def list_text_files():
     try:
@@ -160,33 +168,32 @@ def list_text_files():
         print(f"列出文字文件錯誤: {e}")
         return jsonify({"error": str(e)}), 500
 
-
 @app.route('/transcribe_from_ftp', methods=['POST'])
 def transcribe_handler():
+    if 'filename' not in request.json:
+        return jsonify({"error": "沒有指定文件名"}), 400
+    filename = request.json['filename']
+
+    session_id = str(uuid.uuid4())
+    session[session_id] = 0
+
+    @copy_current_request_context
+    def transcribe_and_store(filename, session_id):
+        return transcribe_audio_from_ftp(filename, session_id)
+
+    if not lock.acquire(blocking=False):
+        return jsonify({"error": "另一個轉檔過程正在進行中，請稍後再試"}), 503
+
     try:
-        if 'filename' not in request.json:
-            return jsonify({"error": "沒有指定文件名"}), 400
-        filename = request.json['filename']
-
-        session_id = str(uuid.uuid4())
-        session[session_id] = 0
-
-        @copy_current_request_context
-        def transcribe_and_store(filename, session_id):
-            return transcribe_audio_from_ftp(filename, session_id)
-
         future = executor.submit(transcribe_and_store, filename, session_id)
-        try:
-            transcription_result, original_filename = future.result(timeout=6000)
-        except FuturesTimeoutError:
-            return jsonify({"error": "轉錄超時"}), 500
-        except Exception as e:
-            print(f"轉錄過程中出錯: {e}")
-            return jsonify({"error": str(e)}), 500
+        transcription_result, original_filename = future.result(timeout=6000)
         return jsonify({"text": transcription_result, "sessionID": session_id, "originalFilename": original_filename})
+    except FuturesTimeoutError:
+        return jsonify({"error": "轉錄超時"}), 500
     except Exception as e:
-        print(f"轉錄處理錯誤: {e}")
         return jsonify({"error": str(e)}), 500
+    finally:
+        lock.release()
 
 def transcribe_audio_from_ftp(filename, session_id):
     try:
@@ -261,18 +268,13 @@ def transcribe_audio_from_ftp(filename, session_id):
 
         os.remove(text_file.name)
 
-        # 刪除原始音頻文件
-        try:
-            ftp.delete(urllib.parse.quote(filename, encoding='utf-8'))
-        except Exception as e:
-            print(f"刪除文件錯誤: {e}")
+
         ftp.quit()
 
         return "\n".join(transcriptions), original_filename
     except Exception as e:
         print(f"轉錄音頻錯誤: {e}")
         return f"{{'error': '{str(e)}'}}", original_filename
-
 
 def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
@@ -303,8 +305,6 @@ def download_text_file(filename):
     except Exception as e:
         print(f"下載文字文件錯誤: {e}")
         return jsonify({"error": str(e)}), 500
-
-
 
 @app.route('/copy_meta_to_file', methods=['POST'])
 def copy_meta_to_file():
@@ -354,7 +354,6 @@ def copy_meta_to_file():
     except Exception as e:
         print(f"操作失敗: {e}")
         return jsonify({"error": str(e)}), 500
-
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
