@@ -161,53 +161,32 @@ def list_text_files():
         return jsonify({"error": str(e)}), 500
 
 
-from queue import Queue
-from threading import Lock, Thread
-
-# 全局隊列和鎖
-transcription_queue = Queue()
-queue_lock = Lock()
-
 @app.route('/transcribe_from_ftp', methods=['POST'])
 def transcribe_handler():
     try:
         if 'filename' not in request.json:
             return jsonify({"error": "沒有指定文件名"}), 400
         filename = request.json['filename']
+
         session_id = str(uuid.uuid4())
+        session[session_id] = 0
 
-        # 添加任務到隊列
-        task = {
-            "filename": filename,
-            "session_id": session_id
-        }
-        with queue_lock:
-            transcription_queue.put(task)
+        @copy_current_request_context
+        def transcribe_and_store(filename, session_id):
+            return transcribe_audio_from_ftp(filename, session_id)
 
-        # 啟動一個新的工作線程來處理隊列中的任務
-        Thread(target=process_queue).start()
-
-        return jsonify({"message": "任務已添加到隊列", "sessionID": session_id, "queue_length": transcription_queue.qsize() - 1})
+        future = executor.submit(transcribe_and_store, filename, session_id)
+        try:
+            transcription_result, original_filename = future.result(timeout=6000)
+        except FuturesTimeoutError:
+            return jsonify({"error": "轉錄超時"}), 500
+        except Exception as e:
+            print(f"轉錄過程中出錯: {e}")
+            return jsonify({"error": str(e)}), 500
+        return jsonify({"text": transcription_result, "sessionID": session_id, "originalFilename": original_filename})
     except Exception as e:
         print(f"轉錄處理錯誤: {e}")
         return jsonify({"error": str(e)}), 500
-
-def process_queue():
-    while not transcription_queue.empty():
-        with queue_lock:
-            task = transcription_queue.get()
-        filename = task["filename"]
-        session_id = task["session_id"]
-
-        # 執行轉檔
-        try:
-            transcription_result, original_filename = transcribe_audio_from_ftp(filename, session_id)
-            # 在這裡可以將結果存儲到 session 或數據庫中供後續查詢
-        except Exception as e:
-            print(f"轉檔失敗: {e}")
-
-        transcription_queue.task_done()
-
 
 def transcribe_audio_from_ftp(filename, session_id):
     try:

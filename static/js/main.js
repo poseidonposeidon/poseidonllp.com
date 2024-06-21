@@ -1111,15 +1111,9 @@ function transcribeFromFTP() {
         })
         .then(data => {
             document.getElementById('transcription-progress-container').style.display = 'none';
-            const queueLength = data.queue_length;
-            const progressText = document.getElementById('transcription-progress-text');
-            if (queueLength > 0) {
-                progressText.textContent = `目前等候${queueLength}個檔案`;
-            } else {
-                progressText.textContent = '轉檔中...';
-            }
-            if (data.message) {
-                console.log('任務已添加到隊列:', data.message);
+            if (data.text) {
+                displayTranscription(data);
+                fetchTextFileList();  // 轉檔完成後刷新文字文件列表
             } else {
                 console.error('錯誤:', data.error);
                 const uploadResult = document.getElementById('upload-result');
@@ -1137,7 +1131,6 @@ function transcribeFromFTP() {
             }
         });
 }
-
 
 function clearPreviousResult() {
     const container = document.getElementById('transcriptionResult');
