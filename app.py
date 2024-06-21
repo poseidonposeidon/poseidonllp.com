@@ -80,20 +80,20 @@ def upload_to_ftp():
             ftp.cwd('錄音檔')
 
             with open(temp_path, 'rb') as f:
-                ftp.storbinary(f'STOR {filename_encoded}', f)
+                ftp.storbinary(f"STOR {filename_encoded}", f)
 
             # 修正：存儲正確的原始文件名
             with io.BytesIO(original_filename.encode('utf-8')) as meta_file:
-                ftp.storbinary(f'STOR {filename_encoded}.meta', meta_file)
+                ftp.storbinary(f"STOR {filename_encoded}.meta", meta_file)
 
             # 在“Text_File”資料夾創建一份 meta 文件
             ftp.cwd('/Text_File')
             with io.BytesIO(original_filename.encode('utf-8')) as meta_file:
-                ftp.storbinary(f'STOR {filename_encoded}.meta', meta_file)
+                ftp.storbinary(f"STOR {filename_encoded}.meta", meta_file)
 
             ftp.quit()
             os.remove(temp_path)
-            return {"message": f"文件 {original_filename} 已成功上傳到FTP伺服器"}
+            return {"message": f"文件 {original_filename} 已成功上傳到伺服器"}
         except Exception as e:
             print(f"FTP上傳失敗: {e}")
             os.remove(temp_path)
@@ -129,7 +129,7 @@ def list_files():
                 original_filename = file
                 try:
                     with tempfile.NamedTemporaryFile() as temp_file:
-                        ftp.retrbinary(f'RETR {meta_file}', temp_file.write)
+                        ftp.retrbinary(f"RETR {meta_file}", temp_file.write)
                         temp_file.seek(0)
                         # 正確解碼
                         original_filename = temp_file.read().decode('utf-8')
@@ -150,7 +150,7 @@ def list_text_files():
         ftp.connect(FTP_HOST)
         ftp.login(FTP_USER, FTP_PASS)
         ftp.set_pasv(True)
-        ftp.cwd('Text_File')
+        ftp.cwd('/Text_File')
 
         text_files = ftp.nlst()
         text_files_decoded = [urllib.parse.unquote(f, encoding='utf-8') for f in text_files if not f.endswith('.meta')]  # 過濾掉 .meta 文件
@@ -201,13 +201,13 @@ def transcribe_audio_from_ftp(filename, session_id):
 
         # 下載原始音頻文件
         with open(temp_path, 'wb') as temp_file:
-            ftp.retrbinary(f'RETR {decoded_filename}', temp_file.write)
+            ftp.retrbinary(f"RETR {decoded_filename}", temp_file.write)
 
         # 嘗試從 .meta 文件中讀取原始檔名
         try:
             meta_file_path = tempfile.mktemp()
             with open(meta_file_path, 'wb') as meta_file:
-                ftp.retrbinary(f'RETR {decoded_filename}.meta', meta_file.write)
+                ftp.retrbinary(f"RETR {decoded_filename}.meta", meta_file.write)
             with open(meta_file_path, 'r', encoding='utf-8') as meta_file:
                 original_filename = meta_file.read().strip()
         except Exception as e:
@@ -257,7 +257,7 @@ def transcribe_audio_from_ftp(filename, session_id):
         # 上傳轉錄文本文件到 "Text_File" 資料夾
         ftp.cwd('/Text_File')
         with open(text_file.name, 'rb') as f:
-            ftp.storbinary(f'STOR {urllib.parse.quote(text_filename)}', f)
+            ftp.storbinary(f"STOR {urllib.parse.quote(text_filename, encoding='utf-8')}", f)
 
         os.remove(text_file.name)
 
@@ -265,14 +265,13 @@ def transcribe_audio_from_ftp(filename, session_id):
         try:
             ftp.delete(urllib.parse.quote(filename, encoding='utf-8'))
         except Exception as e:
-            print(f"刪除FTP文件錯誤: {e}")
+            print(f"刪除文件錯誤: {e}")
         ftp.quit()
 
         return "\n".join(transcriptions), original_filename
     except Exception as e:
         print(f"轉錄音頻錯誤: {e}")
         return f"{{'error': '{str(e)}'}}", original_filename
-
 
 
 def format_time(seconds):
@@ -287,23 +286,23 @@ def download_text_file(filename):
         ftp.connect(FTP_HOST)
         ftp.login(FTP_USER, FTP_PASS)
         ftp.set_pasv(True)
-        ftp.cwd('Text_File')
+        ftp.cwd('/Text_File')
 
-        # 去掉 .txt 後綴，因為 meta 文件沒有這個後綴
+        # 確保使用原始文件名，不帶 .txt 後綴
         decoded_filename = urllib.parse.unquote(filename).replace('.txt', '')
         local_filename = tempfile.mktemp()
 
-        # 嘗試獲取 .meta 檔案中的原始文件名
+        # 嘗試從 .meta 文件中讀取原始檔名
         original_filename = decoded_filename
         try:
             meta_file_path = tempfile.mktemp()
             meta_file_name = f'{decoded_filename}.meta'
             with open(meta_file_path, 'wb') as meta_file:
-                ftp.retrbinary(f'RETR {urllib.parse.quote(meta_file_name)}', meta_file.write)
+                ftp.retrbinary(f"RETR {urllib.parse.quote(meta_file_name, encoding='utf-8')}", meta_file.write)
             with open(meta_file_path, 'r', encoding='utf-8') as meta_file:
-                original_filename = urllib.parse.unquote(meta_file.read().strip()) + ".txt"  # 添加 .txt 後綴
+                original_filename = meta_file.read().strip() + ".txt"  # 添加 .txt 後綴
         except Exception as e:
-            print(f"無法讀取 .meta 檔案: {e}")
+            print(f"無法讀取 .meta 文件: {e}")
 
         # 確認文件是否存在於 FTP 伺服器上
         files = ftp.nlst()
@@ -312,7 +311,7 @@ def download_text_file(filename):
 
         # 下載原始文件名的文件
         with open(local_filename, 'wb') as f:
-            ftp.retrbinary(f'RETR {urllib.parse.quote(original_filename)}', f.write)
+            ftp.retrbinary(f"RETR {urllib.parse.quote(original_filename, encoding='utf-8')}", f.write)
 
         ftp.quit()
         return send_file(local_filename, as_attachment=True, download_name=original_filename)
@@ -345,7 +344,7 @@ def copy_meta_to_file():
         # 讀取 .meta 文件的內容
         meta_temp_path = tempfile.mktemp()
         with open(meta_temp_path, 'wb') as meta_temp_file:
-            ftp.retrbinary(f'RETR {meta_filename}', meta_temp_file.write)
+            ftp.retrbinary(f"RETR {meta_filename}", meta_temp_file.write)
         with open(meta_temp_path, 'r', encoding='utf-8') as meta_temp_file:
             meta_content = meta_temp_file.read()
 
@@ -356,7 +355,7 @@ def copy_meta_to_file():
         # 下載原始文件
         original_temp_path = tempfile.mktemp()
         with open(original_temp_path, 'wb') as original_temp_file:
-            ftp.retrbinary(f'RETR {original_filename}', original_temp_file.write)
+            ftp.retrbinary(f"RETR {original_filename}", original_temp_file.write)
 
         # 將 meta 文件內容寫入原始文件
         with open(original_temp_path, 'ab') as original_temp_file:  # 'ab' 模式打開文件，以便追加內容
@@ -364,7 +363,7 @@ def copy_meta_to_file():
 
         # 上傳修改過的原始文件
         with open(original_temp_path, 'rb') as original_temp_file:
-            ftp.storbinary(f'STOR {original_filename}', original_temp_file)
+            ftp.storbinary(f"STOR {original_filename}", original_temp_file)
 
         ftp.quit()
 

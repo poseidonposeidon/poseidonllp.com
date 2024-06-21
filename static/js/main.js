@@ -919,7 +919,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function fetchFileList() {
-    console.log("Fetching file list from server...");
+    console.log("從伺服器獲取文件列表...");
     fetch('https://api.poseidonllp.com/list_files', {
         method: 'GET',
         mode: 'cors',
@@ -927,15 +927,15 @@ function fetchFileList() {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
+                throw new Error('網絡響應不正常 ' + response.statusText);
             }
             return response.json();
         })
         .then(data => {
-            console.log("File list fetched successfully:", data);
+            console.log("文件列表成功獲取:", data);
             const select = document.getElementById('ftpFileSelect');
             if (!select) {
-                console.error('Element with id "ftpFileSelect" not found');
+                console.error('找不到 ID 為 "ftpFileSelect" 的元素');
                 return;
             }
             select.innerHTML = '';  // 清空之前的選項
@@ -957,7 +957,7 @@ function fetchFileList() {
             }
         })
         .catch(error => {
-            console.error('Error fetching file list:', error);
+            console.error('獲取文件列表時出錯:', error);
             const uploadResult = document.getElementById('upload-result');
             if (uploadResult) {
                 uploadResult.innerText = '錯誤發生，請檢查網絡連接或伺服器狀態！\n' + error;
@@ -966,7 +966,7 @@ function fetchFileList() {
 }
 
 function fetchTextFileList() {
-    console.log("Fetching text file list from server...");
+    console.log("從伺服器獲取文字文件列表...");
     fetch('https://api.poseidonllp.com/list_text_files', {
         method: 'GET',
         mode: 'cors',
@@ -974,15 +974,15 @@ function fetchTextFileList() {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
+                throw new Error('網絡響應不正常 ' + response.statusText);
             }
             return response.json();
         })
         .then(data => {
-            console.log("Text file list fetched successfully:", data);
+            console.log("文字文件列表成功獲取:", data);
             const select = document.getElementById('textFileSelect');
             if (!select) {
-                console.error('Element with id "textFileSelect" not found');
+                console.error('找不到 ID 為 "textFileSelect" 的元素');
                 return;
             }
             select.innerHTML = '';  // 清空之前的選項
@@ -1002,7 +1002,7 @@ function fetchTextFileList() {
             }
         })
         .catch(error => {
-            console.error('Error fetching text file list:', error);
+            console.error('獲取文字文件列表時出錯:', error);
             const uploadResult = document.getElementById('upload-result');
             if (uploadResult) {
                 uploadResult.innerText = '錯誤發生，請檢查網絡連接或伺服器狀態！\n' + error;
@@ -1115,7 +1115,7 @@ function transcribeFromFTP() {
                 displayTranscription(data);
                 fetchTextFileList();  // 轉檔完成後刷新文字文件列表
             } else {
-                console.error('Error:', data.error);
+                console.error('錯誤:', data.error);
                 const uploadResult = document.getElementById('upload-result');
                 if (uploadResult) {
                     uploadResult.innerText = '轉錄失敗，請重試！\n' + data.error;
@@ -1124,7 +1124,7 @@ function transcribeFromFTP() {
         })
         .catch(error => {
             document.getElementById('transcription-progress-container').style.display = 'none';
-            console.error('Error:', error);
+            console.error('錯誤:', error);
             const uploadResult = document.getElementById('upload-result');
             if (uploadResult) {
                 uploadResult.innerText = '錯誤發生，請檢查網絡連接或伺服器狀態！\n' + error;
