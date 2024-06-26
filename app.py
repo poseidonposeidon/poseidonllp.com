@@ -42,6 +42,9 @@ FTP_PASS = '123456'
 # 創建全局的 Lock
 lock = Lock()
 
+# 創建轉錄排程隊列
+transcription_queue = []
+
 @app.before_request
 def log_request_info():
     ip_address = request.remote_addr
@@ -118,8 +121,6 @@ def upload_to_ftp():
     finally:
         lock.release()
 
-
-
 @app.route('/list_files', methods=['GET'])
 def list_files():
     try:
@@ -181,15 +182,19 @@ def transcribe_handler():
         return transcribe_audio_from_ftp(filename, session_id)
 
     if not lock.acquire(blocking=False):
-        return jsonify({"error": "另一個轉檔過程正在進行中，請稍後再試"}), 503
+        transcription_queue.append((filename, session_id))
+        return jsonify({"message": "已加入排程隊列"}), 202
 
     try:
         future = executor.submit(transcribe_and_store, filename, session_id)
         transcription_result, original_filename = future.result(timeout=6000)
+        process_next_in_queue()
         return jsonify({"text": transcription_result, "sessionID": session_id, "originalFilename": original_filename})
     except FuturesTimeoutError:
+        process_next_in_queue()
         return jsonify({"error": "轉錄超時"}), 500
     except Exception as e:
+        process_next_in_queue()
         return jsonify({"error": str(e)}), 500
     finally:
         lock.release()
@@ -267,7 +272,6 @@ def transcribe_audio_from_ftp(filename, session_id):
 
         os.remove(text_file.name)
 
-
         ftp.quit()
 
         return "\n".join(transcriptions), original_filename
@@ -288,9 +292,6 @@ def download_text_file(filename):
         ftp.set_pasv(True)
         ftp.cwd('Text_File')
 
-
-        
-
         # 解碼 URL 編碼的文件名
         decoded_filename = urllib.parse.unquote(filename, encoding='utf-8')
         local_filename = tempfile.mktemp()
@@ -308,54 +309,21 @@ def download_text_file(filename):
         print(f"下載文字文件錯誤: {e}")
         return jsonify({"error": str(e)}), 500
 
-@app.route('/copy_meta_to_file', methods=['POST'])
-def copy_meta_to_file():
-    try:
-        if 'filename' not in request.json:
-            return jsonify({"error": "沒有指定文件名"}), 400
-        meta_filename = request.json['filename']
+@app.route('/queue_length', methods=['GET'])
+def queue_length():
+    return jsonify({"queueLength": len(transcription_queue)})
 
-        if not meta_filename.endswith('.meta'):
-            return jsonify({"error": "文件格式錯誤，必須是 .meta 文件"}), 400
-
-        original_filename = meta_filename.replace('.meta', '')
-
-        ftp = FTP()
-        ftp.connect(FTP_HOST)
-        ftp.login(FTP_USER, FTP_PASS)
-        ftp.set_pasv(True)
-        ftp.cwd('錄音檔')
-
-        # 讀取 .meta 文件的內容
-        meta_temp_path = tempfile.mktemp()
-        with open(meta_temp_path, 'wb') as meta_temp_file:
-            ftp.retrbinary(f"RETR {meta_filename}", meta_temp_file.write)
-        with open(meta_temp_path, 'r', encoding='utf-8') as meta_temp_file:
-            meta_content = meta_temp_file.read()
-
-        if not meta_content:
-            ftp.quit()
-            return jsonify({"error": "Meta 文件為空"}), 400
-
-        # 下載原始文件
-        original_temp_path = tempfile.mktemp()
-        with open(original_temp_path, 'wb') as original_temp_file:
-            ftp.retrbinary(f"RETR {original_filename}", original_temp_file.write)
-
-        # 將 meta 文件內容寫入原始文件
-        with open(original_temp_path, 'ab') as original_temp_file:  # 'ab' 模式打開文件，以便追加內容
-            original_temp_file.write(b'\n' + meta_content.encode('utf-8'))
-
-        # 上傳修改過的原始文件
-        with open(original_temp_path, 'rb') as original_temp_file:
-            ftp.storbinary(f"STOR {original_filename}", original_temp_file)
-
-        ftp.quit()
-
-        return jsonify({"message": f"Meta 文件的內容已成功寫入到 {original_filename}"})
-    except Exception as e:
-        print(f"操作失敗: {e}")
-        return jsonify({"error": str(e)}), 500
+def process_next_in_queue():
+    if transcription_queue:
+        next_filename, next_session_id = transcription_queue.pop(0)
+        @copy_current_request_context
+        def transcribe_and_store():
+            return transcribe_audio_from_ftp(next_filename, next_session_id)
+        future = executor.submit(transcribe_and_store)
+        try:
+            future.result(timeout=6000)
+        except Exception as e:
+            print(f"處理下一個排程時出錯: {e}")
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

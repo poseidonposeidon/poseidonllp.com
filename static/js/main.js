@@ -916,11 +916,13 @@ let currentOriginalFileName = '';
 document.addEventListener("DOMContentLoaded", () => {
     fetchFileList();
     fetchTextFileList();
+    updateQueueLength();
+    setInterval(updateQueueLength, 5000); // 每5秒更新一次排程長度
 });
 
 function fetchFileList(newFileName = null) {
     console.log("從伺服器獲取文件列表...");
-    fetch('https://api.poseidonllp.com/list_files', {
+    fetch('/list_files', {
         method: 'GET',
         mode: 'cors',
         credentials: 'include'
@@ -1002,7 +1004,7 @@ function extractDate(fileName) {
 
 function fetchTextFileList(newTextFileName = null) {
     console.log("從伺服器獲取文字文件列表...");
-    fetch('https://api.poseidonllp.com/list_text_files', {
+    fetch('/list_text_files', {
         method: 'GET',
         mode: 'cors',
         credentials: 'include'
@@ -1090,7 +1092,7 @@ function uploadToFTP() {
     uploadProgressText.style.display = 'block';
 
     const xhr = new XMLHttpRequest();
-    xhr.open('POST', 'https://api.poseidonllp.com/upload_to_ftp', true);
+    xhr.open('POST', '/upload_to_ftp', true);
 
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
@@ -1152,7 +1154,7 @@ function transcribeFromFTP() {
 
     document.getElementById('transcription-progress-container').style.display = 'block';
 
-    fetch('https://api.poseidonllp.com/transcribe_from_ftp', {
+    fetch('/transcribe_from_ftp', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -1246,16 +1248,10 @@ function downloadTextFile() {
     }
     const encodedFileName = encodeURIComponent(textFileName);
 
-    // 根據當前域名生成正確的 API URL
-    const apiUrl = window.location.origin.includes('api')
-        ? window.location.origin
-        : 'https://api.poseidonllp.com';
-
-    const downloadUrl = `${apiUrl}/download_text_file/${encodedFileName}`;
+    const downloadUrl = `/download_text_file/${encodedFileName}`;
 
     console.log("開始下載文件：", downloadUrl);
 
-    // 使用 fetch 進行 API 呼叫
     fetch(downloadUrl, {
         method: 'GET',
         mode: 'cors',
@@ -1282,3 +1278,23 @@ function downloadTextFile() {
         });
 }
 
+function updateQueueLength() {
+    fetch('/queue_length', {
+        method: 'GET',
+        mode: 'cors',
+        credentials: 'include'
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('網絡響應不正常 ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const queueLengthElement = document.getElementById('queueLength');
+            queueLengthElement.innerText = data.queueLength;
+        })
+        .catch(error => {
+            console.error('獲取排程長度時出錯:', error);
+        });
+}
