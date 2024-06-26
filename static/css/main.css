@@ -138,27 +138,28 @@ div {
 #transcription-progress-text {
     margin-top: 20px;
 }
+/* 進度條樣式 */
 #upload-progress-container {
-    width: 70%; /* 設置進度條的寬度 */
-    margin: 20px auto; /* 使進度條居中顯示，並設置外邊距 */
+    width: 70%;
+    margin: 20px auto;
     background-color: #f3f3f3;
-    border-radius: 15px; /* 設置圓角 */
-    overflow: hidden; /* 隱藏超出範圍的內容 */
+    border-radius: 15px;
+    overflow: hidden;
     display: none;
-    height: 30px; /* 設置固定高度 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影效果 */
-    position: relative; /* 設置相對定位 */
+    height: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    position: relative;
 }
 
 #upload-progress-bar {
     width: 0;
-    height: 100%; /* 調整進度條高度 */
+    height: 100%;
     background-color: #4caf50;
-    border-radius: 15px; /* 設置圓角 */
-    transition: width 0.4s ease; /* 添加過渡效果 */
-    position: absolute; /* 設置絕對定位 */
-    left: 0; /* 讓進度條從左邊開始 */
-    top: 0; /* 從容器頂部開始 */
+    border-radius: 15px;
+    transition: width 0.4s ease;
+    position: absolute;
+    left: 0;
+    top: 0;
 }
 
 #upload-progress-text {
@@ -177,29 +178,30 @@ div {
     margin-top: 10px; /* 與上一部分保持間距 */
 }
 
+/* 提示框樣式 */
 .alert {
     padding: 20px;
     background-color: #2196F3; /* 藍色背景 */
     color: white;
-    margin-bottom: 15px;
-    border-radius: 5px; /* 圓角邊框 */
-    position: fixed; /* 固定位置 */
-    top: 20px; /* 頂部距離 */
-    left: 50%; /* 左右居中 */
-    transform: translateX(-50%); /* 水平居中 */
-    z-index: 1000; /* 確保在最上層 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影 */
+    border-radius: 5px;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    white-space: nowrap; /* 使文字不換行 */
 }
 
 .closebtn {
     margin-left: 15px;
     color: white;
     font-weight: bold;
-    float: right;
     font-size: 22px;
     line-height: 20px;
     cursor: pointer;
     transition: 0.3s;
+    display: inline-block; /* 使按鈕與文字同列顯示 */
 }
 
 .closebtn:hover {

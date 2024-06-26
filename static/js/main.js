@@ -918,7 +918,7 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchTextFileList();
 });
 
-function fetchFileList() {
+function fetchFileList(newFileName = null) {
     console.log("從伺服器獲取文件列表...");
     fetch('https://api.poseidonllp.com/list_files', {
         method: 'GET',
@@ -939,8 +939,16 @@ function fetchFileList() {
                 return;
             }
             select.innerHTML = '';  // 清空之前的選項
+
             if (data.files && data.files.length > 0) {
-                data.files.forEach(fileInfo => {
+                // 將文件按最新時間排序
+                const sortedFiles = data.files.sort((a, b) => {
+                    const dateA = extractDate(a.original);
+                    const dateB = extractDate(b.original);
+                    return dateB - dateA;
+                });
+
+                sortedFiles.forEach(fileInfo => {
                     const encodedFileName = fileInfo.encoded;
                     const originalFileName = decodeURIComponent(fileInfo.original);
                     originalFileNames[encodedFileName] = originalFileName;
@@ -949,6 +957,18 @@ function fetchFileList() {
                     option.textContent = originalFileName;
                     select.appendChild(option);
                 });
+
+                if (newFileName) {
+                    const newFileOption = Array.from(select.options).find(option => option.textContent === newFileName);
+                    if (newFileOption) {
+                        select.value = newFileOption.value;
+                        // 将新文件放在第一个位置
+                        select.insertBefore(newFileOption, select.firstChild);
+                    }
+                } else {
+                    // 默认选择第一个文件
+                    select.selectedIndex = 0;
+                }
             } else {
                 const option = document.createElement('option');
                 option.textContent = "無可用文件";
@@ -965,7 +985,22 @@ function fetchFileList() {
         });
 }
 
-function fetchTextFileList() {
+function extractDate(fileName) {
+    // 假設文件名中的日期部分格式為YYYYMMDD
+    const datePattern = /\d{8}/;
+    const match = fileName.match(datePattern);
+    if (match) {
+        const dateString = match[0];
+        return new Date(
+            parseInt(dateString.substring(0, 4), 10),
+            parseInt(dateString.substring(4, 6), 10) - 1,
+            parseInt(dateString.substring(6, 8), 10)
+        );
+    }
+    return new Date(0); // 如果沒有匹配到日期，返回最早的日期
+}
+
+function fetchTextFileList(newTextFileName = null) {
     console.log("從伺服器獲取文字文件列表...");
     fetch('https://api.poseidonllp.com/list_text_files', {
         method: 'GET',
@@ -994,6 +1029,18 @@ function fetchTextFileList() {
                     option.textContent = decodedFileName;
                     select.appendChild(option);
                 });
+
+                if (newTextFileName) {
+                    const newTextFileOption = Array.from(select.options).find(option => option.textContent === newTextFileName);
+                    if (newTextFileOption) {
+                        select.value = newTextFileOption.value;
+                        // 将新文件放在第一个位置
+                        select.insertBefore(newTextFileOption, select.firstChild);
+                    }
+                } else {
+                    // 默认选择第一个文件
+                    select.selectedIndex = 0;
+                }
             } else {
                 const option = document.createElement('option');
                 option.textContent = "無可用文件";
@@ -1012,7 +1059,8 @@ function fetchTextFileList() {
 
 function showAlert(message) {
     const alertBox = document.createElement('div');
-    alertBox.innerHTML = message;
+    alertBox.className = 'alert';
+    alertBox.innerHTML = message + '<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span>';
     document.body.appendChild(alertBox);
 
     // 自動隱藏提示框
@@ -1026,7 +1074,7 @@ function uploadToFTP() {
     const file = fileInput.files[0];
 
     if (!file) {
-        showAlert('<div class="alert">請選擇一個檔案！<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span></div>');
+        showAlert('請選擇一個檔案！');
         return;
     }
 
@@ -1034,31 +1082,58 @@ function uploadToFTP() {
     formData.append('file', file);
     formData.append('originalFileName', file.name);
 
+    const uploadProgressContainer = document.getElementById('upload-progress-container');
+    const uploadProgressBar = document.getElementById('upload-progress-bar');
+    const uploadProgressText = document.getElementById('upload-progress-text');
+
+    uploadProgressContainer.style.display = 'block';
+    uploadProgressText.style.display = 'block';
+
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'https://api.poseidonllp.com/upload_to_ftp', true);
 
+    xhr.upload.onprogress = function (event) {
+        if (event.lengthComputable) {
+            const percentComplete = (event.loaded / event.total) * 100;
+            uploadProgressBar.style.width = percentComplete + '%';
+            uploadProgressText.textContent = '檔案上傳中... ' + Math.round(percentComplete) + '%';
+        }
+    };
+
     xhr.onload = function () {
+        uploadProgressContainer.style.display = 'none';
+        uploadProgressText.style.display = 'none';
         if (xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
             showAlert(response.message || '檔案已成功上傳到伺服器');
-            fetchFileList();  // 手動刷新文件列表
+            const newFileName = file.name;
+            fetchFileList(newFileName);  // 传递新文件名
             fileInput.value = '';  // 清空文件選擇器
         } else if (xhr.status === 503) {
-            showAlert('<div class="alert">另一個轉檔過程正在進行中，請稍後再試<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span></div>');
+            showAlert('另一個轉檔過程正在進行中，請稍後再試');
         } else {
             const response = JSON.parse(xhr.responseText);
-            showAlert('<div class="alert">上傳失敗，請重試！' + (response.error ? '<br>' + response.error : '') + '<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span></div>');
+            showAlert('上傳失敗，請重試！' + (response.error ? '<br>' + response.error : ''));
         }
     };
 
     xhr.onerror = function () {
-        showAlert('<div class="alert">上傳失敗，請重試！<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span></div>');
+        uploadProgressContainer.style.display = 'none';
+        uploadProgressText.style.display = 'none';
+        showAlert('上傳失敗，請重試！');
     };
 
     xhr.send(formData);
 }
 
-
+function insertFileToSelect(fileName) {
+    const select = document.getElementById('ftpFileSelect');
+    const option = document.createElement('option');
+    option.value = fileName;
+    option.textContent = fileName;
+    select.insertBefore(option, select.firstChild);
+    select.value = fileName;  // 自動選中最新上傳的文件
+}
 
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
@@ -1098,7 +1173,8 @@ function transcribeFromFTP() {
             document.getElementById('transcription-progress-container').style.display = 'none';
             if (data.text) {
                 displayTranscription(data);
-                fetchTextFileList();  // 轉檔完成後刷新文字文件列表
+                const newTextFileName = data.originalFilename + '.txt';
+                fetchTextFileList(newTextFileName);  // 轉檔完成後刷新文字文件列表並传递新生成的文件名
             } else {
                 console.error('錯誤:', data.error);
                 const uploadResult = document.getElementById('upload-result');
@@ -1117,7 +1193,6 @@ function transcribeFromFTP() {
             }
         });
 }
-
 
 function clearPreviousResult() {
     const container = document.getElementById('transcriptionResult');
@@ -1206,3 +1281,4 @@ function downloadTextFile() {
             alert('下載失敗，請檢查網絡連接或伺服器狀態！\n' + error);
         });
 }
+

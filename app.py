@@ -1,5 +1,4 @@
 from flask import Flask, request, jsonify, send_file, send_from_directory, session, copy_current_request_context
-from flask_cors import CORS
 from ftplib import FTP
 from werkzeug.utils import secure_filename
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
@@ -33,7 +32,7 @@ translator = GoogleTranslator(source='auto', target='zh-TW')
 # 簡體轉繁體轉換器
 cc = OpenCC('s2twp')
 
-executor = ThreadPoolExecutor(max_workers=4)
+executor = ThreadPoolExecutor(max_workers=8)
 
 # 設置FTP伺服器信息
 FTP_HOST = '114.32.65.180'
