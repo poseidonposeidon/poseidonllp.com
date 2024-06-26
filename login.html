@@ -4,28 +4,29 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Poseidon Capital log in</title>
-    <link rel="stylesheet" href="main.css"> <!-- 引入 CSS 文件 -->
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css">
 </head>
 <body>
-    <div class="navbar">
-        <div class="logo">
-            <img src="img/poseidon.png" alt="Poseidon Capital Ltd." class="logo">
-        </div>
-        <div class="navbar-links">
-            <a href="index.html">首頁</a>
-        </div>
+<div class="navbar">
+    <div class="logo">
+        <img src="/static/img/poseidon.png" alt="Poseidon Capital Ltd." class="logo">
     </div>
-
-    <div class="container">
-        <h1>歡迎來到您的網站！ 123</h1>
-        <!-- 添加 Google 登入按鈕 -->
-        <button id="google-login-btn">使用 Google 登入</button>
+    <div class="navbar-links">
+        <a href="index.html">首頁</a>
+        <a href="login.html">登入</a>
     </div>
+</div>
 
-    <!-- 引入 Google 登入 API -->
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
+<div class="container">
+    <h1>歡迎來到您的網站！</h1>
+    <!-- 添加 Google 登入按鈕 -->
+    <button id="google-login-btn">使用 Google 登入</button>
+</div>
 
-    <!-- 在下面的 JavaScript 代碼中處理 Google 登入 -->
-    <script src="login.js"></script>
+<!-- 引入 Google 登入 API -->
+<script src="https://apis.google.com/js/platform.js" async defer></script>
+
+<!-- 在下面的 JavaScript 代碼中處理 Google 登入 -->
+<script src="login.js"></script>
 </body>
 </html>
