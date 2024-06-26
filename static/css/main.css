@@ -176,3 +176,33 @@ div {
     gap: 10px; /* 元素之間的間距 */
     margin-top: 10px; /* 與上一部分保持間距 */
 }
+
+.alert {
+    padding: 20px;
+    background-color: #2196F3; /* 藍色背景 */
+    color: white;
+    margin-bottom: 15px;
+    border-radius: 5px; /* 圓角邊框 */
+    position: fixed; /* 固定位置 */
+    top: 20px; /* 頂部距離 */
+    left: 50%; /* 左右居中 */
+    transform: translateX(-50%); /* 水平居中 */
+    z-index: 1000; /* 確保在最上層 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影 */
+}
+
+.closebtn {
+    margin-left: 15px;
+    color: white;
+    font-weight: bold;
+    float: right;
+    font-size: 22px;
+    line-height: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.closebtn:hover {
+    color: black;
+}
+

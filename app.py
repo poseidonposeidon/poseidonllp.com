@@ -87,18 +87,16 @@ def upload_to_ftp():
             with open(temp_path, 'rb') as f:
                 ftp.storbinary(f"STOR {filename_encoded}", f)
 
-            # 修正：存儲正確的原始文件名
             with io.BytesIO(original_filename.encode('utf-8')) as meta_file:
                 ftp.storbinary(f"STOR {filename_encoded}.meta", meta_file)
 
-            # 在“Text_File”資料夾創建一份 meta 文件
             ftp.cwd('/Text_File')
             with io.BytesIO(original_filename.encode('utf-8')) as meta_file:
                 ftp.storbinary(f"STOR {filename_encoded}.meta", meta_file)
 
             ftp.quit()
             os.remove(temp_path)
-            return {"message": f"文件 {original_filename} 已成功上傳到伺服器"}
+            return {"message": f"<div class='alert'>文件 {original_filename} 已成功上傳到伺服器<span class='closebtn' onclick='this.parentElement.style.display=\"none\";'>&times;</span></div>"}
         except Exception as e:
             print(f"FTP上傳失敗: {e}")
             os.remove(temp_path)
@@ -120,6 +118,8 @@ def upload_to_ftp():
         return jsonify({"error": str(e)}), 500
     finally:
         lock.release()
+
+
 
 @app.route('/list_files', methods=['GET'])
 def list_files():
@@ -288,6 +288,9 @@ def download_text_file(filename):
         ftp.login(FTP_USER, FTP_PASS)
         ftp.set_pasv(True)
         ftp.cwd('Text_File')
+
+
+        
 
         # 解碼 URL 編碼的文件名
         decoded_filename = urllib.parse.unquote(filename, encoding='utf-8')

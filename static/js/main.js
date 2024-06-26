@@ -1011,12 +1011,11 @@ function fetchTextFileList() {
 }
 
 function showAlert(message) {
-    const alertBox = document.getElementById('error-alert');
-    const alertMessage = document.getElementById('error-message');
-    alertMessage.textContent = message;
-    alertBox.style.display = 'block';
+    const alertBox = document.createElement('div');
+    alertBox.innerHTML = message;
+    document.body.appendChild(alertBox);
 
-    // 在3秒後隱藏提示框
+    // 自動隱藏提示框
     setTimeout(() => {
         alertBox.style.display = 'none';
     }, 3000);
@@ -1027,7 +1026,7 @@ function uploadToFTP() {
     const file = fileInput.files[0];
 
     if (!file) {
-        showAlert('請選擇一個檔案！');
+        showAlert('<div class="alert">請選擇一個檔案！<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span></div>');
         return;
     }
 
@@ -1035,63 +1034,31 @@ function uploadToFTP() {
     formData.append('file', file);
     formData.append('originalFileName', file.name);
 
-    const uploadProgressContainer = document.getElementById('upload-progress-container');
-    const uploadProgressBar = document.getElementById('upload-progress-bar');
-    const uploadProgressText = document.getElementById('upload-progress-text');
-
-    uploadProgressContainer.style.display = 'block';
-    uploadProgressText.style.display = 'block';
-
     const xhr = new XMLHttpRequest();
     xhr.open('POST', 'https://api.poseidonllp.com/upload_to_ftp', true);
 
-    xhr.upload.onprogress = function (event) {
-        if (event.lengthComputable) {
-            const percentComplete = (event.loaded / event.total) * 100;
-            uploadProgressBar.style.width = percentComplete + '%';
-            uploadProgressText.textContent = '檔案上傳中... ' + Math.round(percentComplete) + '%';
-        }
-    };
-
     xhr.onload = function () {
-        uploadProgressContainer.style.display = 'none';
-        uploadProgressText.style.display = 'none';
         if (xhr.status === 200) {
-            const contentType = xhr.getResponseHeader('Content-Type');
-            if (contentType && contentType.includes('application/json')) {
-                try {
-                    const response = JSON.parse(xhr.responseText);
-                    showAlert(response.message || '檔案已成功上傳到伺服器');
-                    fetchFileList();  // 手動刷新文件列表
-                    fileInput.value = '';  // 清空文件選擇器
-                } catch (error) {
-                    console.error('無法解析響應:', error);
-                    showAlert('無法解析伺服器響應');
-                }
-            } else {
-                showAlert('伺服器回應:\n' + xhr.responseText);
-            }
+            const response = JSON.parse(xhr.responseText);
+            showAlert(response.message || '檔案已成功上傳到伺服器');
+            fetchFileList();  // 手動刷新文件列表
+            fileInput.value = '';  // 清空文件選擇器
         } else if (xhr.status === 503) {
-            showAlert('另一個轉檔過程正在進行中，請稍後再試');
+            showAlert('<div class="alert">另一個轉檔過程正在進行中，請稍後再試<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span></div>');
         } else {
-            try {
-                const response = JSON.parse(xhr.responseText);
-                showAlert('上傳失敗，請重試！' + (response.error ? '\n' + response.error : ''));
-            } catch (error) {
-                console.error('無法解析錯誤響應:', error);
-                showAlert('上傳失敗，請重試！');
-            }
+            const response = JSON.parse(xhr.responseText);
+            showAlert('<div class="alert">上傳失敗，請重試！' + (response.error ? '<br>' + response.error : '') + '<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span></div>');
         }
     };
 
     xhr.onerror = function () {
-        uploadProgressContainer.style.display = 'none';
-        uploadProgressText.style.display = 'none';
-        showAlert('上傳失敗，請重試！');
+        showAlert('<div class="alert">上傳失敗，請重試！<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span></div>');
     };
 
     xhr.send(formData);
 }
+
+
 
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
