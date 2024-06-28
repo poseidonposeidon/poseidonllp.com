@@ -135,16 +135,14 @@
         </select>
         <button onclick="downloadTextFile()">下載文字檔</button>
     </div>
-
     <div id="upload-progress-container" style="display: none;">
         <div id="upload-progress-bar"></div>
     </div>
     <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">檔案上傳中...</p>
-
     <div id="transcription-progress-container" style="display: none; text-align: center;">
         <div>
             <div class="loader"></div>
-            <p id="transcription-progress-text">轉檔中...</p>
+            <p id="transcription-status">轉檔中...</p>
         </div>
     </div>
     <div class="scroll-container" id="transcriptionResult">
@@ -152,10 +150,12 @@
     </div>
     <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">閱讀更多</button>
     <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">閱讀更少</button>
-    <div id="error-alert" style="display: none;">
-        <span id="error-message"></span>
+    <div id="alert-box" style="display: none;" class="alert">
+        <span id="alert-message"></span>
+        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
     </div>
 </div>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.min.js"></script>-->
 
 <script src="/static/js/main.js"></script>
 </body>

@@ -12,6 +12,7 @@ from deep_translator import GoogleTranslator
 import torch
 import subprocess
 import io
+import time
 from threading import Lock
 
 # 禁用 FP16 使用 FP32
@@ -20,7 +21,6 @@ os.environ["WHISPER_DISABLE_F16"] = "1"
 app = Flask(__name__)
 app.config['MAX_CONTENT_LENGTH'] = 2048 * 1024 * 1024  # 設置為2048MB
 app.secret_key = 'supersecretkey'  # 用於 session
-
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -104,22 +104,28 @@ def upload_to_ftp():
             os.remove(temp_path)
             return {"error": f"FTP上傳失敗: {e}"}
 
-    if not lock.acquire(blocking=False):
-        return jsonify({"error": "另一個轉檔過程正在進行中，請稍後再試"}), 503
-
-    try:
-        future = executor.submit(upload)
-        result = future.result(timeout=6000)
-        if "error" in result:
-            return jsonify(result), 500
+    max_retries = 5
+    for attempt in range(max_retries):
+        if lock.acquire(blocking=False):
+            try:
+                future = executor.submit(upload)
+                result = future.result(timeout=6000)
+                if "error" in result:
+                    return jsonify(result), 500
+                else:
+                    return jsonify(result), 200
+            except FuturesTimeoutError:
+                return jsonify({"error": "上傳超時"}), 500
+            except Exception as e:
+                return jsonify({"error": str(e)}), 500
+            finally:
+                lock.release()
+            break
         else:
-            return jsonify(result), 200
-    except FuturesTimeoutError:
-        return jsonify({"error": "上傳超時"}), 500
-    except Exception as e:
-        return jsonify({"error": str(e)}), 500
-    finally:
-        lock.release()
+            if attempt < max_retries - 1:
+                time.sleep(2)  # 等待2秒後重試
+            else:
+                return jsonify({"error": "另一個轉檔過程正在進行中，請稍後再試"}), 503
 
 @app.route('/list_files', methods=['GET'])
 def list_files():
@@ -168,6 +174,21 @@ def list_text_files():
         print(f"列出文字文件錯誤: {e}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/check_transcription_status', methods=['POST'])
+def check_transcription_status():
+    if 'filename' not in request.json:
+        return jsonify({"error": "沒有指定文件名"}), 400
+    filename = request.json['filename']
+
+    for queued_filename, session_id in transcription_queue:
+        if queued_filename == filename:
+            return jsonify({"status": "queued"})
+
+    if session.get('current_filename') == filename:
+        return jsonify({"status": "in_progress"})
+
+    return jsonify({"status": "completed"})
+
 @app.route('/transcribe_from_ftp', methods=['POST'])
 def transcribe_handler():
     if 'filename' not in request.json:
@@ -179,7 +200,10 @@ def transcribe_handler():
 
     @copy_current_request_context
     def transcribe_and_store(filename, session_id):
-        return transcribe_audio_from_ftp(filename, session_id)
+        session['current_filename'] = filename
+        result, original_filename = transcribe_audio_from_ftp(filename, session_id)
+        session.pop('current_filename', None)
+        return result, original_filename
 
     if not lock.acquire(blocking=False):
         transcription_queue.append((filename, session_id))
@@ -188,16 +212,14 @@ def transcribe_handler():
     try:
         future = executor.submit(transcribe_and_store, filename, session_id)
         transcription_result, original_filename = future.result(timeout=6000)
-        process_next_in_queue()
         return jsonify({"text": transcription_result, "sessionID": session_id, "originalFilename": original_filename})
     except FuturesTimeoutError:
-        process_next_in_queue()
         return jsonify({"error": "轉錄超時"}), 500
     except Exception as e:
-        process_next_in_queue()
         return jsonify({"error": str(e)}), 500
     finally:
         lock.release()
+        process_next_in_queue()
 
 def transcribe_audio_from_ftp(filename, session_id):
     try:
@@ -279,6 +301,18 @@ def transcribe_audio_from_ftp(filename, session_id):
         print(f"轉錄音頻錯誤: {e}")
         return f"{{'error': '{str(e)}'}}", original_filename
 
+def process_next_in_queue():
+    if transcription_queue:
+        next_filename, next_session_id = transcription_queue.pop(0)
+        @copy_current_request_context
+        def transcribe_and_store():
+            return transcribe_audio_from_ftp(next_filename, next_session_id)
+        future = executor.submit(transcribe_and_store)
+        try:
+            future.result(timeout=6000)
+        except Exception as e:
+            print(f"處理下一個排程時出錯: {e}")
+
 def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)
@@ -312,18 +346,6 @@ def download_text_file(filename):
 @app.route('/queue_length', methods=['GET'])
 def queue_length():
     return jsonify({"queueLength": len(transcription_queue)})
-
-def process_next_in_queue():
-    if transcription_queue:
-        next_filename, next_session_id = transcription_queue.pop(0)
-        @copy_current_request_context
-        def transcribe_and_store():
-            return transcribe_audio_from_ftp(next_filename, next_session_id)
-        future = executor.submit(transcribe_and_store)
-        try:
-            future.result(timeout=6000)
-        except Exception as e:
-            print(f"處理下一個排程時出錯: {e}")
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

@@ -912,7 +912,7 @@ function displayInsiderTrades(data) {
 ////////////////////////////錄音檔轉文字/////////////////////////////
 let originalFileNames = {};
 let currentOriginalFileName = '';
-
+let pollingInterval;
 const baseUrl = 'https://api.poseidonllp.com';
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -1067,10 +1067,9 @@ function showAlert(message) {
     alertBox.innerHTML = message + '<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span>';
     document.body.appendChild(alertBox);
 
-    // 自動隱藏提示框
     setTimeout(() => {
         alertBox.style.display = 'none';
-    }, 3000);
+    }, 5000);
 }
 
 function uploadToFTP() {
@@ -1145,16 +1144,13 @@ function transcribeFromFTP() {
     currentOriginalFileName = originalFileNames[encodedFilename];
 
     if (!encodedFilename) {
-        const uploadResult = document.getElementById('upload-result');
-        if (uploadResult) {
-            uploadResult.innerText = '請選擇FTP上的檔案！';
-        }
+        showAlert('請選擇FTP上的檔案！');
         return;
     }
 
     clearPreviousResult();
-
     document.getElementById('transcription-progress-container').style.display = 'block';
+    document.getElementById('transcription-status').textContent = '正在提交轉錄請求...';
 
     fetch(`${baseUrl}/transcribe_from_ftp`, {
         method: 'POST',
@@ -1164,39 +1160,123 @@ function transcribeFromFTP() {
         body: JSON.stringify({ filename: encodedFilename })
     })
         .then(response => {
-            if (!response.ok) {
-                if (response.status === 503) {
-                    throw new Error('另一個轉檔過程正在進行中，請稍後再試');
-                } else {
-                    return response.text().then(text => { throw new Error(text); });
-                }
+            if (response.status === 202) {
+                showAlert('轉檔進入排程');
+                document.getElementById('transcription-status').textContent = '轉檔已進入排程，請稍後...';
+                startPolling(encodedFilename);
+            } else if (response.status === 503) {
+                showAlert('服務器忙碌中，請稍後重試');
+            } else if (!response.ok) {
+                throw new Error('服務器錯誤，請稍後重試');
             }
             return response.json();
         })
         .then(data => {
-            document.getElementById('transcription-progress-container').style.display = 'none';
-            if (data.text) {
+            if (data.message === '已加入排程隊列') {
+                showAlert(data.message);
+                document.getElementById('transcription-status').textContent = '轉檔已進入排程，請稍後...';
+                startPolling(encodedFilename);
+            } else if (data.text) {
                 displayTranscription(data);
-                const newTextFileName = data.originalFilename + '.txt';
-                fetchTextFileList(newTextFileName);  // 轉檔完成後刷新文字文件列表並传递新生成的文件名
             } else {
-                console.error('錯誤:', data.error);
-                const uploadResult = document.getElementById('upload-result');
-                if (uploadResult) {
-                    uploadResult.innerText = '轉錄失敗，請重試！\n' + data.error;
-                }
+                throw new Error('未收到預期的響應數據');
             }
         })
         .catch(error => {
             document.getElementById('transcription-progress-container').style.display = 'none';
-            console.error('錯誤:', error);
-            showAlert(error.message || '錯誤發生，請檢查網絡連接或伺服器狀態！\n' + error);
-            const uploadResult = document.getElementById('upload-result');
-            if (uploadResult) {
-                uploadResult.innerText = '錯誤發生，請檢查網絡連接或伺服器狀態！\n' + error;
-            }
+            console.error('轉錄錯誤:', error);
+            showAlert(error.message || '轉錄過程中發生錯誤，請重試！');
         });
 }
+
+function startPolling(filename) {
+    const interval = setInterval(() => {
+        fetch(`${baseUrl}/check_transcription_status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ filename: filename })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'completed') {
+                    clearInterval(interval);
+                    showAlert('轉錄完成');
+                    displayTranscription(data);
+                } else if (data.status === 'queued') {
+                    document.getElementById('transcription-status').textContent = '任務排隊中，請稍候...';
+                } else if (data.status === 'in_progress') {
+                    document.getElementById('transcription-status').textContent = '正在轉錄中...';
+                }
+            })
+            .catch(error => {
+                clearInterval(interval);
+                console.error('輪詢錯誤:', error);
+            });
+    }, 5000);
+}
+
+
+function startPolling(filename) {
+    const statusElement = document.getElementById('transcription-status');
+    statusElement.textContent = '任務排隊中，請稍候...';
+
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+    }
+
+    pollingInterval = setInterval(() => {
+        fetch(`${baseUrl}/check_transcription_status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ filename: filename })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'completed') {
+                    clearInterval(pollingInterval);
+                    fetchTranscriptionResult(filename);
+                    statusElement.textContent = '轉錄完成';
+                } else if (data.status === 'in_progress') {
+                    statusElement.textContent = `轉錄進行中... ${data.progress || ''}`;
+                } else if (data.status === 'queued') {
+                    statusElement.textContent = '任務仍在隊列中，請稍候...';
+                }
+            })
+            .catch(error => {
+                clearInterval(pollingInterval);
+                console.error('檢查狀態時出錯:', error);
+                showAlert('檢查轉錄狀態時出錯，請稍後手動檢查結果');
+                statusElement.textContent = '狀態檢查失敗';
+            });
+    }, 5000); // 每5秒检查一次
+}
+
+function fetchTranscriptionResult(filename) {
+    fetch(`${baseUrl}/get_transcription_result`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ filename: filename })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.text) {
+                displayTranscription(data);
+            } else {
+                showAlert('無法獲取轉錄結果');
+            }
+        })
+        .catch(error => {
+            console.error('獲取轉錄結果時出錯:', error);
+            showAlert('獲取轉錄結果時出錯，請稍後重試');
+        });
+}
+
 
 function clearPreviousResult() {
     const container = document.getElementById('transcriptionResult');
@@ -1206,24 +1286,30 @@ function clearPreviousResult() {
     document.getElementById('readLessBtn').classList.add('hidden');
     container.style.maxHeight = '200px';
 }
-
 function displayTranscription(data) {
     const container = document.getElementById('transcriptionResult');
     const readMoreBtn = document.getElementById('readMoreBtn');
     const readLessBtn = document.getElementById('readLessBtn');
+
     container.innerHTML = '';  // 清空先前的結果
-    if (data.error) {
-        container.innerHTML = `<p>錯誤: ${data.error}</p>`;
-    } else {
-        transcriptionText = data.text || "無轉寫內容";
-        container.innerHTML = `<p>${transcriptionText.replace(/\n/g, '<br>')}</p>`;
+
+    if (data.text) {
+        const transcriptionText = data.text.replace(/\n/g, '<br>');
+        container.innerHTML = `<p>${transcriptionText}</p>`;
+
         if (container.scrollHeight > container.clientHeight) {
             readMoreBtn.classList.remove('hidden');
         } else {
             readMoreBtn.classList.add('hidden');
         }
         readLessBtn.classList.add('hidden');
+    } else {
+        container.innerHTML = '<p>無轉寫內容</p>';
+        readMoreBtn.classList.add('hidden');
+        readLessBtn.classList.add('hidden');
     }
+
+    document.getElementById('transcription-progress-container').style.display = 'none';
 }
 
 function toggleReadMore() {
