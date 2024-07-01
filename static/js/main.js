@@ -966,11 +966,9 @@ function fetchFileList(newFileName = null) {
                     const newFileOption = Array.from(select.options).find(option => option.textContent === newFileName);
                     if (newFileOption) {
                         select.value = newFileOption.value;
-                        // 将新文件放在第一个位置
                         select.insertBefore(newFileOption, select.firstChild);
                     }
                 } else {
-                    // 默认选择第一个文件
                     select.selectedIndex = 0;
                 }
             } else {
@@ -990,7 +988,6 @@ function fetchFileList(newFileName = null) {
 }
 
 function extractDate(fileName) {
-    // 假設文件名中的日期部分格式為YYYYMMDD
     const datePattern = /\d{8}/;
     const match = fileName.match(datePattern);
     if (match) {
@@ -1001,7 +998,7 @@ function extractDate(fileName) {
             parseInt(dateString.substring(6, 8), 10)
         );
     }
-    return new Date(0); // 如果沒有匹配到日期，返回最早的日期
+    return new Date(0);
 }
 
 function fetchTextFileList(newTextFileName = null) {
@@ -1038,11 +1035,9 @@ function fetchTextFileList(newTextFileName = null) {
                     const newTextFileOption = Array.from(select.options).find(option => option.textContent === newTextFileName);
                     if (newTextFileOption) {
                         select.value = newTextFileOption.value;
-                        // 将新文件放在第一个位置
                         select.insertBefore(newTextFileOption, select.firstChild);
                     }
                 } else {
-                    // 默认选择第一个文件
                     select.selectedIndex = 0;
                 }
             } else {
@@ -1064,7 +1059,7 @@ function fetchTextFileList(newTextFileName = null) {
 function showAlert(message) {
     const alertBox = document.createElement('div');
     alertBox.className = 'alert';
-    alertBox.innerHTML = message + '<span class="closebtn" onclick="this.parentElement.style.display=\'none\';">&times;</span>';
+    alertBox.innerHTML = `${message}<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>`;
     document.body.appendChild(alertBox);
 
     setTimeout(() => {
@@ -1098,8 +1093,8 @@ function uploadToFTP() {
     xhr.upload.onprogress = function (event) {
         if (event.lengthComputable) {
             const percentComplete = (event.loaded / event.total) * 100;
-            uploadProgressBar.style.width = percentComplete + '%';
-            uploadProgressText.textContent = '檔案上傳中... ' + Math.round(percentComplete) + '%';
+            uploadProgressBar.style.width = `${percentComplete}%`;
+            uploadProgressText.textContent = `檔案上傳中... ${Math.round(percentComplete)}%`;
         }
     };
 
@@ -1110,8 +1105,8 @@ function uploadToFTP() {
             const response = JSON.parse(xhr.responseText);
             showAlert(response.message || '檔案已成功上傳到伺服器');
             const newFileName = file.name;
-            fetchFileList(newFileName);  // 传递新文件名
-            fileInput.value = '';  // 清空文件選擇器
+            fetchFileList(newFileName);
+            fileInput.value = '';
         } else if (xhr.status === 503) {
             showAlert('另一個轉檔過程正在進行中，請稍後再試');
         } else {
@@ -1127,15 +1122,6 @@ function uploadToFTP() {
     };
 
     xhr.send(formData);
-}
-
-function insertFileToSelect(fileName) {
-    const select = document.getElementById('ftpFileSelect');
-    const option = document.createElement('option');
-    option.value = fileName;
-    option.textContent = fileName;
-    select.insertBefore(option, select.firstChild);
-    select.value = fileName;  // 自動選中最新上傳的文件
 }
 
 function transcribeFromFTP() {
@@ -1161,9 +1147,10 @@ function transcribeFromFTP() {
     })
         .then(response => {
             if (response.status === 202) {
-                showAlert('轉檔進入排程');
+                // showAlert('轉檔已加入排程，請稍後...');
                 document.getElementById('transcription-status').textContent = '轉檔已進入排程，請稍後...';
                 startPolling(encodedFilename);
+                return { message: '已加入排程隊列' };
             } else if (response.status === 503) {
                 showAlert('服務器忙碌中，請稍後重試');
             } else if (!response.ok) {
@@ -1188,35 +1175,6 @@ function transcribeFromFTP() {
             showAlert(error.message || '轉錄過程中發生錯誤，請重試！');
         });
 }
-
-function startPolling(filename) {
-    const interval = setInterval(() => {
-        fetch(`${baseUrl}/check_transcription_status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ filename: filename })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'completed') {
-                    clearInterval(interval);
-                    showAlert('轉錄完成');
-                    displayTranscription(data);
-                } else if (data.status === 'queued') {
-                    document.getElementById('transcription-status').textContent = '任務排隊中，請稍候...';
-                } else if (data.status === 'in_progress') {
-                    document.getElementById('transcription-status').textContent = '正在轉錄中...';
-                }
-            })
-            .catch(error => {
-                clearInterval(interval);
-                console.error('輪詢錯誤:', error);
-            });
-    }, 5000);
-}
-
 
 function startPolling(filename) {
     const statusElement = document.getElementById('transcription-status');
@@ -1277,10 +1235,9 @@ function fetchTranscriptionResult(filename) {
         });
 }
 
-
 function clearPreviousResult() {
     const container = document.getElementById('transcriptionResult');
-    container.innerHTML = '';  // 清空先前的結果
+    container.innerHTML = '';
 
     document.getElementById('readMoreBtn').classList.add('hidden');
     document.getElementById('readLessBtn').classList.add('hidden');
@@ -1291,7 +1248,7 @@ function displayTranscription(data) {
     const readMoreBtn = document.getElementById('readMoreBtn');
     const readLessBtn = document.getElementById('readLessBtn');
 
-    container.innerHTML = '';  // 清空先前的結果
+    container.innerHTML = '';
 
     if (data.text) {
         const transcriptionText = data.text.replace(/\n/g, '<br>');
@@ -1355,7 +1312,7 @@ function downloadTextFile() {
             console.log("文件下載成功，處理 Blob 數據...");
             const downloadLink = document.createElement('a');
             downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = textFileName; // 使用解碼後的文件名作為下載名
+            downloadLink.download = textFileName;
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
@@ -1386,3 +1343,4 @@ function updateQueueLength() {
             console.error('獲取排程長度時出錯:', error);
         });
 }
+

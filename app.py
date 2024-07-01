@@ -44,6 +44,7 @@ lock = Lock()
 
 # 創建轉錄排程隊列
 transcription_queue = []
+current_transcription = None
 
 @app.before_request
 def log_request_info():
@@ -92,13 +93,13 @@ def upload_to_ftp():
             with io.BytesIO(original_filename.encode('utf-8')) as meta_file:
                 ftp.storbinary(f"STOR {filename_encoded}.meta", meta_file)
 
-            ftp.cwd('/Text_File')
             with io.BytesIO(original_filename.encode('utf-8')) as meta_file:
+                ftp.cwd('/Text_File')
                 ftp.storbinary(f"STOR {filename_encoded}.meta", meta_file)
 
             ftp.quit()
             os.remove(temp_path)
-            return {"message": f"<div class='alert'>文件 {original_filename} 已成功上傳到伺服器<span class='closebtn' onclick='this.parentElement.style.display=\"none\";'>&times;</span></div>"}
+            return {"message": f"文件 {original_filename} 已成功上傳到伺服器"}
         except Exception as e:
             print(f"FTP上傳失敗: {e}")
             os.remove(temp_path)
@@ -146,7 +147,6 @@ def list_files():
                     with tempfile.NamedTemporaryFile() as temp_file:
                         ftp.retrbinary(f"RETR {meta_file}", temp_file.write)
                         temp_file.seek(0)
-                        # 正確解碼
                         original_filename = temp_file.read().decode('utf-8')
                 except Exception:
                     pass
@@ -167,7 +167,7 @@ def list_text_files():
         ftp.cwd('/Text_File')
 
         text_files = ftp.nlst()
-        text_files_decoded = [urllib.parse.unquote(f, encoding='utf-8') for f in text_files if not f.endswith('.meta')]  # 過濾掉 .meta 文件
+        text_files_decoded = [urllib.parse.unquote(f, encoding='utf-8') for f in text_files if not f.endswith('.meta')]
         ftp.quit()
         return jsonify({"files": text_files_decoded})
     except Exception as e:
@@ -180,46 +180,60 @@ def check_transcription_status():
         return jsonify({"error": "沒有指定文件名"}), 400
     filename = request.json['filename']
 
-    for queued_filename, session_id in transcription_queue:
-        if queued_filename == filename:
-            return jsonify({"status": "queued"})
+    if current_transcription and current_transcription['filename'] == filename:
+        if current_transcription['status'] == 'completed':
+            return jsonify({"status": "completed"})
+        elif current_transcription['status'] == 'in_progress':
+            return jsonify({"status": "in_progress"})
 
-    if session.get('current_filename') == filename:
-        return jsonify({"status": "in_progress"})
+    if any(queued_filename == filename for queued_filename, _ in transcription_queue):
+        return jsonify({"status": "queued"})
 
-    return jsonify({"status": "completed"})
+    return jsonify({"status": "not_found"})
 
 @app.route('/transcribe_from_ftp', methods=['POST'])
 def transcribe_handler():
     if 'filename' not in request.json:
-        return jsonify({"error": "沒有指定文件名"}), 400
-    filename = request.json['filename']
+        return jsonify({"error": "没有指定文件名"}), 400
 
+    filename = request.json['filename']
     session_id = str(uuid.uuid4())
     session[session_id] = 0
 
-    @copy_current_request_context
-    def transcribe_and_store(filename, session_id):
-        session['current_filename'] = filename
-        result, original_filename = transcribe_audio_from_ftp(filename, session_id)
-        session.pop('current_filename', None)
-        return result, original_filename
-
     if not lock.acquire(blocking=False):
         transcription_queue.append((filename, session_id))
-        return jsonify({"message": "已加入排程隊列"}), 202
+        return jsonify({"message": "已加入排程队列"}), 202
+
+    @copy_current_request_context
+    def transcribe_and_store(filename, session_id):
+        global current_transcription
+        current_transcription = {'filename': filename, 'status': 'in_progress'}
+        result, original_filename = transcribe_audio_from_ftp(filename, session_id)
+        current_transcription = {'filename': filename, 'status': 'completed', 'result': result}
+        return result, original_filename
 
     try:
         future = executor.submit(transcribe_and_store, filename, session_id)
         transcription_result, original_filename = future.result(timeout=6000)
         return jsonify({"text": transcription_result, "sessionID": session_id, "originalFilename": original_filename})
     except FuturesTimeoutError:
-        return jsonify({"error": "轉錄超時"}), 500
+        return jsonify({"error": "转录超时"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
         lock.release()
         process_next_in_queue()
+
+@app.route('/get_transcription_result', methods=['POST'])
+def get_transcription_result():
+    if 'filename' not in request.json:
+        return jsonify({"error": "沒有指定文件名"}), 400
+    filename = request.json['filename']
+
+    if current_transcription and current_transcription['filename'] == filename:
+        return jsonify({"text": current_transcription.get('result', '')})
+    else:
+        return jsonify({"error": "結果尚未可用或文件名不匹配"}), 404
 
 def transcribe_audio_from_ftp(filename, session_id):
     try:
@@ -232,11 +246,9 @@ def transcribe_audio_from_ftp(filename, session_id):
         decoded_filename = urllib.parse.unquote(filename, encoding='utf-8')
         temp_path = tempfile.mktemp()
 
-        # 下載原始音頻文件
         with open(temp_path, 'wb') as temp_file:
             ftp.retrbinary(f"RETR {decoded_filename}", temp_file.write)
 
-        # 嘗試從 .meta 文件中讀取原始檔名
         try:
             meta_file_path = tempfile.mktemp()
             with open(meta_file_path, 'wb') as meta_file:
@@ -247,7 +259,6 @@ def transcribe_audio_from_ftp(filename, session_id):
             print(f"讀取 .meta 文件失敗: {e}")
             original_filename = decoded_filename
 
-        # 將音頻轉換為 WAV 格式
         converted_path = tempfile.mktemp(suffix=".wav")
         try:
             subprocess.run(['ffmpeg', '-i', temp_path, '-ar', '16000', '-ac', '1', converted_path], check=True)
@@ -255,7 +266,6 @@ def transcribe_audio_from_ftp(filename, session_id):
             print(f"音頻轉換失敗: {e}")
             raise
 
-        # 進行轉錄
         result = model.transcribe(converted_path)
 
         segments = result['segments']
@@ -282,12 +292,10 @@ def transcribe_audio_from_ftp(filename, session_id):
         os.remove(temp_path)
         os.remove(converted_path)
 
-        # 使用 .meta 文件中的原始檔名來保存轉錄的文本文件
         text_filename = f"{original_filename}.txt"
         with tempfile.NamedTemporaryFile(delete=False) as text_file:
             text_file.write("\n".join(transcriptions).encode('utf-8'))
 
-        # 上傳轉錄文本文件到 "Text_File" 資料夾
         ftp.cwd('/Text_File')
         with open(text_file.name, 'rb') as f:
             ftp.storbinary(f"STOR {urllib.parse.quote(text_filename, encoding='utf-8')}", f)
@@ -306,12 +314,18 @@ def process_next_in_queue():
         next_filename, next_session_id = transcription_queue.pop(0)
         @copy_current_request_context
         def transcribe_and_store():
-            return transcribe_audio_from_ftp(next_filename, next_session_id)
+            global current_transcription
+            current_transcription = {'filename': next_filename, 'status': 'in_progress'}
+            result, original_filename = transcribe_audio_from_ftp(next_filename, next_session_id)
+            current_transcription = {'filename': next_filename, 'status': 'completed', 'result': result}
+            return result, original_filename
         future = executor.submit(transcribe_and_store)
         try:
             future.result(timeout=6000)
         except Exception as e:
             print(f"處理下一個排程時出錯: {e}")
+        finally:
+            process_next_in_queue()
 
 def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
@@ -326,11 +340,9 @@ def download_text_file(filename):
         ftp.set_pasv(True)
         ftp.cwd('Text_File')
 
-        # 解碼 URL 編碼的文件名
         decoded_filename = urllib.parse.unquote(filename, encoding='utf-8')
         local_filename = tempfile.mktemp()
 
-        # 嘗試從 FTP 下載文件
         with open(local_filename, 'wb') as f:
             ftp.retrbinary(f"RETR {urllib.parse.quote(decoded_filename, encoding='utf-8')}", f.write)
 
