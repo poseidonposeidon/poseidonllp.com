@@ -1269,6 +1269,7 @@ function displayTranscription(data) {
     document.getElementById('transcription-progress-container').style.display = 'none';
 }
 
+
 function toggleReadMore() {
     const container = document.getElementById('transcriptionResult');
     const readMoreBtn = document.getElementById('readMoreBtn');
@@ -1343,4 +1344,3 @@ function updateQueueLength() {
             console.error('獲取排程長度時出錯:', error);
         });
 }
-

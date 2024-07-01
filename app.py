@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, send_file, send_from_directory, sessi
 from ftplib import FTP
 from werkzeug.utils import secure_filename
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
+from collections import deque
 import tempfile
 import os
 import urllib.parse
@@ -43,7 +44,7 @@ FTP_PASS = '123456'
 lock = Lock()
 
 # 創建轉錄排程隊列
-transcription_queue = []
+transcription_queue = deque()
 current_transcription = None
 
 @app.before_request
@@ -311,7 +312,7 @@ def transcribe_audio_from_ftp(filename, session_id):
 
 def process_next_in_queue():
     if transcription_queue:
-        next_filename, next_session_id = transcription_queue.pop(0)
+        next_filename, next_session_id = transcription_queue.popleft()
         @copy_current_request_context
         def transcribe_and_store():
             global current_transcription
