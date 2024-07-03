@@ -19,7 +19,7 @@
 
 <div class="container">
     <h1>登入您的帳號</h1>
-    <form id="login-form">
+    <form id="loginForm">
         <label for="username">帳號:</label>
         <input type="text" id="username" name="username" required><br><br>
         <label for="password">密碼:</label>
@@ -30,32 +30,32 @@
 </div>
 
 <script>
-    document.getElementById('login-form').addEventListener('submit', function(event) {
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
-
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        fetch('https://api.poseidonllp.com/login', {
+        fetch('http://api.poseidonllp.com/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username: username, password: password })
+            body: JSON.stringify({ username, password })
         })
             .then(response => response.json())
             .then(data => {
-                alert(data.message);
-                if (response.status === 200) {
-                    window.location.href = "index.html";
+                if (data.message === "Login successful!") {
+                    alert("登入成功！");
+                    window.location.href = "/index";
+                } else {
+                    alert("無效的用戶名或密碼");
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Login failed!');
+                alert('登入過程中發生錯誤');
             });
     });
 </script>
-
 </body>
 </html>

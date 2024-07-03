@@ -20,7 +20,7 @@
 
 <div class="container">
     <h1>註冊一個新帳號</h1>
-    <form id="register-form">
+    <form id="registerForm">
         <label for="username">帳號:</label>
         <input type="text" id="username" name="username" required><br><br>
         <label for="password">密碼:</label>
@@ -30,32 +30,32 @@
 </div>
 
 <script>
-    document.getElementById('register-form').addEventListener('submit', function(event) {
+    document.getElementById('registerForm').addEventListener('submit', function(event) {
         event.preventDefault();
-
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        fetch('https://api.poseidonllp.com/register', {
+        fetch('http://api.poseidonllp.com/api/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ username: username, password: password })
+            body: JSON.stringify({ username, password })
         })
             .then(response => response.json())
             .then(data => {
-                alert(data.message);
-                if (response.status === 201) {
-                    window.location.href = "login.html";
+                if (data.message === "Registration successful!") {
+                    alert("註冊成功！你現在可以登入了。");
+                    window.location.href = "/login_page";
+                } else {
+                    alert(data.message);
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('Registration failed!');
+                alert('註冊過程中發生錯誤');
             });
     });
 </script>
-
 </body>
 </html>
