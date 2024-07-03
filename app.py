@@ -80,14 +80,14 @@ def login():
             return '''
                 <script>
                     alert("登入成功！");
-                    window.location.href = "/index";
+                    window.location.href = "/home.html";
                 </script>
             '''
         else:
             return '''
                 <script>
                     alert("無效的用戶名或密碼");
-                    window.location.href = "/login";
+                    window.location.href = "/index";
                 </script>
             '''
     return render_template('index.html')
@@ -105,7 +105,7 @@ def register():
         return '''
             <script>
                 alert("註冊成功！你現在可以登入了。");
-                window.location.href = "/login";
+                window.location.href = "/index";
             </script>
         '''
     return render_template('register.html')

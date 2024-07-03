@@ -12,7 +12,6 @@
     <div class="logo">
         <img src="/static/img/poseidon.png" alt="Poseidon Capital Ltd." class="logo">
     </div>
-
 </div>
 
 <div class="container">
@@ -44,7 +43,7 @@
             .then(data => {
                 if (data.message === "Login successful!") {
                     alert("登入成功！");
-                    window.location.href = "/index";
+                    window.location.href = "/home.html";
                 } else {
                     alert("無效的用戶名或密碼");
                 }
