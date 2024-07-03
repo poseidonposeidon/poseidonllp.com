@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file, session, copy_current_request_context
 from flask_sqlalchemy import SQLAlchemy
-
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 from ftplib import FTP
@@ -23,7 +22,6 @@ from threading import Lock
 os.environ["WHISPER_DISABLE_F16"] = "1"
 
 app = Flask(__name__)
-
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'supersecretkey'  # 用於 session 和登入系統
@@ -129,11 +127,12 @@ def api_register():
     password = data.get('password')
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "User already exists"}), 400
-    hashed_password = generate_password_hash(password, method='sha256')
+    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')  # 修改這裡
     new_user = User(username=username, password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
     return jsonify({"message": "Registration successful!"}), 201
+
 
 @app.route('/upload_to_ftp', methods=['POST'])
 def upload_to_ftp():
