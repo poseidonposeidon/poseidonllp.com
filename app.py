@@ -87,10 +87,11 @@ def login():
             return '''
                 <script>
                     alert("無效的用戶名或密碼");
-                    window.location.href = "/login_page";
+                    window.location.href = "/login";
                 </script>
             '''
     return render_template('login.html')
+
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
@@ -104,7 +105,7 @@ def register():
         return '''
             <script>
                 alert("註冊成功！你現在可以登入了。");
-                window.location.href = "/login_page";
+                window.location.href = "/login";
             </script>
         '''
     return render_template('register.html')
@@ -127,7 +128,7 @@ def api_register():
     password = data.get('password')
     if User.query.filter_by(username=username).first():
         return jsonify({"message": "User already exists"}), 400
-    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')  # 修改這裡
+    hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
     new_user = User(username=username, password=hashed_password)
     db.session.add(new_user)
     db.session.commit()
