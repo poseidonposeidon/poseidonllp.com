@@ -1165,6 +1165,7 @@ function transcribeFromFTP() {
                 startPolling(encodedFilename);
             } else if (data.text) {
                 displayTranscription(data);
+                showAlert('轉錄完成');
             } else {
                 throw new Error('未收到預期的響應數據');
             }
@@ -1198,6 +1199,7 @@ function startPolling(filename) {
                     clearInterval(pollingInterval);
                     fetchTranscriptionResult(filename);
                     statusElement.textContent = '轉錄完成';
+                    showAlert('轉錄完成');
                 } else if (data.status === 'in_progress') {
                     statusElement.textContent = `轉錄進行中... ${data.progress || ''}`;
                 } else if (data.status === 'queued') {
@@ -1225,6 +1227,7 @@ function fetchTranscriptionResult(filename) {
         .then(data => {
             if (data.text) {
                 displayTranscription(data);
+                showAlert('轉錄完成');
             } else {
                 showAlert('無法獲取轉錄結果');
             }
@@ -1243,6 +1246,7 @@ function clearPreviousResult() {
     document.getElementById('readLessBtn').classList.add('hidden');
     container.style.maxHeight = '200px';
 }
+
 function displayTranscription(data) {
     const container = document.getElementById('transcriptionResult');
     const readMoreBtn = document.getElementById('readMoreBtn');
@@ -1267,6 +1271,7 @@ function displayTranscription(data) {
     }
 
     document.getElementById('transcription-progress-container').style.display = 'none';
+    showAlert('轉錄完成');
 }
 
 
