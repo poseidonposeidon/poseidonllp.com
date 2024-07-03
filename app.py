@@ -69,13 +69,29 @@ def index():
 def index_page():
     return render_template('index.html')
 
-@app.route('/login_page')
-def login_page():
-    return render_template('login.html')
+@app.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    user = User.query.filter_by(username=username).first()
+    if user and check_password_hash(user.password, password):
+        return jsonify({"message": "Login successful!"}), 200
+    else:
+        return jsonify({"message": "Invalid username or password"}), 401
 
-@app.route('/register_page')
-def register_page():
-    return render_template('register.html')
+@app.route('/register', methods=['POST'])
+def register():
+    data = request.json
+    username = data.get('username')
+    password = data.get('password')
+    if User.query.filter_by(username=username).first():
+        return jsonify({"message": "User already exists"}), 400
+    hashed_password = generate_password_hash(password, method='sha256')
+    new_user = User(username=username, password=hashed_password)
+    db.session.add(new_user)
+    db.session.commit()
+    return jsonify({"message": "Registration successful!"}), 201
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

@@ -19,7 +19,7 @@
 
 <div class="container">
     <h1>登入您的帳號</h1>
-    <form method="post" action="{{ url_for('login') }}">
+    <form id="login-form">
         <label for="username">帳號:</label>
         <input type="text" id="username" name="username" required><br><br>
         <label for="password">密碼:</label>
@@ -28,6 +28,34 @@
     </form>
     <p>您沒有帳號嗎？<a href="register.html">註冊一個</a></p>
 </div>
+
+<script>
+    document.getElementById('login-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('password').value;
+
+        fetch('https://api.poseidonllp.com/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ username: username, password: password })
+        })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                if (response.status === 200) {
+                    window.location.href = "index.html";
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Login failed!');
+            });
+    });
+</script>
 
 </body>
 </html>
