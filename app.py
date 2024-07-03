@@ -68,7 +68,7 @@ def index():
 
 @app.route('/index')
 def index_page():
-    return render_template('index.html')
+    return render_template('home.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -90,7 +90,7 @@ def login():
                     window.location.href = "/login";
                 </script>
             '''
-    return render_template('login.html')
+    return render_template('index.html')
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -134,6 +134,11 @@ def api_register():
     db.session.commit()
     return jsonify({"message": "Registration successful!"}), 201
 
+@app.route('/view_users', methods=['GET'])
+def view_users():
+    users = User.query.all()
+    user_list = [{'id': user.id, 'username': user.username, 'password': user.password} for user in users]
+    return jsonify(user_list)
 
 @app.route('/upload_to_ftp', methods=['POST'])
 def upload_to_ftp():
