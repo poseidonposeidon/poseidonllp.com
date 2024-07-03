@@ -64,10 +64,10 @@ def log_request_info():
 
 @app.route('/')
 def index():
-    return redirect(url_for('index_page'))
+    return redirect(url_for('home'))
 
-@app.route('/index')
-def index_page():
+@app.route('/home')
+def home():
     return render_template('home.html')
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -80,14 +80,14 @@ def login():
             return '''
                 <script>
                     alert("登入成功！");
-                    window.location.href = "/home.html";
+                    window.location.href = "/home";
                 </script>
             '''
         else:
             return '''
                 <script>
                     alert("無效的用戶名或密碼");
-                    window.location.href = "/index";
+                    window.location.href = "/login";
                 </script>
             '''
     return render_template('index.html')
@@ -105,7 +105,7 @@ def register():
         return '''
             <script>
                 alert("註冊成功！你現在可以登入了。");
-                window.location.href = "/index";
+                window.location.href = "/login";
             </script>
         '''
     return render_template('register.html')
