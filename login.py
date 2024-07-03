@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file, session, copy_current_request_context
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, send_file, send_from_directory, session, copy_current_request_context
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -63,19 +63,7 @@ def log_request_info():
 
 @app.route('/')
 def index():
-    return redirect(url_for('index_page'))
-
-@app.route('/index')
-def index_page():
-    return render_template('index.html')
-
-@app.route('/login_page')
-def login_page():
-    return render_template('login.html')
-
-@app.route('/register_page')
-def register_page():
-    return render_template('register.html')
+    return redirect(url_for('login'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -84,19 +72,11 @@ def login():
         password = request.form['password']
         user = User.query.filter_by(username=username).first()
         if user and check_password_hash(user.password, password):
-            return '''
-                <script>
-                    alert("登入成功！");
-                    window.location.href = "/index";
-                </script>
-            '''
+            flash('Login successful!')
+            return redirect(url_for('index'))
         else:
-            return '''
-                <script>
-                    alert("無效的用戶名或密碼");
-                    window.location.href = "/login_page";
-                </script>
-            '''
+            flash('Invalid username or password')
+            return redirect(url_for('login'))
     return render_template('login.html')
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -108,12 +88,8 @@ def register():
         new_user = User(username=username, password=hashed_password)
         db.session.add(new_user)
         db.session.commit()
-        return '''
-            <script>
-                alert("註冊成功！你現在可以登入了。");
-                window.location.href = "/login_page";
-            </script>
-        '''
+        flash('Registration successful! You can now log in.')
+        return redirect(url_for('login'))
     return render_template('register.html')
 
 @app.route('/upload_to_ftp', methods=['POST'])

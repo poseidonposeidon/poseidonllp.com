@@ -3,15 +3,24 @@ body {
     color: #333333; /* 深色文字 */
     font-family: 'Courier New', Courier, monospace; /* 打字機字體 */
 }
+
 h1, h2 {
     color: #5c3c1b; /* 棕色調 */
 }
+
 input, button {
     background-color: #e8e1cf; /* 淡棕色按鈕背景 */
-    border: none;
+    border: 2px solid #8b5e3c; /* 深棕色邊框 */
     padding: 10px;
     border-radius: 5px; /* 圓角邊框 */
+    color: #333333; /* 深色文字 */
 }
+
+input:focus {
+    border-color: #a47040; /* 聚焦時的邊框顏色 */
+    background-color: #fff8e1; /* 聚焦時的背景色 */
+}
+
 button {
     background-color: #8b5e3c; /* 暗棕色按鈕 */
     color: white;
@@ -20,9 +29,11 @@ button {
     border-radius: 5px; /* 圓角邊框 */
     cursor: pointer; /* 滑鼠懸停時指針形狀 */
 }
+
 button:hover {
     background-color: #a47040; /* 按鈕懸停時顏色變化 */
 }
+
 div {
     background-color: #eae0d5; /* 容器背景色 */
     margin-top: 10px;
@@ -209,4 +220,3 @@ div {
 .closebtn:hover {
     color: black;
 }
-
