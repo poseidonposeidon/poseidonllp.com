@@ -1678,3 +1678,6 @@ input, select, textarea {
 /*	position: relative;*/
 /*	z-index: 1;*/
 /*}*/
+#intro p {
+	font-size: 0.9rem; /* 可以根據需要調整字體大小 */
+}
