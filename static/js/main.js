@@ -926,7 +926,7 @@ function fetchFileList(newFileName = null) {
     console.log("從伺服器獲取文件列表...");
     fetch(`${baseUrl}/list_files`, {
         method: 'GET',
-        mode: 'cors',
+        mode: 'cors', // 確保有設置此選項
         credentials: 'include'
     })
         .then(response => {
