@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Poseidon Capital - Register</title>
+    <title>Poseidon Capital - Log In</title>
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
 </head>
@@ -12,29 +12,27 @@
     <div class="logo">
         <img src="/static/img/poseidon.png" alt="Poseidon Capital Ltd." class="logo">
     </div>
-    <div class="navbar-links">
-        <a href="login.html">登入</a>
-    </div>
 </div>
 
 <div class="container">
-    <h1>註冊一個新帳號</h1>
-    <form id="registerForm">
+    <h1>登入您的帳號</h1>
+    <form id="loginForm">
         <label for="username">帳號:</label>
         <input type="text" id="username" name="username" required><br><br>
         <label for="password">密碼:</label>
         <input type="password" id="password" name="password" required><br><br>
-        <input type="submit" value="註冊">
+        <input type="submit" value="登入">
     </form>
+    <p>您沒有帳號嗎？<a href="register.html">註冊一個</a></p>
 </div>
 
 <script>
-    document.getElementById('registerForm').addEventListener('submit', function(event) {
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
         event.preventDefault();
         const username = document.getElementById('username').value;
         const password = document.getElementById('password').value;
 
-        fetch('https://api.poseidonllp.com/api/register', {
+        fetch('https://api.poseidonllp.com/api/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -43,16 +41,16 @@
         })
             .then(response => response.json())
             .then(data => {
-                if (data.message === "Registration successful!") {
-                    alert("註冊成功！你現在可以登入了。");
-                    window.location.href = "login.html";  // 確保這裡的URL指向正確的登入頁面
+                if (data.message === "Login successful!") {
+                    alert("登入成功！");
+                    window.location.href = "/home.html";
                 } else {
-                    alert(data.message);
+                    alert("無效的用戶名或密碼");
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                alert('註冊過程中發生錯誤');
+                alert('無效的用戶名或密碼');
             });
     });
 </script>

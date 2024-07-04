@@ -6,7 +6,6 @@
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <title>Poseidon Capital</title>
-
 </head>
 <body>
 
@@ -17,12 +16,10 @@
     </div>
 </div>
 
-
 <h1>Financial Data</h1>
 <input type="text" id="stockSymbol" placeholder="輸入美股代碼" pattern="[A-Z]*">
 <button onclick="fetchStock()">確定</button>
 <p id="outputSymbol" data-last-symbol="">現在查詢的是：</p>
-
 
 <div>
     <h2>財務收入 Income Statement</h2>
@@ -38,7 +35,6 @@
         </table>
     </div>
 </div>
-
 
 <div>
     <h2>資產負債表 Balance Sheet Statements</h2>
@@ -67,8 +63,6 @@
         <div id="cashflowContainer"></div>
     </div>
 </div>
-
-
 
 <div>
     <h2>法說會逐字稿 Earnings Call Transcript</h2>
@@ -110,7 +104,6 @@
 
 <div>
     <h2>內部人交易 Insider Trades </h2>
-
     <button onclick="fetchInsiderTrades()">載入表格</button>
     <div class="scroll-container" >
         <table id="Insider_Trades_Table" border="1" style="width: 100%; border-collapse: collapse;">
