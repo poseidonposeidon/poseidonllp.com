@@ -31,7 +31,7 @@ app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
 app.config['MAIL_USERNAME'] = 'poseidon@poseidonllp.com'
-app.config['MAIL_PASSWORD'] = 'poseidon52369168'
+app.config['MAIL_PASSWORD'] = 'qqlq ckwh cyiw spuf'
 mail = Mail(app)
 
 db = SQLAlchemy(app)
@@ -412,7 +412,8 @@ def process_transcriptions():
             time.sleep(5)
 
 if __name__ == '__main__':
-    db.create_all()
+    with app.app_context():
+        db.create_all()
     import threading
     threading.Thread(target=process_transcriptions, daemon=True).start()
     app.run(debug=True)
