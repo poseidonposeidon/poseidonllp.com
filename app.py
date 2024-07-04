@@ -64,7 +64,7 @@ def log_request_info():
 
 @app.route('/')
 def index():
-    return redirect(url_for('home'))
+    return render_template('index.html')
 
 @app.route('/home')
 def home():
@@ -148,7 +148,6 @@ def clear_users():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
-
 
 @app.route('/upload_to_ftp', methods=['POST'])
 def upload_to_ftp():
