@@ -9,6 +9,7 @@
 </head>
 <body>
 
+
 <div class="navbar">
     <img src="/static/img/favicon.ico" alt="Poseidon Capital Ltd." class="logo">
     <div class="navbar-links">
@@ -32,7 +33,7 @@
 
 <div class="section" id="income-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>財務收入 Income Statement</h2>
-    <div class="content">
+    <div class="content scroll-container-x">
         <label for="period">選擇時段：</label>
         <select id="period">
             <option value="annual">Annual</option>
@@ -49,7 +50,7 @@
 
 <div class="section" id="balance-sheet" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>資產負債表 Balance Sheet Statements</h2>
-    <div class="content">
+    <div class="content scroll-container-x">
         <label for="period_2">選擇時段：</label>
         <select id="period_2">
             <option value="annual">Annual</option>
@@ -66,7 +67,7 @@
 
 <div class="section" id="cashflow-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>現金流表 Cashflow Sheet Statements</h2>
-    <div class="content">
+    <div class="content scroll-container-x">
         <label for="period_3">選擇時段：</label>
         <select id="period_3">
             <option value="annual">Annual</option>
@@ -87,7 +88,7 @@
         <input type="number" id="yearInput" placeholder="輸入年分">
         <input type="number" id="quarterInput" placeholder="輸入季度">
         <button onclick="fetchEarningsCallTranscript()">載入逐字稿</button>
-        <div class="scroll-container-x" id="earningsCallTranscriptContainer" style="width: 100%;">
+        <div class="scroll-container" id="earningsCallTranscriptContainer" style="width: 100%;">
             <!-- 這裡將顯示逐字稿內容 -->
         </div>
     </div>
@@ -99,7 +100,7 @@
         <input type="date" id="fromDate" placeholder="From Date">
         <input type="date" id="toDate" placeholder="To Date">
         <button onclick="fetchEarningsCallCalendar()">載入日曆</button>
-        <div class="scroll-container-x">
+        <div class="scroll-container">
             <div id="earningsCallCalendarContainer"></div>
         </div>
     </div>
@@ -111,7 +112,7 @@
         <input type="date" id="fromDate_1" placeholder="From Date">
         <input type="date" id="toDate_1" placeholder="To Date">
         <button onclick="fetch_historical_earning_calendar()">載入日曆</button>
-        <div class="scroll-container-x" id="historicalEarningsContainer">
+        <div class="scroll-container" id="historicalEarningsContainer">
             <!-- 数据表格将显示在这里 -->
         </div>
     </div>
@@ -123,7 +124,7 @@
         <input type="date" id="fromDate_2" placeholder="From Date">
         <input type="date" id="toDate_2" placeholder="To Date">
         <button onclick="fetch_stock_dividend_calendar()">載入日曆</button>
-        <div class="scroll-container-x" id="stockDividendCalendarContainer">
+        <div class="scroll-container" id="stockDividendCalendarContainer">
             <!-- 数据表格将显示在这里 -->
         </div>
     </div>

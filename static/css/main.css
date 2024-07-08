@@ -41,7 +41,7 @@ button:hover {
 div {
     background-color: #1e1e1e; /* 容器背景色 */
     margin-top: 10px;
-    padding: 15px;
+    padding: 10px; /* 調整padding */
     border-radius: 5px; /* 圓角邊框 */
 }
 
@@ -115,23 +115,23 @@ div {
 }
 
 .section.fixed .content {
-    max-height: 1000px; /* 固定時最大高度取消 */
+    max-height: 200px; /* 固定時最大高度縮短 */
     opacity: 1;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 10px; /* 調整padding-top */
+    padding-bottom: 10px; /* 調整padding-bottom */
 }
 
 .section:hover .content {
-    max-height: 1000px;
+    max-height: 200px; /* 縮短功能區塊的最大高度 */
     opacity: 1;
-    padding-top: 20px;
-    padding-bottom: 20px;
+    padding-top: 10px; /* 調整padding-top */
+    padding-bottom: 10px; /* 調整padding-bottom */
 }
 
 .section {
     border: 1px solid #333;
-    padding: 20px;
-    margin-bottom: 20px;
+    padding: 10px; /* 調整padding */
+    margin-bottom: 10px; /* 調整margin-bottom */
     background-color: #1e1e1e;
     border-radius: 5px;
     transition: background-color 0.6s ease, transform 0.6s ease;
