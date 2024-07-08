@@ -255,10 +255,19 @@ div {
 
 /* section 樣式 */
 .section .content {
-    max-height: 0;
     overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.5s ease, opacity 0.5s ease, padding 0.5s ease;
+    transition: max-height 0.5s ease, opacity 0.5s ease, padding-top 0.5s ease, padding-bottom 0.5s ease;
+    max-height: 0; /* 初始最大高度为 0，内容区块是收起的 */
+    opacity: 0; /* 初始不透明度为 0 */
+    padding-top: 0;
+    padding-bottom: 0;
+}
+
+.section.fixed .content {
+    max-height: 1000px; /* 固定时最大高度取消 */
+    opacity: 1;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .section:hover .content {
@@ -280,4 +289,9 @@ div {
 .section:hover {
     background-color: #2c2c2c;
     transform: scale(1.02);
+}
+
+
+#fullTranscript {
+    white-space: normal; /* 确保文本自动换行 */
 }

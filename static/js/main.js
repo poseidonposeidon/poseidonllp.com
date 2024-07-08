@@ -523,8 +523,6 @@ function formatNumber(value) {
 
 
 
-
-
 //////////////法說會逐字稿 Earnings Call Transcript/////////////////
 function fetchEarningsCallTranscript() {
     var stockSymbol = fetchStock();
@@ -548,20 +546,32 @@ function displayEarningsCallTranscript(transcript, container) {
     }
 
     let htmlContent = `<p id="transcriptPreview">${transcript.content.slice(0, 1000)}...</p>`;
-    htmlContent += `<p id="fullTranscript" style="display:none;">${transcript.content}</p>`;
-    htmlContent += '<button id="expandButton" onclick="expandTranscript()">閱讀更多</button>';
-    htmlContent += '<button id="collapseButton" style="display: none;" onclick="collapseTranscript()">顯示較少</button>';
+    htmlContent += `<p id="fullTranscript" style="display:none; white-space: normal;">${transcript.content}</p>`;
+    htmlContent += '<button id="expandButton" onclick="expandTranscript(event)">顯示較多</button>';
+    htmlContent += '<button id="collapseButton" style="display: none;" onclick="collapseTranscript(event)">顯示較少</button>';
     container.innerHTML = htmlContent;
 }
 
-function expandTranscript() {
+function expandTranscript(event) {
+    event.stopPropagation(); // 防止觸發區塊固定功能
+    const section = event.target.closest('.section');
+    section.classList.add('fixed'); // 固定区块展开
+    section.querySelector('.content').style.maxHeight = 'none'; // 取消 maxHeight 限制
+    section.querySelector('.content').style.height = 'auto'; // 确保内容高度自适应
+    section.querySelector('.content').style.overflow = 'visible'; // 显示所有内容
     document.getElementById('transcriptPreview').style.display = 'none';
     document.getElementById('fullTranscript').style.display = 'block';
     document.getElementById('expandButton').style.display = 'none';
     document.getElementById('collapseButton').style.display = 'inline';
 }
 
-function collapseTranscript() {
+function collapseTranscript(event) {
+    event.stopPropagation(); // 防止觸發區塊固定功能
+    const section = event.target.closest('.section');
+    section.classList.remove('fixed'); // 取消区块固定
+    section.querySelector('.content').style.maxHeight = ''; // 恢复 maxHeight 限制
+    section.querySelector('.content').style.height = ''; // 恢复默认高度
+    section.querySelector('.content').style.overflow = ''; // 恢复默认溢出行为
     document.getElementById('transcriptPreview').style.display = 'block';
     document.getElementById('fullTranscript').style.display = 'none';
     document.getElementById('expandButton').style.display = 'inline';
@@ -585,6 +595,9 @@ function fetchData_Transcript(apiUrl, callback, containerId) {
             container.innerHTML = '<p>數據加載錯誤。請檢查控制台了解更多詳情。</p>';
         });
 }
+
+
+
 //////////////法說會日曆 Earnings Call Calendar/////////////////
 
 
