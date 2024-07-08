@@ -21,7 +21,7 @@
 <button onclick="fetchStock()">確定</button>
 <p id="outputSymbol" data-last-symbol="">現在查詢的是：</p>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(this)">
+<div class="section">
     <h2>財務收入 Income Statement</h2>
     <div class="content">
         <label for="period">選擇時段：</label>
@@ -38,7 +38,7 @@
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(this)">
+<div class="section">
     <h2>資產負債表 Balance Sheet Statements</h2>
     <div class="content">
         <label for="period_2">選擇時段：</label>
@@ -55,7 +55,7 @@
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(this)">
+<div class="section">
     <h2>現金流表 Cashflow Sheet Statements</h2>
     <div class="content">
         <label for="period_3">選擇時段：</label>
@@ -65,78 +65,70 @@
         </select>
         <button onclick="fetchCashflow()">載入報表</button>
         <div class="scroll-container">
-            <table id="cashflowTable" border="1">
-                <div id="cashflowContainer"></div>
-            </table>
+            <div id="cashflowContainer"></div>
         </div>
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(this)">
+<div class="section">
     <h2>法說會逐字稿 Earnings Call Transcript</h2>
     <div class="content">
         <input type="number" id="yearInput" placeholder="輸入年分">
         <input type="number" id="quarterInput" placeholder="輸入季度">
         <button onclick="fetchEarningsCallTranscript()">載入逐字稿</button>
-        <div class="scroll-container">
-            <div id="earningsCallTranscriptContainer"></div>
-        </div>
+        <div id="earningsCallTranscriptContainer"></div>
         <button id="expandButton" style="display:none;" onclick="expandIncomeStatement()">Read More</button>
         <button id="collapseButton" style="display:none;" onclick="collapseIncomeStatement()">Read Less</button>
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(this)">
+<div class="section">
     <h2>法說會日曆 Earnings Call Calendar</h2>
     <div class="content">
         <input type="date" id="fromDate" placeholder="From Date">
         <input type="date" id="toDate" placeholder="To Date">
         <button onclick="fetchEarningsCallCalendar()">載入日曆</button>
-        <div class="scroll-container">
-            <div id="earningsCallCalendarContainer"></div>
-        </div>
+        <div id="earningsCallCalendarContainer"></div>
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(this)">
+<div class="section">
     <h2>歷史獲利和未來獲利 Historical and Future Earnings</h2>
     <div class="content">
         <input type="date" id="fromDate_1" placeholder="From Date">
         <input type="date" id="toDate_1" placeholder="To Date">
         <button onclick="fetch_historical_earning_calendar()">載入日曆</button>
         <div class="scroll-container">
-            <table id="historicalEarningsTable" border="1">
-                <div id="historicalEarningsContainer"></div>
+            <table id="historical_earning_calendarTable" border="1">
+                <div id="historical_earning_calendar"></div>
             </table>
         </div>
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(this)">
+<div class="section">
     <h2>股利發放日期</h2>
     <div class="content">
         <input type="date" id="fromDate_2" placeholder="From Date">
         <input type="date" id="toDate_2" placeholder="To Date">
         <button onclick="fetch_stock_dividend_calendar()">載入日曆</button>
-        <div class="scroll-container">
-            <div id="stockDividendCalendarContainer"></div>
-        </div>
+        <div id="stock_dividend_calendar"></div>
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(this)">
-    <h2>內部人交易 Insider Trades</h2>
+<div class="section">
+    <h2>內部人交易 Insider Trades </h2>
     <div class="content">
         <button onclick="fetchInsiderTrades()">載入表格</button>
         <div class="scroll-container">
-            <table id="InsiderTradesTable" border="1">
-                <tbody id="insiderTradesContainer"></tbody>
+            <table id="Insider_Trades_Table" border="1">
+                <tbody id="Insider_Trades"></tbody>
             </table>
         </div>
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(this)">
+<div class="section">
     <h2>錄音檔轉文字</h2>
     <div class="content">
         <p id="queueStatus">當前排程中的檔案數量：<span id="queueLength">0</span></p>
@@ -175,36 +167,5 @@
 </div>
 
 <script src="/static/js/main.js"></script>
-<script>
-    function expandSection(element) {
-        const content = element.querySelector('.content');
-        if (!element.classList.contains('fixed')) {
-            content.style.maxHeight = '1000px';
-            content.style.opacity = '1';
-            content.style.paddingTop = '20px';
-            content.style.paddingBottom = '20px';
-        }
-    }
-
-    function collapseSection(element) {
-        const content = element.querySelector('.content');
-        if (!element.classList.contains('fixed')) {
-            content.style.maxHeight = '0px';
-            content.style.opacity = '0';
-            content.style.paddingTop = '0';
-            content.style.paddingBottom = '0';
-        }
-    }
-
-    function toggleFixed(element) {
-        const content = element.querySelector('.content');
-        if (content.style.maxHeight !== '0px' && !element.classList.contains('fixed')) {
-            element.classList.add('fixed');
-        } else {
-            element.classList.remove('fixed');
-            collapseSection(element);
-        }
-    }
-</script>
 </body>
 </html>
