@@ -6,39 +6,12 @@
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <title>Poseidon Capital</title>
-    <style>
-        .section .content {
-            overflow: hidden;
-            transition: max-height 0.5s ease, opacity 0.5s ease, padding-top 0.5s ease, padding-bottom 0.5s ease;
-            max-height: 0; /* 初始最大高度为 0，内容区块是收起的 */
-            opacity: 0; /* 初始不透明度为 0 */
-            padding-top: 0;
-            padding-bottom: 0;
-        }
 
-        .section.fixed .content {
-            max-height: 1000px; /* 固定时最大高度取消 */
-            opacity: 1;
-            padding-top: 20px;
-            padding-bottom: 20px;
-        }
-
-        .scroll-container {
-            overflow-x: auto;
-            overflow-y: auto; /* 确保有垂直滚动条 */
-        }
-
-        #fullTranscript {
-            white-space: normal; /* 确保文本自动换行 */
-            max-height: 500px; /* 设置一个合理的最大高度 */
-            overflow-y: auto; /* 确保有垂直滚动条 */
-        }
-    </style>
 </head>
 <body>
 
 <div class="navbar">
-    <img src="/static/img/poseidon.png" alt="Poseidon Capital Ltd." class="logo">
+    <img src="/static/img/favicon.ico" alt="Poseidon Capital Ltd." class="logo">
     <div class="navbar-links">
         <a href="../index.html">首頁</a>
     </div>
@@ -142,8 +115,8 @@
         <input type="date" id="fromDate_2" placeholder="From Date">
         <input type="date" id="toDate_2" placeholder="To Date">
         <button onclick="fetch_stock_dividend_calendar()">載入日曆</button>
-        <div class="scroll-container">
-            <div id="stockDividendCalendarContainer"></div>
+        <div class="scroll-container" id="stockDividendCalendarContainer">
+            <!-- 数据表格将显示在这里 -->
         </div>
     </div>
 </div>
@@ -152,10 +125,8 @@
     <h2>內部人交易 Insider Trades</h2>
     <div class="content">
         <button onclick="fetchInsiderTrades()">載入表格</button>
-        <div class="scroll-container">
-            <table id="InsiderTradesTable" border="1">
-                <tbody id="InsiderTradesContainer"></tbody>
-            </table>
+        <div class="scroll-container" id="insiderTradesContainer">
+            <!-- 数据表格将显示在这里 -->
         </div>
     </div>
 </div>
@@ -199,39 +170,7 @@
 </div>
 
 <script src="/static/js/main.js"></script>
-<script>
-    function expandSection(element) {
-        const content = element.querySelector('.content');
-        if (!element.classList.contains('fixed')) {
-            content.style.maxHeight = '1000px';
-            content.style.opacity = '1';
-            content.style.paddingTop = '20px';
-            content.style.paddingBottom = '20px';
-        }
-    }
 
-    function collapseSection(element) {
-        const content = element.querySelector('.content');
-        if (!element.classList.contains('fixed')) {
-            content.style.maxHeight = '0px';
-            content.style.opacity = '0';
-            content.style.paddingTop = '0';
-            content.style.paddingBottom = '0';
-        }
-    }
 
-    function toggleFixed(event, element) {
-        if (event.target.tagName === 'SELECT' || event.target.tagName === 'BUTTON' || event.target.tagName === 'INPUT') {
-            return;
-        }
-        const content = element.querySelector('.content');
-        if (content.style.maxHeight !== '0px' && !element.classList.contains('fixed')) {
-            element.classList.add('fixed');
-        } else {
-            element.classList.remove('fixed');
-            collapseSection(element);
-        }
-    }
-</script>
 </body>
 </html>

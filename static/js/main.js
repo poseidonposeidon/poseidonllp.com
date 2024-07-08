@@ -4,27 +4,74 @@ document.getElementById('stockSymbol').addEventListener('input', function(e) {
 
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
-    const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol'); // 获取上一次的股票代码
+    const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
 
-    // 判断股票代码是否改变
     if (stockSymbol !== previousSymbol) {
-        // 仅当股票代码发生改变时，更新显示并清空容器
         document.getElementById('outputSymbol').innerText = '現在查詢的是：' + stockSymbol;
-        document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol); // 更新最后一次的股票代码
+        document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
 
-        // 清空所有相關的容器
-        const containers = ['incomeStatementContainer', 'earningsCallTranscriptContainer', 'earningsCallCalendarContainer', 'historical_earning_calendar', 'stock_dividend_calendar','Insider_Trades'];
+        const containers = [
+            'incomeStatementContainer',
+            'balanceSheetContainer',
+            'cashflowContainer',
+            'earningsCallTranscriptContainer',
+            'earningsCallCalendarContainer',
+            'historicalEarningsContainer',
+            'stockDividendCalendarContainer',
+            'insiderTradesContainer'
+        ];
+
         containers.forEach(containerId => {
             const container = document.getElementById(containerId);
             if (container) {
-                container.innerHTML = ''; // 清空容器內容
+                container.innerHTML = '';
             }
+        });
+
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.classList.remove('fixed');
+            collapseSection(section);
         });
     }
 
     return stockSymbol;
 }
 
+
+/////////////////縮放///////////
+function expandSection(element) {
+    const content = element.querySelector('.content');
+    if (!element.classList.contains('fixed')) {
+        content.style.maxHeight = '1000px';
+        content.style.opacity = '1';
+        content.style.paddingTop = '20px';
+        content.style.paddingBottom = '20px';
+    }
+}
+
+function collapseSection(element) {
+    const content = element.querySelector('.content');
+    if (!element.classList.contains('fixed')) {
+        content.style.maxHeight = '0px';
+        content.style.opacity = '0';
+        content.style.paddingTop = '0';
+        content.style.paddingBottom = '0';
+    }
+}
+
+function toggleFixed(event, element) {
+    if (event.target.tagName === 'SELECT' || event.target.tagName === 'BUTTON' || event.target.tagName === 'INPUT') {
+        return;
+    }
+    const content = element.querySelector('.content');
+    if (content.style.maxHeight !== '0px' && !element.classList.contains('fixed')) {
+        element.classList.add('fixed');
+    } else {
+        element.classList.remove('fixed');
+        collapseSection(element);
+    }
+}
 
 
 //////////////財務收入 Income Statement/////////////////
@@ -783,7 +830,7 @@ function fetch_stock_dividend_calendar() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
-    fetchData(apiUrl, display_stock_dividend_calendar, 'stock_dividend_calendar');
+    fetchData(apiUrl, display_stock_dividend_calendar, 'stockDividendCalendarContainer');
 }
 
 function display_stock_dividend_calendar(data, container) {
@@ -795,33 +842,33 @@ function display_stock_dividend_calendar(data, container) {
 
     let htmlContent = '<table border="1">';
     htmlContent += `
-        <tr>
-            <th>Date</th>
-            <th>Label</th>
-            <th>Symbol</th>
-            <th>Dividend</th>
-            <th>Adjusted Dividend</th>
-            <th>Declaration Date</th>
-            <th>Record Date</th>
-            <th>Payment Date</th>
-        </tr>
-    `;
+            <tr>
+                <th>Date</th>
+                <th>Label</th>
+                <th>Symbol</th>
+                <th>Dividend</th>
+                <th>Adjusted Dividend</th>
+                <th>Declaration Date</th>
+                <th>Record Date</th>
+                <th>Payment Date</th>
+            </tr>
+        `;
 
     // 过滤并只显示匹配的股票代码
     data.forEach(item => {
-        if (item.symbol.toUpperCase() === stockSymbol) { // 只添加符合输入的股票代码的行
+        if (item.symbol.toUpperCase() === stockSymbol.toUpperCase()) { // 只添加符合输入的股票代码的行
             htmlContent += `
-                <tr>
-                    <td>${item.date || 'N/A'}</td>
-                    <td>${item.label || 'N/A'}</td>
-                    <td>${item.symbol || 'N/A'}</td>
-                    <td>${item.dividend != null ? item.dividend : 'N/A'}</td>
-                    <td>${item.adjDividend != null ? item.adjDividend : 'N/A'}</td>
-                    <td>${item.declarationDate || 'N/A'}</td>
-                    <td>${item.recordDate || 'N/A'}</td>
-                    <td>${item.paymentDate || 'N/A'}</td>
-                </tr>
-            `;
+                    <tr>
+                        <td>${item.date || 'N/A'}</td>
+                        <td>${item.label || 'N/A'}</td>
+                        <td>${item.symbol || 'N/A'}</td>
+                        <td>${item.dividend != null ? item.dividend : 'N/A'}</td>
+                        <td>${item.adjDividend != null ? item.adjDividend : 'N/A'}</td>
+                        <td>${item.declarationDate || 'N/A'}</td>
+                        <td>${item.recordDate || 'N/A'}</td>
+                        <td>${item.paymentDate || 'N/A'}</td>
+                    </tr>
+                `;
         }
     });
 
@@ -832,7 +879,6 @@ function display_stock_dividend_calendar(data, container) {
         container.innerHTML = '<p>No data available for the selected stock symbol.</p>';
     }
 }
-
 
 function fetchData(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
