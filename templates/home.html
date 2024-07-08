@@ -9,7 +9,6 @@
 </head>
 <body>
 
-
 <div class="navbar">
     <img src="/static/img/favicon.ico" alt="Poseidon Capital Ltd." class="logo">
     <div class="navbar-links">
@@ -40,7 +39,7 @@
             <option value="quarter">Quarter</option>
         </select>
         <button onclick="fetchIncomeStatement()">載入報表</button>
-        <div class="scroll-container">
+        <div class="scroll-container-x">
             <table id="IncomeStatementTable" border="1">
                 <div id="incomeStatementContainer"></div>
             </table>
@@ -57,7 +56,7 @@
             <option value="quarter">Quarter</option>
         </select>
         <button onclick="fetchBalanceSheet()">載入報表</button>
-        <div class="scroll-container">
+        <div class="scroll-container-x">
             <table id="balanceSheetTable" border="1">
                 <div id="balanceSheetContainer"></div>
             </table>
@@ -74,7 +73,7 @@
             <option value="quarter">Quarter</option>
         </select>
         <button onclick="fetchCashflow()">載入報表</button>
-        <div class="scroll-container">
+        <div class="scroll-container-x">
             <table id="cashflowTable" border="1">
                 <div id="cashflowContainer"></div>
             </table>
@@ -88,7 +87,7 @@
         <input type="number" id="yearInput" placeholder="輸入年分">
         <input type="number" id="quarterInput" placeholder="輸入季度">
         <button onclick="fetchEarningsCallTranscript()">載入逐字稿</button>
-        <div class="scroll-container" id="earningsCallTranscriptContainer" style="width: 100%;">
+        <div class="scroll-container-x" id="earningsCallTranscriptContainer" style="width: 100%;">
             <!-- 這裡將顯示逐字稿內容 -->
         </div>
     </div>
@@ -100,7 +99,7 @@
         <input type="date" id="fromDate" placeholder="From Date">
         <input type="date" id="toDate" placeholder="To Date">
         <button onclick="fetchEarningsCallCalendar()">載入日曆</button>
-        <div class="scroll-container">
+        <div class="scroll-container-x">
             <div id="earningsCallCalendarContainer"></div>
         </div>
     </div>
@@ -112,7 +111,7 @@
         <input type="date" id="fromDate_1" placeholder="From Date">
         <input type="date" id="toDate_1" placeholder="To Date">
         <button onclick="fetch_historical_earning_calendar()">載入日曆</button>
-        <div class="scroll-container" id="historicalEarningsContainer">
+        <div class="scroll-container-x" id="historicalEarningsContainer">
             <!-- 数据表格将显示在这里 -->
         </div>
     </div>
@@ -124,7 +123,7 @@
         <input type="date" id="fromDate_2" placeholder="From Date">
         <input type="date" id="toDate_2" placeholder="To Date">
         <button onclick="fetch_stock_dividend_calendar()">載入日曆</button>
-        <div class="scroll-container" id="stockDividendCalendarContainer">
+        <div class="scroll-container-x" id="stockDividendCalendarContainer">
             <!-- 数据表格将显示在这里 -->
         </div>
     </div>
@@ -134,46 +133,8 @@
     <h2>內部人交易 Insider Trades</h2>
     <div class="content">
         <button onclick="fetchInsiderTrades()">載入表格</button>
-        <div class="scroll-container" id="insiderTradesContainer">
+        <div class="scroll-container-x" id="insiderTradesContainer">
             <!-- 数据表格将显示在这里 -->
-        </div>
-    </div>
-</div>
-
-<div class="section" id="audio-transcription" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-    <h2>錄音檔轉文字</h2>
-    <div class="content">
-        <p id="queueStatus">當前排程中的檔案數量：<span id="queueLength">0</span></p>
-        <div class="inline-container">
-            <input type="file" id="audioFile" accept="audio/*">
-            <button onclick="uploadToFTP()">上傳錄音檔</button>
-            <select id="ftpFileSelect">
-                <option value="" disabled selected>選擇轉檔的檔案</option>
-            </select>
-            <button onclick="transcribeFromFTP()">轉檔</button>
-            <select id="textFileSelect">
-                <option value="" disabled selected>選擇文字檔</option>
-            </select>
-            <button onclick="downloadTextFile()">下載文字檔</button>
-        </div>
-        <div id="upload-progress-container" style="display: none;">
-            <div id="upload-progress-bar"></div>
-        </div>
-        <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">檔案上傳中...</p>
-        <div id="transcription-progress-container" style="display: none; text-align: center;">
-            <div>
-                <div class="loader"></div>
-                <p id="transcription-status">轉檔中...</p>
-            </div>
-        </div>
-        <div class="scroll-container" id="transcriptionResult">
-            <!-- 轉寫結果將顯示在這裡 -->
-        </div>
-        <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">閱讀更多</button>
-        <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">閱讀更少</button>
-        <div id="alert-box" style="display: none;" class="alert">
-            <span id="alert-message"></span>
-            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
         </div>
     </div>
 </div>
