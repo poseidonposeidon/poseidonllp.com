@@ -6,6 +6,34 @@
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <title>Poseidon Capital</title>
+    <style>
+        .section .content {
+            overflow: hidden;
+            transition: max-height 0.5s ease, opacity 0.5s ease, padding-top 0.5s ease, padding-bottom 0.5s ease;
+            max-height: 0; /* 初始最大高度为 0，内容区块是收起的 */
+            opacity: 0; /* 初始不透明度为 0 */
+            padding-top: 0;
+            padding-bottom: 0;
+        }
+
+        .section.fixed .content {
+            max-height: 1000px; /* 固定时最大高度取消 */
+            opacity: 1;
+            padding-top: 20px;
+            padding-bottom: 20px;
+        }
+
+        .scroll-container {
+            overflow-x: auto;
+            overflow-y: auto; /* 确保有垂直滚动条 */
+        }
+
+        #fullTranscript {
+            white-space: normal; /* 确保文本自动换行 */
+            max-height: 500px; /* 设置一个合理的最大高度 */
+            overflow-y: auto; /* 确保有垂直滚动条 */
+        }
+    </style>
 </head>
 <body>
 
@@ -102,10 +130,8 @@
         <input type="date" id="fromDate_1" placeholder="From Date">
         <input type="date" id="toDate_1" placeholder="To Date">
         <button onclick="fetch_historical_earning_calendar()">載入日曆</button>
-        <div class="scroll-container">
-            <table id="historicalEarningsTable" border="1">
-                <div id="historicalEarningsContainer"></div>
-            </table>
+        <div class="scroll-container" id="historicalEarningsContainer">
+            <!-- 数据表格将显示在这里 -->
         </div>
     </div>
 </div>

@@ -596,8 +596,6 @@ function fetchData_Transcript(apiUrl, callback, containerId) {
         });
 }
 
-
-
 //////////////法說會日曆 Earnings Call Calendar/////////////////
 
 
@@ -688,7 +686,7 @@ function fetch_historical_earning_calendar() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?apikey=${apiKey}`;
-    fetchData_historical_earning_calendar(apiUrl, display_historical_earning_calendar, 'historical_earning_calendar');
+    fetchData_historical_earning_calendar(apiUrl, display_historical_earning_calendar, 'historicalEarningsContainer');
 }
 
 function display_historical_earning_calendar(data, container) {
@@ -754,8 +752,6 @@ function display_historical_earning_calendar(data, container) {
     htmlContent += '</table>';
     container.innerHTML = htmlContent;
 }
-
-
 
 function fetchData_historical_earning_calendar(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);

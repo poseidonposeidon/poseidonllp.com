@@ -249,9 +249,10 @@ div {
 /* 滾動容器樣式 */
 .scroll-container {
     overflow-x: auto;
-    white-space: nowrap;
-    width: 100%; /* 確保滾動容器的寬度 */
+    overflow-y: auto; /* 确保有垂直滚动条 */
+    max-height: 500px; /* 设置一个合理的最大高度 */
 }
+
 
 /* section 樣式 */
 .section .content {
