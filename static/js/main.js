@@ -825,8 +825,6 @@ function display_stock_dividend_calendar(data, container) {
 }
 
 
-
-
 function fetchData(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>'; // 提供加载时的临时内容
@@ -864,51 +862,66 @@ function fetchInsiderTrades() {
             return response.json();
         })
         .then(data => {
-            displayInsiderTrades(data);
+            const container = document.getElementById('insiderTradesContainer');
+            displayInsiderTrades(data, container);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
-            document.getElementById('Insider_Trades').innerHTML = '<tr><td colspan="11">Error loading data. Please check the console for more details.</td></tr>';
+            const container = document.getElementById('insiderTradesContainer');
+            container.innerHTML = '<tr><td colspan="11">Error loading data. Please check the console for more details.</td></tr>';
         });
 }
 
-function displayInsiderTrades(data) {
-    const table = document.getElementById('Insider_Trades');
-    table.innerHTML = ''; // 清空表格
-
-    if (!data || data.length === 0) {
-        table.innerHTML = '<p>No data available.</p>';
+function displayInsiderTrades(data, container) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<p>No data available.</p>';
         return;
     }
 
-    // 構建所有行數據
-    const headers = ['Symbol', 'Filing Date', 'Transaction Date', 'Reporting Name', 'Transaction Type', 'Securities Owned', 'Securities Transacted', 'Security Name', 'Price', 'Form Type', 'Link'];
-    const rows = headers.map(header => [`<th style="background-color: #f2f2f2;">${header}</th>`]); // 將每個標題創建為一行的第一列
+    let rows = {
+        symbol: ['Symbol'],
+        filingDate: ['Filing Date'],
+        transactionDate: ['Transaction Date'],
+        reportingName: ['Reporting Name'],
+        transactionType: ['Transaction Type'],
+        securitiesOwned: ['Securities Owned'],
+        securitiesTransacted: ['Securities Transacted'],
+        securityName: ['Security Name'],
+        price: ['Price'],
+        formType: ['Form Type'],
+        link: ['Link']
+    };
 
-    // 將每條數據的屬性添加到對應的行
+    // 填充行数据
     data.forEach(item => {
-        rows[0].push(`<td>${item.symbol}</td>`);
-        rows[1].push(`<td>${item.filingDate}</td>`);
-        rows[2].push(`<td>${item.transactionDate}</td>`);
-        rows[3].push(`<td>${item.reportingName}</td>`);
-        rows[4].push(`<td>${item.transactionType}</td>`);
-        rows[5].push(`<td>${item.securitiesOwned.toLocaleString()}</td>`);
-        rows[6].push(`<td>${item.securitiesTransacted.toLocaleString()}</td>`);
-        rows[7].push(`<td>${item.securityName}</td>`);
-        rows[8].push(`<td>$${item.price.toFixed(2)}</td>`);
-        rows[9].push(`<td>${item.formType}</td>`);
-        rows[10].push(`<td><a href="${item.link}" target="_blank">View Form</a></td>`);
+        rows.symbol.push(item.symbol || 'N/A');
+        rows.filingDate.push(item.filingDate || 'N/A');
+        rows.transactionDate.push(item.transactionDate || 'N/A');
+        rows.reportingName.push(item.reportingName || 'N/A');
+        rows.transactionType.push(item.transactionType || 'N/A');
+        rows.securitiesOwned.push(item.securitiesOwned ? item.securitiesOwned.toLocaleString() : 'N/A');
+        rows.securitiesTransacted.push(item.securitiesTransacted ? item.securitiesTransacted.toLocaleString() : 'N/A');
+        rows.securityName.push(item.securityName || 'N/A');
+        rows.price.push(item.price ? `$${item.price.toFixed(2)}` : 'N/A');
+        rows.formType.push(item.formType || 'N/A');
+        rows.link.push(item.link ? `<a href="${item.link}" target="_blank">View Form</a>` : 'N/A');
     });
 
-    // 創建 HTML 表格，並保持第一列使用 <th> 並帶有特定的背景色
+    // 构建 HTML 表格
     let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
-    rows.forEach(row => {
-        htmlContent += `<tr>${row.join('')}</tr>`;
+    Object.keys(rows).forEach(key => {
+        htmlContent += `<tr><th>${rows[key][0]}</th>`;
+        rows[key].slice(1).forEach(value => {
+            htmlContent += `<td>${value}</td>`;
+        });
+        htmlContent += '</tr>';
     });
     htmlContent += '</table>';
 
-    table.innerHTML = htmlContent;
+    container.innerHTML = htmlContent;
 }
+
+
 ////////////////////////////錄音檔轉文字/////////////////////////////
 let originalFileNames = {};
 let currentOriginalFileName = '';
