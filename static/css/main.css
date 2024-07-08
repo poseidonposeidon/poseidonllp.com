@@ -1,28 +1,28 @@
 body {
-    background-color: #f4f1e8; /* 米色背景 */
-    color: #333333; /* 深色文字 */
+    background-color: #121212; /* 深黑色背景 */
+    color: #e0e0e0; /* 淺色文字 */
     font-family: 'Courier New', Courier, monospace; /* 打字機字體 */
 }
 
 h1, h2 {
-    color: #5c3c1b; /* 棕色調 */
+    color: #b0bec5; /* 淺灰色調 */
 }
 
 input, button {
-    background-color: #e8e1cf; /* 淡棕色按鈕背景 */
-    border: 2px solid #8b5e3c; /* 深棕色邊框 */
+    background-color: #1e1e1e; /* 深色按鈕背景 */
+    border: 2px solid #616161; /* 深灰色邊框 */
     padding: 10px;
     border-radius: 5px; /* 圓角邊框 */
-    color: #333333; /* 深色文字 */
+    color: #e0e0e0; /* 淺色文字 */
 }
 
 input:focus {
-    border-color: #a47040; /* 聚焦時的邊框顏色 */
-    background-color: #fff8e1; /* 聚焦時的背景色 */
+    border-color: #757575; /* 聚焦時的邊框顏色 */
+    background-color: #212121; /* 聚焦時的背景色 */
 }
 
 button {
-    background-color: #8b5e3c; /* 暗棕色按鈕 */
+    background-color: #616161; /* 深灰色按鈕 */
     color: white;
     border: none;
     padding: 10px;
@@ -31,11 +31,11 @@ button {
 }
 
 button:hover {
-    background-color: #a47040; /* 按鈕懸停時顏色變化 */
+    background-color: #757575; /* 按鈕懸停時顏色變化 */
 }
 
 div {
-    background-color: #eae0d5; /* 容器背景色 */
+    background-color: #1e1e1e; /* 容器背景色 */
     margin-top: 10px;
     padding: 15px;
     border-radius: 5px; /* 圓角邊框 */
@@ -46,7 +46,7 @@ div {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #f3f3f3; /* 輕灰色背景 */
+    background-color: #212121; /* 深灰色背景 */
     padding: 10px 20px; /* 上下10px，左右20px的填充 */
     border-radius: 10px; /* 设置边框圆角 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
@@ -72,8 +72,8 @@ div {
     align-items: center;
     justify-content: center; /* 中心对齐文本 */
     text-decoration: none;
-    color: black;
-    background-color: #ffffff; /* 白色背景 */
+    color: white; /* 白色文字 */
+    background-color: #424242; /* 深灰色背景 */
     margin: 0 10px; /* 左右边距 */
     padding: 8px 16px; /* 上下左右填充 */
     border-radius: 5px;
@@ -82,14 +82,14 @@ div {
 
 /* 链接悬停样式 */
 .navbar-links a:hover {
-    color: #0056b3;
-    background-color: #e6e6e6; /* 悬停背景色 */
+    color: #90caf9; /* 悬停时的文字颜色 */
+    background-color: #616161; /* 悬停背景色 */
 }
 
 #progress-container {
     width: 70%; /* 設置進度條的寬度 */
     margin: 20px auto; /* 使進度條居中顯示，並設置外邊距 */
-    background-color: #f3f3f3;
+    background-color: #333333;
     border-radius: 15px; /* 設置圓角 */
     overflow: hidden; /* 隱藏超出範圍的內容 */
     display: none;
@@ -97,27 +97,31 @@ div {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加陰影效果 */
     position: relative; /* 設置相對定位 */
 }
+
 #progress-bar {
     width: 0;
     height: 100%; /* 調整進度條高度 */
-    background-color: #4caf50;
+    background-color: #81c784; /* 綠色 */
     border-radius: 15px; /* 設置圓角 */
     transition: width 0.4s ease; /* 添加過渡效果 */
     position: absolute; /* 設置絕對定位 */
     left: 0; /* 讓進度條從左邊開始 */
     top: 0; /* 讓進度條從容器頂部開始 */
 }
+
 #progress-text {
     margin-top: 20px;
     font-size: 18px;
-    color: #333;
+    color: #e0e0e0;
     text-align: center;
 }
+
 #transcriptionResult {
     margin-top: 20px;
     max-height: 200px;
     overflow: hidden;
 }
+
 .hidden {
     display: none;
 }
@@ -142,20 +146,23 @@ div {
     text-align: center;
     margin-top: 20px;
 }
+
 .center-content {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 300px; /* 可以根據需要調整高度 */
 }
+
 #transcription-progress-text {
     margin-top: 20px;
 }
+
 /* 進度條樣式 */
 #upload-progress-container {
     width: 70%;
     margin: 20px auto;
-    background-color: #f3f3f3;
+    background-color: #333333;
     border-radius: 15px;
     overflow: hidden;
     display: none;
@@ -167,7 +174,7 @@ div {
 #upload-progress-bar {
     width: 0;
     height: 100%;
-    background-color: #4caf50;
+    background-color: #81c784; /* 綠色 */
     border-radius: 15px;
     transition: width 0.4s ease;
     position: absolute;
@@ -177,7 +184,7 @@ div {
 
 #upload-progress-text {
     font-size: 18px;
-    color: #333;
+    color: #e0e0e0;
     text-align: center;
     margin-top: 10px;
     display: none;
@@ -194,7 +201,7 @@ div {
 /* 提示框樣式 */
 .alert {
     padding: 20px;
-    background-color: #2196F3; /* 藍色背景 */
+    background-color: #1565c0; /* 深藍色背景 */
     color: white;
     border-radius: 5px;
     position: fixed;

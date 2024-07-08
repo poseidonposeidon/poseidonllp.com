@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, flash, jso
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
+from flask_mail import Mail, Message
 from ftplib import FTP
 from concurrent.futures import ThreadPoolExecutor, TimeoutError as FuturesTimeoutError
 from collections import deque
@@ -26,6 +27,13 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SECRET_KEY'] = 'supersecretkey'  # 用於 session 和登入系統
 app.config['MAX_CONTENT_LENGTH'] = 2048 * 1024 * 1024  # 設置為2048MB
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'poseidon@poseidonllp.com'
+app.config['MAIL_PASSWORD'] = 'qqlq ckwh cyiw spuf'
+
+mail = Mail(app)
 db = SQLAlchemy(app)
 
 # 確認 GPU 是否可用，並將模型加載到 GPU 上
@@ -148,6 +156,24 @@ def clear_users():
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/contact', methods=['POST'])
+def contact():
+    data = request.json
+    name = data.get('name')
+    email = data.get('email')
+    message = data.get('message')
+
+    if not name or not email or not message:
+        return jsonify({"success": False, "message": "All fields are required"}), 400
+
+    msg = Message('New Contact Form Submission',
+                  sender=email,
+                  recipients=['poseidon@poseidonllp.com'])
+    msg.body = f"Name: {name}\nEmail: {email}\nMessage: {message}"
+    mail.send(msg)
+
+    return jsonify({"success": True, "message": "Message sent successfully"}), 200
 
 
 @app.route('/upload_to_ftp', methods=['POST'])
