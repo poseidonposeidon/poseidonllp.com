@@ -6,13 +6,21 @@
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <title>Poseidon Capital</title>
-
 </head>
 <body>
 
 <div class="navbar">
     <img src="/static/img/favicon.ico" alt="Poseidon Capital Ltd." class="logo">
     <div class="navbar-links">
+        <a href="#income-statement">財務收入</a>
+        <a href="#balance-sheet">資產負債表</a>
+        <a href="#cashflow-statement">現金流表</a>
+        <a href="#earnings-call-transcript">法說會逐字稿</a>
+        <a href="#earnings-call-calendar">法說會日曆</a>
+        <a href="#historical-earnings">歷史獲利和未來獲利</a>
+        <a href="#dividend-calendar">股利發放日期</a>
+        <a href="#insider-trades">內部人交易</a>
+        <a href="#audio-transcription">錄音檔轉文字</a>
         <a href="../index.html">首頁</a>
     </div>
 </div>
@@ -22,7 +30,7 @@
 <button onclick="fetchStock()">確定</button>
 <p id="outputSymbol" data-last-symbol="">現在查詢的是：</p>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+<div class="section" id="income-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>財務收入 Income Statement</h2>
     <div class="content">
         <label for="period">選擇時段：</label>
@@ -39,7 +47,7 @@
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+<div class="section" id="balance-sheet" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>資產負債表 Balance Sheet Statements</h2>
     <div class="content">
         <label for="period_2">選擇時段：</label>
@@ -56,7 +64,7 @@
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+<div class="section" id="cashflow-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>現金流表 Cashflow Sheet Statements</h2>
     <div class="content">
         <label for="period_3">選擇時段：</label>
@@ -73,7 +81,7 @@
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+<div class="section" id="earnings-call-transcript" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>法說會逐字稿 Earnings Call Transcript</h2>
     <div class="content">
         <input type="number" id="yearInput" placeholder="輸入年分">
@@ -85,7 +93,7 @@
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+<div class="section" id="earnings-call-calendar" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>法說會日曆 Earnings Call Calendar</h2>
     <div class="content">
         <input type="date" id="fromDate" placeholder="From Date">
@@ -97,7 +105,7 @@
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+<div class="section" id="historical-earnings" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>歷史獲利和未來獲利 Historical and Future Earnings</h2>
     <div class="content">
         <input type="date" id="fromDate_1" placeholder="From Date">
@@ -109,7 +117,7 @@
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+<div class="section" id="dividend-calendar" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>股利發放日期</h2>
     <div class="content">
         <input type="date" id="fromDate_2" placeholder="From Date">
@@ -121,7 +129,7 @@
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+<div class="section" id="insider-trades" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>內部人交易 Insider Trades</h2>
     <div class="content">
         <button onclick="fetchInsiderTrades()">載入表格</button>
@@ -131,7 +139,7 @@
     </div>
 </div>
 
-<div class="section" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+<div class="section" id="audio-transcription" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>錄音檔轉文字</h2>
     <div class="content">
         <p id="queueStatus">當前排程中的檔案數量：<span id="queueLength">0</span></p>
@@ -170,7 +178,6 @@
 </div>
 
 <script src="/static/js/main.js"></script>
-
 
 </body>
 </html>

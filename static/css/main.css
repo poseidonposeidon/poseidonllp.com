@@ -4,10 +4,9 @@ body {
     font-family: 'Arial', 'Helvetica', sans-serif; /* 使用清晰的字體 */
     -webkit-font-smoothing: antialiased; /* Webkit 瀏覽器的字體平滑處理 */
     -moz-osx-font-smoothing: grayscale; /* macOS 字體平滑處理 */
-    margin-top: 70px; /* 確保內容不被固定導航欄遮擋 */
 }
 
-/* 標題樣式 */
+/* 标题样式 */
 h1, h2 {
     color: #b0bec5;
     font-family: 'Arial', 'Helvetica', sans-serif; /* 使用清晰的字體 */
@@ -51,20 +50,14 @@ div {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #333333; /* 深灰色背景 */
+    background-color: #212121; /* 深灰色背景 */
     padding: 10px 20px; /* 上下10px，左右20px的填充 */
     border-radius: 10px; /* 设置边框圆角 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 添加阴影效果 */
     position: fixed;
-    top: 0;
     width: 100%;
+    top: 0;
     z-index: 1000;
-    transition: background-color 0.3s ease; /* 平滑过渡效果 */
-}
-
-/* 懸浮時的背景顏色 */
-.navbar:hover {
-    background-color: #444444; /* 比背景色稍亮的灰色 */
 }
 
 /* Logo 图片样式 */
