@@ -9,7 +9,6 @@
 </head>
 <body>
 
-
 <div class="navbar">
     <img src="/static/img/favicon.ico" alt="Poseidon Capital Ltd." class="logo">
     <div class="navbar-links">
@@ -50,20 +49,17 @@
 
 <div class="section" id="balance-sheet" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>資產負債表 Balance Sheet Statements</h2>
-    <div class="content scroll-container-x">
+    <div class="content table-container">
         <label for="period_2">選擇時段：</label>
         <select id="period_2">
             <option value="annual">Annual</option>
             <option value="quarter">Quarter</option>
         </select>
         <button onclick="fetchBalanceSheet()">載入報表</button>
-        <div class="scroll-container-x">
-            <table id="balanceSheetTable" border="1">
-                <div id="balanceSheetContainer"></div>
-            </table>
-        </div>
+        <div id="balanceSheetContainer"></div>
     </div>
 </div>
+
 
 <div class="section" id="cashflow-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
     <h2>現金流表 Cashflow Sheet Statements</h2>

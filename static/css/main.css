@@ -108,30 +108,30 @@ div {
 .section .content {
     overflow: hidden;
     transition: max-height 1s ease, opacity 1s ease, padding-top 1s ease, padding-bottom 1s ease;
-    max-height: 0; /* 初始最大高度為 0，內容區塊是收起的 */
-    opacity: 0; /* 初始不透明度為 0 */
+    max-height: 0; /* 初始最大高度为 0，内容区块是收起的 */
+    opacity: 0; /* 初始不透明度为 0 */
     padding-top: 0;
     padding-bottom: 0;
 }
 
-.section.fixed .content {
-    max-height: 200px; /* 固定時最大高度縮短 */
+.section:hover .content {
+    max-height: 80px; /* 将高度调小 */
     opacity: 1;
-    padding-top: 10px; /* 調整padding-top */
-    padding-bottom: 10px; /* 調整padding-bottom */
+    padding-top: 5px; /* 调整 padding */
+    padding-bottom: 5px; /* 调整 padding */
 }
 
 .section:hover .content {
-    max-height: 200px; /* 縮短功能區塊的最大高度 */
+    max-height: calc(200px * 0.7); /* 將高度縮小為原來的 70% */
     opacity: 1;
-    padding-top: 10px; /* 調整padding-top */
-    padding-bottom: 10px; /* 調整padding-bottom */
+    padding-top: 10px;
+    padding-bottom: 10px;
 }
 
 .section {
     border: 1px solid #333;
-    padding: 10px; /* 調整padding */
-    margin-bottom: 10px; /* 調整margin-bottom */
+    padding: 5px; /* 调整 padding */
+    margin-bottom: 5px; /* 调整 margin */
     background-color: #1e1e1e;
     border-radius: 5px;
     transition: background-color 0.6s ease, transform 0.6s ease;

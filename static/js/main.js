@@ -229,7 +229,7 @@ function formatNumber(value) {
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
     stockSymbol = fetchStock();
-    const period = document.getElementById('period_2').value;  // 獲取選擇的時段
+    const period = document.getElementById('period_2').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -244,10 +244,6 @@ function fetchBalanceSheet() {
 function displayBalanceSheet(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
-        const expandButton = document.getElementById('expandButton_Balance');
-        if (expandButton) expandButton.style.display = 'none'; // 隐藏按钮
-        const collapseButton = document.getElementById('collapseButton_Balance');
-        if (collapseButton) collapseButton.style.display = 'none';
         return;
     }
 
@@ -308,7 +304,6 @@ function displayBalanceSheet(data, container) {
         finalLink: ['Final Link']
     };
 
-    // 填充行数据
     data.forEach(entry => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -366,7 +361,6 @@ function displayBalanceSheet(data, container) {
         rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
-    // 构建 HTML 表格
     let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
         htmlContent += `<tr><th>${rows[key][0]}</th>`;
@@ -378,8 +372,6 @@ function displayBalanceSheet(data, container) {
     htmlContent += '</table>';
 
     container.innerHTML = htmlContent;
-    const expandButton = document.getElementById('expandButton_Balance');
-    if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
 }
 
 function fetchData_BalanceSheet(apiUrl, callback, containerId) {
@@ -409,7 +401,6 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
-
 
 
 ///////////////////////////////////現金流表Cashflow///////////////
