@@ -18,26 +18,11 @@ input, button {
     padding: 10px;
     border-radius: 5px;
     color: #e0e0e0;
-    width: calc(100% - 40px);
-    box-sizing: border-box;
 }
 
 input:focus {
     border-color: #757575;
     background-color: #212121;
-}
-
-button {
-    background-color: #616161;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 5px;
-    cursor: pointer;
-}
-
-button:hover {
-    background-color: #757575;
 }
 
 div {
@@ -109,29 +94,64 @@ div {
     transform: scale(1.02);
 }
 
-.info-section {
-    display: none;
-    flex-direction: column;
-    background-color: #1e1e1e;
-    padding: 20px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 100%;
+/* 設置過渡動畫效果 */
+.info-section, .ai-box-section {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
+    padding: 0 20px;
 }
 
-.info-section.active {
-    display: flex;
+.info-section.active, .ai-box-section.active {
+    max-height: 2000px; /* 增加這個值以確保完全展開 */
+    opacity: 1;
+    padding: 20px;
 }
 
 .info-input {
     display: flex;
-    flex-direction: column;
+    justify-content: center;
+    align-items: center;
     margin-bottom: 10px;
 }
 
-.info-input input, .info-input button {
-    margin: 5px 0;
+#stockSymbol {
+    width: 300px;
+    box-sizing: border-box;
+}
+
+/* 特定 button 樣式修改 */
+.info-input button {
+    background-color: transparent;
+    border: none;
+    padding: 0;
+    margin-left: -35px;
+}
+
+.confirm-icon {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+/* 其他 button 樣式保持不變 */
+button:not(.info-input button) {
+    background-color: #616161;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:not(.info-input button):hover {
+    background-color: #757575;
+}
+
+#outputSymbol {
+    text-align: center;
+    margin: 10px 0;
 }
 
 .info-content {
@@ -156,24 +176,8 @@ div {
     color: white;
 }
 
-#content.blurred {
-    filter: blur(5px);
-    transition: filter 0.3s ease;
-}
-
 .section-container {
     margin-top: 20px;
-}
-
-.ai-box-section {
-    display: none;
-    flex-direction: column;
-    background-color: #1e1e1e;
-    padding: 20px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 100%;
 }
 
 .inline-container {
@@ -187,7 +191,16 @@ div {
     overflow-y: auto;
 }
 
+
 .scroll-container-x {
+    overflow-x: auto;
+}
+
+.scroll-container-y {
+    max-height: 1000px; /* 移除最大高度限制 */
+    height: auto; /* 可以根據需要調整高度 */
+    width: auto;
+    overflow-y: auto;
     overflow-x: auto;
 }
 
@@ -229,3 +242,5 @@ div {
 .closebtn:hover {
     color: black;
 }
+
+

@@ -8,24 +8,23 @@
     <title>Poseidon Capital</title>
 </head>
 <body>
-
 <div class="navbar">
     <a href="../index.html">
         <img src="/static/img/favicon.ico" alt="Poseidon Capital Ltd." class="logo">
     </a>
     <div class="navbar-links">
-        <a href="#info-section" onclick="showInfoSection(event)">U.S Stock</a>
-        <a href="#ai_box" onclick="showAiBox(event)">AI Research</a>
+        <a href="#info-section" onclick="toggleSection(event, '#info-section')">U.S Stock</a>
+        <a href="#ai_box" onclick="toggleSection(event, '#ai_box')">AI Research</a>
         <a href="../index.html">Home</a>
     </div>
 </div>
 
-<div id="info-section" class="info-section">
+<div id="info-section" class="info-section" style="display: none;">
     <div class="info-input">
         <input type="text" id="stockSymbol" placeholder="Input U.S Stock" pattern="[A-Z]*">
-        <button onclick="fetchStock()">Confirm</button>
-        <p id="outputSymbol" data-last-symbol="">Current query:</p>
+        <button onclick="fetchStock()"><img src="/static/img/send.png" alt="Confirm" class="confirm-icon"></button>
     </div>
+    <p id="outputSymbol" data-last-symbol="">Current query:</p>
     <div class="info-content">
         <div class="info-column-left">
             <a href="#" onclick="loadSection('income-statement')">Income Statement</a>
@@ -47,8 +46,8 @@
     </div>
 </div>
 
-<div id="ai_box" class="ai-box-section" style="display: none;">
-    <div class="section" id="audio-transcription" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+<div id="ai_box" class="ai-box-section"  style="display: none;">
+    <div class="section" id="audio-transcription">
         <h2>Audio Transcription</h2>
         <div class="content">
             <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
@@ -88,7 +87,6 @@
 </div>
 
 <script src="/static/js/main.js"></script>
-
 
 </body>
 </html>

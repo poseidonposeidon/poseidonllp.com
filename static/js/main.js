@@ -1,3 +1,7 @@
+///////////////////////////////////////////////////////////////////////////
+
+let activeSection = null;
+
 document.getElementById('stockSymbol').addEventListener('input', function(e) {
     e.target.value = e.target.value.toUpperCase();
 });
@@ -7,7 +11,7 @@ function fetchStock() {
     const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
 
     if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbol').innerText = '現在查詢的是：' + stockSymbol;
+        document.getElementById('outputSymbol').innerText = 'Current query：' + stockSymbol;
         document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
 
         const containers = [
@@ -38,8 +42,6 @@ function fetchStock() {
     return stockSymbol;
 }
 
-
-/////////////////縮放///////////
 function expandSection(element) {
     const content = element.querySelector('.content');
     if (!element.classList.contains('fixed')) {
@@ -73,12 +75,46 @@ function toggleFixed(event, element) {
     }
 }
 
-/////////////////////////////////美股財務資訊///////////////////////////////////////
-function showInfoSection(event) {
+function toggleSection(event, sectionId) {
     event.preventDefault();
-    document.getElementById('info-section').style.display = 'block';
-    document.getElementById('ai_box').style.display = 'none';
+    const section = document.querySelector(sectionId);
+
+    if (activeSection && activeSection !== section) {
+        // 如果有其他活動的區塊，關閉它
+        activeSection.classList.remove('active');
+        activeSection.style.display = 'none';
+    }
+
+    if (section === activeSection) {
+        // 如果點擊的是當前活動的區塊，則縮小它
+        section.classList.remove('active');
+        setTimeout(() => {
+            if (!section.classList.contains('active')) {
+                section.style.display = 'none';
+            }
+        }, 500); // 與 CSS 過渡時間匹配
+        activeSection = null;
+    } else {
+        // 展開新的區塊
+        section.style.display = 'block';
+        // 使用 setTimeout 確保 display 變更已經應用
+        setTimeout(() => {
+            section.classList.add('active');
+        }, 10);
+        activeSection = section;
+    }
 }
+
+// 綁定導航欄連結點擊事件
+document.querySelector('.navbar-links').addEventListener('click', (event) => {
+    const target = event.target;
+    if (target.tagName === 'A') {
+        const href = target.getAttribute('href');
+        if (href === '#info-section' || href === '#ai_box') {
+            toggleSection(event, href);
+        }
+    }
+});
 
 function loadSection(sectionId) {
     const sections = {
@@ -102,7 +138,7 @@ function loadSection(sectionId) {
         'balance-sheet': `
             <div class="section" id="balance-sheet" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Balance Sheet Statements</h2>
-                <div class="content table-container">
+                <div class="content scroll-container-x">
                     <label for="period_2">Select Period:</label>
                     <select id="period_2">
                         <option value="annual">Annual</option>
@@ -136,7 +172,7 @@ function loadSection(sectionId) {
                     <input type="number" id="yearInput" placeholder="Enter Year">
                     <input type="number" id="quarterInput" placeholder="Enter Quarter">
                     <button onclick="fetchEarningsCallTranscript()">Load Transcript</button>
-                    <div class="scroll-container" id="earningsCallTranscriptContainer" style="width: 100%;">
+                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainer">
                         <!-- Transcription content will be displayed here -->
                     </div>
                 </div>
@@ -193,23 +229,9 @@ function loadSection(sectionId) {
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
 
-function hideModal() {
-    document.getElementById('modal').style.display = 'none';
-    document.getElementById('content').classList.remove('blurred');
-}
 
-window.onclick = function(event) {
-    if (event.target == document.getElementById('modal')) {
-        hideModal();
-    }
-}
-//////////////////////////////////AI工具箱/////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
 
-function showAiBox(event) {
-    event.preventDefault();
-    document.getElementById('ai_box').style.display = 'block';
-    document.getElementById('info-section').style.display = 'none';
-}
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
 function fetchIncomeStatement() {
@@ -722,8 +744,8 @@ function displayEarningsCallTranscript(transcript, container) {
 
     let htmlContent = `<p id="transcriptPreview">${transcript.content.slice(0, 1000)}...</p>`;
     htmlContent += `<p id="fullTranscript" style="display:none; white-space: normal;">${transcript.content}</p>`;
-    htmlContent += '<button id="expandButton" onclick="expandTranscript(event)">顯示較多</button>';
-    htmlContent += '<button id="collapseButton" style="display: none;" onclick="collapseTranscript(event)">顯示較少</button>';
+    htmlContent += '<button id="expandButton" onclick="expandTranscript(event)">Read More</button>';
+    htmlContent += '<button id="collapseButton" style="display: none;" onclick="collapseTranscript(event)">Read Less</button>';
     container.innerHTML = htmlContent;
 }
 
@@ -731,9 +753,6 @@ function expandTranscript(event) {
     event.stopPropagation(); // 防止觸發區塊固定功能
     const section = event.target.closest('.section');
     section.classList.add('fixed'); // 固定区块展开
-    section.querySelector('.content').style.maxHeight = 'none'; // 取消 maxHeight 限制
-    section.querySelector('.content').style.height = 'auto'; // 确保内容高度自适应
-    section.querySelector('.content').style.overflow = 'visible'; // 显示所有内容
     document.getElementById('transcriptPreview').style.display = 'none';
     document.getElementById('fullTranscript').style.display = 'block';
     document.getElementById('expandButton').style.display = 'none';
@@ -744,9 +763,6 @@ function collapseTranscript(event) {
     event.stopPropagation(); // 防止觸發區塊固定功能
     const section = event.target.closest('.section');
     section.classList.remove('fixed'); // 取消区块固定
-    section.querySelector('.content').style.maxHeight = ''; // 恢复 maxHeight 限制
-    section.querySelector('.content').style.height = ''; // 恢复默认高度
-    section.querySelector('.content').style.overflow = ''; // 恢复默认溢出行为
     document.getElementById('transcriptPreview').style.display = 'block';
     document.getElementById('fullTranscript').style.display = 'none';
     document.getElementById('expandButton').style.display = 'inline';
@@ -755,7 +771,7 @@ function collapseTranscript(event) {
 
 function fetchData_Transcript(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
-    container.innerHTML = '<p>正在加載數據...</p>';
+    container.innerHTML = '<p>Loading...</p>';
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
@@ -1196,7 +1212,8 @@ function fetchTranscriptionResult(filename) {
             if (data.text) {
                 displayTranscription(data);
                 showAlert('Transcription completed');
-                fetchTextFileList(currentOriginalFileName, true);  // Fetch text file list again and ensure the new file is the first option
+                console.log("Fetching text file list with new file:", data.originalFilename);
+                fetchTextFileList(data.originalFilename, true);  // 使用 data.originalFilename
             } else {
                 showAlert('Failed to retrieve transcription result');
             }
@@ -1227,29 +1244,31 @@ function fetchTextFileList(newTextFileName = null, isNewFile = false) {
                 console.error('Element with ID "textFileSelect" not found');
                 return;
             }
-            select.innerHTML = '';  // Clear previous options
-            if (data.files && data.files.length > 0) {
-                data.files.forEach(fileInfo => {
-                    const option = document.createElement('option');
-                    option.value = fileInfo.encoded;
-                    option.textContent = fileInfo.original;
-                    select.appendChild(option);
-                });
+            select.innerHTML = '';  // 清除之前的選項
 
+            // 確保 data.files 是一個陣列
+            if (Array.isArray(data.files) && data.files.length > 0) {
+                // 插入新檔案到第一位
                 if (newTextFileName && isNewFile) {
-                    // If there is a new file name and it is a new file, place it in the first position
+                    console.log(`Adding new file: ${newTextFileName}`);
                     const newOption = document.createElement('option');
                     newOption.value = encodeURIComponent(newTextFileName);
                     newOption.textContent = newTextFileName;
                     select.insertBefore(newOption, select.firstChild);
                     select.value = newOption.value;
-                } else if (newTextFileName) {
-                    const newTextFileOption = Array.from(select.options).find(option => option.textContent === newTextFileName);
-                    if (newTextFileOption) {
-                        select.value = newTextFileOption.value;
-                        select.insertBefore(newTextFileOption, select.firstChild);
+                }
+
+                // 依次添加其餘檔案
+                data.files.forEach(fileInfo => {
+                    const option = document.createElement('option');
+                    option.value = fileInfo.encoded;
+                    option.textContent = decodeURIComponent(fileInfo.original);
+                    if (!(newTextFileName && isNewFile && fileInfo.original === newTextFileName)) {
+                        select.appendChild(option);
                     }
-                } else {
+                });
+
+                if (!newTextFileName || !isNewFile) {
                     select.selectedIndex = 0;
                 }
             } else {
@@ -1345,7 +1364,8 @@ function startPolling(filename) {
                     fetchTranscriptionResult(filename);
                     statusElement.textContent = 'Transcription completed';
                     showAlert('Transcription completed');
-                    fetchTextFileList(currentOriginalFileName);  // Fetch text file list again and ensure the new file is the first option
+                    console.log("Transcription completed. Current original file name:", currentOriginalFileName);
+                    fetchTextFileList(currentOriginalFileName, true);  // 確保新檔案在第一位
                 } else if (data.status === 'in_progress') {
                     statusElement.textContent = `Transcription in progress... ${data.progress || ''}`;
                 } else if (data.status === 'queued') {
@@ -1358,7 +1378,7 @@ function startPolling(filename) {
                 showAlert('Error checking transcription status, please check the result manually later');
                 statusElement.textContent = 'Status check failed';
             });
-    }, 5000); // Check every 5 seconds
+    }, 5000); // 每5秒檢查一次
 }
 
 function extractDate(fileName) {
