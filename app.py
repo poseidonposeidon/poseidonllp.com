@@ -19,14 +19,14 @@ import io
 import time
 from threading import Lock
 
-# 禁用 FP16 使用 FP32
+# Disable FP16 and use FP32
 os.environ["WHISPER_DISABLE_F16"] = "1"
 
 app = Flask(__name__)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
-app.config['SECRET_KEY'] = 'supersecretkey'  # 用於 session 和登入系統
-app.config['MAX_CONTENT_LENGTH'] = 2048 * 1024 * 1024  # 設置為2048MB
+app.config['SECRET_KEY'] = 'supersecretkey'  # Used for session and login system
+app.config['MAX_CONTENT_LENGTH'] = 2048 * 1024 * 1024  # Set to 2048MB
 app.config['MAIL_SERVER'] = 'smtp.gmail.com'
 app.config['MAIL_PORT'] = 587
 app.config['MAIL_USE_TLS'] = True
@@ -36,27 +36,27 @@ app.config['MAIL_PASSWORD'] = 'qqlq ckwh cyiw spuf'
 mail = Mail(app)
 db = SQLAlchemy(app)
 
-# 確認 GPU 是否可用，並將模型加載到 GPU 上
+# Confirm if GPU is available and load the model to GPU
 device = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"使用設備: {device}")
+print(f"Using device: {device}")
 model = whisper.load_model("large-v3").to(device)
 
-# 初始化翻譯器
+# Initialize translator
 translator = GoogleTranslator(source='auto', target='zh-TW')
-# 簡體轉繁體轉換器
+# Simplified to Traditional Chinese converter
 cc = OpenCC('s2twp')
 
 executor = ThreadPoolExecutor(max_workers=8)
 
-# 設置FTP伺服器信息
+# Set FTP server info
 FTP_HOST = '114.32.65.180'
 FTP_USER = 'Henry'
 FTP_PASS = '123456'
 
-# 創建全局的 Lock
+# Create a global Lock
 lock = Lock()
 
-# 創建轉錄排程隊列
+# Create transcription queue
 transcription_queue = deque()
 current_transcription = None
 
@@ -68,7 +68,7 @@ class User(db.Model):
 @app.before_request
 def log_request_info():
     ip_address = request.remote_addr
-    print(f"來自IP的新請求: {ip_address}")
+    print(f"New request from IP: {ip_address}")
 
 @app.route('/')
 def index():
@@ -87,14 +87,14 @@ def login():
         if user and check_password_hash(user.password, password):
             return '''
                 <script>
-                    alert("登入成功！");
+                    alert("Login successful!");
                     window.location.href = "/home";
                 </script>
             '''
         else:
             return '''
                 <script>
-                    alert("無效的用戶名或密碼");
+                    alert("Invalid username or password");
                     window.location.href = "/login";
                 </script>
             '''
@@ -111,7 +111,7 @@ def register():
         db.session.commit()
         return '''
             <script>
-                alert("註冊成功！你現在可以登入了。");
+                alert("Registration successful! You can now login.");
                 window.location.href = "/login";
             </script>
         '''
@@ -175,17 +175,16 @@ def contact():
 
     return jsonify({"success": True, "message": "Message sent successfully"}), 200
 
-
 @app.route('/upload_to_ftp', methods=['POST'])
 def upload_to_ftp():
     if 'file' not in request.files or 'originalFileName' not in request.form:
-        return jsonify({"error": "缺少文件或文件名"}), 400
+        return jsonify({"error": "Missing file or filename"}), 400
 
     file = request.files['file']
     original_filename = request.form['originalFileName']
 
     if file.filename == '':
-        return jsonify({"error": "文件名為空"}), 400
+        return jsonify({"error": "Filename is empty"}), 400
 
     filename = secure_filename(file.filename)
     filename_encoded = urllib.parse.quote(filename, safe='', encoding='utf-8')
@@ -197,8 +196,8 @@ def upload_to_ftp():
         with open(temp_path, 'wb') as temp_file:
             file.save(temp_file)
     except Exception as e:
-        print(f"文件保存失敗: {e}")
-        return jsonify({"error": f"文件保存失敗: {e}"}), 500
+        print(f"File save failed: {e}")
+        return jsonify({"error": f"File save failed: {e}"}), 500
 
     def upload():
         try:
@@ -206,7 +205,7 @@ def upload_to_ftp():
             ftp.connect(FTP_HOST)
             ftp.login(FTP_USER, FTP_PASS)
             ftp.set_pasv(True)
-            ftp.cwd('錄音檔')
+            ftp.cwd('audio_files')
 
             with open(temp_path, 'rb') as f:
                 ftp.storbinary(f"STOR {filename_encoded}", f)
@@ -220,11 +219,11 @@ def upload_to_ftp():
 
             ftp.quit()
             os.remove(temp_path)
-            return {"message": f"文件 {original_filename} 已成功上傳到伺服器"}
+            return {"message": f"File {original_filename} successfully uploaded to server"}
         except Exception as e:
-            print(f"FTP上傳失敗: {e}")
+            print(f"FTP upload failed: {e}")
             os.remove(temp_path)
-            return {"error": f"FTP上傳失敗: {e}"}
+            return {"error": f"FTP upload failed: {e}"}
 
     max_retries = 5
     for attempt in range(max_retries):
@@ -237,7 +236,7 @@ def upload_to_ftp():
                 else:
                     return jsonify(result), 200
             except FuturesTimeoutError:
-                return jsonify({"error": "上傳超時"}), 500
+                return jsonify({"error": "Upload timeout"}), 500
             except Exception as e:
                 return jsonify({"error": str(e)}), 500
             finally:
@@ -245,9 +244,9 @@ def upload_to_ftp():
             break
         else:
             if attempt < max_retries - 1:
-                time.sleep(2)  # 等待2秒後重試
+                time.sleep(2)  # Wait 2 seconds before retrying
             else:
-                return jsonify({"error": "另一個轉檔過程正在進行中，請稍後再試"}), 503
+                return jsonify({"error": "Another transcription process is in progress, please try again later"}), 503
 
 @app.route('/list_files', methods=['GET'])
 def list_files():
@@ -256,7 +255,7 @@ def list_files():
         ftp.connect(FTP_HOST)
         ftp.login(FTP_USER, FTP_PASS)
         ftp.set_pasv(True)
-        ftp.cwd('錄音檔')
+        ftp.cwd('audio_files')
 
         files = ftp.nlst()
         files_decoded = []
@@ -275,7 +274,7 @@ def list_files():
         ftp.quit()
         return jsonify({"files": files_decoded})
     except Exception as e:
-        print(f"列出文件錯誤: {e}")
+        print(f"Error listing files: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/list_text_files', methods=['GET'])
@@ -289,16 +288,17 @@ def list_text_files():
 
         text_files = ftp.nlst()
         text_files_decoded = [urllib.parse.unquote(f, encoding='utf-8') for f in text_files if not f.endswith('.meta')]
+        text_files_encoded = [{"encoded": urllib.parse.quote(f, safe=''), "original": f} for f in text_files_decoded]
         ftp.quit()
-        return jsonify({"files": text_files_decoded})
+        return jsonify({"files": text_files_encoded})
     except Exception as e:
-        print(f"列出文字文件錯誤: {e}")
+        print(f"Error listing text files: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/check_transcription_status', methods=['POST'])
 def check_transcription_status():
     if 'filename' not in request.json:
-        return jsonify({"error": "沒有指定文件名"}), 400
+        return jsonify({"error": "Filename not specified"}), 400
     filename = request.json['filename']
 
     if current_transcription and current_transcription['filename'] == filename:
@@ -315,7 +315,7 @@ def check_transcription_status():
 @app.route('/transcribe_from_ftp', methods=['POST'])
 def transcribe_handler():
     if 'filename' not in request.json:
-        return jsonify({"error": "没有指定文件名"}), 400
+        return jsonify({"error": "Filename not specified"}), 400
 
     filename = request.json['filename']
     session_id = str(uuid.uuid4())
@@ -323,7 +323,7 @@ def transcribe_handler():
 
     if not lock.acquire(blocking=False):
         transcription_queue.append((filename, session_id))
-        return jsonify({"message": "已加入排程队列"}), 202
+        return jsonify({"message": "Added to the queue"}), 202
 
     @copy_current_request_context
     def transcribe_and_store(filename, session_id):
@@ -338,7 +338,7 @@ def transcribe_handler():
         transcription_result, original_filename = future.result(timeout=6000)
         return jsonify({"text": transcription_result, "sessionID": session_id, "originalFilename": original_filename})
     except FuturesTimeoutError:
-        return jsonify({"error": "转录超时"}), 500
+        return jsonify({"error": "Transcription timeout"}), 500
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
@@ -348,13 +348,13 @@ def transcribe_handler():
 @app.route('/get_transcription_result', methods=['POST'])
 def get_transcription_result():
     if 'filename' not in request.json:
-        return jsonify({"error": "沒有指定文件名"}), 400
+        return jsonify({"error": "Filename not specified"}), 400
     filename = request.json['filename']
 
     if current_transcription and current_transcription['filename'] == filename:
         return jsonify({"text": current_transcription.get('result', '')})
     else:
-        return jsonify({"error": "結果尚未可用或文件名不匹配"}), 404
+        return jsonify({"error": "Result not available or filename mismatch"}), 404
 
 def transcribe_audio_from_ftp(filename, session_id):
     try:
@@ -362,7 +362,7 @@ def transcribe_audio_from_ftp(filename, session_id):
         ftp.connect(FTP_HOST)
         ftp.login(FTP_USER, FTP_PASS)
         ftp.set_pasv(True)
-        ftp.cwd('錄音檔')
+        ftp.cwd('audio_files')
 
         decoded_filename = urllib.parse.unquote(filename, encoding='utf-8')
         temp_path = tempfile.mktemp()
@@ -377,14 +377,14 @@ def transcribe_audio_from_ftp(filename, session_id):
             with open(meta_file_path, 'r', encoding='utf-8') as meta_file:
                 original_filename = meta_file.read().strip()
         except Exception as e:
-            print(f"讀取 .meta 文件失敗: {e}")
+            print(f"Reading .meta file failed: {e}")
             original_filename = decoded_filename
 
         converted_path = tempfile.mktemp(suffix=".wav")
         try:
             subprocess.run(['ffmpeg', '-i', temp_path, '-ar', '16000', '-ac', '1', converted_path], check=True)
         except subprocess.CalledProcessError as e:
-            print(f"音頻轉換失敗: {e}")
+            print(f"Audio conversion failed: {e}")
             raise
 
         result = model.transcribe(converted_path)
@@ -427,7 +427,7 @@ def transcribe_audio_from_ftp(filename, session_id):
 
         return "\n".join(transcriptions), original_filename
     except Exception as e:
-        print(f"轉錄音頻錯誤: {e}")
+        print(f"Transcribing audio error: {e}")
         return f"{{'error': '{str(e)}'}}", original_filename
 
 def process_next_in_queue():
@@ -444,7 +444,7 @@ def process_next_in_queue():
         try:
             future.result(timeout=6000)
         except Exception as e:
-            print(f"處理下一個排程時出錯: {e}")
+            print(f"Error processing next queue item: {e}")
         finally:
             process_next_in_queue()
 
@@ -470,10 +470,10 @@ def download_text_file(filename):
         ftp.quit()
         return send_file(local_filename, as_attachment=True, download_name=decoded_filename)
     except FileNotFoundError as e:
-        print(f"文件未找到錯誤: {e}")
+        print(f"File not found error: {e}")
         return jsonify({"error": str(e)}), 404
     except Exception as e:
-        print(f"下載文字文件錯誤: {e}")
+        print(f"Error downloading text file: {e}")
         return jsonify({"error": str(e)}), 500
 
 @app.route('/queue_length', methods=['GET'])
@@ -482,5 +482,5 @@ def queue_length():
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # 創建資料庫和表
+        db.create_all()  # Create database and tables
     app.run(debug=True, host='0.0.0.0', port=5000)

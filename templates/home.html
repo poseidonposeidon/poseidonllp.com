@@ -10,171 +10,85 @@
 <body>
 
 <div class="navbar">
-    <img src="/static/img/favicon.ico" alt="Poseidon Capital Ltd." class="logo">
+    <a href="../index.html">
+        <img src="/static/img/favicon.ico" alt="Poseidon Capital Ltd." class="logo">
+    </a>
     <div class="navbar-links">
-        <a href="#income-statement">財務收入</a>
-        <a href="#balance-sheet">資產負債表</a>
-        <a href="#cashflow-statement">現金流表</a>
-        <a href="#earnings-call-transcript">法說會逐字稿</a>
-        <a href="#earnings-call-calendar">法說會日曆</a>
-        <a href="#historical-earnings">歷史獲利和未來獲利</a>
-        <a href="#dividend-calendar">股利發放日期</a>
-        <a href="#insider-trades">內部人交易</a>
-        <a href="#audio-transcription">錄音檔轉文字</a>
-        <a href="../index.html">首頁</a>
+        <a href="#info-section" onclick="showInfoSection(event)">U.S Stock</a>
+        <a href="#ai_box" onclick="showAiBox(event)">AI Research</a>
+        <a href="../index.html">Home</a>
     </div>
 </div>
 
-<h1>Financial Data</h1>
-<input type="text" id="stockSymbol" placeholder="輸入美股代碼" pattern="[A-Z]*">
-<button onclick="fetchStock()">確定</button>
-<p id="outputSymbol" data-last-symbol="">現在查詢的是：</p>
-
-<div class="section" id="income-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-    <h2>財務收入 Income Statement</h2>
-    <div class="content scroll-container-x">
-        <label for="period">選擇時段：</label>
-        <select id="period">
-            <option value="annual">Annual</option>
-            <option value="quarter">Quarter</option>
-        </select>
-        <button onclick="fetchIncomeStatement()">載入報表</button>
-        <div class="scroll-container-x">
-            <table id="IncomeStatementTable" border="1">
-                <div id="incomeStatementContainer"></div>
-            </table>
+<div id="info-section" class="info-section">
+    <div class="info-input">
+        <input type="text" id="stockSymbol" placeholder="Input U.S Stock" pattern="[A-Z]*">
+        <button onclick="fetchStock()">Confirm</button>
+        <p id="outputSymbol" data-last-symbol="">Current query:</p>
+    </div>
+    <div class="info-content">
+        <div class="info-column-left">
+            <a href="#" onclick="loadSection('income-statement')">Income Statement</a>
+            <a href="#" onclick="loadSection('balance-sheet')">Balance Sheet</a>
+            <a href="#" onclick="loadSection('cashflow-statement')">Cash Flow Statement</a>
         </div>
+        <div class="info-column-center">
+            <a href="#" onclick="loadSection('earnings-call-transcript')">Earnings Call Transcript</a>
+            <a href="#" onclick="loadSection('earnings-call-calendar')">Earnings Call Calendar</a>
+            <a href="#" onclick="loadSection('historical-earnings')">Historical and Future Earnings</a>
+        </div>
+        <div class="info-column-right">
+            <a href="#" onclick="loadSection('dividend-calendar')">Dividend Calendar</a>
+            <a href="#" onclick="loadSection('insider-trades')">Insider Trades</a>
+        </div>
+    </div>
+    <div id="section-container" class="section-container">
+        <!-- Dynamic content loading -->
     </div>
 </div>
 
-<div class="section" id="balance-sheet" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-    <h2>資產負債表 Balance Sheet Statements</h2>
-    <div class="content table-container">
-        <label for="period_2">選擇時段：</label>
-        <select id="period_2">
-            <option value="annual">Annual</option>
-            <option value="quarter">Quarter</option>
-        </select>
-        <button onclick="fetchBalanceSheet()">載入報表</button>
-        <div id="balanceSheetContainer"></div>
-    </div>
-</div>
-
-
-<div class="section" id="cashflow-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-    <h2>現金流表 Cashflow Sheet Statements</h2>
-    <div class="content scroll-container-x">
-        <label for="period_3">選擇時段：</label>
-        <select id="period_3">
-            <option value="annual">Annual</option>
-            <option value="quarter">Quarter</option>
-        </select>
-        <button onclick="fetchCashflow()">載入報表</button>
-        <div class="scroll-container-x">
-            <table id="cashflowTable" border="1">
-                <div id="cashflowContainer"></div>
-            </table>
-        </div>
-    </div>
-</div>
-
-<div class="section" id="earnings-call-transcript" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-    <h2>法說會逐字稿 Earnings Call Transcript</h2>
-    <div class="content">
-        <input type="number" id="yearInput" placeholder="輸入年分">
-        <input type="number" id="quarterInput" placeholder="輸入季度">
-        <button onclick="fetchEarningsCallTranscript()">載入逐字稿</button>
-        <div class="scroll-container" id="earningsCallTranscriptContainer" style="width: 100%;">
-            <!-- 這裡將顯示逐字稿內容 -->
-        </div>
-    </div>
-</div>
-
-<div class="section" id="earnings-call-calendar" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-    <h2>法說會日曆 Earnings Call Calendar</h2>
-    <div class="content">
-        <input type="date" id="fromDate" placeholder="From Date">
-        <input type="date" id="toDate" placeholder="To Date">
-        <button onclick="fetchEarningsCallCalendar()">載入日曆</button>
-        <div class="scroll-container">
-            <div id="earningsCallCalendarContainer"></div>
-        </div>
-    </div>
-</div>
-
-<div class="section" id="historical-earnings" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-    <h2>歷史獲利和未來獲利 Historical and Future Earnings</h2>
-    <div class="content">
-        <input type="date" id="fromDate_1" placeholder="From Date">
-        <input type="date" id="toDate_1" placeholder="To Date">
-        <button onclick="fetch_historical_earning_calendar()">載入日曆</button>
-        <div class="scroll-container" id="historicalEarningsContainer">
-            <!-- 数据表格将显示在这里 -->
-        </div>
-    </div>
-</div>
-
-<div class="section" id="dividend-calendar" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-    <h2>股利發放日期</h2>
-    <div class="content">
-        <input type="date" id="fromDate_2" placeholder="From Date">
-        <input type="date" id="toDate_2" placeholder="To Date">
-        <button onclick="fetch_stock_dividend_calendar()">載入日曆</button>
-        <div class="scroll-container" id="stockDividendCalendarContainer">
-            <!-- 数据表格将显示在这里 -->
-        </div>
-    </div>
-</div>
-
-<div class="section" id="insider-trades" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-    <h2>內部人交易 Insider Trades</h2>
-    <div class="content">
-        <button onclick="fetchInsiderTrades()">載入表格</button>
-        <div class="scroll-container-x" id="insiderTradesContainer">
-            <!-- 数据表格将显示在这里 -->
-        </div>
-    </div>
-</div>
-
-<div class="section" id="audio-transcription" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-    <h2>錄音檔轉文字</h2>
-    <div class="content">
-        <p id="queueStatus">當前排程中的檔案數量：<span id="queueLength">0</span></p>
-        <div class="inline-container">
-            <input type="file" id="audioFile" accept="audio/*">
-            <button onclick="uploadToFTP()">上傳錄音檔</button>
-            <select id="ftpFileSelect">
-                <option value="" disabled selected>選擇轉檔的檔案</option>
-            </select>
-            <button onclick="transcribeFromFTP()">轉檔</button>
-            <select id="textFileSelect">
-                <option value="" disabled selected>選擇文字檔</option>
-            </select>
-            <button onclick="downloadTextFile()">下載文字檔</button>
-        </div>
-        <div id="upload-progress-container" style="display: none;">
-            <div id="upload-progress-bar"></div>
-        </div>
-        <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">檔案上傳中...</p>
-        <div id="transcription-progress-container" style="display: none; text-align: center;">
-            <div>
-                <div class="loader"></div>
-                <p id="transcription-status">轉檔中...</p>
+<div id="ai_box" class="ai-box-section" style="display: none;">
+    <div class="section" id="audio-transcription" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+        <h2>Audio Transcription</h2>
+        <div class="content">
+            <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
+            <div class="inline-container">
+                <input type="file" id="audioFile" accept="audio/*">
+                <button onclick="uploadToFTP()">Upload Audio File</button>
+                <select id="ftpFileSelect">
+                    <option value="" disabled selected>Select a file to transcribe</option>
+                </select>
+                <button onclick="transcribeFromFTP()">Transcribe</button>
+                <select id="textFileSelect">
+                    <option value="" disabled selected>Select a text file</option>
+                </select>
+                <button onclick="downloadTextFile()">Download Text File</button>
             </div>
-        </div>
-        <div class="scroll-container" id="transcriptionResult">
-            <!-- 轉寫結果將顯示在這裡 -->
-        </div>
-        <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">閱讀更多</button>
-        <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">閱讀更少</button>
-        <div id="alert-box" style="display: none;" class="alert">
-            <span id="alert-message"></span>
-            <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            <div id="upload-progress-container" style="display: none;">
+                <div id="upload-progress-bar"></div>
+            </div>
+            <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">Uploading file...</p>
+            <div id="transcription-progress-container" style="display: none; text-align: center;">
+                <div>
+                    <div class="loader"></div>
+                    <p id="transcription-status">Transcribing...</p>
+                </div>
+            </div>
+            <div class="scroll-container" id="transcriptionResult">
+                <!-- Transcription results will be displayed here -->
+            </div>
+            <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">Read More</button>
+            <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
+            <div id="alert-box" style="display: none;" class="alert">
+                <span id="alert-message"></span>
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            </div>
         </div>
     </div>
 </div>
 
 <script src="/static/js/main.js"></script>
+
 
 </body>
 </html>
