@@ -6,6 +6,13 @@ document.getElementById('stockSymbol').addEventListener('input', function(e) {
     e.target.value = e.target.value.toUpperCase();
 });
 
+document.getElementById("stockSymbol").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); // 防止表單提交
+        document.querySelector(".info-input button").click(); // 觸發按鈕點擊事件
+    }
+});
+
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
     const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
@@ -85,8 +92,15 @@ function toggleSection(event, sectionId) {
         activeSection.style.display = 'none';
     }
 
-    if (section === activeSection) {
-        // 如果點擊的是當前活動的區塊，則縮小它
+    if (section !== activeSection) {
+        // 如果點擊的是新的區塊，則打開它
+        section.style.display = 'block';
+        setTimeout(() => {
+            section.classList.add('active');
+        }, 10);
+        activeSection = section;
+    } else {
+        // 如果點擊的是當前活動的區塊，則關閉它
         section.classList.remove('active');
         setTimeout(() => {
             if (!section.classList.contains('active')) {
@@ -94,26 +108,20 @@ function toggleSection(event, sectionId) {
             }
         }, 500); // 與 CSS 過渡時間匹配
         activeSection = null;
-    } else {
-        // 展開新的區塊
-        section.style.display = 'block';
-        // 使用 setTimeout 確保 display 變更已經應用
-        setTimeout(() => {
-            section.classList.add('active');
-        }, 10);
-        activeSection = section;
     }
 }
 
-// 綁定導航欄連結點擊事件
-document.querySelector('.navbar-links').addEventListener('click', (event) => {
-    const target = event.target;
-    if (target.tagName === 'A') {
-        const href = target.getAttribute('href');
-        if (href === '#info-section' || href === '#ai_box') {
-            toggleSection(event, href);
-        }
-    }
+// 確保 DOM 加載完成後再添加事件監聽器
+document.addEventListener('DOMContentLoaded', () => {
+    const links = document.querySelectorAll('.navbar-links a');
+    links.forEach(link => {
+        link.addEventListener('click', (event) => {
+            const href = link.getAttribute('href');
+            if (href === '#info-section' || href === '#ai_box') {
+                toggleSection(event, href);
+            }
+        });
+    });
 });
 
 function loadSection(sectionId) {

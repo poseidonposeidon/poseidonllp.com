@@ -104,9 +104,19 @@ div {
 }
 
 .info-section.active, .ai-box-section.active {
-    max-height: 2000px; /* 增加這個值以確保完全展開 */
+    max-height: 2000px; /* 調整這個值以確保內容完全展開 */
     opacity: 1;
     padding: 20px;
+}
+
+.section-content {
+    transition: opacity 0.3s ease-in-out;
+    opacity: 0;
+    display: none;
+}
+
+.section-content[style*="display: block"] {
+    opacity: 1;
 }
 
 .info-input {
