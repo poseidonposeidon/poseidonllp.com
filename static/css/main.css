@@ -95,6 +95,7 @@ div {
 }
 
 /* 設置過渡動畫效果 */
+
 .info-section, .ai-box-section {
     max-height: 0;
     overflow: hidden;
@@ -108,6 +109,7 @@ div {
     opacity: 1;
     padding: 20px;
 }
+
 
 .section-content {
     transition: opacity 0.3s ease-in-out;
@@ -164,6 +166,15 @@ button:not(.info-input button):hover {
     margin: 10px 0;
 }
 
+#companyProfileContainer {
+    text-align: center;
+    margin: 10px auto;
+    padding: 20px;
+    background-color: #1e1e1e;
+    border-radius: 5px;
+    max-width: 600px; /* 控制寬度 */
+}
+
 .info-content {
     display: flex;
     justify-content: space-between;
@@ -186,6 +197,15 @@ button:not(.info-input button):hover {
     color: white;
 }
 
+/* 修改連結顏色 */
+#companyProfileContainer a {
+    color: #90caf9; /* 這是你選擇的顏色 */
+}
+
+#companyProfileContainer a:hover {
+    color: #ffffff; /* 當鼠標懸停時的顏色 */
+}
+
 .section-container {
     margin-top: 20px;
 }
@@ -200,7 +220,6 @@ button:not(.info-input button):hover {
     max-height: 300px;
     overflow-y: auto;
 }
-
 
 .scroll-container-x {
     overflow-x: auto;
@@ -252,5 +271,3 @@ button:not(.info-input button):hover {
 .closebtn:hover {
     color: black;
 }
-
-

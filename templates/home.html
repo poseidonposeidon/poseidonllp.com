@@ -22,9 +22,12 @@
 <div id="info-section" class="info-section" style="display: none;">
     <div class="info-input">
         <input type="text" id="stockSymbol" placeholder="Input U.S Stock" pattern="[A-Z]*">
-        <button onclick="fetchStock()"><img src="/static/img/send.png" alt="Confirm" class="confirm-icon"></button>
+        <button onclick="fetchStock()">
+            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon" style="width: 30px; height: auto; ">
+        </button>
     </div>
-    <p id="outputSymbol" data-last-symbol="">Current query:</p>
+    <p id="outputSymbol" data-last-symbol="">Current query : </p>
+    <div id="companyProfileContainer"></div>
     <div class="info-content">
         <div class="info-column-left">
             <a href="#" onclick="loadSection('income-statement')">Income Statement</a>

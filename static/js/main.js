@@ -1,5 +1,4 @@
 ///////////////////////////////////////////////////////////////////////////
-
 let activeSection = null;
 
 document.getElementById('stockSymbol').addEventListener('input', function(e) {
@@ -20,6 +19,12 @@ function fetchStock() {
     if (stockSymbol !== previousSymbol) {
         document.getElementById('outputSymbol').innerText = 'Current query：' + stockSymbol;
         document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
+
+        // 清除之前的公司資料
+        const companyProfileContainer = document.getElementById('companyProfileContainer');
+        if (companyProfileContainer) {
+            companyProfileContainer.innerHTML = '';
+        }
 
         const containers = [
             'incomeStatementContainer',
@@ -46,6 +51,7 @@ function fetchStock() {
         });
     }
 
+    fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
     return stockSymbol;
 }
 
@@ -88,8 +94,7 @@ function toggleSection(event, sectionId) {
 
     if (activeSection && activeSection !== section) {
         // 如果有其他活動的區塊，關閉它
-        activeSection.classList.remove('active');
-        activeSection.style.display = 'none';
+        hideSection(activeSection);
     }
 
     if (section !== activeSection) {
@@ -101,15 +106,19 @@ function toggleSection(event, sectionId) {
         activeSection = section;
     } else {
         // 如果點擊的是當前活動的區塊，則關閉它
-        section.classList.remove('active');
-        setTimeout(() => {
-            if (!section.classList.contains('active')) {
-                section.style.display = 'none';
-            }
-        }, 500); // 與 CSS 過渡時間匹配
         activeSection = null;
     }
 }
+
+function hideSection(section) {
+    if (section) {
+        section.classList.remove('active');
+        setTimeout(() => {
+            section.style.display = 'none';
+        }, 500); // 與 CSS 過渡時間匹配
+    }
+}
+
 
 // 確保 DOM 加載完成後再添加事件監聽器
 document.addEventListener('DOMContentLoaded', () => {
@@ -238,8 +247,32 @@ function loadSection(sectionId) {
 }
 
 
-////////////////////////////////////////////////////////////////////////////
+//////////////////////////////Profile//////////////////////////////////////////////
+function fetchCompanyProfile(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
 
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainer')))
+        .catch(error => console.error('Error fetching data:', error));
+}
+
+function displayCompanyProfile(data, container) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<p>Data not available.</p>';
+        return;
+    }
+
+    const company = data[0];  // 假設返回的數據是一個包含單個公司信息的數組
+    const website = company.website || 'N/A';
+
+    // 清除之前的資料
+    container.innerHTML = '';
+
+    // 插入新的資料到 container 中
+    container.innerHTML = `<p>Official Website: <a href="${website}" target="_blank">${website}</a></p>`;
+}
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
 function fetchIncomeStatement() {
