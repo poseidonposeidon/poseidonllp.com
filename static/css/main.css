@@ -67,17 +67,17 @@ div {
     justify-content: center;
     text-decoration: none;
     color: white;
-    background-color: #424242;
+    /*background-color: #424242;*/
     margin: 0 5px;
     padding: 5px 10px;
     border-radius: 5px;
     transition: all 0.3s ease;
-    font-size: 12px;
+    font-size: 16px;
 }
 
 .navbar-links a:hover {
     color: #90caf9;
-    background-color: #616161;
+    /*background-color: #616161;*/
 }
 
 .section {

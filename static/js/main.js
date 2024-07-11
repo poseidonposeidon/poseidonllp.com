@@ -99,26 +99,28 @@ function toggleSection(event, sectionId) {
 
     if (section !== activeSection) {
         // 如果點擊的是新的區塊，則打開它
-        section.style.display = 'block';
-        setTimeout(() => {
-            section.classList.add('active');
-        }, 10);
+        showSection(section);
         activeSection = section;
     } else {
         // 如果點擊的是當前活動的區塊，則關閉它
+        hideSection(section);
         activeSection = null;
     }
 }
-
-function hideSection(section) {
-    if (section) {
-        section.classList.remove('active');
-        setTimeout(() => {
-            section.style.display = 'none';
-        }, 500); // 與 CSS 過渡時間匹配
-    }
+function showSection(section) {
+    section.style.display = 'block';
+    setTimeout(() => {
+        section.classList.add('active');
+    }, 10);
 }
-
+function hideSection(section) {
+    section.classList.remove('active');
+    setTimeout(() => {
+        if (!section.classList.contains('active')) {
+            section.style.display = 'none';
+        }
+    }, 500); // 與 CSS 過渡時間匹配
+}
 
 // 確保 DOM 加載完成後再添加事件監聽器
 document.addEventListener('DOMContentLoaded', () => {
@@ -130,6 +132,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 toggleSection(event, href);
             }
         });
+    });
+
+    // 初始化時隱藏所有section
+    document.querySelectorAll('#info-section, #ai_box').forEach(section => {
+        section.style.display = 'none';
     });
 });
 
