@@ -7,8 +7,8 @@ document.getElementById('stockSymbol').addEventListener('input', function(e) {
 
 document.getElementById("stockSymbol").addEventListener("keypress", function(event) {
     if (event.key === "Enter") {
-        event.preventDefault(); // 防止表單提交
-        document.querySelector(".info-input button").click(); // 觸發按鈕點擊事件
+        event.preventDefault(); // Prevent form submission
+        document.querySelector(".info-input button").click(); // Trigger button click event
     }
 });
 
@@ -17,10 +17,10 @@ function fetchStock() {
     const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
 
     if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbol').innerText = 'Current query：' + stockSymbol;
+        document.getElementById('outputSymbol').innerText = 'Current query: ' + stockSymbol;
         document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
 
-        // 清除之前的公司資料
+        // Clear previous company data
         const companyProfileContainer = document.getElementById('companyProfileContainer');
         if (companyProfileContainer) {
             companyProfileContainer.innerHTML = '';
@@ -51,7 +51,7 @@ function fetchStock() {
         });
     }
 
-    fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
+    fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
     return stockSymbol;
 }
 
@@ -122,7 +122,7 @@ function hideSection(section) {
         if (!section.classList.contains('active')) {
             section.style.display = 'none';
         }
-    }, 500); // 與 CSS 過渡時間匹配
+    }, 500); // Match CSS transition duration
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -243,7 +243,6 @@ function loadSection(sectionId) {
     const sectionContainer = document.getElementById('section-container');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
-
 
 
 //////////////////////////////Profile//////////////////////////////////////////////

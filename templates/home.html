@@ -8,8 +8,9 @@
     <title>Poseidon Capital</title>
 </head>
 <body>
+
 <div class="navbar">
-    <a href="../index.html">
+    <a href="../index.html" class="logo-container">
         <img src="/static/img/favicon.ico" alt="Poseidon Capital Ltd." class="logo">
     </a>
     <div class="navbar-links">
@@ -23,23 +24,23 @@
     <div class="info-input">
         <input type="text" id="stockSymbol" placeholder="Input U.S Stock" pattern="[A-Z]*">
         <button onclick="fetchStock()">
-            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon" style="width: 30px; height: auto; ">
+            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
         </button>
     </div>
     <p id="outputSymbol" data-last-symbol="">Current query : </p>
     <div id="companyProfileContainer"></div>
     <div class="info-content">
-        <div class="info-column-left">
+        <div class="info-column">
             <a href="#" onclick="loadSection('income-statement')">Income Statement</a>
             <a href="#" onclick="loadSection('balance-sheet')">Balance Sheet</a>
             <a href="#" onclick="loadSection('cashflow-statement')">Cash Flow Statement</a>
         </div>
-        <div class="info-column-center">
+        <div class="info-column">
             <a href="#" onclick="loadSection('earnings-call-transcript')">Earnings Call Transcript</a>
             <a href="#" onclick="loadSection('earnings-call-calendar')">Earnings Call Calendar</a>
             <a href="#" onclick="loadSection('historical-earnings')">Historical and Future Earnings</a>
         </div>
-        <div class="info-column-right">
+        <div class="info-column">
             <a href="#" onclick="loadSection('dividend-calendar')">Dividend Calendar</a>
             <a href="#" onclick="loadSection('insider-trades')">Insider Trades</a>
         </div>
@@ -50,7 +51,7 @@
 </div>
 
 <div id="ai_box" class="ai-box-section" style="display: none;">
-    <div class="section" id="audio-transcription" >
+    <div class="section" id="audio-transcription">
         <h2>Audio Transcription</h2>
         <div class="content">
             <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
@@ -88,6 +89,7 @@
         </div>
     </div>
 </div>
+
 
 <script src="/static/js/main.js"></script>
 
