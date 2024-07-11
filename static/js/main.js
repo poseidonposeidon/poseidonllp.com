@@ -126,17 +126,6 @@ function hideSection(section) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const links = document.querySelectorAll('.navbar-links a');
-    links.forEach(link => {
-        link.addEventListener('click', (event) => {
-            const href = link.getAttribute('href');
-            if (href === '#info-section' || href === '#ai_box') {
-                toggleSection(event, href);
-            }
-        });
-    });
-
-    // 初始化時隱藏所有section
     document.querySelectorAll('#info-section, #ai_box').forEach(section => {
         section.style.display = 'none';
     });
