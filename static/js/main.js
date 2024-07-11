@@ -92,27 +92,30 @@ function toggleSection(event, sectionId) {
     event.preventDefault();
     const section = document.querySelector(sectionId);
 
-    if (activeSection && activeSection !== section) {
-        // 如果有其他活動的區塊，關閉它
-        hideSection(activeSection);
-    }
-
-    if (section !== activeSection) {
-        // 如果點擊的是新的區塊，則打開它
-        showSection(section);
-        activeSection = section;
-    } else {
-        // 如果點擊的是當前活動的區塊，則關閉它
+    if (activeSection && activeSection === section) {
         hideSection(section);
         activeSection = null;
+    } else {
+        if (activeSection) {
+            hideSection(activeSection);
+        }
+        showSection(section);
+        activeSection = section;
     }
 }
+
 function showSection(section) {
+    document.querySelectorAll('#info-section, #ai_box').forEach(sec => {
+        if (sec !== section) {
+            hideSection(sec);
+        }
+    });
     section.style.display = 'block';
     setTimeout(() => {
         section.classList.add('active');
     }, 10);
 }
+
 function hideSection(section) {
     section.classList.remove('active');
     setTimeout(() => {
@@ -122,7 +125,6 @@ function hideSection(section) {
     }, 500); // 與 CSS 過渡時間匹配
 }
 
-// 確保 DOM 加載完成後再添加事件監聽器
 document.addEventListener('DOMContentLoaded', () => {
     const links = document.querySelectorAll('.navbar-links a');
     links.forEach(link => {
@@ -252,6 +254,7 @@ function loadSection(sectionId) {
     const sectionContainer = document.getElementById('section-container');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
+
 
 
 //////////////////////////////Profile//////////////////////////////////////////////
