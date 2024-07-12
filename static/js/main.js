@@ -1290,24 +1290,26 @@ function fetchTextFileList(newTextFileName = null, isNewFile = false) {
                 if (newTextFileName && isNewFile) {
                     console.log(`Adding new file: ${newTextFileName}`);
                     const newOption = document.createElement('option');
-                    newOption.value = encodeURIComponent(newTextFileName);
-                    newOption.textContent = newTextFileName;
+                    const newFileNameWithTxt = newTextFileName.endsWith('.txt') ? newTextFileName : `${newTextFileName}.txt`;
+                    newOption.value = encodeURIComponent(newFileNameWithTxt);
+                    newOption.textContent = newFileNameWithTxt;
                     select.appendChild(newOption);
                 }
 
                 // Add the rest of the files
                 data.files.forEach(fileInfo => {
-                    if (!(newTextFileName && isNewFile && fileInfo.original === newTextFileName)) {
-                        const option = document.createElement('option');
-                        option.value = fileInfo.encoded;
-                        option.textContent = decodeURIComponent(fileInfo.original);
-                        select.appendChild(option);
-                    }
+                    const option = document.createElement('option');
+                    const originalFileName = decodeURIComponent(fileInfo.original);
+                    const fileNameWithTxt = originalFileName.endsWith('.txt') ? originalFileName : `${originalFileName}.txt`;
+                    option.value = encodeURIComponent(fileNameWithTxt);
+                    option.textContent = fileNameWithTxt;
+                    select.appendChild(option);
                 });
 
                 // Select the new file if it exists, otherwise select the first option
                 if (newTextFileName && isNewFile) {
-                    select.value = encodeURIComponent(newTextFileName);
+                    const newFileNameWithTxt = newTextFileName.endsWith('.txt') ? newTextFileName : `${newTextFileName}.txt`;
+                    select.value = encodeURIComponent(newFileNameWithTxt);
                 } else {
                     select.selectedIndex = 0;
                 }
@@ -1544,9 +1546,9 @@ function downloadTextFile() {
         alert('Please select a text file!');
         return;
     }
-    const encodedFileName = encodeURIComponent(textFileName);
+    const decodedFileName = decodeURIComponent(textFileName);
 
-    const downloadUrl = `${baseUrl}/download_text_file/${encodedFileName}`;
+    const downloadUrl = `${baseUrl}/download_text_file/${encodeURIComponent(textFileName)}`;
 
     console.log("Starting file download:", downloadUrl);
 
@@ -1565,7 +1567,7 @@ function downloadTextFile() {
             console.log("File downloaded successfully, processing Blob data...");
             const downloadLink = document.createElement('a');
             downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = textFileName;
+            downloadLink.download = decodedFileName;
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
