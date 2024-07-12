@@ -175,7 +175,6 @@ def contact():
 
     return jsonify({"success": True, "message": "Message sent successfully"}), 200
 
-
 @app.route('/upload_to_ftp', methods=['POST'])
 def upload_to_ftp():
     if 'file' not in request.files or 'originalFileName' not in request.form:
@@ -296,7 +295,6 @@ def list_text_files():
         print(f"列出文字文件錯誤: {e}")
         return jsonify({"error": str(e)}), 500
 
-
 @app.route('/check_transcription_status', methods=['POST'])
 def check_transcription_status():
     if 'filename' not in request.json:
@@ -333,6 +331,8 @@ def transcribe_handler():
         current_transcription = {'filename': filename, 'status': 'in_progress'}
         result, original_filename = transcribe_audio_from_ftp(filename, session_id)
         current_transcription = {'filename': filename, 'status': 'completed', 'result': result}
+        lock.release()  # 確保鎖在處理下一個隊列前釋放
+        process_next_in_queue()  # 處理下一個隊列項目
         return result, original_filename
 
     try:
@@ -344,8 +344,8 @@ def transcribe_handler():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
     finally:
-        lock.release()
-        process_next_in_queue()
+        if lock.locked():
+            lock.release()
 
 @app.route('/get_transcription_result', methods=['POST'])
 def get_transcription_result():
@@ -441,15 +441,13 @@ def process_next_in_queue():
             current_transcription = {'filename': next_filename, 'status': 'in_progress'}
             result, original_filename = transcribe_audio_from_ftp(next_filename, next_session_id)
             current_transcription = {'filename': next_filename, 'status': 'completed', 'result': result}
+            process_next_in_queue()  # 處理下一個隊列項目
             return result, original_filename
         future = executor.submit(transcribe_and_store)
         try:
             future.result(timeout=6000)
         except Exception as e:
             print(f"處理下一個排程時出錯: {e}")
-        finally:
-            process_next_in_queue()
-
 def format_time(seconds):
     hours, remainder = divmod(seconds, 3600)
     minutes, seconds = divmod(remainder, 60)

@@ -1170,33 +1170,33 @@ document.addEventListener("DOMContentLoaded", () => {
     fetchFileList();
     fetchTextFileList();
     updateQueueLength();
-    setInterval(updateQueueLength, 500); // Update queue length every 5 seconds
+    setInterval(updateQueueLength, 5000); // 每5秒更新一次排程長度
 });
 
 function fetchFileList(newFileName = null) {
-    console.log("Fetching file list from server...");
+    console.log("Get file list from server...");
     fetch(`${baseUrl}/list_files`, {
         method: 'GET',
-        mode: 'cors', // Ensure this option is set
+        mode: 'cors',
         credentials: 'include'
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
+                throw new Error('Network response is abnormal ' + response.statusText);
             }
             return response.json();
         })
         .then(data => {
-            console.log("File list successfully retrieved:", data);
+            console.log("File list successfully obtained:", data);
             const select = document.getElementById('ftpFileSelect');
             if (!select) {
                 console.error('Element with ID "ftpFileSelect" not found');
                 return;
             }
-            select.innerHTML = '';  // Clear previous options
+            select.innerHTML = '';  // 清空之前的選項
 
             if (data.files && data.files.length > 0) {
-                // Sort files by latest date
+                // 將文件按最新時間排序
                 const sortedFiles = data.files.sort((a, b) => {
                     const dateA = extractDate(a.original);
                     const dateB = extractDate(b.original);
@@ -1224,47 +1224,36 @@ function fetchFileList(newFileName = null) {
                 }
             } else {
                 const option = document.createElement('option');
-                option.textContent = "No available files";
+                option.textContent = "No files available";
                 option.disabled = true;
                 select.appendChild(option);
             }
         })
         .catch(error => {
-            console.error('Error fetching file list:', error);
+            console.error('Error getting file list:', error);
             const uploadResult = document.getElementById('upload-result');
             if (uploadResult) {
-                uploadResult.innerText = 'An error occurred, please check network connection or server status!\n' + error;
+                uploadResult.innerText = 'An error occurred, please check the network connection or server status！\n' + error;
             }
         });
 }
 
-function fetchTranscriptionResult(filename) {
-    fetch(`${baseUrl}/get_transcription_result`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ filename: filename })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.text) {
-                displayTranscription(data);
-                showAlert('Transcription completed');
-                console.log("Fetching text file list with new file:", data.originalFilename);
-                fetchTextFileList(data.originalFilename, true);  // Pass true to indicate it's a new file
-            } else {
-                showAlert('Failed to retrieve transcription result');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching transcription result:', error);
-            showAlert('Error fetching transcription result, please try again later');
-        });
+function extractDate(fileName) {
+    const datePattern = /\d{8}/;
+    const match = fileName.match(datePattern);
+    if (match) {
+        const dateString = match[0];
+        return new Date(
+            parseInt(dateString.substring(0, 4), 10),
+            parseInt(dateString.substring(4, 6), 10) - 1,
+            parseInt(dateString.substring(6, 8), 10)
+        );
+    }
+    return new Date(0);
 }
 
 function fetchTextFileList(newTextFileName = null, isNewFile = false) {
-    console.log("Fetching text file list from server...");
+    console.log("Get a list of text files from the server...");
     fetch(`${baseUrl}/list_text_files`, {
         method: 'GET',
         mode: 'cors',
@@ -1272,18 +1261,18 @@ function fetchTextFileList(newTextFileName = null, isNewFile = false) {
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
+                throw new Error('Network response is abnormal ' + response.statusText);
             }
             return response.json();
         })
         .then(data => {
-            console.log("Text file list successfully retrieved:", data);
+            console.log("Text file list successfully obtained:", data);
             const select = document.getElementById('textFileSelect');
             if (!select) {
                 console.error('Element with ID "textFileSelect" not found');
                 return;
             }
-            select.innerHTML = '';  // Clear previous options
+            select.innerHTML = '';  // 清空之前的選項
 
             if (Array.isArray(data.files) && data.files.length > 0) {
                 // Add the new file to the top if it exists
@@ -1315,109 +1304,18 @@ function fetchTextFileList(newTextFileName = null, isNewFile = false) {
                 }
             } else {
                 const option = document.createElement('option');
-                option.textContent = "No available files";
+                option.textContent = "No files available";
                 option.disabled = true;
                 select.appendChild(option);
             }
         })
         .catch(error => {
-            console.error('Error fetching text file list:', error);
+            console.error('獲取文字文件列表時出錯:', error);
             const uploadResult = document.getElementById('upload-result');
             if (uploadResult) {
-                uploadResult.innerText = 'An error occurred, please check network connection or server status!\n' + error;
+                uploadResult.innerText = 'An error occurred, please check the network connection or server status！\n' + error;
             }
         });
-}
-
-function transcribeFromFTP() {
-    const select = document.getElementById('ftpFileSelect');
-    const encodedFilename = select.value;
-    currentOriginalFileName = originalFileNames[encodedFilename];
-
-    if (!encodedFilename) {
-        showAlert('Please select a file from FTP!');
-        return;
-    }
-
-    clearPreviousResult();
-    document.getElementById('transcription-progress-container').style.display = 'block';
-    document.getElementById('transcription-status').textContent = 'Submitting transcription request...';
-
-    fetch(`${baseUrl}/transcribe_from_ftp`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ filename: encodedFilename })
-    })
-        .then(response => {
-            if (response.status === 202) {
-                document.getElementById('transcription-status').textContent = 'File has been added to the queue, please wait...';
-                startPolling(encodedFilename);
-                return { message: 'Added to the queue' };
-            } else if (response.status === 503) {
-                showAlert('Server is busy, please try again later');
-            } else if (!response.ok) {
-                throw new Error('Server error, please try again later');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.message === 'Added to the queue') {
-                showAlert(data.message);
-                document.getElementById('transcription-status').textContent = 'File has been added to the queue, please wait...';
-                startPolling(encodedFilename);
-            } else if (data.text) {
-                displayTranscription(data);
-                fetchTextFileList(currentOriginalFileName, true);
-            } else {
-                throw new Error('Unexpected response data');
-            }
-        })
-        .catch(error => {
-            document.getElementById('transcription-progress-container').style.display = 'none';
-            console.error('Transcription error:', error);
-            showAlert(error.message || 'Error during transcription, please try again!');
-        });
-}
-
-function startPolling(encodedFilename) {
-    // 實現文件轉錄狀態輪詢的函數
-    const intervalId = setInterval(() => {
-        fetch(`${baseUrl}/transcription_status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ filename: encodedFilename })
-        })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'completed') {
-                    clearInterval(intervalId);
-                    fetchTranscriptionResult(encodedFilename);
-                }
-            })
-            .catch(error => {
-                clearInterval(intervalId);
-                console.error('Polling error:', error);
-                showAlert('Error during transcription, please try again!');
-            });
-    }, 5000); // 每 5 秒輪詢一次
-}
-
-function extractDate(fileName) {
-    const datePattern = /\d{8}/;
-    const match = fileName.match(datePattern);
-    if (match) {
-        const dateString = match[0];
-        return new Date(
-            parseInt(dateString.substring(0, 4), 10),
-            parseInt(dateString.substring(4, 6), 10) - 1,
-            parseInt(dateString.substring(6, 8), 10)
-        );
-    }
-    return new Date(0);
 }
 
 function showAlert(message) {
@@ -1436,7 +1334,7 @@ function uploadToFTP() {
     const file = fileInput.files[0];
 
     if (!file) {
-        showAlert('Please select a file!');
+        showAlert('Please select a file！');
         return;
     }
 
@@ -1458,7 +1356,7 @@ function uploadToFTP() {
         if (event.lengthComputable) {
             const percentComplete = (event.loaded / event.total) * 100;
             uploadProgressBar.style.width = `${percentComplete}%`;
-            uploadProgressText.textContent = `Uploading file... ${Math.round(percentComplete)}%`;
+            uploadProgressText.textContent = `File uploading... ${Math.round(percentComplete)}%`;
         }
     };
 
@@ -1467,25 +1365,138 @@ function uploadToFTP() {
         uploadProgressText.style.display = 'none';
         if (xhr.status === 200) {
             const response = JSON.parse(xhr.responseText);
-            showAlert(response.message || 'File successfully uploaded to server');
+            showAlert(response.message || 'The file has been successfully uploaded to the server');
             const newFileName = file.name;
             fetchFileList(newFileName);
             fileInput.value = '';
         } else if (xhr.status === 503) {
-            showAlert('Another transcription process is in progress, please try again later');
+            showAlert('Another conversion process is in progress, please try again later');
         } else {
             const response = JSON.parse(xhr.responseText);
-            showAlert('Upload failed, please try again!' + (response.error ? '<br>' + response.error : ''));
+            showAlert('Upload failed, please try again！' + (response.error ? '<br>' + response.error : ''));
         }
     };
 
     xhr.onerror = function () {
         uploadProgressContainer.style.display = 'none';
         uploadProgressText.style.display = 'none';
-        showAlert('Upload failed, please try again!');
+        showAlert('Upload failed, please try again！');
     };
 
     xhr.send(formData);
+}
+
+function transcribeFromFTP() {
+    const select = document.getElementById('ftpFileSelect');
+    const encodedFilename = select.value;
+    currentOriginalFileName = originalFileNames[encodedFilename];
+
+    if (!encodedFilename) {
+        showAlert('Please select a file！');
+        return;
+    }
+
+    clearPreviousResult();
+    document.getElementById('transcription-progress-container').style.display = 'block';
+    document.getElementById('transcription-status').textContent = 'Submitting transcription request...';
+
+    fetch(`${baseUrl}/transcribe_from_ftp`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ filename: encodedFilename })
+    })
+        .then(response => {
+            if (response.status === 202) {
+                // showAlert('轉檔已加入排程，請稍後...');
+                document.getElementById('transcription-status').textContent = 'The conversion has been scheduled, please wait....';
+                startPolling(encodedFilename);
+                return { message: 'Already added to schedule queue' };
+            } else if (response.status === 503) {
+                showAlert('The server is busy, please try again later');
+            } else if (!response.ok) {
+                throw new Error('Server error, please try again later');
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.message === 'Already added to schedule queue') {
+                showAlert(data.message);
+                document.getElementById('transcription-status').textContent = 'The conversion has been scheduled, please wait....';
+                startPolling(encodedFilename);
+            } else if (data.text) {
+                displayTranscription(data);
+                fetchTextFileList(currentOriginalFileName, true);
+            } else {
+                throw new Error('Expected response data not received');
+            }
+        })
+        .catch(error => {
+            document.getElementById('transcription-progress-container').style.display = 'none';
+            console.error('Transcription error:', error);
+            showAlert(error.message || 'An error occurred during transcription, please try again！');
+        });
+}
+
+function startPolling(encodedFilename) {
+    const statusElement = document.getElementById('transcription-status');
+    statusElement.textContent = 'Tasks are being queued, please wait....';
+
+    if (pollingInterval) {
+        clearInterval(pollingInterval);
+    }
+
+    pollingInterval = setInterval(() => {
+        fetch(`${baseUrl}/check_transcription_status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ filename: encodedFilename })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'completed') {
+                    clearInterval(pollingInterval);
+                    fetchTranscriptionResult(encodedFilename);
+                    statusElement.textContent = 'Transcription completed';
+                } else if (data.status === 'in_progress') {
+                    statusElement.textContent = `Transcription in progress... ${data.progress || ''}`;
+                } else if (data.status === 'queued') {
+                    statusElement.textContent = 'The task is still in the queue, please wait....';
+                }
+            })
+            .catch(error => {
+                clearInterval(pollingInterval);
+                console.error('An error occurred while checking status:', error);
+                showAlert('An error occurred while checking the transcription status, please check the results manually later');
+                statusElement.textContent = 'Status check failed';
+            });
+    }, 5000); // 每5秒检查一次
+}
+
+function fetchTranscriptionResult(filename) {
+    fetch(`${baseUrl}/get_transcription_result`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ filename: filename })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.text) {
+                displayTranscription(data);
+                fetchTextFileList(currentOriginalFileName, true);
+            } else {
+                showAlert('Failed to retrieve transcription result');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching transcription result:', error);
+            showAlert('Error fetching transcription result, please try again later');
+        });
 }
 
 function clearPreviousResult() {
@@ -1546,9 +1557,9 @@ function downloadTextFile() {
         alert('Please select a text file!');
         return;
     }
-    const decodedFileName = decodeURIComponent(textFileName);
+    const encodedFileName = encodeURIComponent(textFileName);
 
-    const downloadUrl = `${baseUrl}/download_text_file/${encodeURIComponent(textFileName)}`;
+    const downloadUrl = `${baseUrl}/download_text_file/${encodedFileName}`;
 
     console.log("Starting file download:", downloadUrl);
 
@@ -1567,7 +1578,7 @@ function downloadTextFile() {
             console.log("File downloaded successfully, processing Blob data...");
             const downloadLink = document.createElement('a');
             downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = decodedFileName;
+            downloadLink.download = textFileName;
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
