@@ -225,28 +225,18 @@ def upload_to_ftp():
             os.remove(temp_path)
             return {"error": f"FTP上傳失敗: {e}"}
 
-    max_retries = 5
-    for attempt in range(max_retries):
-        if lock.acquire(blocking=False):
-            try:
-                future = executor.submit(upload)
-                result = future.result(timeout=6000)
-                if "error" in result:
-                    return jsonify(result), 500
-                else:
-                    return jsonify(result), 200
-            except FuturesTimeoutError:
-                return jsonify({"error": "上傳超時"}), 500
-            except Exception as e:
-                return jsonify({"error": str(e)}), 500
-            finally:
-                lock.release()
-            break
+    try:
+        future = executor.submit(upload)
+        result = future.result(timeout=6000)
+        if "error" in result:
+            return jsonify(result), 500
         else:
-            if attempt < max_retries - 1:
-                time.sleep(2)  # 等待2秒後重試
-            else:
-                return jsonify({"error": "另一個轉檔過程正在進行中，請稍後再試"}), 503
+            return jsonify(result), 200
+    except FuturesTimeoutError:
+        return jsonify({"error": "上傳超時"}), 500
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
 
 @app.route('/list_files', methods=['GET'])
 def list_files():
