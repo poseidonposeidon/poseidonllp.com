@@ -1557,9 +1557,11 @@ function downloadTextFile() {
         alert('Please select a text file!');
         return;
     }
-    const encodedFileName = encodeURIComponent(textFileName);
 
-    const downloadUrl = `${baseUrl}/download_text_file/${encodedFileName}`;
+    // 將檔案名稱從 URL 編碼轉回 UTF-8
+    const decodedFileName = decodeURIComponent(textFileName);
+
+    const downloadUrl = `${baseUrl}/download_text_file/${encodeURIComponent(decodedFileName)}`;
 
     console.log("Starting file download:", downloadUrl);
 
@@ -1578,7 +1580,7 @@ function downloadTextFile() {
             console.log("File downloaded successfully, processing Blob data...");
             const downloadLink = document.createElement('a');
             downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = textFileName;
+            downloadLink.download = decodedFileName; // 使用解碼後的檔案名稱
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
