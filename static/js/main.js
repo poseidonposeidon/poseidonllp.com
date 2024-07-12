@@ -1252,7 +1252,7 @@ function fetchTranscriptionResult(filename) {
                 displayTranscription(data);
                 showAlert('Transcription completed');
                 console.log("Fetching text file list with new file:", data.originalFilename);
-                fetchTextFileList(data.originalFilename, true);  // 使用 data.originalFilename
+                fetchTextFileList(data.originalFilename, true);  // Pass true to indicate it's a new file
             } else {
                 showAlert('Failed to retrieve transcription result');
             }
@@ -1262,7 +1262,6 @@ function fetchTranscriptionResult(filename) {
             showAlert('Error fetching transcription result, please try again later');
         });
 }
-
 function fetchTextFileList(newTextFileName = null, isNewFile = false) {
     console.log("Fetching text file list from server...");
     fetch(`${baseUrl}/list_text_files`, {
@@ -1283,31 +1282,32 @@ function fetchTextFileList(newTextFileName = null, isNewFile = false) {
                 console.error('Element with ID "textFileSelect" not found');
                 return;
             }
-            select.innerHTML = '';  // 清除之前的選項
+            select.innerHTML = '';  // Clear previous options
 
-            // 確保 data.files 是一個陣列
             if (Array.isArray(data.files) && data.files.length > 0) {
-                // 插入新檔案到第一位
+                // Add the new file to the top if it exists
                 if (newTextFileName && isNewFile) {
                     console.log(`Adding new file: ${newTextFileName}`);
                     const newOption = document.createElement('option');
                     newOption.value = encodeURIComponent(newTextFileName);
                     newOption.textContent = newTextFileName;
-                    select.insertBefore(newOption, select.firstChild);
-                    select.value = newOption.value;
+                    select.appendChild(newOption);
                 }
 
-                // 依次添加其餘檔案
+                // Add the rest of the files
                 data.files.forEach(fileInfo => {
-                    const option = document.createElement('option');
-                    option.value = fileInfo.encoded;
-                    option.textContent = decodeURIComponent(fileInfo.original);
                     if (!(newTextFileName && isNewFile && fileInfo.original === newTextFileName)) {
+                        const option = document.createElement('option');
+                        option.value = fileInfo.encoded;
+                        option.textContent = decodeURIComponent(fileInfo.original);
                         select.appendChild(option);
                     }
                 });
 
-                if (!newTextFileName || !isNewFile) {
+                // Select the new file if it exists, otherwise select the first option
+                if (newTextFileName && isNewFile) {
+                    select.value = encodeURIComponent(newTextFileName);
+                } else {
                     select.selectedIndex = 0;
                 }
             } else {
@@ -1325,7 +1325,6 @@ function fetchTextFileList(newTextFileName = null, isNewFile = false) {
             }
         });
 }
-
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
     const encodedFilename = select.value;
@@ -1349,7 +1348,6 @@ function transcribeFromFTP() {
     })
         .then(response => {
             if (response.status === 202) {
-                // showAlert('File has been added to the queue, please wait...');
                 document.getElementById('transcription-status').textContent = 'File has been added to the queue, please wait...';
                 startPolling(encodedFilename);
                 return { message: 'Added to the queue' };
@@ -1367,8 +1365,7 @@ function transcribeFromFTP() {
                 startPolling(encodedFilename);
             } else if (data.text) {
                 displayTranscription(data);
-                // Remove this line to avoid duplicate alerts
-                // showAlert('Transcription completed');
+                fetchTextFileList(currentOriginalFileName, true);
             } else {
                 throw new Error('Unexpected response data');
             }
@@ -1380,44 +1377,29 @@ function transcribeFromFTP() {
         });
 }
 
-function startPolling(filename) {
-    const statusElement = document.getElementById('transcription-status');
-    statusElement.textContent = 'Task is in queue, please wait...';
-
-    if (pollingInterval) {
-        clearInterval(pollingInterval);
-    }
-
-    pollingInterval = setInterval(() => {
-        fetch(`${baseUrl}/check_transcription_status`, {
+function startPolling(encodedFilename) {
+    // 實現文件轉錄狀態輪詢的函數
+    const intervalId = setInterval(() => {
+        fetch(`${baseUrl}/transcription_status`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ filename: filename })
+            body: JSON.stringify({ filename: encodedFilename })
         })
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'completed') {
-                    clearInterval(pollingInterval);
-                    fetchTranscriptionResult(filename);
-                    statusElement.textContent = 'Transcription completed';
-                    showAlert('Transcription completed');
-                    console.log("Transcription completed. Current original file name:", currentOriginalFileName);
-                    fetchTextFileList(currentOriginalFileName, true);  // 確保新檔案在第一位
-                } else if (data.status === 'in_progress') {
-                    statusElement.textContent = `Transcription in progress... ${data.progress || ''}`;
-                } else if (data.status === 'queued') {
-                    statusElement.textContent = 'Task is still in queue, please wait...';
+                    clearInterval(intervalId);
+                    fetchTranscriptionResult(encodedFilename);
                 }
             })
             .catch(error => {
-                clearInterval(pollingInterval);
-                console.error('Error checking status:', error);
-                showAlert('Error checking transcription status, please check the result manually later');
-                statusElement.textContent = 'Status check failed';
+                clearInterval(intervalId);
+                console.error('Polling error:', error);
+                showAlert('Error during transcription, please try again!');
             });
-    }, 5000); // 每5秒檢查一次
+    }, 5000); // 每 5 秒輪詢一次
 }
 
 function extractDate(fileName) {
