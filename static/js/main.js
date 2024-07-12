@@ -1262,6 +1262,7 @@ function fetchTranscriptionResult(filename) {
             showAlert('Error fetching transcription result, please try again later');
         });
 }
+
 function fetchTextFileList(newTextFileName = null, isNewFile = false) {
     console.log("Fetching text file list from server...");
     fetch(`${baseUrl}/list_text_files`, {
@@ -1325,6 +1326,7 @@ function fetchTextFileList(newTextFileName = null, isNewFile = false) {
             }
         });
 }
+
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
     const encodedFilename = select.value;
