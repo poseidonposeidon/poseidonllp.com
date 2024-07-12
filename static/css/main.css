@@ -45,7 +45,6 @@ div {
     transition: background-color 0.3s ease;
     position: relative;
     top: -10px;
-
 }
 
 .logo-container {
@@ -64,7 +63,6 @@ div {
     display: flex;
     justify-content: center;
     background-color: #121212;
-
 }
 
 .navbar-links a {
@@ -294,4 +292,26 @@ button:not(.info-input button):hover {
     .logo {
         margin-right: 500px; /* 桌面裝置上的 margin */
     }
+}
+
+/* 修改 ai-box-section 的設置以適應較小屏幕 */
+.ai-box-section {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
+    padding: 0 20px;
+}
+
+.ai-box-section.active {
+    max-height: 2000px;
+    opacity: 1;
+    padding: 20px;
+}
+
+.inline-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap; /* 確保在較小屏幕上能自適應 */
 }
