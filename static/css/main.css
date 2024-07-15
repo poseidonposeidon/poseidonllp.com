@@ -315,3 +315,31 @@ button:not(.info-input button):hover {
     gap: 10px;
     flex-wrap: wrap; /* 確保在較小屏幕上能自適應 */
 }
+
+/* 新增的佈局樣式 */
+.container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.item {
+    flex: 1 1 30%;
+    margin: 10px;
+    padding: 20px;
+    background: #1e1e1e;
+    color: #e0e0e0;
+    text-align: center;
+    border-radius: 5px;
+}
+
+.large-item {
+    flex: 1 1 100%;
+    margin: 10px;
+    padding: 20px;
+    background: #1e1e1e;
+    color: #e0e0e0;
+    text-align: center;
+    border-radius: 5px;
+}

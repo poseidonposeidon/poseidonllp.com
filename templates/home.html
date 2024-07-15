@@ -6,9 +6,10 @@
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <title>Poseidon Capital</title>
+    
 </head>
 
-<body style="display: none;">
+<body>
 
 <div class="navbar">
     <a href="../index.html" class="logo-container">
@@ -18,9 +19,19 @@
         <a href="#info-section" onclick="toggleSection(event, '#info-section')">U.S Stock</a>
         <a href="#ai_box" onclick="toggleSection(event, '#ai_box')">AI Research</a>
         <a href="../index.html">Home</a>
-<!--        <a href="../index.html">Logout</a>-->
-<!--        <span>Welcome, {{ username }}!</span>-->
     </div>
+</div>
+
+<div class="container">
+    <div class="item">Let your imagination run wild</div>
+    <div class="item">A superassistant for every member of your team</div>
+    <div class="item">Empower your entire workforce with enterprise-grade AI</div>
+    <div class="item">Chat about email, screenshots, files, and anything on your screen</div>
+    <div class="item">Responsibly deploy AI to students, faculty, researchers, and campus operations</div>
+    <div class="item">Improvements to analysis in ChatGPT</div>
+    <div class="large-item">GPT-4o - May 13, 2024</div>
+    <div class="item">Safety & Alignment</div>
+    <div class="item">GPT-4</div>
 </div>
 
 <div id="info-section" class="info-section" style="display: none;">
@@ -92,40 +103,6 @@
         </div>
     </div>
 </div>
-
-  <p>你好</p>>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const token = localStorage.getItem('authToken');
-        if (!token) {
-            window.location.href = '/';  // 重定向到登錄頁面
-        } else {
-            // 驗證 token
-            fetch('https://api.poseidonllp.com/api/verify-token', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Invalid token');
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Token 有效，顯示頁面內容
-                    document.body.style.display = 'block';
-                })
-                .catch(error => {
-                    // Token 無效，重定向到登錄頁面
-                    localStorage.removeItem('authToken');
-                    window.location.href = '/';
-                });
-        }
-    });
-</script>
-
 
 <script src="/static/js/main.js"></script>
 

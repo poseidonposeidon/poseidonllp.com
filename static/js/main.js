@@ -1,6 +1,36 @@
 ///////////////////////////////////////////////////////////////////////////
 let activeSection = null;
 
+document.addEventListener('DOMContentLoaded', function() {
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        window.location.href = '/';  // 重定向到登錄頁面
+    } else {
+        // 驗證 token
+        fetch('https://api.poseidonllp.com/api/verify-token', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Invalid token');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Token 有效，顯示頁面內容
+                document.body.style.display = 'block';
+            })
+            .catch(error => {
+                // Token 無效，重定向到登錄頁面
+                localStorage.removeItem('authToken');
+                window.location.href = '/';
+            });
+    }
+});
+
 document.getElementById('stockSymbol').addEventListener('input', function(e) {
     e.target.value = e.target.value.toUpperCase();
 });
