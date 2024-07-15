@@ -25,6 +25,13 @@ input:focus {
     background-color: #212121;
 }
 
+div {
+    background-color: #1e1e1e;
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: 5px;
+}
+
 .navbar {
     display: flex;
     justify-content: center;
@@ -43,13 +50,13 @@ input:focus {
 .logo-container {
     display: flex;
     align-items: center;
-    margin-right: 20px;
+    margin-right: 20px; /* 確保 logo 和連結之間有一點空間 */
 }
 
 .logo {
     height: 40px;
     width: auto;
-    margin-right: 50px;
+    margin-right: 50px; /* 默認情況下的 margin */
 }
 
 .navbar-links {
@@ -64,7 +71,7 @@ input:focus {
     justify-content: center;
     text-decoration: none;
     color: white;
-    margin: 0 10px;
+    margin: 0 10px; /* 增加 margin 來讓連結之間有些空間 */
     padding: 5px 10px;
     border-radius: 5px;
     transition: all 0.3s ease;
@@ -75,47 +82,21 @@ input:focus {
     color: #90caf9;
 }
 
-.container {
-    display: flex;
-    overflow-x: auto;
-    white-space: nowrap;
-    padding: 20px 0;
-    scrollbar-width: none; /* For Firefox */
-}
-
-.container::-webkit-scrollbar {
-    display: none; /* For Chrome, Safari, and Opera */
-}
-
-.item {
-    display: inline-block;
-    width: 300px;
-    margin: 0 10px;
-    padding: 20px;
-    background: #1e1e1e;
-    color: #e0e0e0;
-    text-align: center;
+.section {
+    border: 1px solid #333;
+    padding: 5px;
+    margin-bottom: 5px;
+    background-color: #1e1e1e;
     border-radius: 5px;
-    box-sizing: border-box;
+    transition: background-color 0.6s ease, transform 0.6s ease;
 }
 
-.item img {
-    width: 100%;
-    height: auto;
-    border-radius: 5px;
+.section:hover {
+    background-color: #2c2c2c;
+    transform: scale(1.009);
 }
 
-.large-item {
-    flex: 1 1 100%;
-    margin: 10px;
-    padding: 20px;
-    background: #1e1e1e;
-    color: #e0e0e0;
-    text-align: center;
-    border-radius: 5px;
-    box-sizing: border-box;
-}
-
+/* 設置過渡動畫效果 */
 .info-section, .ai-box-section {
     max-height: 0;
     overflow: hidden;
@@ -218,6 +199,15 @@ button:not(.info-input button):hover {
     color: white;
 }
 
+/* 修改連結顏色 */
+#companyProfileContainer a {
+    color: #90caf9;
+}
+
+#companyProfileContainer a:hover {
+    color: #ffffff;
+}
+
 .section-container {
     margin-top: 20px;
 }
@@ -231,6 +221,18 @@ button:not(.info-input button):hover {
 .scroll-container {
     max-height: 300px;
     overflow-y: auto;
+}
+
+.scroll-container-x {
+    overflow-x: auto;
+}
+
+.scroll-container-y {
+    max-height: 1000px;
+    height: auto;
+    width: auto;
+    overflow-y: auto;
+    overflow-x: auto;
 }
 
 .loader {
@@ -292,6 +294,7 @@ button:not(.info-input button):hover {
     }
 }
 
+/* 修改 ai-box-section 的設置以適應較小屏幕 */
 .ai-box-section {
     max-height: 0;
     overflow: hidden;
