@@ -175,18 +175,20 @@
 		})
 				.then(response => response.json())
 				.then(data => {
-					if (data.message === "Login successful!") {
-						alert("Login successful!");
-						window.location.href = "templates/home";
+					if (data.message === "Login successful") {
+						localStorage.setItem('authToken', data.token);
+						window.location.href = "/templates/home";
 					} else {
 						alert("Invalid username or password");
 					}
 				})
 				.catch(error => {
 					console.error('Error:', error);
-					alert('Invalid username or password');
+					alert('An error occurred during login');
 				});
 	});
+
+
 </script>
 
 </body>
