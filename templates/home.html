@@ -6,12 +6,9 @@
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <title>Poseidon Capital</title>
-    <style>
-        /* 在這裡插入上面的 CSS 代碼 */
-    </style>
 </head>
 
-<body>
+<body style="display: none;">
 
 <div class="navbar">
     <a href="../index.html" class="logo-container">
@@ -21,6 +18,8 @@
         <a href="#info-section" onclick="toggleSection(event, '#info-section')">U.S Stock</a>
         <a href="#ai_box" onclick="toggleSection(event, '#ai_box')">AI Research</a>
         <a href="../index.html">Home</a>
+        <a href="../index.html">Logout</a>
+        <span>Welcome, {{ username }}!</span>
     </div>
 </div>
 
@@ -94,17 +93,6 @@
     </div>
 </div>
 
-<div class="container">
-    <div class="item"><img src="/static/img/1.jpg" alt="Image 1"><p>Let your imagination run wild</p></div>
-    <div class="item"><img src="/static/img/2.jpg" alt="Image 2"><p>A superassistant for every member of your team</p></div>
-    <div class="item"><img src="/static/img/3.jpg" alt="Image 3"><p>Empower your entire workforce with enterprise-grade AI</p></div>
-    <div class="item"><img src="/static/img/4.jpg" alt="Image 4"><p>Chat about email, screenshots, files, and anything on your screen</p></div>
-    <div class="item"><img src="/static/img/1.jpg" alt="Image 5"><p>Responsibly deploy AI to students, faculty, researchers, and campus operations</p></div>
-    <div class="item"><img src="/static/img/2.jpg" alt="Image 6"><p>Improvements to analysis in ChatGPT</p></div>
-    <div class="large-item"><img src="/static/img/3.jpg" alt="Image 7"><p>GPT-4o - May 13, 2024</p></div>
-    <div class="item"><img src="/static/img/4.jpg" alt="Image 8"><p>Safety & Alignment</p></div>
-    <div class="item"><img src="/static/img/1.jpg" alt="Image 9"><p>GPT-4</p></div>
-</div>
 
 <script src="/static/js/main.js"></script>
 
