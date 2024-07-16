@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <link href="img/favicon.ico" rel="shortcut icon"/>
+    <title>Poseidon Capital</title>
+</head>
+<body>
+
+<<<<<<< Updated upstream
+    <div class="navbar">
+        <img src="img/poseidon.png" alt="Poseidon Capital Ltd." class="logo">
+        <div class="navbar-links">
+            <a href="/home">首頁</a>
+            <a href="/login.html">登入</a>
+        </div>
+    </div>
+=======
+<!-- Wrapper -->
+<div id="wrapper">
+
+	<!-- Header -->
+	<header id="header">
+		<div class="content">
+			<div class="inner">
+				<h1>Poseidon Capital</h1>
+				<p>"The greatest enemy of knowledge is not ignorance. It is the illusion of knowledge” - Stephen Hawking.</p>
+			</div>
+		</div>
+		<nav>
+			<ul>
+				<li><a href="#intro">Intro</a></li>
+				<li><a href="#work">Memo</a></li>
+				<li><a href="#contact">Contact</a></li>
+				<li><a href="#login">Login</a></li>
+			</ul>
+		</nav>
+	</header>
+
+	<!-- Main -->
+	<div id="main">
+		<!-- Intro -->
+		<article id="intro">
+			<h2 class="major">Intro</h2>
+			<span class="image main"><img src="images/pic01.jpg" alt=""/></span>
+			<p>We're an investment research firm founded in 2016, focused on value investing and long-term growth. Our goal is to grow together with the companies we invest in. We believe that real growth comes from long-term capital investment and partnership. This drives us to focus on companies with strong long-term growth potential, competitive advantages, and undervalued worth.</p>
+			<p>Poseidon Capital's strategy centers around two core principles. First, we look for companies with strong growth potential. These are usually innovative companies with wide market coverage, leading technologies, and high barriers to entry. Second, we pay attention to how well a company operates, which includes brand influence, strong management teams, and solid financial decisions.</p>
+			<p>Our strength comes from our ongoing learning and research abilities. We have a team of experienced, professional, and industry-savvy investment researchers. We dive deep into the market, analyzing industry trends, financial conditions, and competitive landscapes to make informed investment decisions. We also offer strategic advice and financial support to help companies achieve their long-term growth goals.</p>
+			<p>We’re committed to growing together with the companies we invest in and our partners.</p>
+		</article>
+
+		<!-- Work -->
+		<article id="work">
+			<h2 class="major">Memo</h2>
+			<span class="image main"><img src="images/bg.jpg" alt=""/></span>
+			<p>Coming soon !</p>
+		</article>
+
+		<!-- About -->
+		<article id="about">
+			<h2 class="major">About</h2>
+			<span class="image main"><img src="images/pic03.jpg" alt=""/></span>
+			<p>Lorem ipsum dolor sit amet, consectetur et adipiscing elit. Praesent eleifend dignissim arcu, at eleifend sapien imperdiet ac. Aliquam erat volutpat. Praesent urna nisi, fringila lorem et vehicula lacinia quam. Integer sollicitudin mauris nec lorem luctus ultrices. Aliquam libero et malesuada fames ac ante ipsum primis in faucibus. Cras viverra ligula sit amet ex mollis mattis lorem ipsum dolor sit amet.</p>
+		</article>
+
+		<!-- Contact -->
+		<article id="contact">
+			<h2 class="major">Contact</h2>
+			<form id="contactForm">
+				<div class="fields">
+					<div class="field half">
+						<label for="name">Name</label>
+						<input type="text" name="name" id="name" required/>
+					</div>
+					<div class="field half">
+						<label for="email">Email</label>
+						<input type="email" name="email" id="email" required/>
+					</div>
+					<div class="field">
+						<label for="message">Message</label>
+						<textarea name="message" id="message" rows="4" required></textarea>
+					</div>
+				</div>
+				<ul class="actions">
+					<li><input type="submit" value="Send Message" class="primary"/></li>
+					<li><input type="reset" value="Reset"/></li>
+				</ul>
+			</form>
+			<!--			<ul class="icons">-->
+			<!--				<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>-->
+			<!--				<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>-->
+			<!--				<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>-->
+			<!--				<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>-->
+			<!--			</ul>-->
+		</article>
+
+		<!-- Login -->
+		<article id="login">
+			<h2 class="major">Log In</h2>
+			<form id="loginForm">
+				<div class="fields">
+					<div class="field half">
+						<label for="username">Username</label>
+						<input type="text" name="username" id="username" required/>
+					</div>
+					<div class="field half">
+						<label for="password">Password</label>
+						<input type="password" name="password" id="password" required/>
+					</div>
+				</div>
+				<ul class="actions">
+					<li><input type="submit" value="Log In" class="primary"/></li>
+				</ul>
+			</form>
+			<!--			<p>Don't have an account? <a href="register.html">Register</a></p>-->
+		</article>
+
+	</div>
+
+	<!-- Footer -->
+	<footer id="footer">
+		<p class="copyright">© Poseidon Capital. All rights reserved.</p>
+	</footer>
+
+</div>
+
+<!-- BG Video -->
+<video autoplay muted  playsinline id="bg-video">
+	<source src="video/20689130-uhd_3840_2160_60fps.mp4" type="video/mp4">
+</video>
+
+<!-- Scripts -->
+<script src="assets/js/jquery.min.js"></script>
+<script src="assets/js/browser.min.js"></script>
+<script src="assets/js/breakpoints.min.js"></script>
+<script src="assets/js/util.js"></script>
+<script src="assets/js/main.js"></script>
+
+<script>
+	document.getElementById('contactForm').addEventListener('submit', function(event) {
+		event.preventDefault();
+
+		const name = document.getElementById('name').value;
+		const email = document.getElementById('email').value;
+		const message = document.getElementById('message').value;
+
+		fetch('https://api.poseidonllp.com/api/contact', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ name, email, message })
+		})
+				.then(response => response.json())
+				.then(data => {
+					if (data.success) {
+						alert("Message sent successfully!");
+						document.getElementById('contactForm').reset();
+					} else {
+						alert("Failed to send message. Please try again later.");
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					alert('An error occurred. Please try again later.');
+				});
+	});
+
+	document.getElementById('loginForm').addEventListener('submit', function (event) {
+		event.preventDefault();
+		const username = document.getElementById('username').value;
+		const password = document.getElementById('password').value;
+
+		fetch('https://api.poseidonllp.com/api/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json'
+			},
+			body: JSON.stringify({ username, password })
+		})
+				.then(response => response.json())
+				.then(data => {
+					if (data.message === "Login successful") {
+						localStorage.setItem('authToken', data.token);
+						window.location.href = "/templates/home";
+						alert('Login successful!');
+					} else {
+						alert("Invalid username or password");
+					}
+				})
+				.catch(error => {
+					console.error('Error:', error);
+					alert('An error occurred during login');
+				});
+	});
+>>>>>>> Stashed changes
+
+
+    <h1>Financial Data</h1>
+    <input type="text" id="stockSymbol" placeholder="輸入美股代碼">
+    <button onclick="fetchStock()">確定</button>
+    <p id="outputSymbol" data-last-symbol="">現在查詢的是：</p>
+
+
+    <div>
+    <h2>財務收入 Income Statement</h2>
+    <label for="period">選擇時段：</label>
+    <select id="period">
+        <option value="annual">Annual</option>
+        <option value="quarter">Quarter</option>
+    </select>
+    <button onclick="fetchIncomeStatement()">載入報表</button>
+    <div class="scroll-container">
+        <table id="IncomeStatementTable" border="1" style="width: 100%; border-collapse: collapse;">
+        <div id="incomeStatementContainer"></div>
+        </table>
+    </div>
+    </div>
+
+
+    <div>
+        <h2>法說會逐字稿 Earnings Call Transcript</h2>
+        <input type="number" id="yearInput" placeholder="輸入年分">
+        <input type="number" id="quarterInput" placeholder="輸入季度">
+        <button onclick="fetchEarningsCallTranscript()">載入逐字稿</button>
+        <div id="earningsCallTranscriptContainer"></div>
+        <button id="expandButton" style="display:none;" onclick="expandIncomeStatement()">Read More</button>
+        <button id="collapseButton" style="display:none;" onclick="collapseIncomeStatement()">Read Less</button>
+    </div>
+
+    <div>
+        <h2>法說會日曆 Earnings Call Calendar</h2>
+        <input type="date" id="fromDate" placeholder="From Date">
+        <input type="date" id="toDate" placeholder="To Date">
+        <button onclick="fetchEarningsCallCalendar()">載入日曆</button>
+        <div id="earningsCallCalendarContainer"></div>
+    </div>
+
+    <div>
+        <h2>歷史獲利和未來獲利 Historical and Future Earnings</h2>
+        <input type="date" id="fromDate_1" placeholder="From Date">
+        <input type="date" id="toDate_1" placeholder="To Date">
+        <button onclick="fetch_historical_earning_calendar()">載入日曆</button>
+        <div class="scroll-container">
+        <table id="historical_earning_calendarTable" border="1" style="width: 100%; border-collapse: collapse;">
+        <div id="historical_earning_calendar"></div>
+        </table>
+        </div>
+    </div>
+
+    <div>
+        <h2>股利發放日期</h2>
+        <input type="date" id="fromDate_2" placeholder="From Date">
+        <input type="date" id="toDate_2" placeholder="To Date">
+        <button onclick="fetch_stock_dividend_calendar()">載入日曆</button>
+        <div id="stock_dividend_calendar"></div>
+    </div>
+
+    <div>
+    <h2>內部人交易 Insider Trades </h2>
+
+    <button onclick="fetchInsiderTrades()">載入表格</button>
+    <div class="scroll-container" >
+    <table id="Insider_Trades_Table" border="1" style="width: 100%; border-collapse: collapse;">
+        <tbody id="Insider_Trades"></tbody>
+    </table>
+    </div>
+    </div>
+
+
+
+    <script src="main.js"></script>
+</body>
+</html>
