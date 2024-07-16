@@ -82,6 +82,21 @@ div {
     color: #90caf9;
 }
 
+.blurred-background {
+    filter: blur(5px);
+    pointer-events: none;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 10; /* 確保覆蓋在其他內容上 */
+}
+
 .section {
     border: 1px solid #333;
     padding: 5px;
@@ -109,6 +124,8 @@ div {
     max-height: 2000px;
     opacity: 1;
     padding: 20px;
+    z-index: 20; /* 確保覆蓋在 logo-container-new 上 */
+    position: relative;
 }
 
 .section-content {
@@ -366,10 +383,11 @@ button:not(.info-input button):hover {
     border-radius: 10px;
     margin: 20px auto;
     max-width: 80%;
-    position: absolute;
+    position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 5;
 }
 
 .logo-container-new img {
