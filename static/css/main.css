@@ -104,6 +104,7 @@ div {
     transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
     padding: 0 20px;
     z-index: 10;
+    position: relative;
 }
 
 .info-section.active, .ai-box-section.active {
@@ -367,7 +368,7 @@ button:not(.info-input button):hover {
     border-radius: 10px;
     margin: 20px auto;
     max-width: 80%;
-    position: absolute;
+    position: relative;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
