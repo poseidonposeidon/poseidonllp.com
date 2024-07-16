@@ -103,6 +103,7 @@ div {
     opacity: 0;
     transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
     padding: 0 20px;
+    z-index: 10;
 }
 
 .info-section.active, .ai-box-section.active {
@@ -370,6 +371,7 @@ button:not(.info-input button):hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 1
 }
 
 .logo-container-new img {
