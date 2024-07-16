@@ -121,18 +121,18 @@ function toggleFixed(event, element) {
 function toggleSection(event, sectionId) {
     event.preventDefault();
     const section = document.querySelector(sectionId);
-
-    if (activeSection && activeSection === section) {
-        hideSection(section);
-        activeSection = null;
+    const logoContainer = document.querySelector('.logo-container-new.center');
+    if (section.style.display === "none" || !section.style.display) {
+        section.style.display = "block";
+        section.classList.add('active');
+        logoContainer.classList.add('blur');
     } else {
-        if (activeSection) {
-            hideSection(activeSection);
-        }
-        showSection(section);
-        activeSection = section;
+        section.style.display = "none";
+        section.classList.remove('active');
+        logoContainer.classList.remove('blur');
     }
 }
+
 
 function showSection(section) {
     document.querySelectorAll('#info-section, #ai_box').forEach(sec => {
