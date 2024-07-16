@@ -121,24 +121,19 @@ function toggleFixed(event, element) {
 function toggleSection(event, sectionId) {
     event.preventDefault();
     const section = document.querySelector(sectionId);
-    const logoContainer = document.querySelector('.logo-container-new.center');
-    const body = document.body;
 
     if (activeSection && activeSection === section) {
         hideSection(section);
         activeSection = null;
-        logoContainer.classList.remove('blurred-background');
-        body.classList.remove('modal-overlay');
     } else {
         if (activeSection) {
             hideSection(activeSection);
         }
         showSection(section);
         activeSection = section;
-        logoContainer.classList.add('blurred-background');
-        body.classList.add('modal-overlay');
     }
 }
+
 function showSection(section) {
     document.querySelectorAll('#info-section, #ai_box').forEach(sec => {
         if (sec !== section) {
@@ -158,16 +153,7 @@ function hideSection(section) {
             section.style.display = 'none';
         }
     }, 500); // Match CSS transition duration
-    const logoContainer = document.querySelector('.logo-container-new.center');
-    logoContainer.classList.remove('blurred-background');
-    document.body.classList.remove('modal-overlay');
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box').forEach(section => {
-        section.style.display = 'none';
-    });
-});
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#info-section, #ai_box').forEach(section => {
