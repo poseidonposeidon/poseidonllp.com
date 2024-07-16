@@ -1,6 +1,5 @@
 <!DOCTYPE HTML>
 <html lang="en">
-<html>
 <head>
 	<link href="/static/img/favicon.ico" rel="shortcut icon"/>
 	<title>Poseidon Capital</title>
@@ -81,12 +80,6 @@
 					<li><input type="reset" value="Reset"/></li>
 				</ul>
 			</form>
-			<!--			<ul class="icons">-->
-			<!--				<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>-->
-			<!--				<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a></li>-->
-			<!--				<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a></li>-->
-			<!--				<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>-->
-			<!--			</ul>-->
 		</article>
 
 		<!-- Login -->
@@ -107,7 +100,6 @@
 					<li><input type="submit" value="Log In" class="primary"/></li>
 				</ul>
 			</form>
-			<!--			<p>Don't have an account? <a href="register.html">Register</a></p>-->
 		</article>
 
 	</div>
@@ -120,7 +112,7 @@
 </div>
 
 <!-- BG Video -->
-<video autoplay muted  playsinline id="bg-video">
+<video autoplay muted playsinline id="bg-video">
 	<source src="video/20689130-uhd_3840_2160_60fps.mp4" type="video/mp4">
 </video>
 
@@ -178,7 +170,7 @@
 					if (data.message === "Login successful") {
 						localStorage.setItem('authToken', data.token);
 						window.location.href = "/templates/home";
-						alert('Login successful');
+						alert('Login successful!');
 					} else {
 						alert("Invalid username or password");
 					}
@@ -188,8 +180,6 @@
 					alert('An error occurred during login');
 				});
 	});
-
-
 </script>
 
 </body>
