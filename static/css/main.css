@@ -372,3 +372,7 @@ button:not(.info-input button):hover {
     max-height: 100px; /* 調整 logo 的高度 */
     margin: 0 20px;
 }
+
+#trend_notification_app {
+    display: none;
+}
