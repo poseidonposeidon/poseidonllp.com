@@ -326,6 +326,9 @@ button:not(.info-input button):hover {
     padding: 10px;
     border-radius: 5px;
     position: relative;
+    max-width: 800px; /* 限制容器的最大寬度 */
+    margin-left: auto; /* 中心對齊 */
+    margin-right: auto; /* 中心對齊 */
 }
 
 .text-block {
@@ -334,6 +337,8 @@ button:not(.info-input button):hover {
     padding: 20px;
     z-index: 1;
     width: 70%;
+    max-width: 500px; /* 限制文字區塊的最大寬度 */
+    margin: auto; /* 中心對齊 */
 }
 
 .image-block {
