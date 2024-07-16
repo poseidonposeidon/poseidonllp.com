@@ -178,6 +178,7 @@
 					if (data.message === "Login successful") {
 						localStorage.setItem('authToken', data.token);
 						window.location.href = "/templates/home";
+						alert('Login successful');
 					} else {
 						alert("Invalid username or password");
 					}
