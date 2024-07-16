@@ -356,7 +356,7 @@ button:not(.info-input button):hover {
 }
 
 /* 新增的 logo 容器樣式 */
-.logo-container-new {
+.logo-container-new.center {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -366,6 +366,10 @@ button:not(.info-input button):hover {
     border-radius: 10px;
     margin: 20px auto;
     max-width: 80%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .logo-container-new img {
