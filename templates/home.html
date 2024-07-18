@@ -8,6 +8,8 @@
     <title>Poseidon Capital</title>
 </head>
 <body>
+<div class="overlay"></div> <!-- 添加遮罩層 -->
+
 <div class="navbar">
     <a href="../index.html" class="logo-container">
         <img src="/static/img/favicon.ico" alt="Poseidon Capital Ltd." class="logo">
@@ -19,88 +21,85 @@
     </div>
 </div>
 
-<div id="main-content">
-    <div id="info-section" class="info-section" style="display: none;">
-        <div class="info-input">
-            <input type="text" id="stockSymbol" placeholder="Input U.S Stock" pattern="[A-Z]*">
-            <button onclick="fetchStock()">
-                <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
-            </button>
+<div id="info-section" class="info-section" style="display: none;">
+    <div class="info-input">
+        <input type="text" id="stockSymbol" placeholder="Input U.S Stock" pattern="[A-Z]*">
+        <button onclick="fetchStock()">
+            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
+        </button>
+    </div>
+    <p id="outputSymbol" data-last-symbol="">Current query : </p>
+    <div id="companyProfileContainer"></div>
+    <div class="info-content">
+        <div class="info-column">
+            <a href="#" onclick="loadSection('income-statement')">Income Statement</a>
+            <a href="#" onclick="loadSection('balance-sheet')">Balance Sheet</a>
+            <a href="#" onclick="loadSection('cashflow-statement')">Cash Flow Statement</a>
         </div>
-        <p id="outputSymbol" data-last-symbol="">Current query : </p>
-        <div id="companyProfileContainer"></div>
-        <div class="info-content">
-            <div class="info-column">
-                <a href="#" onclick="loadSection('income-statement')">Income Statement</a>
-                <a href="#" onclick="loadSection('balance-sheet')">Balance Sheet</a>
-                <a href="#" onclick="loadSection('cashflow-statement')">Cash Flow Statement</a>
-            </div>
-            <div class="info-column">
-                <a href="#" onclick="loadSection('earnings-call-transcript')">Earnings Call Transcript</a>
-                <a href="#" onclick="loadSection('earnings-call-calendar')">Earnings Call Calendar</a>
-                <a href="#" onclick="loadSection('historical-earnings')">Historical and Future Earnings</a>
-            </div>
-            <div class="info-column">
-                <a href="#" onclick="loadSection('dividend-calendar')">Dividend Calendar</a>
-                <a href="#" onclick="loadSection('insider-trades')">Insider Trades</a>
-            </div>
+        <div class="info-column">
+            <a href="#" onclick="loadSection('earnings-call-transcript')">Earnings Call Transcript</a>
+            <a href="#" onclick="loadSection('earnings-call-calendar')">Earnings Call Calendar</a>
+            <a href="#" onclick="loadSection('historical-earnings')">Historical and Future Earnings</a>
         </div>
-        <div id="section-container" class="section-container">
-            <!-- Dynamic content loading -->
+        <div class="info-column">
+            <a href="#" onclick="loadSection('dividend-calendar')">Dividend Calendar</a>
+            <a href="#" onclick="loadSection('insider-trades')">Insider Trades</a>
         </div>
     </div>
-
-    <div id="ai_box" class="ai-box-section" style="display: none;">
-        <div class="section" id="audio-transcription" onmouseover="expandSection(this)">
-            <h2>Audio Transcription</h2>
-            <div class="content">
-                <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
-                <div class="inline-container">
-                    <input type="file" id="audioFile" accept="audio/*">
-                    <button onclick="uploadToFTP()">Upload Audio File</button>
-                    <select id="ftpFileSelect">
-                        <option value="" disabled selected>Select a file to transcribe</option>
-                    </select>
-                    <button onclick="transcribeFromFTP()">Transcribe</button>
-                    <select id="textFileSelect">
-                        <option value="" disabled selected>Select a text file</option>
-                    </select>
-                    <button onclick="downloadTextFile()">Download Text File</button>
-                </div>
-                <div id="upload-progress-container" style="display: none;">
-                    <div id="upload-progress-bar"></div>
-                </div>
-                <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">Uploading file...</p>
-                <div id="transcription-progress-container" style="display: none; text-align: center;">
-                    <div>
-                        <div class="loader"></div>
-                        <p id="transcription-status">Transcribing...</p>
-                    </div>
-                </div>
-                <div class="scroll-container" id="transcriptionResult">
-                    <!-- Transcription results will be displayed here -->
-                </div>
-                <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">Read More</button>
-                <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
-                <div id="alert-box" style="display: none;" class="alert">
-                    <span id="alert-message"></span>
-                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    <div class="logo-container-new center">
-        <a href="https://chatgpt.com/"><img src="/static/img/gpt.png" alt="gpt"></a>
-        <a href="https://www.businessweekly.com.tw/Archive/"><img src="/static/img/businessweek.png" alt="businessweek" ></a>
-        <a href="https://finance.yahoo.com/"><img src="/static/img/fyahoo.png" alt="yahoo"></a>
-        <!--    <a href="https://www.cnyes.com/"><img src="/static/img/unnamed (1).png" alt="unnamed"></a>-->
-        <a href="https://www.oaktreecapital.com/insights"><img src="/static/img/OKAtree .png" alt="unnamed"></a>
-
+    <div id="section-container" class="section-container">
+        <!-- Dynamic content loading -->
     </div>
 </div>
 
+<div id="ai_box" class="ai-box-section" style="display: none;">
+    <div class="section" id="audio-transcription" onmouseover="expandSection(this)">
+        <h2>Audio Transcription</h2>
+        <div class="content">
+            <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
+            <div class="inline-container">
+                <input type="file" id="audioFile" accept="audio/*">
+                <button onclick="uploadToFTP()">Upload Audio File</button>
+                <select id="ftpFileSelect">
+                    <option value="" disabled selected>Select a file to transcribe</option>
+                </select>
+                <button onclick="transcribeFromFTP()">Transcribe</button>
+                <select id="textFileSelect">
+                    <option value="" disabled selected>Select a text file</option>
+                </select>
+                <button onclick="downloadTextFile()">Download Text File</button>
+            </div>
+            <div id="upload-progress-container" style="display: none;">
+                <div id="upload-progress-bar"></div>
+            </div>
+            <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">Uploading file...</p>
+            <div id="transcription-progress-container" style="display: none; text-align: center;">
+                <div>
+                    <div class="loader"></div>
+                    <p id="transcription-status">Transcribing...</p>
+                </div>
+            </div>
+            <div class="scroll-container" id="transcriptionResult">
+                <!-- Transcription results will be displayed here -->
+            </div>
+            <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">Read More</button>
+            <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
+            <div id="alert-box" style="display: none;" class="alert">
+                <span id="alert-message"></span>
+                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="logo-container-new center">
+    <a href="https://chatgpt.com/"><img src="/static/img/gpt.png" alt="gpt"></a>
+    <a href="https://www.businessweekly.com.tw/Archive/"><img src="/static/img/businessweek.png" alt="businessweek" ></a>
+    <a href="https://finance.yahoo.com/"><img src="/static/img/fyahoo.png" alt="yahoo"></a>
+    <!--    <a href="https://www.cnyes.com/"><img src="/static/img/unnamed (1).png" alt="unnamed"></a>-->
+    <a href="https://www.oaktreecapital.com/insights"><img src="/static/img/OKAtree .png" alt="unnamed"></a>
+
+</div>
 
 <script src="/static/js/main.js"></script>
 

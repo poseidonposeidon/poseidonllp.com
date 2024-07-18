@@ -125,14 +125,12 @@ function toggleSection(event, sectionId) {
     if (activeSection && activeSection === section) {
         hideSection(section);
         activeSection = null;
-        document.body.classList.remove('section-active');
     } else {
         if (activeSection) {
             hideSection(activeSection);
         }
         showSection(section);
         activeSection = section;
-        document.body.classList.add('section-active');
     }
 }
 
@@ -154,8 +152,9 @@ function hideSection(section) {
         if (!section.classList.contains('active')) {
             section.style.display = 'none';
         }
-    }, 500);
+    }, 500); // Match CSS transition duration
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#info-section, #ai_box').forEach(section => {
         section.style.display = 'none';
