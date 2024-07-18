@@ -141,18 +141,26 @@ div {
 
 /* 设置过渡动画效果 */
 .info-section, .ai-box-section {
-    max-height: 0;
-    overflow: hidden;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1e1e1e;
+    padding: 20px;
+    z-index: 999;
+    max-height: 80%;
+    width: 80%;
+    overflow-y: auto;  /* 這行增加垂直滾動 */
     opacity: 0;
-    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
-    padding: 0 20px;
+    transition: opacity 0.5s ease-in-out;
 }
 
 .info-section.active, .ai-box-section.active {
-    max-height: 2000px;
     opacity: 1;
-    padding: 20px;
+    max-height: 80%; /* 保持一致 */
+    overflow-y: auto;  /* 確保垂直滾動有效 */
 }
+
 
 .section-content {
     transition: opacity 0.3s ease-in-out;

@@ -146,11 +146,13 @@ function showSection(section) {
     section.style.display = 'block';
     setTimeout(() => {
         section.classList.add('active');
+        section.style.overflowY = 'auto'; // 確保展開後支援滾動
     }, 10);
 }
 
 function hideSection(section) {
     section.classList.remove('active');
+    section.style.overflowY = 'hidden'; // 隱藏時移除滾動條
     setTimeout(() => {
         if (!section.classList.contains('active')) {
             section.style.display = 'none';
@@ -163,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
         section.style.display = 'none';
     });
 });
-
 
 function loadSection(sectionId) {
     const sections = {
