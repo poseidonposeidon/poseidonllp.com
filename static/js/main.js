@@ -139,9 +139,6 @@ function toggleSection(event, sectionId) {
         overlay.classList.add('active');
         document.body.classList.add('modal-open');
         blurElements.forEach(el => el.classList.add('blur-background'));
-
-        // 确保页面本身可以滚动
-        document.body.style.overflow = 'auto';
     }
 }
 
@@ -166,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         section.style.display = 'none';
     });
 });
+
 
 function loadSection(sectionId) {
     const sections = {

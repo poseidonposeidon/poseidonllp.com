@@ -19,14 +19,13 @@ body.modal-open {
 
 .info-section, .ai-box-section {
     position: fixed;
-    top: 50px;
-    bottom: 50px;
+    top: 50%;
     left: 50%;
-    transform: translateX(-50%);
+    transform: translate(-50%, -50%);
     background-color: #1e1e1e;
     padding: 20px;
     z-index: 999;
-    max-height: calc(100% - 100px);
+    max-height: 80%;
     width: 80%;
     overflow-y: auto;
     opacity: 0;
@@ -48,7 +47,6 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: filter 0.3s ease;
-    overflow: auto;
 }
 
 h1, h2 {
@@ -141,15 +139,17 @@ div {
     transform: scale(1.009);
 }
 
+/* 设置过渡动画效果 */
 .info-section, .ai-box-section {
-    max-height: none;
-    overflow: visible;
+    max-height: 0;
+    overflow: hidden;
     opacity: 0;
     transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
     padding: 0 20px;
 }
 
 .info-section.active, .ai-box-section.active {
+    max-height: 2000px;
     opacity: 1;
     padding: 20px;
 }
@@ -242,6 +242,7 @@ button:not(.info-input button):hover {
     color: white;
 }
 
+/* 修改链接颜色 */
 #companyProfileContainer a {
     color: #90caf9;
 }
@@ -316,6 +317,7 @@ button:not(.info-input button):hover {
     color: black;
 }
 
+/* Media Queries */
 @media (min-width: 768px) {
     .info-column {
         width: 30%;
@@ -335,15 +337,17 @@ button:not(.info-input button):hover {
     }
 }
 
+/* 修改 ai-box-section 的设置以适应较小屏幕 */
 .ai-box-section {
-    max-height: none;
-    overflow: visible;
+    max-height: 0;
+    overflow: hidden;
     opacity: 0;
     transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
     padding: 0 20px;
 }
 
 .ai-box-section.active {
+    max-height: 2000px;
     opacity: 1;
     padding: 20px;
 }
