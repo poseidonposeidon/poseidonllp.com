@@ -36,7 +36,7 @@ body.modal-open {
     opacity: 1;
 }
 
-.blur-background:not(.navbar) {
+.blur-background {
     filter: blur(5px);
 }
 
@@ -87,19 +87,19 @@ div {
     transition: background-color 0.3s ease;
     position: relative;
     top: -10px;
-    z-index: 1000; /* 提升導航欄的層級 */
+    z-index: 1000; /* 提升导航栏的层级 */
 }
 
 .logo-container {
     display: flex;
     align-items: center;
-    margin-right: 20px; /* 確保 logo 和連結之間有一點空間 */
+    margin-right: 20px; /* 确保 logo 和链接之间有一点空间 */
 }
 
 .logo {
     height: 40px;
     width: auto;
-    margin-right: 50px; /* 默認情況下的 margin */
+    margin-right: 50px; /* 默认情况下的 margin */
 }
 
 .navbar-links {
@@ -114,7 +114,7 @@ div {
     justify-content: center;
     text-decoration: none;
     color: white;
-    margin: 0 10px; /* 增加 margin 來讓連結之間有些空間 */
+    margin: 0 10px; /* 增加 margin 来让链接之间有些空间 */
     padding: 5px 10px;
     border-radius: 5px;
     transition: all 0.3s ease;
@@ -139,7 +139,7 @@ div {
     transform: scale(1.009);
 }
 
-/* 設置過渡動畫效果 */
+/* 设置过渡动画效果 */
 .info-section, .ai-box-section {
     max-height: 0;
     overflow: hidden;
@@ -176,7 +176,7 @@ div {
     box-sizing: border-box;
 }
 
-/* 特定 button 樣式修改 */
+/* 特定 button 样式修改 */
 .info-input button {
     background-color: transparent;
     border: none;
@@ -190,7 +190,7 @@ div {
     cursor: pointer;
 }
 
-/* 其他 button 樣式保持不變 */
+/* 其他 button 样式保持不变 */
 button:not(.info-input button) {
     background-color: #616161;
     color: white;
@@ -215,7 +215,7 @@ button:not(.info-input button):hover {
     padding: 20px;
     background-color: #1e1e1e;
     border-radius: 5px;
-    max-width: 100%; /* 控制寬度 */
+    max-width: 100%; /* 控制宽度 */
 }
 
 .info-content {
@@ -242,7 +242,7 @@ button:not(.info-input button):hover {
     color: white;
 }
 
-/* 修改連結顏色 */
+/* 修改链接颜色 */
 #companyProfileContainer a {
     color: #90caf9;
 }
@@ -324,7 +324,7 @@ button:not(.info-input button):hover {
     }
 
     .logo {
-        margin-right: 30px; /* 平板裝置上的 margin */
+        margin-right: 30px; /* 平板设备上的 margin */
     }
 }
 
@@ -333,11 +333,11 @@ button:not(.info-input button):hover {
         flex-wrap: nowrap;
     }
     .logo {
-        margin-right: 500px; /* 桌面裝置上的 margin */
+        margin-right: 500px; /* 桌面设备上的 margin */
     }
 }
 
-/* 修改 ai-box-section 的設置以適應較小屏幕 */
+/* 修改 ai-box-section 的设置以适应较小屏幕 */
 .ai-box-section {
     max-height: 0;
     overflow: hidden;
@@ -356,10 +356,10 @@ button:not(.info-input button):hover {
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-wrap: wrap; /* 確保在較小屏幕上能自適應 */
+    flex-wrap: wrap; /* 确保在较小屏幕上能自适应 */
 }
 
-/* 新增的樣式 */
+/* 新增的样式 */
 .container {
     display: flex;
     align-items: center;
@@ -369,9 +369,9 @@ button:not(.info-input button):hover {
     padding: 10px;
     border-radius: 5px;
     position: relative;
-    max-width: 800px; /* 限制容器的最大寬度 */
-    margin-left: auto; /* 中心對齊 */
-    margin-right: auto; /* 中心對齊 */
+    max-width: 800px; /* 限制容器的最大宽度 */
+    margin-left: auto; /* 中心对齐 */
+    margin-right: auto; /* 中心对齐 */
 }
 
 .text-block {
@@ -380,8 +380,8 @@ button:not(.info-input button):hover {
     padding: 20px;
     z-index: 1;
     width: 70%;
-    max-width: 500px; /* 限制文字區塊的最大寬度 */
-    margin: auto; /* 中心對齊 */
+    max-width: 500px; /* 限制文字区块的最大宽度 */
+    margin: auto; /* 中心对齐 */
 }
 
 .image-block {
@@ -398,12 +398,12 @@ button:not(.info-input button):hover {
     max-height: 100%;
 }
 
-/* 新增的 logo 容器樣式 */
+/* 新增的 logo 容器样式 */
 .logo-container-new.center {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 30px; /* 調整 logo 之間的間距 */
+    gap: 30px; /* 调整 logo 之间的间距 */
     background-color: #121212;
     padding: 20px;
     border-radius: 10px;
@@ -413,10 +413,11 @@ button:not(.info-input button):hover {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    z-index: 997;
 }
 
 .logo-container-new img {
-    max-height: 100px; /* 調整 logo 的高度 */
+    max-height: 100px; /* 调整 logo 的高度 */
     margin: 0 20px;
 }
 

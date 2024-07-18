@@ -4,9 +4,9 @@ let activeSection = null;
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('authToken');
     if (!token) {
-        window.location.href = '/';  // 重定向到登錄頁面
+        window.location.href = '/';  // 重定向到登录页面
     } else {
-        // 驗證 token
+        // 验证 token
         fetch('https://api.poseidonllp.com/api/verify-token', {
             method: 'POST',
             headers: {
@@ -20,11 +20,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 return response.json();
             })
             .then(data => {
-                // Token 有效，顯示頁面內容
+                // Token 有效，显示页面内容
                 document.body.style.display = 'block';
             })
             .catch(error => {
-                // Token 無效，重定向到登錄頁面
+                // Token 无效，重定向到登录页面
                 localStorage.removeItem('authToken');
                 window.location.href = '/';
             });
@@ -163,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         section.style.display = 'none';
     });
 });
+
 
 
 function loadSection(sectionId) {
