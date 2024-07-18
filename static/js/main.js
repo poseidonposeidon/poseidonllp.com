@@ -166,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 
+
 function loadSection(sectionId) {
     const sections = {
         'income-statement': `
