@@ -140,8 +140,8 @@ function toggleSection(event, sectionId) {
         document.body.classList.add('modal-open');
         blurElements.forEach(el => el.classList.add('blur-background'));
 
-        // Check if the section requires page scrolling
-        if (['#incomeStatementContainer', '#balanceSheetContainer', '#cashflowContainer', '#earningsCallTranscriptContainer', '#insiderTradesContainer', '#ai_box'].includes(sectionId)) {
+        // 检查是否需要启用页面滚动
+        if (['#income-statement', '#balance-sheet', '#cashflow-statement', '#earnings-call-transcript', '#insider-trades', '#ai_box'].includes(sectionId)) {
             document.body.style.overflow = 'auto';
         } else {
             document.body.style.overflow = 'hidden';
@@ -283,8 +283,6 @@ function loadSection(sectionId) {
     const sectionContainer = document.getElementById('section-container');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
-
-
 
 //////////////////////////////Profile//////////////////////////////////////////////
 function fetchCompanyProfile(stockSymbol) {
