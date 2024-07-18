@@ -411,7 +411,7 @@ button:not(.info-input button):hover {
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 30px; /* 调整 logo 之间的间距 */
+    gap: 30px; /* 調整 logo 之間的間距 */
     background-color: #121212;
     padding: 20px;
     border-radius: 10px;
@@ -425,8 +425,14 @@ button:not(.info-input button):hover {
 }
 
 .logo-container-new img {
-    max-height: 100px; /* 调整 logo 的高度 */
+    max-height: 100px; /* 調整 logo 的高度 */
     margin: 0 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* 過渡效果 */
+}
+
+.logo-container-new img:hover {
+    transform: scale(1.1); /* 放大效果 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 陰影效果 */
 }
 
 #trend_notification_app {
