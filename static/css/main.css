@@ -18,12 +18,18 @@ body.modal-open {
 }
 
 .info-section, .ai-box-section {
-    position: relative;
+    position: fixed;
+    top: 50px;
+    bottom: 50px;
+    left: 0;
+    right: 0;
+    margin: auto;
     background-color: #1e1e1e;
     padding: 20px;
     z-index: 999;
-    max-height: none;
-    width: 100%;
+    max-height: calc(100% - 100px);
+    width: 80%;
+    overflow-y: auto;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
 }

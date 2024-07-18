@@ -140,12 +140,8 @@ function toggleSection(event, sectionId) {
         document.body.classList.add('modal-open');
         blurElements.forEach(el => el.classList.add('blur-background'));
 
-        // 检查是否需要启用页面滚动
-        if (['#income-statement', '#balance-sheet', '#cashflow-statement', '#earnings-call-transcript', '#insider-trades', '#ai_box'].includes(sectionId)) {
-            document.body.style.overflow = 'auto';
-        } else {
-            document.body.style.overflow = 'hidden';
-        }
+        // 确保页面本身可以滚动
+        document.body.style.overflow = 'auto';
     }
 }
 
@@ -283,6 +279,7 @@ function loadSection(sectionId) {
     const sectionContainer = document.getElementById('section-container');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
+
 
 //////////////////////////////Profile//////////////////////////////////////////////
 function fetchCompanyProfile(stockSymbol) {
