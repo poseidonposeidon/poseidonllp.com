@@ -122,7 +122,7 @@ function toggleSection(event, sectionId) {
     event.preventDefault();
     const section = document.querySelector(sectionId);
     const overlay = document.querySelector('.overlay');
-    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.info-section):not(.ai-box-section)');
+    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)');
 
     if (activeSection && activeSection === section) {
         hideSection(section);
@@ -163,7 +163,6 @@ document.addEventListener('DOMContentLoaded', () => {
         section.style.display = 'none';
     });
 });
-
 
 
 function loadSection(sectionId) {
