@@ -122,12 +122,14 @@ function toggleSection(event, sectionId) {
     event.preventDefault();
     const section = document.querySelector(sectionId);
     const overlay = document.querySelector('.overlay');
+    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.info-section):not(.ai-box-section)');
 
     if (activeSection && activeSection === section) {
         hideSection(section);
         activeSection = null;
         overlay.classList.remove('active');
         document.body.classList.remove('modal-open');
+        blurElements.forEach(el => el.classList.remove('blur-background'));
     } else {
         if (activeSection) {
             hideSection(activeSection);
@@ -136,15 +138,11 @@ function toggleSection(event, sectionId) {
         activeSection = section;
         overlay.classList.add('active');
         document.body.classList.add('modal-open');
+        blurElements.forEach(el => el.classList.add('blur-background'));
     }
 }
 
 function showSection(section) {
-    document.querySelectorAll('#info-section, #ai_box').forEach(sec => {
-        if (sec !== section) {
-            hideSection(sec);
-        }
-    });
     section.style.display = 'block';
     setTimeout(() => {
         section.classList.add('active');
@@ -165,6 +163,7 @@ document.addEventListener('DOMContentLoaded', () => {
         section.style.display = 'none';
     });
 });
+
 
 
 function loadSection(sectionId) {
