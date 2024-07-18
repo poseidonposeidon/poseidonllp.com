@@ -121,16 +121,21 @@ function toggleFixed(event, element) {
 function toggleSection(event, sectionId) {
     event.preventDefault();
     const section = document.querySelector(sectionId);
+    const overlay = document.querySelector('.overlay');
 
     if (activeSection && activeSection === section) {
         hideSection(section);
         activeSection = null;
+        overlay.classList.remove('active');
+        document.body.classList.remove('modal-open');
     } else {
         if (activeSection) {
             hideSection(activeSection);
         }
         showSection(section);
         activeSection = section;
+        overlay.classList.add('active');
+        document.body.classList.add('modal-open');
     }
 }
 
@@ -160,6 +165,7 @@ document.addEventListener('DOMContentLoaded', () => {
         section.style.display = 'none';
     });
 });
+
 
 function loadSection(sectionId) {
     const sections = {
