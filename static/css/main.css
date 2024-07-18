@@ -21,9 +21,8 @@ body.modal-open {
     position: fixed;
     top: 50px;
     bottom: 50px;
-    left: 0;
-    right: 0;
-    margin: auto;
+    left: 50%;
+    transform: translateX(-50%);
     background-color: #1e1e1e;
     padding: 20px;
     z-index: 999;
@@ -142,7 +141,6 @@ div {
     transform: scale(1.009);
 }
 
-/* 设置过渡动画效果 */
 .info-section, .ai-box-section {
     max-height: none;
     overflow: visible;
@@ -244,7 +242,6 @@ button:not(.info-input button):hover {
     color: white;
 }
 
-/* 修改链接颜色 */
 #companyProfileContainer a {
     color: #90caf9;
 }
@@ -319,7 +316,6 @@ button:not(.info-input button):hover {
     color: black;
 }
 
-/* Media Queries */
 @media (min-width: 768px) {
     .info-column {
         width: 30%;
@@ -339,7 +335,6 @@ button:not(.info-input button):hover {
     }
 }
 
-/* 修改 ai-box-section 的设置以适应较小屏幕 */
 .ai-box-section {
     max-height: none;
     overflow: visible;

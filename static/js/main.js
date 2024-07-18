@@ -281,6 +281,7 @@ function loadSection(sectionId) {
 }
 
 
+
 //////////////////////////////Profile//////////////////////////////////////////////
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
