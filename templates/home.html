@@ -16,6 +16,7 @@
     </a>
     <div class="navbar-links">
         <a href="#info-section" onclick="toggleSection(event, '#info-section')">U.S Stock</a>
+        <a href="#info-section" onclick="toggleSection(event, '#info-section')">J.P Stock</a>
         <a href="#ai_box" onclick="toggleSection(event, '#ai_box')">AI Research</a>
         <a href="../index.html">Home</a>
     </div>
@@ -50,6 +51,42 @@
         <!-- Dynamic content loading -->
     </div>
 </div>
+
+
+<!-- 新增的日本股票 section -->
+<div id="info-section-jp" class="info-section" style="display: none;">
+    <div class="info-input">
+        <input type="text" id="stockSymbolJP" placeholder="Input J.P Stock" pattern="[0-9]*\.T">
+        <button onclick="fetchStockJP()">
+            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
+        </button>
+    </div>
+    <p id="outputSymbolJP" data-last-symbol="">Current query : </p>
+    <div id="companyProfileContainerJP"></div>
+    <div class="info-content">
+        <div class="info-column">
+            <a href="#" onclick="loadSection('income-statement-jp')">Income Statement</a>
+            <a href="#" onclick="loadSection('balance-sheet-jp')">Balance Sheet</a>
+            <a href="#" onclick="loadSection('cashflow-statement-jp')">Cash Flow Statement</a>
+        </div>
+        <div class="info-column">
+            <a href="#" onclick="loadSection('earnings-call-transcript-jp')">Earnings Call Transcript</a>
+            <a href="#" onclick="loadSection('earnings-call-calendar-jp')">Earnings Call Calendar</a>
+            <a href="#" onclick="loadSection('historical-earnings-jp')">Historical and Future Earnings</a>
+        </div>
+        <div class="info-column">
+            <a href="#" onclick="loadSection('dividend-calendar-jp')">Dividend Calendar</a>
+            <a href="#" onclick="loadSection('insider-trades-jp')">Insider Trades</a>
+        </div>
+    </div>
+    <div id="section-container-jp" class="section-container">
+        <!-- Dynamic content loading -->
+    </div>
+</div>
+
+
+
+
 
 <div id="ai_box" class="ai-box-section" style="display: none;">
     <div class="section" id="audio-transcription" onmouseover="expandSection(this)">

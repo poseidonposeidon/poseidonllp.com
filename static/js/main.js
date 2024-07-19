@@ -85,6 +85,57 @@ function fetchStock() {
     return stockSymbol;
 }
 
+function fetchStockJP() {
+    const stockSymbol = document.getElementById('stockSymbolJP').value.trim().toUpperCase();
+    const previousSymbol = document.getElementById('outputSymbolJP').getAttribute('data-last-symbol');
+
+    // 確認日股代號格式是否正確，例如 "7203.T"
+    const jpStockPattern = /^[0-9]+\.T$/;
+    if (!jpStockPattern.test(stockSymbol)) {
+        alert('Please enter a valid J.P Stock symbol (e.g., 7203.T)');
+        return;
+    }
+
+    if (stockSymbol !== previousSymbol) {
+        document.getElementById('outputSymbolJP').innerText = 'Current query: ' + stockSymbol;
+        document.getElementById('outputSymbolJP').setAttribute('data-last-symbol', stockSymbol);
+
+        // 清空先前的公司資料
+        const companyProfileContainer = document.getElementById('companyProfileContainer');
+        if (companyProfileContainer) {
+            companyProfileContainer.innerHTML = '';
+        }
+
+        const containers = [
+            'incomeStatementContainer',
+            'balanceSheetContainer',
+            'cashflowContainer',
+            'earningsCallTranscriptContainer',
+            'earningsCallCalendarContainer',
+            'historicalEarningsContainer',
+            'stockDividendCalendarContainer',
+            'insiderTradesContainer'
+        ];
+
+        containers.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '';
+            }
+        });
+
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.classList.remove('fixed');
+            collapseSection(section);
+        });
+    }
+
+    fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
+    return stockSymbol;
+}
+
+
 function expandSection(element) {
     const content = element.querySelector('.content');
     if (!element.classList.contains('fixed')) {
