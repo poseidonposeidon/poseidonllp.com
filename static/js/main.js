@@ -166,7 +166,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-
 function loadSection(sectionId) {
     const sections = {
         'income-statement': `
@@ -277,6 +276,52 @@ function loadSection(sectionId) {
     };
 
     const sectionContainer = document.getElementById('section-container');
+    sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+}
+
+function loadAIBoxSection(sectionId) {
+    const sections = {
+        'audio-transcription': `
+            <div class="section" id="audio-transcription" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Audio Transcription</h2>
+                <div class="content">
+                    <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
+                    <div class="inline-container">
+                        <input type="file" id="audioFile" accept="audio/*">
+                        <button onclick="uploadToFTP()">Upload Audio File</button>
+                        <select id="ftpFileSelect">
+                            <option value="" disabled selected>Select a file to transcribe</option>
+                        </select>
+                        <button onclick="transcribeFromFTP()">Transcribe</button>
+                        <select id="textFileSelect">
+                            <option value="" disabled selected>Select a text file</option>
+                        </select>
+                        <button onclick="downloadTextFile()">Download Text File</button>
+                    </div>
+                    <div id="upload-progress-container" style="display: none;">
+                        <div id="upload-progress-bar"></div>
+                    </div>
+                    <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">Uploading file...</p>
+                    <div id="transcription-progress-container" style="display: none; text-align: center;">
+                        <div>
+                            <div class="loader"></div>
+                            <p id="transcription-status">Transcribing...</p>
+                        </div>
+                    </div>
+                    <div class="scroll-container" id="transcriptionResult">
+                        <!-- Transcription results will be displayed here -->
+                    </div>
+                    <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">Read More</button>
+                    <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
+                    <div id="alert-box" style="display: none;" class="alert">
+                        <span id="alert-message"></span>
+                        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                    </div>
+                </div>
+            </div>`
+    };
+
+    const sectionContainer = document.getElementById('aiBoxSectionContainer');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
 

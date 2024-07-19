@@ -52,42 +52,14 @@
 </div>
 
 <div id="ai_box" class="ai-box-section" style="display: none;">
-    <div class="section" id="audio-transcription" onmouseover="expandSection(this)">
-        <h2>Audio Transcription</h2>
-        <div class="content">
-            <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
-            <div class="inline-container">
-                <input type="file" id="audioFile" accept="audio/*">
-                <button onclick="uploadToFTP()">Upload Audio File</button>
-                <select id="ftpFileSelect">
-                    <option value="" disabled selected>Select a file to transcribe</option>
-                </select>
-                <button onclick="transcribeFromFTP()">Transcribe</button>
-                <select id="textFileSelect">
-                    <option value="" disabled selected>Select a text file</option>
-                </select>
-                <button onclick="downloadTextFile()">Download Text File</button>
-            </div>
-            <div id="upload-progress-container" style="display: none;">
-                <div id="upload-progress-bar"></div>
-            </div>
-            <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">Uploading file...</p>
-            <div id="transcription-progress-container" style="display: none; text-align: center;">
-                <div>
-                    <div class="loader"></div>
-                    <p id="transcription-status">Transcribing...</p>
-                </div>
-            </div>
-            <div class="scroll-container" id="transcriptionResult">
-                <!-- Transcription results will be displayed here -->
-            </div>
-            <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">Read More</button>
-            <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
-            <div id="alert-box" style="display: none;" class="alert">
-                <span id="alert-message"></span>
-                <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
-            </div>
+    <div class="info-section">
+        <div class="info-column">
+            <a href="https://chatgpt.com/">Chat GPT</a>
+            <a href="#" onclick="loadAIBoxSection('audio-transcription')">Audio Transcription</a>
         </div>
+    </div>
+    <div id="aiBoxSectionContainer" class="section-container">
+        <!-- Dynamic content loading -->
     </div>
 </div>
 
