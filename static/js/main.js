@@ -810,16 +810,34 @@ function fetchEarningsCallTranscript() {
     fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainer');
 }
 
+function splitTranscriptIntoParagraphs(content) {
+    // 使用正則表達式檢測常見的講者名稱或段落開頭
+    const regex = /(Operator:|[A-Z][a-z]+ [A-Z][a-z]+:)/g;
+    let parts = content.split(regex);
+
+    // 組裝段落
+    let paragraphs = [];
+    for (let i = 1; i < parts.length; i += 2) {
+        paragraphs.push(`<p><strong>${parts[i]}</strong> ${parts[i + 1] ? parts[i + 1] : ''}</p>`);
+    }
+    return paragraphs;
+}
+
 function displayEarningsCallTranscript(transcript, container) {
     if (!transcript || !transcript.content) {
         container.innerHTML = '<p>資料不可用。</p>';
         return;
     }
 
-    let htmlContent = `<p id="transcriptPreview">${transcript.content.slice(0, 1000)}...</p>`;
-    htmlContent += `<p id="fullTranscript" style="display:none; white-space: normal;">${transcript.content}</p>`;
+    // 將逐字稿內容分段
+    let paragraphs = splitTranscriptIntoParagraphs(transcript.content);
+
+    // 組裝HTML內容
+    let htmlContent = `<div id="transcriptPreview">${paragraphs.slice(0, 3).join('')}...</div>`;
+    htmlContent += `<div id="fullTranscript" style="display:none; white-space: normal;">${paragraphs.join('')}</div>`;
     htmlContent += '<button id="expandButton" onclick="expandTranscript(event)">Read More</button>';
     htmlContent += '<button id="collapseButton" style="display: none;" onclick="collapseTranscript(event)">Read Less</button>';
+    htmlContent += '<button id="copyButton" onclick="copyTranscript()">Copy</button>';
     container.innerHTML = htmlContent;
 }
 
@@ -841,6 +859,17 @@ function collapseTranscript(event) {
     document.getElementById('fullTranscript').style.display = 'none';
     document.getElementById('expandButton').style.display = 'inline';
     document.getElementById('collapseButton').style.display = 'none';
+}
+
+function copyTranscript() {
+    const fullTranscript = document.getElementById('fullTranscript').innerText;
+    const textArea = document.createElement('textarea');
+    textArea.value = fullTranscript;
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    alert('Transcript copied to clipboard!');
 }
 
 function fetchData_Transcript(apiUrl, callback, containerId) {
