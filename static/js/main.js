@@ -281,6 +281,13 @@ function loadSection(sectionId) {
 
 function loadAIBoxSection(sectionId) {
     const sections = {
+        'chat-gpt': `
+            <div class="section" id="chat-gpt" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Chat GPT</h2>
+                <div class="content">
+                    <p>Chat GPT功能描述...</p>
+                </div>
+            </div>`,
         'audio-transcription': `
             <div class="section" id="audio-transcription" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Audio Transcription</h2>
