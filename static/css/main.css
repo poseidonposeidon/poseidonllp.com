@@ -415,3 +415,11 @@ button:not(.info-input button):hover {
 #trend_notification_app {
     display: none;
 }
+
+.transcript-button {
+    margin-right: 10px; /* 每個按鈕之間增加間距 */
+}
+
+.transcript-button:last-child {
+    margin-right: 0; /* 最後一個按鈕不需要右側間距 */
+}

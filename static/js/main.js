@@ -835,9 +835,9 @@ function displayEarningsCallTranscript(transcript, container) {
     // 組裝HTML內容
     let htmlContent = `<div id="transcriptPreview">${paragraphs.slice(0, 3).join('')}...</div>`;
     htmlContent += `<div id="fullTranscript" style="display:none; white-space: normal;">${paragraphs.join('')}</div>`;
-    htmlContent += '<button id="expandButton" onclick="expandTranscript(event)">Read More</button>';
-    htmlContent += '<button id="collapseButton" style="display: none;" onclick="collapseTranscript(event)">Read Less</button>';
-    htmlContent += '<button id="copyButton" onclick="copyTranscript()">Copy</button>';
+    htmlContent += '<button id="expandButton" class="transcript-button" onclick="expandTranscript(event)">Read More</button>';
+    htmlContent += '<button id="collapseButton" class="transcript-button" style="display: none;" onclick="collapseTranscript(event)">Read Less</button>';
+    htmlContent += '<button id="copyButton" class="transcript-button" onclick="copyTranscript()">Copy</button>';
     container.innerHTML = htmlContent;
 }
 
@@ -889,6 +889,7 @@ function fetchData_Transcript(apiUrl, callback, containerId) {
             container.innerHTML = '<p>數據加載錯誤。請檢查控制台了解更多詳情。</p>';
         });
 }
+
 
 //////////////法說會日曆 Earnings Call Calendar/////////////////
 
