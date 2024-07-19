@@ -1,4 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////
 let activeSection = null;
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -42,29 +43,39 @@ document.getElementById("stockSymbol").addEventListener("keypress", function(eve
     }
 });
 
-function fetchStock() {
-    const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
-    const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
+function fetchStock(country) {
+    const stockSymbolInput = document.getElementById(`stockSymbol${country}`).value.trim().toUpperCase();
+    const previousSymbol = document.getElementById(`outputSymbol${country}`).getAttribute('data-last-symbol');
+
+    let stockSymbol = stockSymbolInput;
+    if (country === 'JP') {
+        const jpStockPattern = /^[0-9]{4}$/;
+        if (!jpStockPattern.test(stockSymbol)) {
+            alert('Please enter a valid J.P Stock symbol (e.g., 7203)');
+            return;
+        }
+        stockSymbol = stockSymbol + '.T';
+    }
 
     if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbol').innerText = 'Current query: ' + stockSymbol;
-        document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
+        document.getElementById(`outputSymbol${country}`).innerText = 'Current query: ' + stockSymbol;
+        document.getElementById(`outputSymbol${country}`).setAttribute('data-last-symbol', stockSymbol);
 
-        // Clear previous company data
-        const companyProfileContainer = document.getElementById('companyProfileContainer');
+        // 清空先前的公司資料
+        const companyProfileContainer = document.getElementById(`companyProfileContainer${country}`);
         if (companyProfileContainer) {
             companyProfileContainer.innerHTML = '';
         }
 
         const containers = [
-            'incomeStatementContainer',
-            'balanceSheetContainer',
-            'cashflowContainer',
-            'earningsCallTranscriptContainer',
-            'earningsCallCalendarContainer',
-            'historicalEarningsContainer',
-            'stockDividendCalendarContainer',
-            'insiderTradesContainer'
+            `incomeStatementContainer${country}`,
+            `balanceSheetContainer${country}`,
+            `cashflowContainer${country}`,
+            `earningsCallTranscriptContainer${country}`,
+            `earningsCallCalendarContainer${country}`,
+            `historicalEarningsContainer${country}`,
+            `stockDividendCalendarContainer${country}`,
+            `insiderTradesContainer${country}`
         ];
 
         containers.forEach(containerId => {
@@ -74,68 +85,14 @@ function fetchStock() {
             }
         });
 
-        const sections = document.querySelectorAll('.section');
+        const sections = document.querySelectorAll(`.section${country}`);
         sections.forEach(section => {
             section.classList.remove('fixed');
             collapseSection(section);
         });
     }
 
-    fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
-    return stockSymbol;
-}
-
-function fetchStockJP() {
-    let stockSymbol = document.getElementById('stockSymbolJP').value.trim();
-    const previousSymbol = document.getElementById('outputSymbolJP').getAttribute('data-last-symbol');
-
-    // 确认日股代号格式是否正确，例如 "7203"
-    const jpStockPattern = /^[0-9]{4}$/;
-    if (!jpStockPattern.test(stockSymbol)) {
-        alert('Please enter a valid J.P Stock symbol (e.g., 7203)');
-        return;
-    }
-
-    // 自动添加 ".T"
-    stockSymbol = stockSymbol.toUpperCase() + '.T';
-
-    if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbolJP').innerText = 'Current query: ' + stockSymbol;
-        document.getElementById('outputSymbolJP').setAttribute('data-last-symbol', stockSymbol);
-
-        // 清空先前的公司资料
-        const companyProfileContainerJP = document.getElementById('companyProfileContainerJP');
-        if (companyProfileContainerJP) {
-            companyProfileContainerJP.innerHTML = '';
-        }
-
-        const containers = [
-            'incomeStatementContainerJP',
-            'balanceSheetContainerJP',
-            'cashflowContainerJP',
-            'earningsCallTranscriptContainerJP',
-            'earningsCallCalendarContainerJP',
-            'historicalEarningsContainerJP',
-            'stockDividendCalendarContainerJP',
-            'insiderTradesContainerJP'
-        ];
-
-        containers.forEach(containerId => {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.innerHTML = '';
-            }
-        });
-
-        const sections = document.querySelectorAll('.section');
-        sections.forEach(section => {
-            section.classList.remove('fixed');
-            collapseSection(section);
-        });
-    }
-
-    // 这里直接调用 fetchIncomeStatement，并传递修改后的 stockSymbol
-    fetchIncomeStatement(stockSymbol, 'jp');
+    fetchCompanyProfile(stockSymbol, country);  // 傳遞 stockSymbol 和 country 給 fetchCompanyProfile
     return stockSymbol;
 }
 
@@ -220,242 +177,127 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-function loadSection(sectionId) {
+function loadSection(sectionId, country) {
     const sections = {
         'income-statement': `
-            <div class="section" id="income-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section${country}" id="income-statement${country}" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Income Statement</h2>
                 <div class="content scroll-container-x">
-                    <label for="period">Select Period:</label>
-                    <select id="period">
+                    <label for="period${country}">Select Period:</label>
+                    <select id="period${country}">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
-                    <button onclick="fetchIncomeStatement()">Load Statement</button>
+                    <button onclick="fetchIncomeStatement('${country}')">Load Statement</button>
                     <div class="scroll-container-x">
-                        <table id="IncomeStatementTable" border="1">
-                            <div id="incomeStatementContainer"></div>
+                        <table id="IncomeStatementTable${country}" border="1">
+                            <div id="incomeStatementContainer${country}"></div>
                         </table>
                     </div>
                 </div>
             </div>`,
         'balance-sheet': `
-            <div class="section" id="balance-sheet" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section${country}" id="balance-sheet${country}" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Balance Sheet Statements</h2>
                 <div class="content scroll-container-x">
-                    <label for="period_2">Select Period:</label>
-                    <select id="period_2">
+                    <label for="period_2${country}">Select Period:</label>
+                    <select id="period_2${country}">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
-                    <button onclick="fetchBalanceSheet()">Load Statement</button>
-                    <div id="balanceSheetContainer"></div>
+                    <button onclick="fetchBalanceSheet('${country}')">Load Statement</button>
+                    <div id="balanceSheetContainer${country}"></div>
                 </div>
             </div>`,
         'cashflow-statement': `
-            <div class="section" id="cashflow-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section${country}" id="cashflow-statement${country}" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Cashflow Sheet Statements</h2>
                 <div class="content scroll-container-x">
-                    <label for="period_3">Select Period:</label>
-                    <select id="period_3">
+                    <label for="period_3${country}">Select Period:</label>
+                    <select id="period_3${country}">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
-                    <button onclick="fetchCashflow()">Load Statement</button>
+                    <button onclick="fetchCashflow('${country}')">Load Statement</button>
                     <div class="scroll-container-x">
-                        <table id="cashflowTable" border="1">
-                            <div id="cashflowContainer"></div>
+                        <table id="cashflowTable${country}" border="1">
+                            <div id="cashflowContainer${country}"></div>
                         </table>
                     </div>
                 </div>
             </div>`,
         'earnings-call-transcript': `
-            <div class="section" id="earnings-call-transcript" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section${country}" id="earnings-call-transcript${country}" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Earnings Call Transcript</h2>
                 <div class="content">
-                    <input type="number" id="yearInput" placeholder="Enter Year">
-                    <input type="number" id="quarterInput" placeholder="Enter Quarter">
-                    <button onclick="fetchEarningsCallTranscript()">Load Transcript</button>
-                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainer">
+                    <input type="number" id="yearInput${country}" placeholder="Enter Year">
+                    <input type="number" id="quarterInput${country}" placeholder="Enter Quarter">
+                    <button onclick="fetchEarningsCallTranscript('${country}')">Load Transcript</button>
+                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainer${country}">
                         <!-- Transcription content will be displayed here -->
                     </div>
                 </div>
             </div>`,
         'earnings-call-calendar': `
-            <div class="section" id="earnings-call-calendar" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section${country}" id="earnings-call-calendar${country}" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Earnings Call Calendar</h2>
                 <div class="content">
-                    <input type="date" id="fromDate" placeholder="From Date">
-                    <input type="date" id="toDate" placeholder="To Date">
-                    <button onclick="fetchEarningsCallCalendar()">Load Calendar</button>
+                    <input type="date" id="fromDate${country}" placeholder="From Date">
+                    <input type="date" id="toDate${country}" placeholder="To Date">
+                    <button onclick="fetchEarningsCallCalendar('${country}')">Load Calendar</button>
                     <div class="scroll-container">
-                        <div id="earningsCallCalendarContainer"></div>
+                        <div id="earningsCallCalendarContainer${country}"></div>
                     </div>
                 </div>
             </div>`,
         'historical-earnings': `
-            <div class="section" id="historical-earnings" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section${country}" id="historical-earnings${country}" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Historical and Future Earnings</h2>
                 <div class="content">
-                    <input type="date" id="fromDate_1" placeholder="From Date">
-                    <input type="date" id="toDate_1" placeholder="To Date">
-                    <button onclick="fetch_historical_earning_calendar()">Load Calendar</button>
-                    <div class="scroll-container" id="historicalEarningsContainer">
+                    <input type="date" id="fromDate_1${country}" placeholder="From Date">
+                    <input type="date" id="toDate_1${country}" placeholder="To Date">
+                    <button onclick="fetch_historical_earning_calendar('${country}')">Load Calendar</button>
+                    <div class="scroll-container" id="historicalEarningsContainer${country}">
                         <!-- Data table will be displayed here -->
                     </div>
                 </div>
             </div>`,
         'dividend-calendar': `
-            <div class="section" id="dividend-calendar" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section${country}" id="dividend-calendar${country}" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Dividend Calendar</h2>
                 <div class="content">
-                    <input type="date" id="fromDate_2" placeholder="From Date">
-                    <input type="date" id="toDate_2" placeholder="To Date">
-                    <button onclick="fetch_stock_dividend_calendar()">Load Calendar</button>
-                    <div class="scroll-container" id="stockDividendCalendarContainer">
+                    <input type="date" id="fromDate_2${country}" placeholder="From Date">
+                    <input type="date" id="toDate_2${country}" placeholder="To Date">
+                    <button onclick="fetch_stock_dividend_calendar('${country}')">Load Calendar</button>
+                    <div class="scroll-container" id="stockDividendCalendarContainer${country}">
                         <!-- Data table will be displayed here -->
                     </div>
                 </div>
             </div>`,
         'insider-trades': `
-            <div class="section" id="insider-trades" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section${country}" id="insider-trades${country}" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Insider Trades</h2>
                 <div class="content">
-                    <button onclick="fetchInsiderTrades()">Load Table</button>
-                    <div class="scroll-container-x" id="insiderTradesContainer">
+                    <button onclick="fetchInsiderTrades('${country}')">Load Table</button>
+                    <div class="scroll-container-x" id="insiderTradesContainer${country}">
                         <!-- Data table will be displayed here -->
                     </div>
                 </div>
             </div>`
     };
 
-    const sectionContainer = document.getElementById('section-container');
+    const sectionContainer = document.getElementById(`section-container${country}`);
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
 
-function loadSectionJP(sectionId) {
-    const sections = {
-        'income-statement-jp': `
-            <div class="section" id="income-statement-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-                <h2>Income Statement</h2>
-                <div class="content scroll-container-x">
-                    <label for="period-jp">Select Period:</label>
-                    <select id="period-jp">
-                        <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
-                    </select>
-                    <button onclick="fetchIncomeStatement()">Load Statement</button>
-                    <div class="scroll-container-x">
-                        <table id="IncomeStatementTableJP" border="1">
-                            <div id="incomeStatementContainerJP"></div>
-                        </table>
-                    </div>
-                </div>
-            </div>`,
-        'balance-sheet-jp': `
-            <div class="section" id="balance-sheet-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-                <h2>Balance Sheet Statements</h2>
-                <div class="content scroll-container-x">
-                    <label for="period_2-jp">Select Period:</label>
-                    <select id="period_2-jp">
-                        <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
-                    </select>
-                    <button onclick="fetchBalanceSheetJP()">Load Statement</button>
-                    <div id="balanceSheetContainerJP"></div>
-                </div>
-            </div>`,
-        'cashflow-statement-jp': `
-            <div class="section" id="cashflow-statement-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-                <h2>Cashflow Sheet Statements</h2>
-                <div class="content scroll-container-x">
-                    <label for="period_3-jp">Select Period:</label>
-                    <select id="period_3-jp">
-                        <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
-                    </select>
-                    <button onclick="fetchCashflowJP()">Load Statement</button>
-                    <div class="scroll-container-x">
-                        <table id="cashflowTableJP" border="1">
-                            <div id="cashflowContainerJP"></div>
-                        </table>
-                    </div>
-                </div>
-            </div>`,
-        'earnings-call-transcript-jp': `
-            <div class="section" id="earnings-call-transcript-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-                <h2>Earnings Call Transcript</h2>
-                <div class="content">
-                    <input type="number" id="yearInputJP" placeholder="Enter Year">
-                    <input type="number" id="quarterInputJP" placeholder="Enter Quarter">
-                    <button onclick="fetchEarningsCallTranscriptJP()">Load Transcript</button>
-                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainerJP">
-                        <!-- Transcription content will be displayed here -->
-                    </div>
-                </div>
-            </div>`,
-        'earnings-call-calendar-jp': `
-            <div class="section" id="earnings-call-calendar-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-                <h2>Earnings Call Calendar</h2>
-                <div class="content">
-                    <input type="date" id="fromDateJP" placeholder="From Date">
-                    <input type="date" id="toDateJP" placeholder="To Date">
-                    <button onclick="fetchEarningsCallCalendarJP()">Load Calendar</button>
-                    <div class="scroll-container">
-                        <div id="earningsCallCalendarContainerJP"></div>
-                    </div>
-                </div>
-            </div>`,
-        'historical-earnings-jp': `
-            <div class="section" id="historical-earnings-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-                <h2>Historical and Future Earnings</h2>
-                <div class="content">
-                    <input type="date" id="fromDate_1_jp" placeholder="From Date">
-                    <input type="date" id="toDate_1_jp" placeholder="To Date">
-                    <button onclick="fetch_historical_earning_calendarJP()">Load Calendar</button>
-                    <div class="scroll-container" id="historicalEarningsContainerJP">
-                        <!-- Data table will be displayed here -->
-                    </div>
-                </div>
-            </div>`,
-        'dividend-calendar-jp': `
-            <div class="section" id="dividend-calendar-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-                <h2>Dividend Calendar</h2>
-                <div class="content">
-                    <input type="date" id="fromDate_2_jp" placeholder="From Date">
-                    <input type="date" id="toDate_2_jp" placeholder="To Date">
-                    <button onclick="fetch_stock_dividend_calendarJP()">Load Calendar</button>
-                    <div class="scroll-container" id="stockDividendCalendarContainerJP">
-                        <!-- Data table will be displayed here -->
-                    </div>
-                </div>
-            </div>`,
-        'insider-trades-jp': `
-            <div class="section" id="insider-trades-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-                <h2>Insider Trades</h2>
-                <div class="content">
-                    <button onclick="fetchInsiderTradesJP()">Load Table</button>
-                    <div class="scroll-container-x" id="insiderTradesContainerJP">
-                        <!-- Data table will be displayed here -->
-                    </div>
-                </div>
-            </div>`
-    };
-
-    const sectionContainerJP = document.getElementById('section-container-jp');
-    sectionContainerJP.innerHTML = sections[sectionId] || '<p>Section not found</p>';
-}
-
-
-
 //////////////////////////////Profile//////////////////////////////////////////////
-function fetchCompanyProfile(stockSymbol) {
+function fetchCompanyProfile(stockSymbol, country) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
-        .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainer')))
+        .then(data => displayCompanyProfile(data, document.getElementById(`companyProfileContainer${country}`)))
         .catch(error => console.error('Error fetching data:', error));
 }
 
@@ -476,8 +318,9 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-function fetchIncomeStatement(stockSymbol, country = 'us') {
-    const period = country === 'us' ? document.getElementById('period').value : document.getElementById('period-jp').value;  // 获取选择的时段
+function fetchIncomeStatement(country) {
+    const stockSymbol = fetchStock(country);
+    const period = document.getElementById(`period${country}`).value;  // 獲取選擇的時段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -486,31 +329,7 @@ function fetchIncomeStatement(stockSymbol, country = 'us') {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    const containerId = country === 'us' ? 'incomeStatementContainer' : 'incomeStatementContainerJP';
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, containerId);
-}
-
-function fetchData_IncomeStatement(apiUrl, callback, containerId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '<p>Loading...</p>';
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            // 检查响应数据是否为 undefined 或非数组
-            if (data === undefined || !Array.isArray(data)) {
-                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
-            } else {
-                if (data.length > 0) {
-                    callback(data, container);  // 修改这里以传递整个数据数组
-                } else {
-                    container.innerHTML = '<p>No data found for this symbol.</p>';
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching data: ', error);
-            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
-        });
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, `incomeStatementContainer${country}`);
 }
 
 function displayIncomeStatement(data, container) {
@@ -622,15 +441,38 @@ function displayIncomeStatement(data, container) {
     if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
 }
 
+function fetchData_IncomeStatement(apiUrl, callback, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '<p>Loading...</p>';
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            // 檢查回應資料是否為 undefined 或非陣列
+            if (data === undefined || !Array.isArray(data)) {
+                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
+            } else {
+                if (data.length > 0) {
+                    callback(data, container);  // 修改這裡以傳遞整個數據陣列
+                } else {
+                    container.innerHTML = '<p>No data found for this symbol.</p>';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data: ', error);
+            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
+        });
+}
+
 function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
-//////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
-function fetchBalanceSheet() {
-    stockSymbol = fetchStock();
-    const period = document.getElementById('period_2').value;
+//////////////////////////////////////////////////資產負債表 Balance Sheet Statements////////////////////////////////
+function fetchBalanceSheet(country) {
+    const stockSymbol = fetchStock(country);
+    const period = document.getElementById(`period_2${country}`).value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -639,7 +481,7 @@ function fetchBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainer');
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, `balanceSheetContainer${country}`);
 }
 
 function displayBalanceSheet(data, container) {
@@ -803,11 +645,10 @@ function formatNumber(value) {
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
-
-///////////////////////////////////現金流表Cashflow///////////////
-function fetchCashflow() {
-    const stockSymbol = fetchStock();
-    const period = document.getElementById('period_3').value;  // 獲取選擇的時段
+///////////////////////////////////現金流表 Cashflow ///////////////
+function fetchCashflow(country) {
+    const stockSymbol = fetchStock(country);
+    const period = document.getElementById(`period_3${country}`).value;  // 獲取選擇的時段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -816,7 +657,7 @@ function fetchCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainer');
+    fetchData_Cashflow(apiUrl, displayCashflow, `cashflowContainer${country}`);
 }
 
 function displayCashflow(data, container) {
@@ -960,13 +801,11 @@ function formatNumber(value) {
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
-
-
 //////////////法說會逐字稿 Earnings Call Transcript/////////////////
-function fetchEarningsCallTranscript() {
-    var stockSymbol = fetchStock();
-    const year = document.getElementById('yearInput').value;
-    const quarter = document.getElementById('quarterInput').value;
+function fetchEarningsCallTranscript(country) {
+    const stockSymbol = fetchStock(country);
+    const year = document.getElementById(`yearInput${country}`).value;
+    const quarter = document.getElementById(`quarterInput${country}`).value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (stockSymbol.length === 0 || year.length === 0 || quarter.length === 0) {
@@ -975,7 +814,7 @@ function fetchEarningsCallTranscript() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/earning_call_transcript/${stockSymbol}?year=${year}&quarter=${quarter}&apikey=${apiKey}`;
-    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainer');
+    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, `earningsCallTranscriptContainer${country}`);
 }
 
 function splitTranscriptIntoParagraphs(content) {
@@ -1060,19 +899,17 @@ function fetchData_Transcript(apiUrl, callback, containerId) {
 
 
 //////////////法說會日曆 Earnings Call Calendar/////////////////
-
-
-function fetchEarningsCallCalendar() {
-    const fromDate = document.getElementById('fromDate').value;
-    const toDate = document.getElementById('toDate').value;
-    stockSymbol = fetchStock();
+function fetchEarningsCallCalendar(country) {
+    const fromDate = document.getElementById(`fromDate${country}`).value;
+    const toDate = document.getElementById(`toDate${country}`).value;
+    const stockSymbol = fetchStock(country);
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     if (!fromDate || !toDate) {
         alert('Please enter both from and to dates.');
         return;
     }
     const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
-    fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainer', stockSymbol), 'earningsCallCalendarContainer');
+    fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, `earningsCallCalendarContainer${country}`, stockSymbol), `earningsCallCalendarContainer${country}`);
 }
 
 function displayEarningsCallCalendar(data, containerId, stockSymbol) {
@@ -1138,10 +975,10 @@ function fetchData_2(apiUrl, callback, containerId) {
             container.innerHTML = `<p>Error loading data: ${error.message}. Please check the console for more details.</p>`;
         });
 }
-//////////////歷史獲利和未來獲利 Historical and Future Earnings/////////////////
 
-function fetch_historical_earning_calendar() {
-    stockSymbol = fetchStock();
+//////////////歷史獲利和未來獲利 Historical and Future Earnings/////////////////
+function fetch_historical_earning_calendar(country) {
+    const stockSymbol = fetchStock(country);
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 你的 API 密鑰
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -1149,7 +986,7 @@ function fetch_historical_earning_calendar() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?apikey=${apiKey}`;
-    fetchData_historical_earning_calendar(apiUrl, display_historical_earning_calendar, 'historicalEarningsContainer');
+    fetchData_historical_earning_calendar(apiUrl, display_historical_earning_calendar, `historicalEarningsContainer${country}`);
 }
 
 function display_historical_earning_calendar(data, container) {
@@ -1212,7 +1049,6 @@ function display_historical_earning_calendar(data, container) {
         });
         htmlContent += '</tr>';
     });
-    htmlContent += '</table>';
     container.innerHTML = htmlContent;
 }
 
@@ -1234,10 +1070,10 @@ function fetchData_historical_earning_calendar(apiUrl, callback, containerId) {
         });
 }
 
-//////////////股利發放日期/////////////////
-function fetch_stock_dividend_calendar() {
-    const fromDate = document.getElementById('fromDate_2').value;
-    const toDate = document.getElementById('toDate_2').value;
+//////////////股利發放日期 Dividend Calendar /////////////////
+function fetch_stock_dividend_calendar(country) {
+    const fromDate = document.getElementById(`fromDate_2${country}`).value;
+    const toDate = document.getElementById(`toDate_2${country}`).value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 请替换成您的 API 密钥
 
     if (!fromDate || !toDate) {
@@ -1246,11 +1082,11 @@ function fetch_stock_dividend_calendar() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
-    fetchData(apiUrl, display_stock_dividend_calendar, 'stockDividendCalendarContainer');
+    fetchData(apiUrl, display_stock_dividend_calendar, `stockDividendCalendarContainer${country}`);
 }
 
 function display_stock_dividend_calendar(data, container) {
-    stockSymbol = fetchStock();
+    const stockSymbol = fetchStock(country);
     if (!data || data.length === 0) {
         container.innerHTML = '<p>No data available for the selected dates.</p>';
         return;
@@ -1319,10 +1155,10 @@ function fetchData(apiUrl, callback, containerId) {
         });
 }
 
-//////////////內部人交易/////////////////
-function fetchInsiderTrades() {
+//////////////內部人交易 Insider Trades /////////////////
+function fetchInsiderTrades(country) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 替換為你的 API 密鑰
-    stockSymbol = fetchStock();
+    const stockSymbol = fetchStock(country);
     const apiUrl = `https://financialmodelingprep.com/api/v4/insider-trading?symbol=${stockSymbol}&page=0&apikey=${apiKey}`;
 
     fetch(apiUrl)
@@ -1333,12 +1169,12 @@ function fetchInsiderTrades() {
             return response.json();
         })
         .then(data => {
-            const container = document.getElementById('insiderTradesContainer');
+            const container = document.getElementById(`insiderTradesContainer${country}`);
             displayInsiderTrades(data, container);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
-            const container = document.getElementById('insiderTradesContainer');
+            const container = document.getElementById(`insiderTradesContainer${country}`);
             container.innerHTML = '<tr><td colspan="11">Error loading data. Please check the console for more details.</td></tr>';
         });
 }
