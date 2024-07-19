@@ -134,7 +134,8 @@ function fetchStockJP() {
         });
     }
 
-    fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
+    // 這裡直接調用 fetchIncomeStatement，並傳遞修改後的 stockSymbol
+    fetchIncomeStatement(stockSymbol, 'jp');
     return stockSymbol;
 }
 
@@ -475,9 +476,8 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-function fetchIncomeStatement() {
-    stockSymbol = fetchStock();
-    const period = document.getElementById('period').value;  // 獲取選擇的時段
+function fetchIncomeStatement(stockSymbol, country = 'us') {
+    const period = country === 'us' ? document.getElementById('period').value : document.getElementById('period-jp').value;  // 獲取選擇的時段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -486,7 +486,8 @@ function fetchIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer');
+    const containerId = country === 'us' ? 'incomeStatementContainer' : 'incomeStatementContainerJP';
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, containerId);
 }
 
 function displayIncomeStatement(data, container) {
