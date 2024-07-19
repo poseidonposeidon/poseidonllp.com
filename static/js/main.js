@@ -86,7 +86,7 @@ function fetchStock() {
 }
 
 function fetchStockJP() {
-    let stockSymbol = document.getElementById('stockSymbolJP').value.trim().toUpperCase();
+    let stockSymbol = document.getElementById('stockSymbolJP').value.trim();
     const previousSymbol = document.getElementById('outputSymbolJP').getAttribute('data-last-symbol');
 
     // 確認日股代號格式是否正確，例如 "7203"
@@ -97,7 +97,7 @@ function fetchStockJP() {
     }
 
     // 自動添加 ".T"
-    stockSymbol += '.T';
+    stockSymbol = stockSymbol.toUpperCase() + '.T';
 
     if (stockSymbol !== previousSymbol) {
         document.getElementById('outputSymbolJP').innerText = 'Current query: ' + stockSymbol;
@@ -137,7 +137,6 @@ function fetchStockJP() {
     fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
     return stockSymbol;
 }
-
 
 function expandSection(element) {
     const content = element.querySelector('.content');
@@ -215,7 +214,7 @@ function hideSection(section) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box').forEach(section => {
+    document.querySelectorAll('#info-section, #info-section-jp, #ai_box').forEach(section => {
         section.style.display = 'none';
     });
 });
@@ -445,6 +444,7 @@ function loadSectionJP(sectionId) {
     const sectionContainerJP = document.getElementById('section-container-jp');
     sectionContainerJP.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
+
 
 
 //////////////////////////////Profile//////////////////////////////////////////////
