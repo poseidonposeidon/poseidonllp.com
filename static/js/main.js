@@ -340,7 +340,7 @@ function loadSectionJP(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
-                    <button onclick="fetchIncomeStatementJP()">Load Statement</button>
+                    <button onclick="fetchIncomeStatement()">Load Statement</button>
                     <div class="scroll-container-x">
                         <table id="IncomeStatementTableJP" border="1">
                             <div id="incomeStatementContainerJP"></div>
