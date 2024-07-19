@@ -101,20 +101,20 @@ function fetchStockJP() {
         document.getElementById('outputSymbolJP').setAttribute('data-last-symbol', stockSymbol);
 
         // 清空先前的公司資料
-        const companyProfileContainer = document.getElementById('companyProfileContainer');
-        if (companyProfileContainer) {
-            companyProfileContainer.innerHTML = '';
+        const companyProfileContainerJP = document.getElementById('companyProfileContainerJP');
+        if (companyProfileContainerJP) {
+            companyProfileContainerJP.innerHTML = '';
         }
 
         const containers = [
-            'incomeStatementContainer',
-            'balanceSheetContainer',
-            'cashflowContainer',
-            'earningsCallTranscriptContainer',
-            'earningsCallCalendarContainer',
-            'historicalEarningsContainer',
-            'stockDividendCalendarContainer',
-            'insiderTradesContainer'
+            'incomeStatementContainerJP',
+            'balanceSheetContainerJP',
+            'cashflowContainerJP',
+            'earningsCallTranscriptContainerJP',
+            'earningsCallCalendarContainerJP',
+            'historicalEarningsContainerJP',
+            'stockDividendCalendarContainerJP',
+            'insiderTradesContainerJP'
         ];
 
         containers.forEach(containerId => {
@@ -134,7 +134,6 @@ function fetchStockJP() {
     fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
     return stockSymbol;
 }
-
 
 function expandSection(element) {
     const content = element.querySelector('.content');
@@ -216,7 +215,6 @@ document.addEventListener('DOMContentLoaded', () => {
         section.style.display = 'none';
     });
 });
-
 
 function loadSection(sectionId) {
     const sections = {
@@ -330,6 +328,120 @@ function loadSection(sectionId) {
     const sectionContainer = document.getElementById('section-container');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
+
+function loadSectionJP(sectionId) {
+    const sections = {
+        'income-statement-jp': `
+            <div class="section" id="income-statement-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Income Statement</h2>
+                <div class="content scroll-container-x">
+                    <label for="period-jp">Select Period:</label>
+                    <select id="period-jp">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchIncomeStatementJP()">Load Statement</button>
+                    <div class="scroll-container-x">
+                        <table id="IncomeStatementTableJP" border="1">
+                            <div id="incomeStatementContainerJP"></div>
+                        </table>
+                    </div>
+                </div>
+            </div>`,
+        'balance-sheet-jp': `
+            <div class="section" id="balance-sheet-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Balance Sheet Statements</h2>
+                <div class="content scroll-container-x">
+                    <label for="period_2-jp">Select Period:</label>
+                    <select id="period_2-jp">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchBalanceSheetJP()">Load Statement</button>
+                    <div id="balanceSheetContainerJP"></div>
+                </div>
+            </div>`,
+        'cashflow-statement-jp': `
+            <div class="section" id="cashflow-statement-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Cashflow Sheet Statements</h2>
+                <div class="content scroll-container-x">
+                    <label for="period_3-jp">Select Period:</label>
+                    <select id="period_3-jp">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchCashflowJP()">Load Statement</button>
+                    <div class="scroll-container-x">
+                        <table id="cashflowTableJP" border="1">
+                            <div id="cashflowContainerJP"></div>
+                        </table>
+                    </div>
+                </div>
+            </div>`,
+        'earnings-call-transcript-jp': `
+            <div class="section" id="earnings-call-transcript-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Earnings Call Transcript</h2>
+                <div class="content">
+                    <input type="number" id="yearInputJP" placeholder="Enter Year">
+                    <input type="number" id="quarterInputJP" placeholder="Enter Quarter">
+                    <button onclick="fetchEarningsCallTranscriptJP()">Load Transcript</button>
+                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainerJP">
+                        <!-- Transcription content will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'earnings-call-calendar-jp': `
+            <div class="section" id="earnings-call-calendar-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Earnings Call Calendar</h2>
+                <div class="content">
+                    <input type="date" id="fromDateJP" placeholder="From Date">
+                    <input type="date" id="toDateJP" placeholder="To Date">
+                    <button onclick="fetchEarningsCallCalendarJP()">Load Calendar</button>
+                    <div class="scroll-container">
+                        <div id="earningsCallCalendarContainerJP"></div>
+                    </div>
+                </div>
+            </div>`,
+        'historical-earnings-jp': `
+            <div class="section" id="historical-earnings-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Historical and Future Earnings</h2>
+                <div class="content">
+                    <input type="date" id="fromDate_1_jp" placeholder="From Date">
+                    <input type="date" id="toDate_1_jp" placeholder="To Date">
+                    <button onclick="fetch_historical_earning_calendarJP()">Load Calendar</button>
+                    <div class="scroll-container" id="historicalEarningsContainerJP">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'dividend-calendar-jp': `
+            <div class="section" id="dividend-calendar-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Dividend Calendar</h2>
+                <div class="content">
+                    <input type="date" id="fromDate_2_jp" placeholder="From Date">
+                    <input type="date" id="toDate_2_jp" placeholder="To Date">
+                    <button onclick="fetch_stock_dividend_calendarJP()">Load Calendar</button>
+                    <div class="scroll-container" id="stockDividendCalendarContainerJP">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'insider-trades-jp': `
+            <div class="section" id="insider-trades-jp" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Insider Trades</h2>
+                <div class="content">
+                    <button onclick="fetchInsiderTradesJP()">Load Table</button>
+                    <div class="scroll-container-x" id="insiderTradesContainerJP">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`
+    };
+
+    const sectionContainerJP = document.getElementById('section-container-jp');
+    sectionContainerJP.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+}
+
 
 //////////////////////////////Profile//////////////////////////////////////////////
 function fetchCompanyProfile(stockSymbol) {
