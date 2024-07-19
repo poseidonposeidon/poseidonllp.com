@@ -330,8 +330,13 @@ function loadAIBoxSection(sectionId) {
 
     const sectionContainer = document.getElementById('aiBoxSectionContainer');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+    if (sectionId === 'audio-transcription') {
+        fetchFileList();
+        fetchTextFileList();
+        updateQueueLength();
+        setInterval(updateQueueLength, 5000); // 每5秒更新一次排程長度
+    }
 }
-
 //////////////////////////////Profile//////////////////////////////////////////////
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
