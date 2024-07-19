@@ -89,21 +89,21 @@ function fetchStockJP() {
     let stockSymbol = document.getElementById('stockSymbolJP').value.trim();
     const previousSymbol = document.getElementById('outputSymbolJP').getAttribute('data-last-symbol');
 
-    // 確認日股代號格式是否正確，例如 "7203"
+    // 确认日股代号格式是否正确，例如 "7203"
     const jpStockPattern = /^[0-9]{4}$/;
     if (!jpStockPattern.test(stockSymbol)) {
         alert('Please enter a valid J.P Stock symbol (e.g., 7203)');
         return;
     }
 
-    // 自動添加 ".T"
+    // 自动添加 ".T"
     stockSymbol = stockSymbol.toUpperCase() + '.T';
 
     if (stockSymbol !== previousSymbol) {
         document.getElementById('outputSymbolJP').innerText = 'Current query: ' + stockSymbol;
         document.getElementById('outputSymbolJP').setAttribute('data-last-symbol', stockSymbol);
 
-        // 清空先前的公司資料
+        // 清空先前的公司资料
         const companyProfileContainerJP = document.getElementById('companyProfileContainerJP');
         if (companyProfileContainerJP) {
             companyProfileContainerJP.innerHTML = '';
@@ -134,7 +134,7 @@ function fetchStockJP() {
         });
     }
 
-    // 這裡直接調用 fetchIncomeStatement，並傳遞修改後的 stockSymbol
+    // 这里直接调用 fetchIncomeStatement，并传递修改后的 stockSymbol
     fetchIncomeStatement(stockSymbol, 'jp');
     return stockSymbol;
 }
@@ -477,7 +477,7 @@ function displayCompanyProfile(data, container) {
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
 function fetchIncomeStatement(stockSymbol, country = 'us') {
-    const period = country === 'us' ? document.getElementById('period').value : document.getElementById('period-jp').value;  // 獲取選擇的時段
+    const period = country === 'us' ? document.getElementById('period').value : document.getElementById('period-jp').value;  // 获取选择的时段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -488,6 +488,29 @@ function fetchIncomeStatement(stockSymbol, country = 'us') {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     const containerId = country === 'us' ? 'incomeStatementContainer' : 'incomeStatementContainerJP';
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, containerId);
+}
+
+function fetchData_IncomeStatement(apiUrl, callback, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '<p>Loading...</p>';
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            // 检查响应数据是否为 undefined 或非数组
+            if (data === undefined || !Array.isArray(data)) {
+                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
+            } else {
+                if (data.length > 0) {
+                    callback(data, container);  // 修改这里以传递整个数据数组
+                } else {
+                    container.innerHTML = '<p>No data found for this symbol.</p>';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data: ', error);
+            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
+        });
 }
 
 function displayIncomeStatement(data, container) {
@@ -597,29 +620,6 @@ function displayIncomeStatement(data, container) {
     container.innerHTML = htmlContent;
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
-}
-
-function fetchData_IncomeStatement(apiUrl, callback, containerId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '<p>Loading...</p>';
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            // 檢查回應資料是否為 undefined 或非陣列
-            if (data === undefined || !Array.isArray(data)) {
-                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
-            } else {
-                if (data.length > 0) {
-                    callback(data, container);  // 修改這裡以傳遞整個數據陣列
-                } else {
-                    container.innerHTML = '<p>No data found for this symbol.</p>';
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching data: ', error);
-            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
-        });
 }
 
 function formatNumber(value) {
