@@ -166,6 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+
 function loadSection(sectionId) {
     const sections = {
         'income-statement': `
@@ -278,8 +279,6 @@ function loadSection(sectionId) {
     const sectionContainer = document.getElementById('section-container');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
-
-
 
 //////////////////////////////Profile//////////////////////////////////////////////
 function fetchCompanyProfile(stockSymbol) {
