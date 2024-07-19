@@ -86,15 +86,18 @@ function fetchStock() {
 }
 
 function fetchStockJP() {
-    const stockSymbol = document.getElementById('stockSymbolJP').value.trim().toUpperCase();
+    let stockSymbol = document.getElementById('stockSymbolJP').value.trim().toUpperCase();
     const previousSymbol = document.getElementById('outputSymbolJP').getAttribute('data-last-symbol');
 
-    // 確認日股代號格式是否正確，例如 "7203.T"
-    const jpStockPattern = /^[0-9]+\.T$/;
+    // 確認日股代號格式是否正確，例如 "7203"
+    const jpStockPattern = /^[0-9]{4}$/;
     if (!jpStockPattern.test(stockSymbol)) {
-        alert('Please enter a valid J.P Stock symbol (e.g., 7203.T)');
+        alert('Please enter a valid J.P Stock symbol (e.g., 7203)');
         return;
     }
+
+    // 自動添加 ".T"
+    stockSymbol += '.T';
 
     if (stockSymbol !== previousSymbol) {
         document.getElementById('outputSymbolJP').innerText = 'Current query: ' + stockSymbol;
@@ -134,6 +137,7 @@ function fetchStockJP() {
     fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
     return stockSymbol;
 }
+
 
 function expandSection(element) {
     const content = element.querySelector('.content');
