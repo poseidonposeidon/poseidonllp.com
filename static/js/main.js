@@ -1501,12 +1501,12 @@ function fetchJPInsiderTrades() {
             return response.json();
         })
         .then(data => {
-            const container = document.getElementById('insiderTradesContainer-JP');
+            const container = document.getElementById('insiderTradesContainerJP');
             displayInsiderTrades(data, container);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
-            const container = document.getElementById('insiderTradesContainer-JP');
+            const container = document.getElementById('insiderTradesContainer-P');
             container.innerHTML = '<tr><td colspan="11">Error loading data. Please check the console for more details.</td></tr>';
         });
 }
