@@ -198,6 +198,61 @@ function loadSection(sectionId) {
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
 
+function loadSectionJP(sectionId) {
+    const sections = {
+        'income-statement': `
+            <div class="section" id="income-statement-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Income Statement</h2>
+                <div class="content scroll-container-x">
+                    <label for="periodJP">Select Period:</label>
+                    <select id="periodJP">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchJPIncomeStatement()">Load Statement</button>
+                    <div class="scroll-container-x">
+                        <table id="IncomeStatementTableJP" border="1">
+                            <div id="incomeStatementContainerJP"></div>
+                        </table>
+                    </div>
+                </div>
+            </div>`,
+        'balance-sheet': `
+            <div class="section" id="balance-sheet-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Balance Sheet Statements</h2>
+                <div class="content scroll-container-x">
+                    <label for="periodJP_2">Select Period:</label>
+                    <select id="periodJP_2">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchJPBalanceSheet()">Load Statement</button>
+                    <div id="balanceSheetContainerJP"></div>
+                </div>
+            </div>`,
+        'cashflow-statement': `
+            <div class="section" id="cashflow-statement-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Cashflow Statement</h2>
+                <div class="content scroll-container-x">
+                    <label for="periodJP_3">Select Period:</label>
+                    <select id="periodJP_3">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchJPCashflow()">Load Statement</button>
+                    <div class="scroll-container-x">
+                        <table id="cashflowTableJP" border="1">
+                            <div id="cashflowContainerJP"></div>
+                        </table>
+                    </div>
+                </div>
+            </div>`
+    };
+
+    const sectionContainerJP = document.getElementById('section-container-JP');
+    sectionContainerJP.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+}
+
 function loadAIBoxSection(sectionId) {
     const sections = {
         // 'chat-gpt': `
@@ -435,6 +490,20 @@ function fetchIncomeStatement() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer');
+}
+
+function fetchJPIncomeStatement() {
+    const stockSymbol = fetchJPStock();
+    const period = document.getElementById('periodJP').value;  // 獲取選擇的時段
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP');
 }
 
 function displayIncomeStatement(data, container) {
