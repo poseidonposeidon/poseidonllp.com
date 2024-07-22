@@ -373,12 +373,18 @@ document.getElementById('stockSymbol').addEventListener('input', function(e) {
     e.target.value = e.target.value.toUpperCase();
 });
 
-document.getElementById("stockSymbol").addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault(); // Prevent form submission
-        document.querySelector(".info-input button").click(); // Trigger button click event
-    }
-});
+function addEnterKeyListener(inputId, buttonSelector) {
+    document.getElementById(inputId).addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent form submission
+            document.querySelector(buttonSelector).click(); // Trigger button click event
+        }
+    });
+}
+
+addEnterKeyListener("stockSymbol", ".info-input button");
+addEnterKeyListener("jpStockSymbol", ".info-input button");
+
 //////////////////////////////Profile//////////////////////////////////////////////
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
