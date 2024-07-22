@@ -1189,17 +1189,50 @@ function fetchEarningsCallCalendar() {
 function fetchJPEarningsCallCalendar() {
     const fromDate = document.getElementById('fromDateJP').value;
     const toDate = document.getElementById('toDateJP').value;
-    const stockSymbol = fetchJPStock();
+    stockSymbol = fetchJPStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
     if (!fromDate || !toDate) {
         alert('請輸入開始和結束日期。');
         return;
     }
     const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
-    fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainerJP', stockSymbol), 'earningsCallCalendarContainerJP');
+    fetchData_2(apiUrl, (data) => displayEarningsCallCalendar_JP(data, 'earningsCallCalendarContainer', stockSymbol), 'earningsCallCalendarContainer');
 }
 
 function displayEarningsCallCalendar(data, containerId, stockSymbol) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+        console.error('Container element not found');
+        return;
+    }
+
+    if (!data || !Array.isArray(data)) {
+        container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
+        return;
+    }
+
+    const earningsData = stockSymbol ? data.filter(item => item.symbol.toUpperCase() === stockSymbol) : data;
+    if (earningsData.length === 0) {
+        container.innerHTML = `<p>No earnings calendar data found for ${stockSymbol}.</p>`;
+        return;
+    }
+
+    let htmlContent = '<ul>';
+    earningsData.forEach(item => {
+        htmlContent += `<li>
+            Date: ${item.date || 'N/A'} <br>
+            Symbol: ${item.symbol || 'N/A'} <br>
+            EPS: ${item.eps !== null ? item.eps.toFixed(4) : 'N/A'} <br>
+            EPS Estimated: ${item.epsEstimated !== null ? item.epsEstimated.toFixed(4) : 'N/A'} <br>
+            Revenue: ${item.revenue !== null ? item.revenue.toLocaleString() : 'N/A'} <br>
+            Revenue Estimated: ${item.revenueEstimated !== null ? item.revenueEstimated.toLocaleString() : 'N/A'}
+        </li>`;
+    });
+    htmlContent += '</ul>';
+    container.innerHTML = htmlContent;
+}
+
+function displayEarningsCallCalendar_JP(data, containerId, stockSymbol) {
     const container = document.getElementById(containerId);
     if (!container) {
         console.error('Container element not found');
@@ -1277,7 +1310,7 @@ function fetch_historical_earning_calendar() {
 }
 
 function fetchJPHistoricalEarnings() {
-    const stockSymbol = fetchJPStock();
+    stockSymbol = fetchJPStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 替換為你的實際 API 密鑰
     if (!stockSymbol) {
         alert('請輸入股票代碼。');
@@ -1285,7 +1318,7 @@ function fetchJPHistoricalEarnings() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?apikey=${apiKey}`;
-    fetchData_historical_earning_calendar(apiUrl, display_historical_earning_calendar, 'historicalEarningsContainerJP');
+    fetchData_historical_earning_calendar(apiUrl, display_historical_earning_calendar_JP, 'historicalEarningsContainerJP');
 }
 
 
@@ -1352,6 +1385,71 @@ function display_historical_earning_calendar(data, container) {
     htmlContent += '</table>';
     container.innerHTML = htmlContent;
 }
+
+function display_historical_earning_calendar_JP(data, container) {
+    const fromDate = document.getElementById('fromDate_1').value;
+    const toDate = document.getElementById('toDate_1').value;
+    const startDate = new Date(fromDate);
+    const endDate = new Date(toDate);
+
+    if (!data || data.length === 0) {
+        container.innerHTML = '<p>No data available.</p>';
+        return;
+    }
+
+    let rows = {
+        date: ['Date'],
+        symbol: ['Symbol'],
+        eps: ['EPS'],
+        estimatedEPS: ['Estimated EPS'],
+        epsDifference: ['EPS預期差異'], // 新增列标题
+        time: ['Time'],
+        revenue: ['Revenue'],
+        estimatedRevenue: ['Estimated Revenue'],
+        revenueDifference: ['營收預期差異'], // 新增列标题
+        fiscalDateEnding: ['Fiscal Date Ending']
+    };
+
+    data.forEach(item => {
+        const itemDate = new Date(item.date);
+        if (itemDate >= startDate && itemDate <= endDate) {
+            rows.date.push(item.date || 'N/A');
+            rows.symbol.push(item.symbol || 'N/A');
+            rows.eps.push(item.eps != null ? item.eps : 'N/A');
+            rows.estimatedEPS.push(item.epsEstimated != null ? item.epsEstimated : 'N/A');
+            // 计算 EPS 预期差异百分比
+            if (item.eps != null && item.epsEstimated != null && item.epsEstimated !== 0) {
+                const epsDifference = ((item.eps - item.epsEstimated) / item.epsEstimated * 100).toFixed(2) + '%';
+                rows.epsDifference.push(epsDifference);
+            } else {
+                rows.epsDifference.push('N/A');
+            }
+            rows.time.push(item.time || 'N/A');
+            rows.revenue.push(item.revenue != null ? item.revenue.toLocaleString() : 'N/A');
+            rows.estimatedRevenue.push(item.revenueEstimated != null ? item.revenueEstimated.toLocaleString() : 'N/A');
+            // 计算营收预期差异百分比
+            if (item.revenue != null && item.revenueEstimated != null && item.revenueEstimated !== 0) {
+                const revenueDifference = ((item.revenue - item.revenueEstimated) / item.revenueEstimated * 100).toFixed(2) + '%';
+                rows.revenueDifference.push(revenueDifference);
+            } else {
+                rows.revenueDifference.push('N/A');
+            }
+            rows.fiscalDateEnding.push(item.fiscalDateEnding || 'N/A');
+        }
+    });
+
+    let htmlContent = '<table border="1">';
+    Object.keys(rows).forEach(key => {
+        htmlContent += `<tr><th>${rows[key][0]}</th>`;
+        rows[key].slice(1).forEach(value => {
+            htmlContent += `<td>${value}</td>`;
+        });
+        htmlContent += '</tr>';
+    });
+    htmlContent += '</table>';
+    container.innerHTML = htmlContent;
+}
+
 
 function fetchData_historical_earning_calendar(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
@@ -1541,7 +1639,7 @@ function fetchInsiderTrades() {
 
 function fetchJPInsiderTrades() {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 替換為你的 API 密鑰
-    const stockSymbol = fetchJPStock();
+    stockSymbol = fetchJPStock();
     const apiUrl = `https://financialmodelingprep.com/api/v4/insider-trading?symbol=${stockSymbol}&page=0&apikey=${apiKey}`;
 
     fetch(apiUrl)
@@ -1553,16 +1651,65 @@ function fetchJPInsiderTrades() {
         })
         .then(data => {
             const container = document.getElementById('insiderTradesContainerJP');
-            displayInsiderTrades(data, container);
+            displayInsiderTrades_JP(data, container);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
-            const container = document.getElementById('insiderTradesContainer-P');
+            const container = document.getElementById('insiderTradesContainerJP');
             container.innerHTML = '<tr><td colspan="11">Error loading data. Please check the console for more details.</td></tr>';
         });
 }
 
 function displayInsiderTrades(data, container) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
+        container.innerHTML = '<p>No data available.</p>';
+        return;
+    }
+
+    let rows = {
+        symbol: ['Symbol'],
+        filingDate: ['Filing Date'],
+        transactionDate: ['Transaction Date'],
+        reportingName: ['Reporting Name'],
+        transactionType: ['Transaction Type'],
+        securitiesOwned: ['Securities Owned'],
+        securitiesTransacted: ['Securities Transacted'],
+        securityName: ['Security Name'],
+        price: ['Price'],
+        formType: ['Form Type'],
+        link: ['Link']
+    };
+
+    // 填充行数据
+    data.forEach(item => {
+        rows.symbol.push(item.symbol || 'N/A');
+        rows.filingDate.push(item.filingDate || 'N/A');
+        rows.transactionDate.push(item.transactionDate || 'N/A');
+        rows.reportingName.push(item.reportingName || 'N/A');
+        rows.transactionType.push(item.transactionType || 'N/A');
+        rows.securitiesOwned.push(item.securitiesOwned ? item.securitiesOwned.toLocaleString() : 'N/A');
+        rows.securitiesTransacted.push(item.securitiesTransacted ? item.securitiesTransacted.toLocaleString() : 'N/A');
+        rows.securityName.push(item.securityName || 'N/A');
+        rows.price.push(item.price ? `$${item.price.toFixed(2)}` : 'N/A');
+        rows.formType.push(item.formType || 'N/A');
+        rows.link.push(item.link ? `<a href="${item.link}" target="_blank">View Form</a>` : 'N/A');
+    });
+
+    // 构建 HTML 表格
+    let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
+    Object.keys(rows).forEach(key => {
+        htmlContent += `<tr><th>${rows[key][0]}</th>`;
+        rows[key].slice(1).forEach(value => {
+            htmlContent += `<td>${value}</td>`;
+        });
+        htmlContent += '</tr>';
+    });
+    htmlContent += '</table>';
+
+    container.innerHTML = htmlContent;
+}
+
+function displayInsiderTrades_JP(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>No data available.</p>';
         return;
