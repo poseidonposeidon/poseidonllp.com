@@ -1,90 +1,7 @@
 ///////////////////////////////////////////////////////////////////////////
 let activeSection = null;
 
-document.addEventListener('DOMContentLoaded', function() {
-    const token = localStorage.getItem('authToken');
-    if (!token) {
-        window.location.href = '/';  // 重定向到登录页面
-    } else {
-        // 验证 token
-        fetch('https://api.poseidonllp.com/api/verify-token', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Invalid token');
-                }
-                return response.json();
-            })
-            .then(data => {
-                // Token 有效，显示页面内容
-                document.body.style.display = 'block';
-            })
-            .catch(error => {
-                // Token 无效，重定向到登录页面
-                localStorage.removeItem('authToken');
-                window.location.href = '/';
-            });
-    }
-});
-
-document.getElementById('stockSymbol').addEventListener('input', function(e) {
-    e.target.value = e.target.value.toUpperCase();
-});
-
-document.getElementById("stockSymbol").addEventListener("keypress", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault(); // Prevent form submission
-        document.querySelector(".info-input button").click(); // Trigger button click event
-    }
-});
-
-function fetchStock() {
-    const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
-    const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
-
-    if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbol').innerText = 'Current query: ' + stockSymbol;
-        document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
-
-        // Clear previous company data
-        const companyProfileContainer = document.getElementById('companyProfileContainer');
-        if (companyProfileContainer) {
-            companyProfileContainer.innerHTML = '';
-        }
-
-        const containers = [
-            'incomeStatementContainer',
-            'balanceSheetContainer',
-            'cashflowContainer',
-            'earningsCallTranscriptContainer',
-            'earningsCallCalendarContainer',
-            'historicalEarningsContainer',
-            'stockDividendCalendarContainer',
-            'insiderTradesContainer'
-        ];
-
-        containers.forEach(containerId => {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.innerHTML = '';
-            }
-        });
-
-        const sections = document.querySelectorAll('.section');
-        sections.forEach(section => {
-            section.classList.remove('fixed');
-            collapseSection(section);
-        });
-    }
-
-    fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
-    return stockSymbol;
-}
-
+/////////////////////////////////////////////
 function expandSection(element) {
     const content = element.querySelector('.content');
     if (!element.classList.contains('fixed')) {
@@ -161,10 +78,12 @@ function hideSection(section) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box').forEach(section => {
+    document.querySelectorAll('#info-section, #ai_box,#jp-info-section').forEach(section => {
         section.style.display = 'none';
     });
 });
+
+////////////////////////////////////////////////////////////////////////////
 
 function loadSection(sectionId) {
     const sections = {
@@ -337,6 +256,129 @@ function loadAIBoxSection(sectionId) {
         setInterval(updateQueueLength, 5000); // 每5秒更新一次排程長度
     }
 }
+//////////////////////////////////////////////////////////////////////////////
+function fetchStock() {
+    const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
+    const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
+
+    if (stockSymbol !== previousSymbol) {
+        document.getElementById('outputSymbol').innerText = 'Current query: ' + stockSymbol;
+        document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
+
+        // Clear previous company data
+        const companyProfileContainer = document.getElementById('companyProfileContainer');
+        if (companyProfileContainer) {
+            companyProfileContainer.innerHTML = '';
+        }
+
+        const containers = [
+            'incomeStatementContainer',
+            'balanceSheetContainer',
+            'cashflowContainer',
+            'earningsCallTranscriptContainer',
+            'earningsCallCalendarContainer',
+            'historicalEarningsContainer',
+            'stockDividendCalendarContainer',
+            'insiderTradesContainer'
+        ];
+
+        containers.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '';
+            }
+        });
+
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.classList.remove('fixed');
+            collapseSection(section);
+        });
+    }
+
+    fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
+    return stockSymbol;
+}
+
+function fetchJPStock() {
+    const stockSymbol = document.getElementById('jpStockSymbol').value.trim() + ".T";
+    const previousSymbol = document.getElementById('outputSymbolJP').getAttribute('data-last-symbol');
+
+    if (stockSymbol !== previousSymbol) {
+        document.getElementById('outputSymbolJP').innerText = 'Current query: ' + stockSymbol;
+        document.getElementById('outputSymbolJP').setAttribute('data-last-symbol', stockSymbol);
+
+        // Clear previous company data
+        const companyProfileContainerJP = document.getElementById('companyProfileContainerJP');
+        if (companyProfileContainerJP) {
+            companyProfileContainerJP.innerHTML = '';
+        }
+
+        const containers = [
+            'incomeStatementContainerJP',
+            'balanceSheetContainerJP',
+            'cashflowContainerJP'
+        ];
+
+        containers.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '';
+            }
+        });
+
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.classList.remove('fixed');
+            collapseSection(section);
+        });
+    }
+
+    fetchJPCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchJPCompanyProfile
+    return stockSymbol;
+}
+
+
+document.addEventListener('DOMContentLoaded', function() /**/{
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        window.location.href = '/';  // 重定向到登录页面
+    } else {
+        // 验证 token
+        fetch('https://api.poseidonllp.com/api/verify-token', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Invalid token');
+                }
+                return response.json();
+            })
+            .then(data => {
+                // Token 有效，显示页面内容
+                document.body.style.display = 'block';
+            })
+            .catch(error => {
+                // Token 无效，重定向到登录页面
+                localStorage.removeItem('authToken');
+                window.location.href = '/';
+            });
+    }
+});
+
+document.getElementById('stockSymbol').addEventListener('input', function(e) {
+    e.target.value = e.target.value.toUpperCase();
+});
+
+document.getElementById("stockSymbol").addEventListener("keypress", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); // Prevent form submission
+        document.querySelector(".info-input button").click(); // Trigger button click event
+    }
+});
 //////////////////////////////Profile//////////////////////////////////////////////
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
@@ -345,6 +387,16 @@ function fetchCompanyProfile(stockSymbol) {
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainer')))
+        .catch(error => console.error('Error fetching data:', error));
+}
+
+function fetchJPCompanyProfile(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 這裡填入你的API密鑰
+    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerJP')))
         .catch(error => console.error('Error fetching data:', error));
 }
 
@@ -691,7 +743,6 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
-
 
 ///////////////////////////////////現金流表Cashflow///////////////
 function fetchCashflow() {

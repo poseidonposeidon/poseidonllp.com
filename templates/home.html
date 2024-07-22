@@ -52,6 +52,28 @@
     </div>
 </div>
 
+<div id="jp-info-section" class="info-section" style="display: none;">
+    <div class="info-input">
+        <input type="text" id="jpStockSymbol" placeholder="Input JP Stock" pattern="[0-9]*">
+        <button onclick="fetchJPStock()">
+            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
+        </button>
+    </div>
+    <p id="outputSymbolJP" data-last-symbol="">Current query : </p>
+    <div id="companyProfileContainerJP"></div>
+    <div class="info-content">
+        <div class="info-column">
+            <a href="#" onclick="loadSectionJP('income-statement')">Income Statement</a>
+            <a href="#" onclick="loadSectionJP('balance-sheet')">Balance Sheet</a>
+            <a href="#" onclick="loadSectionJP('cashflow-statement')">Cash Flow Statement</a>
+        </div>
+    </div>
+    <div id="section-container-JP" class="section-container">
+        <!-- Dynamic content loading -->
+    </div>
+</div>
+
+
 <div id="ai_box" class="ai-box-section" style="display: none;">
     <div class="info-content">
         <div class="info-column">
@@ -65,7 +87,6 @@
 </div>
 
 <div class="logo-container-new center">
-<!--    <a href="https://chatgpt.com/" target="_blank"><img src="/static/img/gpt.png" alt="gpt"></a>-->
     <a href="https://www.businessweekly.com.tw/Archive/" target="_blank"><img src="/static/img/businessweek.png" alt="businessweek" ></a>
     <a href="https://finance.yahoo.com/" target="_blank"><img src="/static/img/fyahoo.png" alt="yahoo"></a>
     <a href="https://www.oaktreecapital.com/insights" target="_blank"><img src="/static/img/OKAtree .png" alt="unnamed"></a>
