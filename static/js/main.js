@@ -1071,7 +1071,6 @@ function fetchJPEarningsCallTranscript() {
     fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerJP');
 }
 
-
 function splitTranscriptIntoParagraphs(content) {
     // 使用正則表達式檢測常見的講者名稱或段落開頭
     const regex = /(Operator:|[A-Z][a-z]+ [A-Z][a-z]+:)/g;
@@ -1155,7 +1154,6 @@ function fetchData_Transcript(apiUrl, callback, containerId) {
 
 //////////////法說會日曆 Earnings Call Calendar/////////////////
 
-
 function fetchEarningsCallCalendar() {
     const fromDate = document.getElementById('fromDate').value;
     const toDate = document.getElementById('toDate').value;
@@ -1167,6 +1165,19 @@ function fetchEarningsCallCalendar() {
     }
     const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
     fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainer', stockSymbol), 'earningsCallCalendarContainer');
+}
+
+function fetchJPEarningsCallCalendar() {
+    const fromDate = document.getElementById('fromDateJP').value;
+    const toDate = document.getElementById('toDateJP').value;
+    const stockSymbol = fetchJPStock();
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+    if (!fromDate || !toDate) {
+        alert('請輸入開始和結束日期。');
+        return;
+    }
+    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
+    fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainerJP', stockSymbol), 'earningsCallCalendarContainerJP');
 }
 
 function displayEarningsCallCalendar(data, containerId, stockSymbol) {
@@ -1245,6 +1256,19 @@ function fetch_historical_earning_calendar() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?apikey=${apiKey}`;
     fetchData_historical_earning_calendar(apiUrl, display_historical_earning_calendar, 'historicalEarningsContainer');
 }
+
+function fetchJPHistoricalEarnings() {
+    const stockSymbol = fetchJPStock();
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 替換為你的實際 API 密鑰
+    if (!stockSymbol) {
+        alert('請輸入股票代碼。');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?apikey=${apiKey}`;
+    fetchData_historical_earning_calendar(apiUrl, display_historical_earning_calendar, 'historicalEarningsContainerJP');
+}
+
 
 function display_historical_earning_calendar(data, container) {
     const fromDate = document.getElementById('fromDate_1').value;
