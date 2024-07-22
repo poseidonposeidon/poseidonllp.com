@@ -246,6 +246,42 @@ function loadSectionJP(sectionId) {
                         </table>
                     </div>
                 </div>
+            </div>`,
+        'earnings-call-transcript': `
+            <div class="section" id="earnings-call-transcript-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Earnings Call Transcript</h2>
+                <div class="content">
+                    <input type="number" id="yearInputJP" placeholder="Enter Year">
+                    <input type="number" id="quarterInputJP" placeholder="Enter Quarter">
+                    <button onclick="fetchJPEarningsCallTranscript()">Load Transcript</button>
+                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainerJP">
+                        <!-- Transcription content will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'earnings-call-calendar': `
+            <div class="section" id="earnings-call-calendar-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Earnings Call Calendar</h2>
+                <div class="content">
+                    <input type="date" id="fromDateJP" placeholder="From Date">
+                    <input type="date" id="toDateJP" placeholder="To Date">
+                    <button onclick="fetchJPEarningsCallCalendar()">Load Calendar</button>
+                    <div class="scroll-container">
+                        <div id="earningsCallCalendarContainerJP"></div>
+                    </div>
+                </div>
+            </div>`,
+        'historical-earnings': `
+            <div class="section" id="historical-earnings-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Historical and Future Earnings</h2>
+                <div class="content">
+                    <input type="date" id="fromDateJP_1" placeholder="From Date">
+                    <input type="date" id="toDateJP_1" placeholder="To Date">
+                    <button onclick="fetchJPHistoricalEarnings()">Load Calendar</button>
+                    <div class="scroll-container" id="historicalEarningsContainerJP">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
             </div>`
     };
 
@@ -1019,6 +1055,22 @@ function fetchEarningsCallTranscript() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/earning_call_transcript/${stockSymbol}?year=${year}&quarter=${quarter}&apikey=${apiKey}`;
     fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainer');
 }
+
+function fetchJPEarningsCallTranscript() {
+    var stockSymbol = fetchJPStock();
+    const year = document.getElementById('yearInputJP').value;
+    const quarter = document.getElementById('quarterInputJP').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+
+    if (stockSymbol.length === 0 || year.length === 0 || quarter.length === 0) {
+        alert('請輸入股票代碼、年份及季度。');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_call_transcript/${stockSymbol}?year=${year}&quarter=${quarter}&apikey=${apiKey}`;
+    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerJP');
+}
+
 
 function splitTranscriptIntoParagraphs(content) {
     // 使用正則表達式檢測常見的講者名稱或段落開頭
