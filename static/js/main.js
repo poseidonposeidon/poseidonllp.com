@@ -1490,7 +1490,7 @@ function fetchInsiderTrades() {
 
 function fetchJPInsiderTrades() {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 替換為你的 API 密鑰
-    stockSymbol = fetchJPStock();
+    const stockSymbol = fetchJPStock();
     const apiUrl = `https://financialmodelingprep.com/api/v4/insider-trading?symbol=${stockSymbol}&page=0&apikey=${apiKey}`;
 
     fetch(apiUrl)
