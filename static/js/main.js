@@ -200,29 +200,29 @@ function loadSection(sectionId) {
 
 function loadSectionJP(sectionId) {
     const sections = {
-        'income-statement-JP': `
+        'income-statement': `
             <div class="section" id="income-statement-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Income Statement</h2>
                 <div class="content scroll-container-x">
-                    <label for="period-JP">Select Period:</label>
-                    <select id="period-JP">
+                    <label for="periodJP">Select Period:</label>
+                    <select id="periodJP">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchJPIncomeStatement()">Load Statement</button>
                     <div class="scroll-container-x">
-                        <table id="IncomeStatementTable-JP" border="1">
+                        <table id="IncomeStatementTableJP" border="1">
                             <div id="incomeStatementContainerJP"></div>
                         </table>
                     </div>
                 </div>
             </div>`,
-        'balance-sheet-JP': `
+        'balance-sheet': `
             <div class="section" id="balance-sheet-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Balance Sheet Statements</h2>
                 <div class="content scroll-container-x">
-                    <label for="period_2-JP">Select Period:</label>
-                    <select id="period_2-JP">
+                    <label for="periodJP_2">Select Period:</label>
+                    <select id="periodJP_2">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
@@ -230,60 +230,60 @@ function loadSectionJP(sectionId) {
                     <div id="balanceSheetContainerJP"></div>
                 </div>
             </div>`,
-        'cashflow-statement-JP': `
+        'cashflow-statement': `
             <div class="section" id="cashflow-statement-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-                <h2>Cashflow Sheet Statements</h2>
+                <h2>Cashflow Statement</h2>
                 <div class="content scroll-container-x">
-                    <label for="period_3-JP">Select Period:</label>
-                    <select id="period_3-JP">
+                    <label for="periodJP_3">Select Period:</label>
+                    <select id="periodJP_3">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchJPCashflow()">Load Statement</button>
                     <div class="scroll-container-x">
-                        <table id="cashflowTable-JP" border="1">
+                        <table id="cashflowTableJP" border="1">
                             <div id="cashflowContainerJP"></div>
                         </table>
                     </div>
                 </div>
             </div>`,
-        'earnings-call-transcript-JP': `
+        'earnings-call-transcript': `
             <div class="section" id="earnings-call-transcript-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Earnings Call Transcript</h2>
                 <div class="content">
-                    <input type="number" id="yearInput-JP" placeholder="Enter Year">
-                    <input type="number" id="quarterInput-JP" placeholder="Enter Quarter">
+                    <input type="number" id="yearInputJP" placeholder="Enter Year">
+                    <input type="number" id="quarterInputJP" placeholder="Enter Quarter">
                     <button onclick="fetchJPEarningsCallTranscript()">Load Transcript</button>
                     <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainerJP">
                         <!-- Transcription content will be displayed here -->
                     </div>
                 </div>
             </div>`,
-        'earnings-call-calendar-JP': `
+        'earnings-call-calendar': `
             <div class="section" id="earnings-call-calendar-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Earnings Call Calendar</h2>
                 <div class="content">
-                    <input type="date" id="fromDate-JP" placeholder="From Date">
-                    <input type="date" id="toDate-JP" placeholder="To Date">
+                    <input type="date" id="fromDateJP" placeholder="From Date">
+                    <input type="date" id="toDateJP" placeholder="To Date">
                     <button onclick="fetchJPEarningsCallCalendar()">Load Calendar</button>
                     <div class="scroll-container">
-                        <div id="earningsCallCalendarContainer-P"></div>
+                        <div id="earningsCallCalendarContainerJP"></div>
                     </div>
                 </div>
             </div>`,
-        'historical-earnings-JP': `
+        'historical-earnings': `
             <div class="section" id="historical-earnings-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Historical and Future Earnings</h2>
                 <div class="content">
-                    <input type="date" id="fromDate_1-JP" placeholder="From Date">
-                    <input type="date" id="toDate_1-JP" placeholder="To Date">
+                    <input type="date" id="fromDateJP_1" placeholder="From Date">
+                    <input type="date" id="toDateJP_1" placeholder="To Date">
                     <button onclick="fetchJPHistoricalEarnings()">Load Calendar</button>
                     <div class="scroll-container" id="historicalEarningsContainerJP">
                         <!-- Data table will be displayed here -->
                     </div>
                 </div>
             </div>`,
-        'dividend-calendar-JP': `
+        'dividend-calendar': `
             <div class="section" id="dividend-calendar-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Dividend Calendar</h2>
                 <div class="content">
@@ -295,7 +295,7 @@ function loadSectionJP(sectionId) {
                     </div>
                 </div>
             </div>`,
-        'insider-trades-JP': `
+        'insider-trades': `
             <div class="section" id="insider-trades-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Insider Trades</h2>
                 <div class="content">
@@ -313,13 +313,6 @@ function loadSectionJP(sectionId) {
 
 function loadAIBoxSection(sectionId) {
     const sections = {
-        // 'chat-gpt': `
-        //     <div class="section" id="chat-gpt" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-        //         <h2>Chat GPT</h2>
-        //         <div class="content">
-        //             <p>Chat GPT功能描述...</p>
-        //         </div>
-        //     </div>`,
         'audio-transcription': `
             <div class="section" id="audio-transcription" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Audio Transcription</h2>
