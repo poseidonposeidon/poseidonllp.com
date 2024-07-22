@@ -277,7 +277,7 @@ function loadSectionJP(sectionId) {
                 <div class="content">
                     <input type="date" id="fromDate_1-JP" placeholder="From Date">
                     <input type="date" id="toDate_1-JP" placeholder="To Date">
-                    <button onclick="fetchJPHistoricalEarningCalendar()">Load Calendar</button>
+                    <button onclick="fetchJPHistoricalEarnings()">Load Calendar</button>
                     <div class="scroll-container" id="historicalEarningsContainer-JP">
                         <!-- Data table will be displayed here -->
                     </div>
