@@ -195,7 +195,7 @@ button:not(.info-input button):hover {
     margin: 10px 0;
 }
 
-#companyProfileContainer {
+#companyProfileContainer ,#companyProfileContainerJP{
     text-align: center;
     margin: 10px auto;
     padding: 20px;
@@ -229,11 +229,11 @@ button:not(.info-input button):hover {
 }
 
 /* 修改链接颜色 */
-#companyProfileContainer a {
+#companyProfileContainer a  ,#companyProfileContainerJP a{
     color: #90caf9;
 }
 
-#companyProfileContainer a:hover {
+#companyProfileContainer a:hover ,#companyProfileContainerJP a{
     color: #ffffff;
 }
 
