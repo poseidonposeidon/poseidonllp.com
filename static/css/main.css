@@ -190,7 +190,7 @@ button:not(.info-input button):hover {
     background-color: #757575;
 }
 
-#outputSymbol {
+#outputSymbol , #outputSymbolJP{
     text-align: center;
     margin: 10px 0;
 }
