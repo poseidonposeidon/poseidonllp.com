@@ -192,7 +192,7 @@ button:not(.info-input button):hover {
 
 #outputSymbol,
 #outputSymbolJP,
-#outputSymbolTW{
+#outputSymbolTW {
     text-align: center;
     margin: 10px 0;
 }
@@ -235,14 +235,14 @@ button:not(.info-input button):hover {
 /* 設置連結的默認顏色 */
 #companyProfileContainer a,
 #companyProfileContainerJP a,
-#companyProfileContainerTW a{
+#companyProfileContainerTW a {
     color: #90caf9;
 }
 
 /* 設置連結在懸停時的顏色 */
 #companyProfileContainer a:hover,
-#companyProfileContainerJP a:hover ,
-#companyProfileContainerTW a:hover{
+#companyProfileContainerJP a:hover,
+#companyProfileContainerTW a:hover {
     color: #ffffff;
 }
 
