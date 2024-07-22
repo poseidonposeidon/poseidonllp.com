@@ -1267,6 +1267,7 @@ function displayEarningsCallCalendar_JP(data, containerId, stockSymbol) {
 
 function fetchData_2(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
+    console.log(container); // Add this line
     container.innerHTML = '<p>Loading...</p>';
     fetch(apiUrl)
         .then(response => {
@@ -1295,6 +1296,7 @@ function fetchData_2(apiUrl, callback, containerId) {
             container.innerHTML = `<p>Error loading data: ${error.message}. Please check the console for more details.</p>`;
         });
 }
+
 //////////////歷史獲利和未來獲利 Historical and Future Earnings/////////////////
 
 function fetch_historical_earning_calendar() {
