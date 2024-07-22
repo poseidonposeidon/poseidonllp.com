@@ -589,6 +589,7 @@ function addEnterKeyListener(inputId, buttonSelector) {
 
 addEnterKeyListener("stockSymbol", "#usStockButton");
 addEnterKeyListener("jpStockSymbol", "#jpStockButton");
+addEnterKeyListener("twStockSymbol", "#twStockButton");
 
 //////////////////////////////Profile//////////////////////////////////////////////
 function fetchCompanyProfile(stockSymbol) {
