@@ -444,7 +444,6 @@ function fetchJPStock() {
     return stockSymbol;
 }
 
-
 document.addEventListener('DOMContentLoaded', function() /**/{
     const token = localStorage.getItem('authToken');
     if (!token) {
