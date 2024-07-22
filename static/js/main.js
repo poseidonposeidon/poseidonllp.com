@@ -212,7 +212,7 @@ function loadSectionJP(sectionId) {
                     <button onclick="fetchJPIncomeStatement()">Load Statement</button>
                     <div class="scroll-container-x">
                         <table id="IncomeStatementTable-JP" border="1">
-                            <div id="incomeStatementContainer-JP"></div>
+                            <div id="incomeStatementContainerJP"></div>
                         </table>
                     </div>
                 </div>
@@ -227,7 +227,7 @@ function loadSectionJP(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchJPBalanceSheet()">Load Statement</button>
-                    <div id="balanceSheetContainer-JP"></div>
+                    <div id="balanceSheetContainerJP"></div>
                 </div>
             </div>`,
         'cashflow-statement-JP': `
@@ -242,7 +242,7 @@ function loadSectionJP(sectionId) {
                     <button onclick="fetchJPCashflow()">Load Statement</button>
                     <div class="scroll-container-x">
                         <table id="cashflowTable-JP" border="1">
-                            <div id="cashflowContainer-JP"></div>
+                            <div id="cashflowContainerJP"></div>
                         </table>
                     </div>
                 </div>
@@ -254,7 +254,7 @@ function loadSectionJP(sectionId) {
                     <input type="number" id="yearInput-JP" placeholder="Enter Year">
                     <input type="number" id="quarterInput-JP" placeholder="Enter Quarter">
                     <button onclick="fetchJPEarningsCallTranscript()">Load Transcript</button>
-                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainer-JP">
+                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainerJP">
                         <!-- Transcription content will be displayed here -->
                     </div>
                 </div>
@@ -267,7 +267,7 @@ function loadSectionJP(sectionId) {
                     <input type="date" id="toDate-JP" placeholder="To Date">
                     <button onclick="fetchJPEarningsCallCalendar()">Load Calendar</button>
                     <div class="scroll-container">
-                        <div id="earningsCallCalendarContainer-JP"></div>
+                        <div id="earningsCallCalendarContainer-P"></div>
                     </div>
                 </div>
             </div>`,
@@ -278,7 +278,7 @@ function loadSectionJP(sectionId) {
                     <input type="date" id="fromDate_1-JP" placeholder="From Date">
                     <input type="date" id="toDate_1-JP" placeholder="To Date">
                     <button onclick="fetchJPHistoricalEarnings()">Load Calendar</button>
-                    <div class="scroll-container" id="historicalEarningsContainer-JP">
+                    <div class="scroll-container" id="historicalEarningsContainerJP">
                         <!-- Data table will be displayed here -->
                     </div>
                 </div>
@@ -290,7 +290,7 @@ function loadSectionJP(sectionId) {
                     <input type="date" id="fromDate_2-JP" placeholder="From Date">
                     <input type="date" id="toDate_2-JP" placeholder="To Date">
                     <button onclick="fetchJPStockDividendCalendar()">Load Calendar</button>
-                    <div class="scroll-container" id="stockDividendCalendarContainer-JP">
+                    <div class="scroll-container" id="stockDividendCalendarContainerJP">
                         <!-- Data table will be displayed here -->
                     </div>
                 </div>
@@ -300,7 +300,7 @@ function loadSectionJP(sectionId) {
                 <h2>Insider Trades</h2>
                 <div class="content">
                     <button onclick="fetchJPInsiderTrades()">Load Table</button>
-                    <div class="scroll-container-x" id="insiderTradesContainer-JP">
+                    <div class="scroll-container-x" id="insiderTradesContainerJP">
                         <!-- Data table will be displayed here -->
                     </div>
                 </div>
