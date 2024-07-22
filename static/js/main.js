@@ -2209,6 +2209,6 @@ function updateQueueLength() {
             queueLengthElement.innerText = data.queueLength;
         })
         .catch(error => {
-            console.error('Error fetching queue length:', error);
+            // console.error('Error fetching queue length:', error);
         });
 }
