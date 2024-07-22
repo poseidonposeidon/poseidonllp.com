@@ -1391,7 +1391,7 @@ function fetchJPStockDividendCalendar() {
         return;
     }
     const apiUrl = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
-    fetchData_2(apiUrl, displayJPStockDividendCalendar, 'stockDividendCalendarContainerJP');
+    fetchData_2(apiUrl, display_stock_dividend_calendar, 'stockDividendCalendarContainerJP');
 }
 
 function display_stock_dividend_calendar(data, container) {
@@ -1502,7 +1502,7 @@ function fetchJPInsiderTrades() {
         })
         .then(data => {
             const container = document.getElementById('insiderTradesContainer-JP');
-            displayJPInsiderTrades(data, container);
+            displayInsiderTrades(data, container);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
