@@ -382,8 +382,8 @@ function addEnterKeyListener(inputId, buttonSelector) {
     });
 }
 
-addEnterKeyListener("stockSymbol", ".info-input button");
-addEnterKeyListener("jpStockSymbol", ".info-input button");
+addEnterKeyListener("stockSymbol", "#usStockButton");
+addEnterKeyListener("jpStockSymbol", "#jpStockButton");
 
 //////////////////////////////Profile//////////////////////////////////////////////
 function fetchCompanyProfile(stockSymbol) {
