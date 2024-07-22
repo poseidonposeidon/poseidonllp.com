@@ -423,7 +423,12 @@ function fetchJPStock() {
         const containers = [
             'incomeStatementContainerJP',
             'balanceSheetContainerJP',
-            'cashflowContainerJP'
+            'cashflowContainerJP',
+            'earningsCallTranscriptContainerJP',
+            'earningsCallCalendarContainerJP',
+            'historicalEarningsContainerJP',
+            'stockDividendCalendarContainerJP',
+            'insiderTradesContainerJP'
         ];
 
         containers.forEach(containerId => {
