@@ -83,6 +83,28 @@
     </div>
 </div>
 
+<div id="tw-info-section" class="info-section" style="display: none;">
+    <div class="info-input">
+        <input type="text" id="twStockSymbol" placeholder="Input TW Stock" pattern="[0-9]*">
+        <button id="twStockButton" onclick="fetchJPStock()">
+            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
+        </button>
+    </div>
+    <p id="outputSymbolTW" data-last-symbol="">Current query : </p>
+    <div id="companyProfileContainerTW"></div>
+    <div class="info-content">
+        <div class="info-column">
+            <a href="#" onclick="loadSectionTW('income-statement')">Income Statement</a>
+            <a href="#" onclick="loadSectionTW('balance-sheet')">Balance Sheet</a>
+            <a href="#" onclick="loadSectionTW('cashflow-statement')">Cash Flow Statement</a>
+        </div>
+
+    </div>
+    <div id="section-container-TW" class="section-container">
+        <!-- Dynamic content loading -->
+    </div>
+</div>
+
 
 <div id="ai_box" class="ai-box-section" style="display: none;">
     <div class="info-content">

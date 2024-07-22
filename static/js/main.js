@@ -78,7 +78,7 @@ function hideSection(section) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box,#jp-info-section').forEach(section => {
+    document.querySelectorAll('#info-section, #ai_box,#jp-info-section,#tw-info-section').forEach(section => {
         section.style.display = 'none';
     });
 });
@@ -311,6 +311,62 @@ function loadSectionJP(sectionId) {
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
 
+function loadSectionTW(sectionId) {
+    const sections = {
+        'income-statement': `
+            <div class="section" id="income-statement-TW" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Income Statement</h2>
+                <div class="content scroll-container-x">
+                    <label for="periodTW">Select Period:</label>
+                    <select id="periodTW">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchTWIncomeStatement()">Load Statement</button>
+                    <div class="scroll-container-x">
+                        <table id="IncomeStatementTableTW" border="1">
+                            <div id="incomeStatementContainerTW"></div>
+                        </table>
+                    </div>
+                </div>
+            </div>`,
+        'balance-sheet': `
+            <div class="section" id="balance-sheet-TW" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Balance Sheet Statements</h2>
+                <div class="content scroll-container-x">
+                    <label for="periodTW_2">Select Period:</label>
+                    <select id="periodTW_2">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchTWBalanceSheet()">Load Statement</button>
+                    <div id="balanceSheetContainerTW"></div>
+                </div>
+            </div>`,
+        'cashflow-statement': `
+            <div class="section" id="cashflow-statement-TW" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Cashflow Statement</h2>
+                <div class="content scroll-container-x">
+                    <label for="periodTW_3">Select Period:</label>
+                    <select id="periodTW_3">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchTWCashflow()">Load Statement</button>
+                    <div class="scroll-container-x">
+                        <table id="cashflowTableTW" border="1">
+                            <div id="cashflowContainerTW"></div>
+                        </table>
+                    </div>
+                </div>
+            </div>`
+    };
+
+    const sectionContainer = document.getElementById('section-container-TW');
+    sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+}
+
+
 function loadAIBoxSection(sectionId) {
     const sections = {
         'audio-transcription': `
@@ -449,6 +505,45 @@ function fetchJPStock() {
     return stockSymbol;
 }
 
+function fetchTWStock() {
+    const stockSymbol = document.getElementById('twStockSymbol').value.trim() + ".TW";
+    const previousSymbol = document.getElementById('outputSymbolTW').getAttribute('data-last-symbol');
+
+    if (stockSymbol !== previousSymbol) {
+        document.getElementById('outputSymbolTW').innerText = 'Current query: ' + stockSymbol;
+        document.getElementById('outputSymbolTW').setAttribute('data-last-symbol', stockSymbol);
+
+        // 清除之前的公司資料
+        const companyProfileContainerTW = document.getElementById('companyProfileContainerTW');
+        if (companyProfileContainerTW) {
+            companyProfileContainerTW.innerHTML = '';
+        }
+
+        const containers = [
+            'incomeStatementContainerTW',
+            'balanceSheetContainerTW',
+            'cashflowContainerTW',
+        ];
+
+        containers.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '';
+            }
+        });
+
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.classList.remove('fixed');
+            collapseSection(section);
+        });
+    }
+
+    fetchTWCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchTWCompanyProfile
+    return stockSymbol;
+}
+
+
 document.addEventListener('DOMContentLoaded', function() /**/{
     const token = localStorage.getItem('authToken');
     if (!token) {
@@ -516,6 +611,16 @@ function fetchJPCompanyProfile(stockSymbol) {
         .catch(error => console.error('Error fetching data:', error));
 }
 
+function fetchTWCompanyProfile(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerTW')))
+        .catch(error => console.error('Error fetching data:', error));
+}
+
 function displayCompanyProfile(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
@@ -559,6 +664,20 @@ function fetchJPIncomeStatement() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP');
+}
+
+function fetchTWIncomeStatement() {
+    const stockSymbol = fetchTWStock();
+    const period = document.getElementById('periodTW').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW');
 }
 
 function displayIncomeStatement(data, container) {
@@ -725,6 +844,20 @@ function fetchJPBalanceSheet() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerJP');
+}
+
+function fetchTWBalanceSheet() {
+    const stockSymbol = fetchTWStock();
+    const period = document.getElementById('periodTW_2').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW');
 }
 
 function displayBalanceSheet(data, container) {
@@ -917,6 +1050,19 @@ function fetchJPCashflow() {
     fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerJP');
 }
 
+function fetchTWCashflow() {
+    const stockSymbol = fetchJPStock();
+    const period = document.getElementById('periodJP_3').value;  // 獲取選擇的時段
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerJP');
+}
 
 function displayCashflow(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
