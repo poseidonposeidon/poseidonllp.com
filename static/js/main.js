@@ -672,7 +672,6 @@ function fetchJPBalanceSheet() {
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerJP');
 }
 
-
 function displayBalanceSheet(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
@@ -849,6 +848,21 @@ function fetchCashflow() {
     fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainer');
 }
 
+function fetchJPCashflow() {
+    const stockSymbol = fetchJPStock();
+    const period = document.getElementById('periodJP_3').value;  // 獲取選擇的時段
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerJP');
+}
+
+
 function displayCashflow(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
@@ -989,8 +1003,6 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
-
-
 
 //////////////法說會逐字稿 Earnings Call Transcript/////////////////
 function fetchEarningsCallTranscript() {
