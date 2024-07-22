@@ -1389,18 +1389,64 @@ function fetch_stock_dividend_calendar() {
 function fetchJPStockDividendCalendar() {
     const fromDate = document.getElementById('fromDate_2-JP').value;
     const toDate = document.getElementById('toDate_2-JP').value;
-    const stockSymbol = fetchJPStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 替換為你的實際 API 密鑰
     if (!fromDate || !toDate) {
         alert('請輸入起始日期和結束日期。');
         return;
     }
     const apiUrl = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
-    fetchData_2(apiUrl, display_stock_dividend_calendar, 'stockDividendCalendarContainerJP');
+    fetchData_2(apiUrl, display_stock_dividend_calendar_JP, 'stockDividendCalendarContainerJP');
 }
 
 function display_stock_dividend_calendar(data, container) {
     stockSymbol = fetchStock();
+    if (!data || data.length === 0) {
+        container.innerHTML = '<p>No data available for the selected dates.</p>';
+        return;
+    }
+
+    let htmlContent = '<table border="1">';
+    htmlContent += `
+            <tr>
+                <th>Date</th>
+                <th>Label</th>
+                <th>Symbol</th>
+                <th>Dividend</th>
+                <th>Adjusted Dividend</th>
+                <th>Declaration Date</th>
+                <th>Record Date</th>
+                <th>Payment Date</th>
+            </tr>
+        `;
+
+    // 过滤并只显示匹配的股票代码
+    data.forEach(item => {
+        if (item.symbol.toUpperCase() === stockSymbol.toUpperCase()) { // 只添加符合输入的股票代码的行
+            htmlContent += `
+                    <tr>
+                        <td>${item.date || 'N/A'}</td>
+                        <td>${item.label || 'N/A'}</td>
+                        <td>${item.symbol || 'N/A'}</td>
+                        <td>${item.dividend != null ? item.dividend : 'N/A'}</td>
+                        <td>${item.adjDividend != null ? item.adjDividend : 'N/A'}</td>
+                        <td>${item.declarationDate || 'N/A'}</td>
+                        <td>${item.recordDate || 'N/A'}</td>
+                        <td>${item.paymentDate || 'N/A'}</td>
+                    </tr>
+                `;
+        }
+    });
+
+    htmlContent += '</table>';
+    container.innerHTML = htmlContent;
+
+    if (htmlContent.indexOf('<tr>') === -1) { // 如果没有匹配的数据，显示消息
+        container.innerHTML = '<p>No data available for the selected stock symbol.</p>';
+    }
+}
+
+function display_stock_dividend_calendar_JP(data, container) {
+    stockSymbol = fetchJPStock();
     if (!data || data.length === 0) {
         container.innerHTML = '<p>No data available for the selected dates.</p>';
         return;
