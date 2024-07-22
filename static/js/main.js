@@ -1053,7 +1053,7 @@ function fetchJPCashflow() {
 
 function fetchTWCashflow() {
     const stockSymbol = fetchJPStock();
-    const period = document.getElementById('periodJP_3').value;  // 獲取選擇的時段
+    const period = document.getElementById('periodTW_3').value;  // 獲取選擇的時段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
 
     if (!stockSymbol) {
@@ -1062,7 +1062,7 @@ function fetchTWCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerJP');
+    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerTW');
 }
 
 function displayCashflow(data, container) {
