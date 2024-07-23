@@ -366,7 +366,6 @@ function loadSectionTW(sectionId) {
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
 
-
 function loadAIBoxSection(sectionId) {
     const sections = {
         'audio-transcription': `
@@ -505,13 +504,50 @@ function fetchJPStock() {
     return stockSymbol;
 }
 
-function fetchTWStock() {
-    const stockSymbol = document.getElementById('twStockSymbol').value.trim() + ".TW";
+async function fetchStockExchange(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        if (data.length > 0) {
+            return data[0].exchangeShortName; // 假設 API 返回 { "exchangeShortName": "TW" } 或 { "exchangeShortName": "TWO" }
+        } else {
+            return null;
+        }
+    } catch (error) {
+        console.error('Error fetching stock exchange:', error);
+        return null;
+    }
+}
+
+async function fetchTWStock() {
+    const stockSymbol = document.getElementById('twStockSymbol').value.trim();
     const previousSymbol = document.getElementById('outputSymbolTW').getAttribute('data-last-symbol');
 
-    if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbolTW').innerText = 'Current query: ' + stockSymbol;
-        document.getElementById('outputSymbolTW').setAttribute('data-last-symbol', stockSymbol);
+    // 調用 API 來判斷交易所類型
+    const exchangeShortName = await fetchStockExchange(stockSymbol);
+    if (!exchangeShortName) {
+        alert('無法判斷股票代碼所屬的交易所');
+        return;
+    }
+
+    let fullStockSymbol = '';
+    if (exchangeShortName === 'TW') {
+        fullStockSymbol = stockSymbol + '.TW';
+    } else if (exchangeShortName === 'TWO') {
+        fullStockSymbol = stockSymbol + '.TWO';
+    } else {
+        alert('未知的交易所類型');
+        return;
+    }
+
+    if (fullStockSymbol !== previousSymbol) {
+        document.getElementById('outputSymbolTW').innerText = 'Current query: ' + fullStockSymbol;
+        document.getElementById('outputSymbolTW').setAttribute('data-last-symbol', fullStockSymbol);
 
         // 清除之前的公司資料
         const companyProfileContainerTW = document.getElementById('companyProfileContainerTW');
@@ -539,10 +575,9 @@ function fetchTWStock() {
         });
     }
 
-    fetchTWCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchTWCompanyProfile
-    return stockSymbol;
+    fetchTWCompanyProfile(fullStockSymbol);  // 傳遞 fullStockSymbol 給 fetchTWCompanyProfile
+    return fullStockSymbol;
 }
-
 
 document.addEventListener('DOMContentLoaded', function() /**/{
     const token = localStorage.getItem('authToken');
