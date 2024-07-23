@@ -477,9 +477,6 @@ function fetchStock() {
     return stockSymbol;
 }
 
-
-
-
 function fetchJPStock() {
     const stockSymbol = document.getElementById('jpStockSymbol').value.trim() + ".T";
     const previousSymbol = document.getElementById('outputSymbolJP').getAttribute('data-last-symbol');
@@ -746,9 +743,6 @@ function displayIncomeStatement(data, container) {
         return;
     }
 
-    // 按日期排序數據
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
-
     let rows = {
         date: ['Date'],
         symbol: ['Symbol'],
@@ -790,7 +784,6 @@ function displayIncomeStatement(data, container) {
         finalLink: ['Final Link']
     };
 
-    // 填充行數據
     data.forEach(entry => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -832,7 +825,6 @@ function displayIncomeStatement(data, container) {
         rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
-    // 構建 HTML 表格
     let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
         htmlContent += `<tr><th>${rows[key][0]}</th>`;
@@ -845,7 +837,6 @@ function displayIncomeStatement(data, container) {
 
     container.innerHTML = htmlContent;
 
-    // 繪製圖表
     drawChart(data);
 }
 
@@ -855,12 +846,11 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId) {
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            // 檢查回應資料是否為 undefined 或非陣列
             if (data === undefined || !Array.isArray(data)) {
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container);  // 修改這裡以傳遞整個數據陣列
+                    callback(data, container);
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -879,7 +869,7 @@ function drawChart(data) {
     const netIncomeRatio = data.map(entry => entry.netIncomeRatio ? (entry.netIncomeRatio * 100).toFixed(2) : null);
 
     const ctx = document.getElementById('ratioChart').getContext('2d');
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 清除之前的圖表
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
 
     const ratioChart = new Chart(ctx, {
         type: 'line',
