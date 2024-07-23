@@ -422,7 +422,7 @@ function loadAIBoxSection(sectionId) {
     }
 }
 //////////////////////////////////////////////////////////////////////////////
-function fetchStock() {
+async function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
     const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
 
@@ -453,6 +453,15 @@ function fetchStock() {
                 container.innerHTML = '';
             }
         });
+
+        // 清除之前的圖表
+        const ratioChartElement = document.getElementById('ratioChart');
+        if (ratioChartElement) {
+            const ctx = ratioChartElement.getContext('2d');
+            if (ctx) {
+                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            }
+        }
 
         const sections = document.querySelectorAll('.section');
         sections.forEach(section => {
