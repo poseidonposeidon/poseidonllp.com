@@ -698,53 +698,18 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-function fetchStock() {
-    const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
-    const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
+async function fetchIncomeStatement() {
+    const stockSymbol = fetchStock(); // 確保 fetchStock 函式也已定義
+    const period = document.getElementById('period').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbol').innerText = 'Current query: ' + stockSymbol;
-        document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
-
-        // 清除之前的公司數據
-        const companyProfileContainer = document.getElementById('companyProfileContainer');
-        if (companyProfileContainer) {
-            companyProfileContainer.innerHTML = '';
-        }
-
-        const containers = [
-            'incomeStatementContainer',
-            'balanceSheetContainer',
-            'cashflowContainer',
-            'earningsCallTranscriptContainer',
-            'earningsCallCalendarContainer',
-            'historicalEarningsContainer',
-            'stockDividendCalendarContainer',
-            'insiderTradesContainer'
-        ];
-
-        containers.forEach(containerId => {
-            const container = document.getElementById(containerId);
-            if (container) {
-                container.innerHTML = '';
-            }
-        });
-
-        // 清除之前的圖表
-        const ctx = document.getElementById('ratioChart').getContext('2d');
-        if (ctx) {
-            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-        }
-
-        const sections = document.querySelectorAll('.section');
-        sections.forEach(section => {
-            section.classList.remove('fixed');
-            collapseSection(section);
-        });
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
     }
 
-    fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
-    return stockSymbol;
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer');
 }
 
 function fetchJPIncomeStatement() {
