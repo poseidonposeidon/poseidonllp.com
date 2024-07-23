@@ -198,6 +198,12 @@ function loadSection(sectionId) {
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
 
+document.body.insertAdjacentHTML('beforeend', `
+    <div style="display:none;">
+        <canvas id="ratioChart" width="400" height="200"></canvas>
+    </div>
+`);
+
 function loadSectionJP(sectionId) {
     const sections = {
         'income-statement': `
@@ -681,7 +687,7 @@ function displayCompanyProfile(data, container) {
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
 function fetchIncomeStatement() {
     stockSymbol = fetchStock();
-    const period = document.getElementById('period').value;  // 獲取選擇的時段
+    const period = document.getElementById('period').value; // 獲取選擇的時段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -814,7 +820,7 @@ function displayIncomeStatement(data, container) {
         rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
-    // 构建 HTML 表格
+    // 構建 HTML 表格
     let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
         htmlContent += `<tr><th>${rows[key][0]}</th>`;
@@ -826,8 +832,10 @@ function displayIncomeStatement(data, container) {
     htmlContent += '</table>';
 
     container.innerHTML = htmlContent;
-    const expandButton = document.getElementById('expandButton_Income');
-    if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
+
+    // 繪製圖表並生成下載連結
+    drawChart(data);
+    createDownloadLink();
 }
 
 function fetchData_IncomeStatement(apiUrl, callback, containerId) {
@@ -836,12 +844,11 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId) {
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            // 檢查回應資料是否為 undefined 或非陣列
             if (data === undefined || !Array.isArray(data)) {
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container);  // 修改這裡以傳遞整個數據陣列
+                    callback(data, container);
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -851,6 +858,62 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId) {
             console.error('Error fetching data: ', error);
             container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
         });
+}
+
+function drawChart(data) {
+    const dates = data.map(entry => entry.date);
+    const grossProfitRatio = data.map(entry => entry.grossProfitRatio ? (entry.grossProfitRatio * 100).toFixed(2) : null);
+    const operatingIncomeRatio = data.map(entry => entry.operatingIncomeRatio ? (entry.operatingIncomeRatio * 100).toFixed(2) : null);
+    const netIncomeRatio = data.map(entry => entry.netIncomeRatio ? (entry.netIncomeRatio * 100).toFixed(2) : null);
+
+    const ctx = document.getElementById('ratioChart').getContext('2d');
+    const ratioChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [
+                {
+                    label: 'Gross Profit Ratio',
+                    data: grossProfitRatio,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false
+                },
+                {
+                    label: 'Operating Income Ratio',
+                    data: operatingIncomeRatio,
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    fill: false
+                },
+                {
+                    label: 'Net Income Ratio',
+                    data: netIncomeRatio,
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    fill: false
+                }
+            ]
+        },
+        options: {
+            scales: {
+                x: { title: { display: true, text: 'Date' } },
+                y: { title: { display: true, text: 'Ratio (%)' } }
+            }
+        }
+    });
+
+    // 將圖表保存為圖片並生成下載連結
+    document.getElementById('downloadChart').onclick = function() {
+        const a = document.createElement('a');
+        a.href = ratioChart.toBase64Image();
+        a.download = 'income_statement_ratios_chart.png';
+        a.click();
+    };
+}
+
+function createDownloadLink() {
+    const downloadLink = document.createElement('button');
+    downloadLink.innerHTML = 'Download Chart';
+    downloadLink.id = 'downloadChart';
+    document.querySelector('#income-statement .content').appendChild(downloadLink);
 }
 
 function formatNumber(value) {
