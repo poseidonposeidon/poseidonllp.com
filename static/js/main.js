@@ -518,7 +518,8 @@ async function fetchStockExchange(stockSymbol) {
         // 過濾出包含 .TW 或 .TWO 的結果
         const filteredData = data.filter(item => item.symbol.endsWith('.TW') || item.symbol.endsWith('.TWO'));
         if (filteredData.length > 0) {
-            return filteredData[0].exchangeShortName;
+            const match = filteredData.find(item => item.symbol.split('.')[0] === stockSymbol);
+            return match ? match.exchangeShortName : null;
         } else {
             return null;
         }
