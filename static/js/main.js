@@ -97,6 +97,7 @@ function loadSection(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchIncomeStatement()">Load Statement</button>
+                    <button id="downloadChart" style="display:none;">Download Chart</button>
                     <div class="scroll-container-x">
                         <table id="IncomeStatementTable" border="1">
                             <div id="incomeStatementContainer"></div>
