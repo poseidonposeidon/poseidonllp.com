@@ -197,8 +197,7 @@ function loadSection(sectionId) {
 
     const sectionContainer = document.getElementById('section-container');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
-}
-// 添加繪圖和下載功能的HTML
+}// 添加繪圖和下載功能的HTML
 document.body.insertAdjacentHTML('beforeend', `
     <div style="display:none;">
         <canvas id="ratioChart" width="400" height="200"></canvas>
