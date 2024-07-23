@@ -628,6 +628,7 @@ addEnterKeyListener("jpStockSymbol", "#jpStockButton");
 addEnterKeyListener("twStockSymbol", "#twStockButton");
 
 //////////////////////////////Profile//////////////////////////////////////////////
+
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
@@ -675,6 +676,8 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
+let incomeStatementChartInstance;
+
 function fetchIncomeStatement() {
     stockSymbol = fetchStock();
     const period = document.getElementById('period').value;  // 獲取選擇的時段
@@ -847,7 +850,13 @@ function createIncomeStatementChart(data) {
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const ctx = document.getElementById('incomeStatementChart').getContext('2d');
-    new Chart(ctx, {
+
+    // 銷毀現有圖表實例（如果存在）
+    if (incomeStatementChartInstance) {
+        incomeStatementChartInstance.destroy();
+    }
+
+    incomeStatementChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
             labels: data.map(entry => entry.date),
