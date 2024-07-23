@@ -97,14 +97,14 @@ function loadSection(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchIncomeStatement()">Load Statement</button>
+                    <!-- Hidden canvas for chart generation -->
+                    <div style="display: none;">
+                        <canvas id="ratioChart" width="400" height="200"></canvas>
+                    </div>
                     <div class="scroll-container-x">
                         <table id="IncomeStatementTable" border="1">
                             <div id="incomeStatementContainer"></div>
                         </table>
-                    </div>
-                    <!-- Chart container -->
-                    <div class="chart-container">
-                        <canvas id="ratioChart" width="400" height="200"></canvas>
                     </div>
                 </div>
             </div>`,
@@ -683,18 +683,53 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-function fetchIncomeStatement() {
-    const stockSymbol = fetchStock();
-    const period = document.getElementById('period').value;  // 獲取選擇的時段
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+function fetchStock() {
+    const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
+    const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
 
-    if (!stockSymbol) {
-        alert('Please enter a stock symbol.');
-        return;
+    if (stockSymbol !== previousSymbol) {
+        document.getElementById('outputSymbol').innerText = 'Current query: ' + stockSymbol;
+        document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
+
+        // 清除之前的公司數據
+        const companyProfileContainer = document.getElementById('companyProfileContainer');
+        if (companyProfileContainer) {
+            companyProfileContainer.innerHTML = '';
+        }
+
+        const containers = [
+            'incomeStatementContainer',
+            'balanceSheetContainer',
+            'cashflowContainer',
+            'earningsCallTranscriptContainer',
+            'earningsCallCalendarContainer',
+            'historicalEarningsContainer',
+            'stockDividendCalendarContainer',
+            'insiderTradesContainer'
+        ];
+
+        containers.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '';
+            }
+        });
+
+        // 清除之前的圖表
+        const ctx = document.getElementById('ratioChart').getContext('2d');
+        if (ctx) {
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+        }
+
+        const sections = document.querySelectorAll('.section');
+        sections.forEach(section => {
+            section.classList.remove('fixed');
+            collapseSection(section);
+        });
     }
 
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer');
+    fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
+    return stockSymbol;
 }
 
 function fetchJPIncomeStatement() {
@@ -864,6 +899,8 @@ function drawChart(data) {
     const netIncomeRatio = data.map(entry => entry.netIncomeRatio ? (entry.netIncomeRatio * 100).toFixed(2) : null);
 
     const ctx = document.getElementById('ratioChart').getContext('2d');
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // 清除之前的圖表
+
     const ratioChart = new Chart(ctx, {
         type: 'line',
         data: {
@@ -897,7 +934,6 @@ function drawChart(data) {
         }
     });
 
-    // 確保圖表已正確渲染
     ratioChart.update();
 }
 
