@@ -199,12 +199,6 @@ function loadSection(sectionId) {
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
 
-document.body.insertAdjacentHTML('beforeend', `
-    <div style="display:none;">
-        <canvas id="ratioChart" width="400" height="200"></canvas>
-    </div>
-`);
-
 function loadSectionJP(sectionId) {
     const sections = {
         'income-statement': `
@@ -433,7 +427,7 @@ function fetchStock() {
         document.getElementById('outputSymbol').innerText = 'Current query: ' + stockSymbol;
         document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
 
-        // Clear previous company data
+        // 清除之前的公司數據
         const companyProfileContainer = document.getElementById('companyProfileContainer');
         if (companyProfileContainer) {
             companyProfileContainer.innerHTML = '';
@@ -464,7 +458,7 @@ function fetchStock() {
         });
     }
 
-    fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
+    fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
     return stockSymbol;
 }
 
@@ -821,7 +815,7 @@ function displayIncomeStatement(data, container) {
         rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
-    // 构建 HTML 表格
+    // 構建 HTML 表格
     let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
         htmlContent += `<tr><th>${rows[key][0]}</th>`;
@@ -902,12 +896,13 @@ function drawChart(data) {
         }
     });
 
+    // 確保圖表已正確渲染
+    ratioChart.update();
+
     // 將圖表保存為圖片並生成下載連結
     document.getElementById('downloadChart').onclick = function() {
-        // 確保圖表已正確渲染
-        ratioChart.update();
         const a = document.createElement('a');
-        a.href = ratioChart.toBase64Image();
+        a.href = ratioChart.toBase64Image('image/png');
         a.download = 'income_statement_ratios_chart.png';
         a.click();
     };
@@ -921,9 +916,16 @@ function createDownloadLink() {
 }
 
 function formatNumber(value) {
-    // Check if the value is numeric and format it, otherwise return 'N/A'
+    // 檢查數值是否為數字，格式化數值，否則返回 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
+
+// 添加繪圖和下載功能的HTML
+document.body.insertAdjacentHTML('beforeend', `
+    <div style="display:none;">
+        <canvas id="ratioChart" width="400" height="200"></canvas>
+    </div>
+`);
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
