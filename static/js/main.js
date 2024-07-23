@@ -851,21 +851,21 @@ function createIncomeStatementChart(data) {
             datasets: [
                 {
                     label: 'Gross Profit Ratio',
-                    data: data.map(entry => entry.grossProfitRatio * 100),
-                    borderColor: 'rgb(255, 99, 132)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                    data: grossProfitRatio,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    fill: false
                 },
                 {
                     label: 'Operating Income Ratio',
-                    data: data.map(entry => entry.operatingIncomeRatio * 100),
-                    borderColor: 'rgb(54, 162, 235)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    data: operatingIncomeRatio,
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    fill: false
                 },
                 {
                     label: 'Net Income Ratio',
-                    data: data.map(entry => entry.netIncomeRatio * 100),
-                    borderColor: 'rgb(75, 192, 192)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                    data: netIncomeRatio,
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    fill: false
                 }
             ]
         },
