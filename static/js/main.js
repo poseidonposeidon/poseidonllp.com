@@ -97,15 +97,14 @@ function loadSection(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchIncomeStatement()">Load Statement</button>
-                    <!-- Hidden canvas for chart generation -->
-                    <div style="display: none;">
-                        <canvas id="ratioChart" width="400" height="200"></canvas>
-                    </div>
-                    <button id="downloadChart" style="display:none;">Download Chart</button>
                     <div class="scroll-container-x">
                         <table id="IncomeStatementTable" border="1">
                             <div id="incomeStatementContainer"></div>
                         </table>
+                    </div>
+                    <!-- Chart container -->
+                    <div class="chart-container">
+                        <canvas id="ratioChart" width="400" height="200"></canvas>
                     </div>
                 </div>
             </div>`,
@@ -729,12 +728,11 @@ async function fetchTWIncomeStatement() {
 function displayIncomeStatement(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
-        const expandButton = document.getElementById('expandButton_Income');
-        if (expandButton) expandButton.style.display = 'none'; // 隱藏按鈕
-        const collapseButton = document.getElementById('collapseButton_Income');
-        if (collapseButton) collapseButton.style.display = 'none';
         return;
     }
+
+    // 按日期排序數據
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let rows = {
         date: ['Date'],
@@ -832,9 +830,8 @@ function displayIncomeStatement(data, container) {
 
     container.innerHTML = htmlContent;
 
-    // 繪製圖表並生成下載連結
+    // 繪製圖表
     drawChart(data);
-    createDownloadLink();
 }
 
 function fetchData_IncomeStatement(apiUrl, callback, containerId) {
@@ -859,13 +856,6 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId) {
             container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
         });
 }
-
-// 插入 canvas 元素并设为隐藏
-document.body.insertAdjacentHTML('beforeend', `
-    <div style="display: none;">
-        <canvas id="ratioChart" width="400" height="200"></canvas>
-    </div>
-`);
 
 function drawChart(data) {
     const dates = data.map(entry => entry.date);
@@ -907,31 +897,8 @@ function drawChart(data) {
         }
     });
 
-    // 确保图表已正确渲染
+    // 確保圖表已正確渲染
     ratioChart.update();
-
-    // 将图表保存为图片并生成下载链接
-    document.getElementById('downloadChart').onclick = function() {
-        const a = document.createElement('a');
-        a.href = ratioChart.toBase64Image('image/png');
-        a.download = 'income_statement_ratios_chart.png';
-        a.click();
-    };
-}
-
-// 添加绘图和下载功能的HTML
-document.body.insertAdjacentHTML('beforeend', `
-    <div style="display: none;">
-        <canvas id="ratioChart" width="400" height="200"></canvas>
-    </div>
-`);
-
-
-function createDownloadLink() {
-    const downloadLink = document.getElementById('downloadChart');
-    if (downloadLink) {
-        downloadLink.style.display = 'inline'; // 显示下载按钮
-    }
 }
 
 function formatNumber(value) {
