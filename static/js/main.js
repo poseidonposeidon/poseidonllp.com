@@ -896,16 +896,16 @@ function drawChart(data) {
         }
     });
 
-    // 確保圖表已正確渲染
-    ratioChart.update();
-
-    // 將圖表保存為圖片並生成下載連結
-    document.getElementById('downloadChart').onclick = function() {
-        const a = document.createElement('a');
-        a.href = ratioChart.toBase64Image('image/png');
-        a.download = 'income_statement_ratios_chart.png';
-        a.click();
-    };
+    // 使用 setTimeout 確保圖表已正確渲染
+    setTimeout(() => {
+        // 將圖表保存為圖片並生成下載連結
+        document.getElementById('downloadChart').onclick = function() {
+            const a = document.createElement('a');
+            a.href = ratioChart.toBase64Image('image/png');
+            a.download = 'income_statement_ratios_chart.png';
+            a.click();
+        };
+    }, 1000); // 延遲 1 秒以確保圖表已渲染
 }
 
 function createDownloadLink() {
@@ -922,7 +922,7 @@ function formatNumber(value) {
 
 // 添加繪圖和下載功能的HTML
 document.body.insertAdjacentHTML('beforeend', `
-    <div style="display:none;">
+    <div>
         <canvas id="ratioChart" width="400" height="200"></canvas>
     </div>
 `);
