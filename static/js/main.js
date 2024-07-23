@@ -198,7 +198,6 @@ function loadSection(sectionId) {
     const sectionContainer = document.getElementById('section-container');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
-
 // 添加繪圖和下載功能的HTML
 document.body.insertAdjacentHTML('beforeend', `
     <div style="display:none;">
@@ -688,8 +687,8 @@ function displayCompanyProfile(data, container) {
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
 function fetchIncomeStatement() {
-    const stockSymbol = document.querySelector('#stock-symbol').value.trim();
-    const period = document.getElementById('period').value; // 獲取選擇的時段
+    const stockSymbol = fetchStock();
+    const period = document.getElementById('period').value;  // 獲取選擇的時段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -733,7 +732,7 @@ function displayIncomeStatement(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
-        if (expandButton) expandButton.style.display = 'none'; // 隐藏按钮
+        if (expandButton) expandButton.style.display = 'none'; // 隱藏按鈕
         const collapseButton = document.getElementById('collapseButton_Income');
         if (collapseButton) collapseButton.style.display = 'none';
         return;
@@ -780,7 +779,7 @@ function displayIncomeStatement(data, container) {
         finalLink: ['Final Link']
     };
 
-    // 填充行数据
+    // 填充行數據
     data.forEach(entry => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -822,7 +821,7 @@ function displayIncomeStatement(data, container) {
         rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
-    // 構建 HTML 表格
+    // 构建 HTML 表格
     let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
         htmlContent += `<tr><th>${rows[key][0]}</th>`;
@@ -846,11 +845,12 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId) {
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
+            // 檢查回應資料是否為 undefined 或非陣列
             if (data === undefined || !Array.isArray(data)) {
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container);
+                    callback(data, container);  // 修改這裡以傳遞整個數據陣列
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -912,10 +912,10 @@ function drawChart(data) {
 }
 
 function createDownloadLink() {
-    const downloadLink = document.createElement('button');
-    downloadLink.innerHTML = 'Download Chart';
-    downloadLink.id = 'downloadChart';
-    document.querySelector('#income-statement .content').appendChild(downloadLink);
+    const downloadLink = document.getElementById('downloadChart');
+    if (downloadLink) {
+        downloadLink.style.display = 'inline'; // 顯示下載按鈕
+    }
 }
 
 function formatNumber(value) {
