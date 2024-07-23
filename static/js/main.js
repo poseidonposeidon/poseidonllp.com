@@ -513,8 +513,9 @@ async function fetchStockExchange(stockSymbol) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
+        console.log(data); // 在這裡打印出返回的資料
         if (data.length > 0) {
-            return data[0].exchangeShortName; // 假設 API 返回 { "exchangeShortName": "TAI" } 或 { "exchangeShortName": "TWO" }
+            return data[0].exchangeShortName;
         } else {
             return null;
         }
@@ -523,6 +524,7 @@ async function fetchStockExchange(stockSymbol) {
         return null;
     }
 }
+
 
 async function fetchTWStock() {
     const stockSymbol = document.getElementById('twStockSymbol').value.trim();
