@@ -690,7 +690,7 @@ function fetchIncomeStatement() {
 }
 
 function fetchJPIncomeStatement() {
-    const stockSymbol = fetchJPStock();
+    stockSymbol = fetchJPStock();
     const period = document.getElementById('periodJP').value;  // 獲取選擇的時段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
 
@@ -704,7 +704,7 @@ function fetchJPIncomeStatement() {
 }
 
 async function fetchTWIncomeStatement() {
-    const stockSymbol = await fetchTWStock();  // 確保 fetchTWStock 是 async 並等待它完成
+    stockSymbol = await fetchTWStock();  // 確保 fetchTWStock 是 async 並等待它完成
     const period = document.getElementById('periodTW').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
