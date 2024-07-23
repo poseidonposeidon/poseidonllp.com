@@ -896,7 +896,7 @@ function drawChart(data) {
         }
     });
 
-    // 使用 setTimeout 確保圖表已正確渲染
+    // 確保圖表已正確渲染
     setTimeout(() => {
         // 將圖表保存為圖片並生成下載連結
         document.getElementById('downloadChart').onclick = function() {
@@ -905,6 +905,9 @@ function drawChart(data) {
             a.download = 'income_statement_ratios_chart.png';
             a.click();
         };
+
+        // 隱藏 canvas 元素
+        document.getElementById('ratioChart').parentElement.style.display = 'none';
     }, 1000); // 延遲 1 秒以確保圖表已渲染
 }
 
@@ -922,8 +925,8 @@ function formatNumber(value) {
 
 // 添加繪圖和下載功能的HTML
 document.body.insertAdjacentHTML('beforeend', `
-    <div>
-        <canvas id="ratioChart" width="400" height="200" style="display: none;"></canvas>
+    <div style="display:none;">
+        <canvas id="ratioChart" width="400" height="200"></canvas>
     </div>
 `);
 
