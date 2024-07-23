@@ -422,7 +422,7 @@ function loadAIBoxSection(sectionId) {
     }
 }
 //////////////////////////////////////////////////////////////////////////////
-async function fetchStock() {
+function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
     const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
 
@@ -468,11 +468,17 @@ async function fetchStock() {
             section.classList.remove('fixed');
             collapseSection(section);
         });
+
+        // 設定一個空白的圖表
+        drawEmptyChart();
     }
 
     fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
     return stockSymbol;
 }
+
+
+
 
 function fetchJPStock() {
     const stockSymbol = document.getElementById('jpStockSymbol').value.trim() + ".T";
@@ -944,6 +950,23 @@ function drawChart(data) {
     });
 
     ratioChart.update();
+}
+
+function drawEmptyChart() {
+    const ctx = document.getElementById('ratioChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: []
+        },
+        options: {
+            scales: {
+                x: { title: { display: true, text: 'Date' } },
+                y: { title: { display: true, text: 'Ratio (%)' } }
+            }
+        }
+    });
 }
 
 function formatNumber(value) {
