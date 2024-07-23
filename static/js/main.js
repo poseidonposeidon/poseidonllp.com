@@ -97,6 +97,10 @@ function loadSection(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchIncomeStatement()">Load Statement</button>
+                    <!-- Hidden canvas for chart generation -->
+                    <div style="display: none;">
+                        <canvas id="ratioChart" width="400" height="200"></canvas>
+                    </div>
                     <button id="downloadChart" style="display:none;">Download Chart</button>
                     <div class="scroll-container-x">
                         <table id="IncomeStatementTable" border="1">
@@ -856,6 +860,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId) {
         });
 }
 
+// 插入 canvas 元素并设为隐藏
 document.body.insertAdjacentHTML('beforeend', `
     <div style="display: none;">
         <canvas id="ratioChart" width="400" height="200"></canvas>
@@ -902,10 +907,10 @@ function drawChart(data) {
         }
     });
 
-    // 確保圖表已正確渲染
+    // 确保图表已正确渲染
     ratioChart.update();
 
-    // 將圖表保存為圖片並生成下載連結
+    // 将图表保存为图片并生成下载链接
     document.getElementById('downloadChart').onclick = function() {
         const a = document.createElement('a');
         a.href = ratioChart.toBase64Image('image/png');
@@ -914,10 +919,18 @@ function drawChart(data) {
     };
 }
 
+// 添加绘图和下载功能的HTML
+document.body.insertAdjacentHTML('beforeend', `
+    <div style="display: none;">
+        <canvas id="ratioChart" width="400" height="200"></canvas>
+    </div>
+`);
+
+
 function createDownloadLink() {
     const downloadLink = document.getElementById('downloadChart');
     if (downloadLink) {
-        downloadLink.style.display = 'inline'; // 顯示下載按鈕
+        downloadLink.style.display = 'inline'; // 显示下载按钮
     }
 }
 
@@ -928,11 +941,6 @@ function formatNumber(value) {
 
 
 
-document.body.insertAdjacentHTML('beforeend', `
-    <div style="display: none;">
-        <canvas id="ratioChart" width="400" height="200"></canvas>
-    </div>
-`);
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
     stockSymbol = fetchStock();
