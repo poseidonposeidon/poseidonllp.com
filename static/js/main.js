@@ -199,6 +199,7 @@ function loadSection(sectionId) {
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
 
+// 添加繪圖和下載功能的HTML
 document.body.insertAdjacentHTML('beforeend', `
     <div style="display:none;">
         <canvas id="ratioChart" width="400" height="200"></canvas>
@@ -687,7 +688,7 @@ function displayCompanyProfile(data, container) {
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
 function fetchIncomeStatement() {
-    stockSymbol = fetchStock();
+    const stockSymbol = document.querySelector('#stock-symbol').value.trim();
     const period = document.getElementById('period').value; // 獲取選擇的時段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
