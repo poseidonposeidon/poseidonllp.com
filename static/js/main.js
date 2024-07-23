@@ -843,6 +843,9 @@ function displayIncomeStatement(data, container) {
 }
 
 function createIncomeStatementChart(data) {
+    // 首先，按日期從舊到新排序數據
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     const ctx = document.getElementById('incomeStatementChart').getContext('2d');
     new Chart(ctx, {
         type: 'line',
@@ -872,23 +875,25 @@ function createIncomeStatementChart(data) {
         options: {
             responsive: true,
             scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    },
+                    reverse: false // 確保x軸不是反轉的
+                },
                 y: {
                     beginAtZero: true,
                     title: {
                         display: true,
                         text: 'Percentage (%)'
                     }
-                },
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    }
                 }
             }
         }
     });
 }
+
 function fetchData_IncomeStatement(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
