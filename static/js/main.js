@@ -676,7 +676,7 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-let incomeStatementChartInstance; // 這個變數應放在全域範圍內
+let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
 function fetchIncomeStatement() {
     stockSymbol = fetchStock();
@@ -853,11 +853,11 @@ function createIncomeStatementChart(data, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
 
     // 銷毀現有圖表實例（如果存在）
-    if (incomeStatementChartInstance) {
-        incomeStatementChartInstance.destroy();
+    if (incomeStatementChartInstances[chartId]) {
+        incomeStatementChartInstances[chartId].destroy();
     }
 
-    incomeStatementChartInstance = new Chart(ctx, {
+    incomeStatementChartInstances[chartId] = new Chart(ctx, {
         type: 'line',
         data: {
             labels: data.map(entry => entry.date),
