@@ -923,7 +923,7 @@ function formatNumber(value) {
 // 添加繪圖和下載功能的HTML
 document.body.insertAdjacentHTML('beforeend', `
     <div>
-        <canvas id="ratioChart" width="400" height="200"></canvas>
+        <canvas id="ratioChart" width="400" height="200" style="display: none;"></canvas>
     </div>
 `);
 
