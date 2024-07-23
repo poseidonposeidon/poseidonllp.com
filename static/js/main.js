@@ -537,7 +537,7 @@ async function fetchTWStock() {
     const exchangeShortName = await fetchStockExchange(stockSymbol);
     if (!exchangeShortName) {
         alert('無法判斷股票代碼所屬的交易所');
-        return;
+        return null;
     }
 
     let fullStockSymbol = '';
@@ -547,7 +547,7 @@ async function fetchTWStock() {
         fullStockSymbol = stockSymbol + '.TWO';
     } else {
         alert('未知的交易所類型');
-        return;
+        return null;
     }
 
     if (fullStockSymbol !== previousSymbol) {
@@ -707,8 +707,8 @@ function fetchJPIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP');
 }
 
-function fetchTWIncomeStatement() {
-    const stockSymbol = fetchTWStock();
+async function fetchTWIncomeStatement() {
+    const stockSymbol = await fetchTWStock();  // 確保 fetchTWStock 是 async 並等待它完成
     const period = document.getElementById('periodTW').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
@@ -720,7 +720,6 @@ function fetchTWIncomeStatement() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW');
 }
-
 function displayIncomeStatement(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
