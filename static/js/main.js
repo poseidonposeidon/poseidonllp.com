@@ -720,6 +720,7 @@ async function fetchTWIncomeStatement() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW');
 }
+
 function displayIncomeStatement(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
