@@ -97,15 +97,7 @@ function loadSection(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchIncomeStatement()">Load Statement</button>
-                    <!-- Hidden canvas for chart generation -->
-                    <div style="display: none;">
-                        <canvas id="ratioChart" width="400" height="200"></canvas>
-                    </div>
-                    <div class="scroll-container-x">
-                        <table id="IncomeStatementTable" border="1">
-                            <div id="incomeStatementContainer"></div>
-                        </table>
-                    </div>
+                    <div id="incomeStatementContainer"></div>
                 </div>
             </div>`,
         'balance-sheet': `
@@ -430,7 +422,7 @@ function fetchStock() {
         document.getElementById('outputSymbol').innerText = 'Current query: ' + stockSymbol;
         document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
 
-        // 清除之前的公司數據
+        // Clear previous company data
         const companyProfileContainer = document.getElementById('companyProfileContainer');
         if (companyProfileContainer) {
             companyProfileContainer.innerHTML = '';
@@ -454,26 +446,14 @@ function fetchStock() {
             }
         });
 
-        // 清除之前的圖表
-        const ratioChartElement = document.getElementById('ratioChart');
-        if (ratioChartElement) {
-            const ctx = ratioChartElement.getContext('2d');
-            if (ctx) {
-                ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-            }
-        }
-
         const sections = document.querySelectorAll('.section');
         sections.forEach(section => {
             section.classList.remove('fixed');
             collapseSection(section);
         });
-
-        // 設定一個空白的圖表
-        drawEmptyChart();
     }
 
-    fetchCompanyProfile(stockSymbol);  // 傳遞 stockSymbol 給 fetchCompanyProfile
+    fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
     return stockSymbol;
 }
 
@@ -695,9 +675,9 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-async function fetchIncomeStatement() {
-    const stockSymbol = fetchStock(); // 確保 fetchStock 函式也已定義
-    const period = document.getElementById('period').value;
+function fetchIncomeStatement() {
+    stockSymbol = fetchStock();
+    const period = document.getElementById('period').value;  // 獲取選擇的時段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -740,6 +720,10 @@ async function fetchTWIncomeStatement() {
 function displayIncomeStatement(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
+        const expandButton = document.getElementById('expandButton_Income');
+        if (expandButton) expandButton.style.display = 'none';
+        const collapseButton = document.getElementById('collapseButton_Income');
+        if (collapseButton) collapseButton.style.display = 'none';
         return;
     }
 
@@ -784,6 +768,7 @@ function displayIncomeStatement(data, container) {
         finalLink: ['Final Link']
     };
 
+    // 填充行數據
     data.forEach(entry => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -825,19 +810,84 @@ function displayIncomeStatement(data, container) {
         rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
-    let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
+    // 構建 HTML 表格
+    let tableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
-        htmlContent += `<tr><th>${rows[key][0]}</th>`;
+        tableHtml += `<tr><th>${rows[key][0]}</th>`;
         rows[key].slice(1).forEach(value => {
-            htmlContent += `<td>${value}</td>`;
+            tableHtml += `<td>${value}</td>`;
         });
-        htmlContent += '</tr>';
+        tableHtml += '</tr>';
     });
-    htmlContent += '</table>';
+    tableHtml += '</table>';
 
-    container.innerHTML = htmlContent;
+    // 創建容器結構
+    container.innerHTML = `
+        <div class="scroll-container-x">
+            <table id="IncomeStatementTable" border="1">
+                <div id="incomeStatementContainer">
+                    ${tableHtml}
+                </div>
+            </table>
+        </div>
+        <div id="chartContainer" style="margin-top: 20px;">
+            <canvas id="incomeStatementChart"></canvas>
+        </div>
+    `;
 
-    drawChart(data);
+    // 創建圖表
+    createIncomeStatementChart(data);
+
+    const expandButton = document.getElementById('expandButton_Income');
+    if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
+}
+
+function createIncomeStatementChart(data) {
+    const ctx = document.getElementById('incomeStatementChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(entry => entry.date),
+            datasets: [
+                {
+                    label: 'Gross Profit Ratio',
+                    data: data.map(entry => entry.grossProfitRatio * 100),
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.5)',
+                },
+                {
+                    label: 'Operating Income Ratio',
+                    data: data.map(entry => entry.operatingIncomeRatio * 100),
+                    borderColor: 'rgb(54, 162, 235)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                },
+                {
+                    label: 'Net Income Ratio',
+                    data: data.map(entry => entry.netIncomeRatio * 100),
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Percentage (%)'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            }
+        }
+    });
 }
 
 function fetchData_IncomeStatement(apiUrl, callback, containerId) {
@@ -846,11 +896,12 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId) {
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
+            // 檢查回應資料是否為 undefined 或非陣列
             if (data === undefined || !Array.isArray(data)) {
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container);
+                    callback(data, container);  // 修改這裡以傳遞整個數據陣列
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -862,74 +913,10 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId) {
         });
 }
 
-function drawChart(data) {
-    const dates = data.map(entry => entry.date);
-    const grossProfitRatio = data.map(entry => entry.grossProfitRatio ? (entry.grossProfitRatio * 100).toFixed(2) : null);
-    const operatingIncomeRatio = data.map(entry => entry.operatingIncomeRatio ? (entry.operatingIncomeRatio * 100).toFixed(2) : null);
-    const netIncomeRatio = data.map(entry => entry.netIncomeRatio ? (entry.netIncomeRatio * 100).toFixed(2) : null);
-
-    const ctx = document.getElementById('ratioChart').getContext('2d');
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-
-    const ratioChart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: dates,
-            datasets: [
-                {
-                    label: 'Gross Profit Ratio',
-                    data: grossProfitRatio,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    fill: false
-                },
-                {
-                    label: 'Operating Income Ratio',
-                    data: operatingIncomeRatio,
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    fill: false
-                },
-                {
-                    label: 'Net Income Ratio',
-                    data: netIncomeRatio,
-                    borderColor: 'rgba(255, 159, 64, 1)',
-                    fill: false
-                }
-            ]
-        },
-        options: {
-            scales: {
-                x: { title: { display: true, text: 'Date' } },
-                y: { title: { display: true, text: 'Ratio (%)' } }
-            }
-        }
-    });
-
-    ratioChart.update();
-}
-
-function drawEmptyChart() {
-    const ctx = document.getElementById('ratioChart').getContext('2d');
-    new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: [],
-            datasets: []
-        },
-        options: {
-            scales: {
-                x: { title: { display: true, text: 'Date' } },
-                y: { title: { display: true, text: 'Ratio (%)' } }
-            }
-        }
-    });
-}
-
 function formatNumber(value) {
-    // 檢查數值是否為數字，格式化數值，否則返回 'N/A'
+    // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
-
-
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
