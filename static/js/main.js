@@ -197,7 +197,8 @@ function loadSection(sectionId) {
 
     const sectionContainer = document.getElementById('section-container');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
-}// 添加繪圖和下載功能的HTML
+}
+
 document.body.insertAdjacentHTML('beforeend', `
     <div style="display:none;">
         <canvas id="ratioChart" width="400" height="200"></canvas>
@@ -903,6 +904,8 @@ function drawChart(data) {
 
     // 將圖表保存為圖片並生成下載連結
     document.getElementById('downloadChart').onclick = function() {
+        // 確保圖表已正確渲染
+        ratioChart.update();
         const a = document.createElement('a');
         a.href = ratioChart.toBase64Image();
         a.download = 'income_statement_ratios_chart.png';
