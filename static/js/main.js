@@ -853,19 +853,19 @@ function createIncomeStatementChart(data) {
                     label: 'Gross Profit Ratio',
                     data: data.map(entry => entry.grossProfitRatio * 100),
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    fill: false
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
                 },
                 {
                     label: 'Operating Income Ratio',
-                    data: data.map(entry => entry.operatingIncomeRatio  * 100),
+                    data: data.map(entry => entry.operatingIncomeRatio * 100),
                     borderColor: 'rgba(153, 102, 255, 1)',
-                    fill: false
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
                 },
                 {
                     label: 'Net Income Ratio',
-                    data:  data.map(entry => entry.netIncomeRatio * 100),
+                    data: data.map(entry => entry.netIncomeRatio * 100),
                     borderColor: 'rgba(255, 159, 64, 1)',
-                    fill: false
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
                 }
             ]
         },
@@ -889,7 +889,6 @@ function createIncomeStatementChart(data) {
         }
     });
 }
-
 function fetchData_IncomeStatement(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
