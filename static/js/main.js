@@ -856,6 +856,12 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId) {
         });
 }
 
+document.body.insertAdjacentHTML('beforeend', `
+    <div style="display: none;">
+        <canvas id="ratioChart" width="400" height="200"></canvas>
+    </div>
+`);
+
 function drawChart(data) {
     const dates = data.map(entry => entry.date);
     const grossProfitRatio = data.map(entry => entry.grossProfitRatio ? (entry.grossProfitRatio * 100).toFixed(2) : null);
@@ -897,18 +903,15 @@ function drawChart(data) {
     });
 
     // 確保圖表已正確渲染
-    setTimeout(() => {
-        // 將圖表保存為圖片並生成下載連結
-        document.getElementById('downloadChart').onclick = function() {
-            const a = document.createElement('a');
-            a.href = ratioChart.toBase64Image('image/png');
-            a.download = 'income_statement_ratios_chart.png';
-            a.click();
-        };
+    ratioChart.update();
 
-        // 隱藏 canvas 元素
-        document.getElementById('ratioChart').parentElement.style.display = 'none';
-    }, 1000); // 延遲 1 秒以確保圖表已渲染
+    // 將圖表保存為圖片並生成下載連結
+    document.getElementById('downloadChart').onclick = function() {
+        const a = document.createElement('a');
+        a.href = ratioChart.toBase64Image('image/png');
+        a.download = 'income_statement_ratios_chart.png';
+        a.click();
+    };
 }
 
 function createDownloadLink() {
@@ -923,13 +926,13 @@ function formatNumber(value) {
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
-// 添加繪圖和下載功能的HTML
+
+
 document.body.insertAdjacentHTML('beforeend', `
-    <div style="display:none;">
+    <div style="display: none;">
         <canvas id="ratioChart" width="400" height="200"></canvas>
     </div>
 `);
-
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
     stockSymbol = fetchStock();
