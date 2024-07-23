@@ -676,7 +676,7 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-let incomeStatementChartInstance;
+let incomeStatementChartInstance; // 這個變數應放在全域範圍內
 
 function fetchIncomeStatement() {
     stockSymbol = fetchStock();
@@ -689,7 +689,7 @@ function fetchIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart');
 }
 
 function fetchJPIncomeStatement() {
@@ -703,7 +703,7 @@ function fetchJPIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP');
 }
 
 async function fetchTWIncomeStatement() {
@@ -717,10 +717,11 @@ async function fetchTWIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW');
 }
 
-function displayIncomeStatement(data, container) {
+
+function displayIncomeStatement(data, container, chartId) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
@@ -828,28 +829,28 @@ function displayIncomeStatement(data, container) {
     container.innerHTML = `
         <div class="scroll-container-x">
             <table id="IncomeStatementTable" border="1">
-                <div id="incomeStatementContainer">
+                <div id="${chartId}Container">
                     ${tableHtml}
                 </div>
             </table>
         </div>
         <div id="chartContainer" style="margin-top: 20px;">
-            <canvas id="incomeStatementChart"></canvas>
+            <canvas id="${chartId}"></canvas>
         </div>
     `;
 
     // 創建圖表
-    createIncomeStatementChart(data);
+    createIncomeStatementChart(data, chartId);
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
 }
 
-function createIncomeStatementChart(data) {
+function createIncomeStatementChart(data, chartId) {
     // 首先，按日期從舊到新排序數據
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    const ctx = document.getElementById('incomeStatementChart').getContext('2d');
+    const ctx = document.getElementById(chartId).getContext('2d');
 
     // 銷毀現有圖表實例（如果存在）
     if (incomeStatementChartInstance) {
@@ -903,7 +904,7 @@ function createIncomeStatementChart(data) {
     });
 }
 
-function fetchData_IncomeStatement(apiUrl, callback, containerId) {
+function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
     fetch(apiUrl)
@@ -914,7 +915,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId) {
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container);  // 修改這裡以傳遞整個數據陣列
+                    callback(data, container, chartId);  // 修改這裡以傳遞整個數據陣列
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
