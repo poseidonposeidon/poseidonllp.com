@@ -514,7 +514,7 @@ async function fetchStockExchange(stockSymbol) {
         }
         const data = await response.json();
         if (data.length > 0) {
-            return data[0].exchangeShortName; // 假設 API 返回 { "exchangeShortName": "TW" } 或 { "exchangeShortName": "TWO" }
+            return data[0].exchangeShortName; // 假設 API 返回 { "exchangeShortName": "TAI" } 或 { "exchangeShortName": "TWO" }
         } else {
             return null;
         }
@@ -536,7 +536,7 @@ async function fetchTWStock() {
     }
 
     let fullStockSymbol = '';
-    if (exchangeShortName === 'TW') {
+    if (exchangeShortName === 'TAI') {
         fullStockSymbol = stockSymbol + '.TW';
     } else if (exchangeShortName === 'TWO') {
         fullStockSymbol = stockSymbol + '.TWO';
