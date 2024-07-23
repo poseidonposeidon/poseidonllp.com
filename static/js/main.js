@@ -886,8 +886,8 @@ function fetchJPBalanceSheet() {
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerJP');
 }
 
-function fetchTWBalanceSheet() {
-    const stockSymbol = fetchTWStock();
+async function fetchTWBalanceSheet() {
+    const stockSymbol = await fetchTWStock();
     const period = document.getElementById('periodTW_2').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
@@ -1090,8 +1090,8 @@ function fetchJPCashflow() {
     fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerJP');
 }
 
-function fetchTWCashflow() {
-    const stockSymbol = fetchJPStock();
+async function fetchTWCashflow() {
+    const stockSymbol = await fetchTWStock();  // 正確使用 fetchTWStock 函式
     const period = document.getElementById('periodTW_3').value;  // 獲取選擇的時段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
 
