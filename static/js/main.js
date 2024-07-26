@@ -838,7 +838,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
                 </div>
             </table>
         </div>
-        <div id="chartContainer" style="margin-top: 20px;">
+        <div id="operatingChartContainer" style="margin-top: 20px;">
             <canvas id="${operatingChartId}"></canvas>
         </div>
         <div id="chartContainer" style="margin-top: 20px;">
