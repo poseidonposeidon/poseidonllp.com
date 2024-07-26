@@ -9,6 +9,7 @@ function expandSection(element) {
         content.style.opacity = '1';
         content.style.paddingTop = '20px';
         content.style.paddingBottom = '20px';
+        content.style.transition = 'max-height 0.8s ease-in-out, opacity 0.8s ease-in-out, padding 0.8s ease-in-out';
     }
 }
 
@@ -19,6 +20,7 @@ function collapseSection(element) {
         content.style.opacity = '0';
         content.style.paddingTop = '0';
         content.style.paddingBottom = '0';
+        content.style.transition = 'max-height 0.8s ease-in-out, opacity 0.8s ease-in-out, padding 0.8s ease-in-out';
     }
 }
 
@@ -83,13 +85,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+
 ////////////////////////////////////////////////////////////////////////////
 
 function loadSection(sectionId) {
     const sections = {
         'income-statement': `
             <div class="section" id="income-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-                <h2>Income Statement</h2>
+                <h2 onmouseover="expandSection(this.parentElement)">Income Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="period">Select Period:</label>
                     <select id="period">
