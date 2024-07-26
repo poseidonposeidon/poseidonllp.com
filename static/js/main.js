@@ -925,7 +925,7 @@ function createOperatingChart(data, chartId) {
     }
 
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
-        type: 'line',
+        type: 'bar', // 主要圖表類型設為柱狀圖
         data: {
             labels: data.map(entry => entry.date),
             datasets: [
@@ -960,6 +960,7 @@ function createOperatingChart(data, chartId) {
                 {
                     label: 'Growth Rate',
                     data: data.map(entry => entry.growthRate),
+                    type: 'line', // 單獨設置為折線圖
                     borderColor: 'rgba(255, 159, 64, 1)',
                     backgroundColor: 'rgba(255, 159, 64, 0.2)',
                     yAxisID: 'y1'
