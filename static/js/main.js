@@ -5,6 +5,7 @@ let activeSection = null;
 function expandSection(element) {
     const content = element.querySelector('.content');
     if (!element.classList.contains('fixed')) {
+        content.style.transition = 'max-height 0.6s ease, opacity 0.6s ease, padding-top 0.6s ease, padding-bottom 0.6s ease';
         content.style.maxHeight = '1000px';
         content.style.opacity = '1';
         content.style.paddingTop = '20px';
@@ -15,6 +16,7 @@ function expandSection(element) {
 function collapseSection(element) {
     const content = element.querySelector('.content');
     if (!element.classList.contains('fixed')) {
+        content.style.transition = 'max-height 0.6s ease, opacity 0.6s ease, padding-top 0.6s ease, padding-bottom 0.6s ease';
         content.style.maxHeight = '0px';
         content.style.opacity = '0';
         content.style.paddingTop = '0';
