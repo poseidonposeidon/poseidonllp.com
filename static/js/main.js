@@ -735,6 +735,9 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
         return;
     }
 
+    // 按日期升序排序
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     let rows = {
         date: ['Date'],
         symbol: ['Symbol'],
