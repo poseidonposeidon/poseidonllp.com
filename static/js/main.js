@@ -1,4 +1,4 @@
-///////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
 
 /////////////////////////////////////////////
@@ -585,7 +585,7 @@ async function fetchTWStock() {
     return fullStockSymbol;
 }
 
-document.addEventListener('DOMContentLoaded', function() /**/{
+document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('authToken');
     if (!token) {
         window.location.href = '/';  // 重定向到登录页面
@@ -694,7 +694,7 @@ function fetchIncomeStatement() {
         return;
     }
 
-    const apiUrl = https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey};
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period);
 }
 
@@ -708,7 +708,7 @@ function fetchJPIncomeStatement() {
         return;
     }
 
-    const apiUrl = https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey};
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period);
 }
 
@@ -722,7 +722,7 @@ async function fetchTWIncomeStatement() {
         return;
     }
 
-    const apiUrl = https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey};
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period);
 }
 
@@ -842,8 +842,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.epsdiluted.push(entry.epsdiluted || 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
-        rows.link.push(<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>);
-        rows.finalLink.push(<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>);
+        rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
 
         // 計算增長率
         if (index > 0) {
@@ -862,12 +862,12 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 構建 HTML 表格
     let tableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
-        tableHtml += <tr><th>${rows[key][0]}</th>;
-            rows[key].slice(1).forEach(value => {
-                tableHtml += <td>${value}</td>;
-            });
-            tableHtml += <th>${rows[key][0]}</th>; // 在最右側添加欄位名稱
-            tableHtml += '</tr>';
+        tableHtml += `<tr><th>${rows[key][0]}</th>`;
+        rows[key].slice(1).forEach(value => {
+            tableHtml += `<td>${value}</td>`;
+        });
+        tableHtml += `<th>${rows[key][0]}</th>`; // 在最右側添加欄位名稱
+        tableHtml += '</tr>';
     });
     tableHtml += '</table>';
 
