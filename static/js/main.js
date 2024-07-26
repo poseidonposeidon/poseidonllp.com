@@ -681,11 +681,11 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
+let incomeStatementChartInstances = {}; // 使用对对象来存储不同国家的图表实例
 
 function fetchIncomeStatement() {
     stockSymbol = fetchStock();
-    const period = document.getElementById('period').value;  // 獲取選擇的時段
+    const period = document.getElementById('period').value;  // 获取选择的时段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -699,8 +699,8 @@ function fetchIncomeStatement() {
 
 function fetchJPIncomeStatement() {
     stockSymbol = fetchJPStock();
-    const period = document.getElementById('periodJP').value;  // 獲取選擇的時段
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+    const period = document.getElementById('periodJP').value;  // 获取选择的时段
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替换为你的实际 API 密钥
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -712,7 +712,7 @@ function fetchJPIncomeStatement() {
 }
 
 async function fetchTWIncomeStatement() {
-    stockSymbol = await fetchTWStock();  // 確保 fetchTWStock 是 async 並等待它完成
+    stockSymbol = await fetchTWStock();  // 确保 fetchTWStock 是 async 并等待它完成
     const period = document.getElementById('periodTW').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
@@ -731,12 +731,12 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            // 檢查回應資料是否為 undefined 或非陣列
+            // 检查回应用数据是否为 undefined 或非数组
             if (data === undefined || !Array.isArray(data)) {
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container, chartId, operatingChartId, epsChartId, period);  // 修改這裡以傳遞整個數據陣列和選擇的時段
+                    callback(data, container, chartId, operatingChartId, epsChartId, period);  // 修改这里以传递整个数据数组和选择的时段
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -800,10 +800,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
         link: ['Report Link'],
         finalLink: ['Final Link'],
-        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根據選擇的時段設定欄位名稱
+        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根据选择的时段设置列标题
     };
 
-    // 填充行數據
+    // 填充行数据
     data.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -844,7 +844,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
         rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
         rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
 
-        // 計算增長率
+        // 计算增长率
         if (index > 0) {
             let lastRevenue = data[index - 1].revenue;
             if (entry.revenue && lastRevenue) {
@@ -858,7 +858,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
         }
     });
 
-    // 構建 HTML 表格
+    // 构建 HTML 表格
     let tableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
         tableHtml += `<tr><th>${rows[key][0]}</th>`;
@@ -869,7 +869,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
     });
     tableHtml += '</table>';
 
-    // 創建容器結構
+    // 创建容器结构
     container.innerHTML = `
         <div class="scroll-container-x">
             <table id="IncomeStatementTable" border="1">
@@ -889,23 +889,23 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
         </div>
     `;
 
-    // 創建圖表
+    // 创建图表
     createOperatingChart(data, operatingChartId);
     createIncomeStatementChart(data, chartId);
     createEPSChart(data, epsChartId);
 
     const expandButton = document.getElementById('expandButton_Income');
-    if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
+    if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
 }
 
 
 function createIncomeStatementChart(data, chartId) {
-    // 首先，按日期從舊到新排序數據
+    // 首先，按日期从旧到新排序数据
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
+    // 销毁现有图表实例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
@@ -943,7 +943,7 @@ function createIncomeStatementChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 確保x軸不是反轉的
+                    reverse: false // 确保x轴不是反转的
                 },
                 y: {
                     beginAtZero: true,
@@ -958,12 +958,12 @@ function createIncomeStatementChart(data, chartId) {
 }
 
 function createOperatingChart(data, chartId) {
-    // 首先，按日期從舊到新排序數據
+    // 首先，按日期从旧到新排序数据
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
+    // 销毁现有图表实例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
@@ -1007,7 +1007,7 @@ function createOperatingChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 確保x軸不是反轉的
+                    reverse: false // 确保x轴不是反转的
                 },
                 y: {
                     beginAtZero: true,
@@ -1022,12 +1022,12 @@ function createOperatingChart(data, chartId) {
 }
 
 function createEPSChart(data, chartId) {
-    // 首先，按日期從舊到新排序數據
+    // 首先，按日期从旧到新排序数据
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
+    // 销毁现有图表实例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
@@ -1059,7 +1059,7 @@ function createEPSChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 確保x軸不是反轉的
+                    reverse: false // 确保x轴不是反转的
                 },
                 y: {
                     beginAtZero: true,
@@ -1073,33 +1073,11 @@ function createEPSChart(data, chartId) {
     });
 }
 
-function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, epsChartId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '<p>Loading...</p>';
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            // 檢查回應資料是否為 undefined 或非陣列
-            if (data === undefined || !Array.isArray(data)) {
-                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
-            } else {
-                if (data.length > 0) {
-                    callback(data, container, chartId, operatingChartId, epsChartId);  // 修改這裡以傳遞整個數據陣列
-                } else {
-                    container.innerHTML = '<p>No data found for this symbol.</p>';
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching data: ', error);
-            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
-        });
-}
-
 function formatNumber(value) {
-    // Check if the value is numeric and format it, otherwise return 'N/A'
+    // 检查值是否为数字并格式化，否则返回 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
+
 
 
 
