@@ -958,7 +958,6 @@ function createOperatingChart(data, chartId) {
                     backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
-
                 {
                     label: 'Growth Rate',
                     data: data.map(entry => entry.growthRate),
@@ -1024,18 +1023,28 @@ function createIncomeStatementChart(data, chartId) {
                     data: data.map(entry => entry.grossProfitRatio * 100),
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    yAxisID: 'y1'
                 },
                 {
                     label: 'Operating Income Ratio',
                     data: data.map(entry => entry.operatingIncomeRatio * 100),
                     borderColor: 'rgba(153, 102, 255, 1)',
                     backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    yAxisID: 'y1'
                 },
                 {
                     label: 'Net Income Ratio',
                     data: data.map(entry => entry.netIncomeRatio * 100),
                     borderColor: 'rgba(255, 159, 64, 1)',
                     backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    yAxisID: 'y1'
+                },
+                {
+                    label: 'EPS',
+                    data: data.map(entry => entry.eps),
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    yAxisID: 'y'
                 }
             ]
         },
@@ -1053,7 +1062,19 @@ function createIncomeStatementChart(data, chartId) {
                     beginAtZero: true,
                     title: {
                         display: true,
+                        text: 'Value'
+                    },
+                    position: 'left'
+                },
+                y1: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
                         text: 'Percentage (%)'
+                    },
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false // 仅绘制 y1 网格
                     }
                 }
             }
