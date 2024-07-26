@@ -933,28 +933,28 @@ function createOperatingChart(data, chartId) {
                     label: 'Operating Expenses',
                     data: data.map(entry => entry.operatingExpenses),
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Income',
                     data: data.map(entry => entry.operatingIncome),
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Revenue',
                     data: data.map(entry => entry.revenue),
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Cost of Revenue',
                     data: data.map(entry => entry.costOfRevenue),
                     borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
@@ -962,7 +962,7 @@ function createOperatingChart(data, chartId) {
                     data: data.map(entry => entry.growthRate),
                     type: 'line', // 單獨設置為折線圖
                     borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y1'
                 }
             ]
