@@ -689,7 +689,7 @@ function fetchIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart');
 }
 
 function fetchJPIncomeStatement() {
@@ -703,7 +703,7 @@ function fetchJPIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP');
 }
 
 async function fetchTWIncomeStatement() {
@@ -717,11 +717,10 @@ async function fetchTWIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW');
 }
 
-
-function displayIncomeStatement(data, container, chartId) {
+function displayIncomeStatement(data, container, chartId, operatingChartId) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
@@ -837,10 +836,14 @@ function displayIncomeStatement(data, container, chartId) {
         <div id="chartContainer" style="margin-top: 20px;">
             <canvas id="${chartId}"></canvas>
         </div>
+        <div id="operatingChartContainer" style="margin-top: 20px;">
+            <canvas id="${operatingChartId}"></canvas>
+        </div>
     `;
 
     // 創建圖表
     createIncomeStatementChart(data, chartId);
+    createOperatingChart(data, operatingChartId);
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
@@ -904,7 +907,59 @@ function createIncomeStatementChart(data, chartId) {
     });
 }
 
-function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId) {
+function createOperatingChart(data, chartId) {
+    // 首先，按日期從舊到新排序數據
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const ctx = document.getElementById(chartId).getContext('2d');
+
+    // 銷毀現有圖表實例（如果存在）
+    if (incomeStatementChartInstances[chartId]) {
+        incomeStatementChartInstances[chartId].destroy();
+    }
+
+    incomeStatementChartInstances[chartId] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(entry => entry.date),
+            datasets: [
+                {
+                    label: 'Operating Expenses',
+                    data: data.map(entry => entry.operatingExpenses),
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                },
+                {
+                    label: 'Operating Income',
+                    data: data.map(entry => entry.operatingIncome),
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    },
+                    reverse: false // 確保x軸不是反轉的
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Value'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
     fetch(apiUrl)
@@ -915,7 +970,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId) {
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container, chartId);  // 修改這裡以傳遞整個數據陣列
+                    callback(data, container, chartId, operatingChartId);  // 修改這裡以傳遞整個數據陣列
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -931,6 +986,7 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
+
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
