@@ -694,7 +694,7 @@ function fetchIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', 'epsChart');
 }
 
 function fetchJPIncomeStatement() {
@@ -708,7 +708,7 @@ function fetchJPIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', 'epsChartJP');
 }
 
 async function fetchTWIncomeStatement() {
@@ -722,10 +722,10 @@ async function fetchTWIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', 'epsChartTW');
 }
 
-function displayIncomeStatement(data, container, chartId, operatingChartId) {
+function displayIncomeStatement(data, container, chartId, operatingChartId, epsChartId) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
@@ -844,11 +844,15 @@ function displayIncomeStatement(data, container, chartId, operatingChartId) {
         <div id="operatingChartContainer" style="margin-top: 20px;">
             <canvas id="${operatingChartId}"></canvas>
         </div>
+        <div id="epsChartContainer" style="margin-top: 20px;">
+            <canvas id="${epsChartId}"></canvas>
+        </div>
     `;
 
     // 創建圖表
     createIncomeStatementChart(data, chartId);
     createOperatingChart(data, operatingChartId);
+    createEPSChart(data, epsChartId);
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
@@ -964,7 +968,59 @@ function createOperatingChart(data, chartId) {
     });
 }
 
-function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId) {
+function createEPSChart(data, chartId) {
+    // 首先，按日期從舊到新排序數據
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const ctx = document.getElementById(chartId).getContext('2d');
+
+    // 銷毀現有圖表實例（如果存在）
+    if (incomeStatementChartInstances[chartId]) {
+        incomeStatementChartInstances[chartId].destroy();
+    }
+
+    incomeStatementChartInstances[chartId] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(entry => entry.date),
+            datasets: [
+                {
+                    label: 'EPS',
+                    data: data.map(entry => entry.eps),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                },
+                {
+                    label: 'EPS Diluted',
+                    data: data.map(entry => entry.epsdiluted),
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    },
+                    reverse: false // 確保x軸不是反轉的
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Value'
+                    }
+                }
+            }
+        }
+    });
+}
+
+function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, epsChartId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
     fetch(apiUrl)
@@ -975,7 +1031,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container, chartId, operatingChartId);  // 修改這裡以傳遞整個數據陣列
+                    callback(data, container, chartId, operatingChartId, epsChartId);  // 修改這裡以傳遞整個數據陣列
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -991,6 +1047,7 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
+
 
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
