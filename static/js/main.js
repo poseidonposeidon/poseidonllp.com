@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function loadSection(sectionId) {
     const sections = {
-        'income-statement':
+        'income-statement': `
             <div class="section" id="income-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Income Statement</h2>
                 <div class="content scroll-container-x">
@@ -99,7 +99,7 @@ function loadSection(sectionId) {
                     <button onclick="fetchIncomeStatement()">Load Statement</button>
                     <div id="incomeStatementContainer"></div>
                 </div>
-            </div>,
+            </div>`,
         'balance-sheet': `
             <div class="section" id="balance-sheet" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Balance Sheet Statements</h2>
