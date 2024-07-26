@@ -1082,6 +1082,7 @@ function createIncomeStatementChart(data, chartId) {
     });
 }
 
+
 function createEPSChart(data, chartId) {
     // 首先，按日期從舊到新排序數據
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
