@@ -949,6 +949,12 @@ function createOperatingChart(data, chartId) {
                     data: data.map(entry => entry.revenue),
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                },
+                {
+                    label: 'Cost of Revenue',
+                    data: data.map(entry => entry.costOfRevenue),
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
                 }
             ]
         },
