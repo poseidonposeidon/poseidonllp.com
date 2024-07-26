@@ -694,7 +694,7 @@ function fetchIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', 'epsChart');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', 'epsChart', period);
 }
 
 function fetchJPIncomeStatement() {
@@ -708,7 +708,7 @@ function fetchJPIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', 'epsChartJP');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', 'epsChartJP', period);
 }
 
 async function fetchTWIncomeStatement() {
@@ -722,10 +722,33 @@ async function fetchTWIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', 'epsChartTW');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', 'epsChartTW', period);
 }
 
-function displayIncomeStatement(data, container, chartId, operatingChartId, epsChartId) {
+function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, epsChartId, period) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '<p>Loading...</p>';
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            // 檢查回應資料是否為 undefined 或非陣列
+            if (data === undefined || !Array.isArray(data)) {
+                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
+            } else {
+                if (data.length > 0) {
+                    callback(data, container, chartId, operatingChartId, epsChartId, period);  // 修改這裡以傳遞整個數據陣列和選擇的時段
+                } else {
+                    container.innerHTML = '<p>No data found for this symbol.</p>';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data: ', error);
+            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
+        });
+}
+
+function displayIncomeStatement(data, container, chartId, operatingChartId, epsChartId, period) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
@@ -777,8 +800,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
         link: ['Report Link'],
         finalLink: ['Final Link'],
-        yoyGrowth: ['YoY Growth'],  // 新增年增率欄位
-        qoqGrowth: ['QoQ Growth']   // 新增季增率欄位
+        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根據選擇的時段設定欄位名稱
     };
 
     // 填充行數據
@@ -822,30 +844,17 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
         rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
         rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
 
-        // 計算年增率
+        // 計算增長率
         if (index > 0) {
-            let lastYearRevenue = data[index - 1].revenue;
-            if (entry.revenue && lastYearRevenue) {
-                let yoyGrowth = ((entry.revenue - lastYearRevenue) / lastYearRevenue) * 100;
-                rows.yoyGrowth.push(yoyGrowth.toFixed(2) + '%');
+            let lastRevenue = data[index - 1].revenue;
+            if (entry.revenue && lastRevenue) {
+                let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
+                rows.growthRate.push(growthRate.toFixed(2) + '%');
             } else {
-                rows.yoyGrowth.push('N/A');
+                rows.growthRate.push('N/A');
             }
         } else {
-            rows.yoyGrowth.push('N/A');
-        }
-
-        // 計算季增率
-        if (index > 0 && data[index].period === 'quarter' && data[index - 1].period === 'quarter') {
-            let lastQuarterRevenue = data[index - 1].revenue;
-            if (entry.revenue && lastQuarterRevenue) {
-                let qoqGrowth = ((entry.revenue - lastQuarterRevenue) / lastQuarterRevenue) * 100;
-                rows.qoqGrowth.push(qoqGrowth.toFixed(2) + '%');
-            } else {
-                rows.qoqGrowth.push('N/A');
-            }
-        } else {
-            rows.qoqGrowth.push('N/A');
+            rows.growthRate.push('N/A');
         }
     });
 
@@ -888,6 +897,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
 }
+
 
 function createIncomeStatementChart(data, chartId) {
     // 首先，按日期從舊到新排序數據
