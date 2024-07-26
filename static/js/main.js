@@ -773,11 +773,13 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
         weightedAverageShsOut: ['Weighted Average Shares Outstanding'],
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
         link: ['Report Link'],
-        finalLink: ['Final Link']
+        finalLink: ['Final Link'],
+        yoyGrowth: ['YoY Growth'],  // 新增年增率欄位
+        qoqGrowth: ['QoQ Growth']   // 新增季增率欄位
     };
 
     // 填充行數據
-    data.forEach(entry => {
+    data.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
@@ -816,6 +818,32 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
         rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
         rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+
+        // 計算年增率
+        if (index > 0) {
+            let lastYearRevenue = data[index - 1].revenue;
+            if (entry.revenue && lastYearRevenue) {
+                let yoyGrowth = ((entry.revenue - lastYearRevenue) / lastYearRevenue) * 100;
+                rows.yoyGrowth.push(yoyGrowth.toFixed(2) + '%');
+            } else {
+                rows.yoyGrowth.push('N/A');
+            }
+        } else {
+            rows.yoyGrowth.push('N/A');
+        }
+
+        // 計算季增率
+        if (index > 0 && data[index].period === 'quarter' && data[index - 1].period === 'quarter') {
+            let lastQuarterRevenue = data[index - 1].revenue;
+            if (entry.revenue && lastQuarterRevenue) {
+                let qoqGrowth = ((entry.revenue - lastQuarterRevenue) / lastQuarterRevenue) * 100;
+                rows.qoqGrowth.push(qoqGrowth.toFixed(2) + '%');
+            } else {
+                rows.qoqGrowth.push('N/A');
+            }
+        } else {
+            rows.qoqGrowth.push('N/A');
+        }
     });
 
     // 構建 HTML 表格
