@@ -899,12 +899,27 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
 }
 
 function createOperatingChart(data, chartId) {
-    // 首先，按日期从旧到新排序数据
+    // 首先，按日期從舊到新排序數據
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // 計算增長率
+    data.forEach((entry, index) => {
+        if (index > 0) {
+            let lastRevenue = data[index - 1].revenue;
+            if (entry.revenue && lastRevenue) {
+                let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
+                entry.growthRate = growthRate.toFixed(2); // 這裡將增長率加入數據集
+            } else {
+                entry.growthRate = 'N/A';
+            }
+        } else {
+            entry.growthRate = 'N/A';
+        }
+    });
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 销毁现有图表实例（如果存在）
+    // 銷毀現有圖表實例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
@@ -959,7 +974,7 @@ function createOperatingChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 确保x轴不是反转的
+                    reverse: false // 確保x軸不是反轉的
                 },
                 y: {
                     beginAtZero: true,
