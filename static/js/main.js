@@ -1011,32 +1011,35 @@ function createIncomeStatementChart(data, chartId) {
     }
 
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
-        type: 'line',
         data: {
             labels: data.map(entry => entry.date),
             datasets: [
                 {
+                    type: 'bar',
                     label: 'Gross Profit Ratio',
                     data: data.map(entry => entry.grossProfitRatio * 100),
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
                     yAxisID: 'y1'
                 },
                 {
+                    type: 'bar',
                     label: 'Operating Income Ratio',
                     data: data.map(entry => entry.operatingIncomeRatio * 100),
                     borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
                     yAxisID: 'y1'
                 },
                 {
+                    type: 'bar',
                     label: 'Net Income Ratio',
                     data: data.map(entry => entry.netIncomeRatio * 100),
                     borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)',
                     yAxisID: 'y1'
                 },
                 {
+                    type: 'line',
                     label: 'EPS',
                     data: data.map(entry => entry.eps),
                     borderColor: 'rgba(255, 99, 132, 1)',
