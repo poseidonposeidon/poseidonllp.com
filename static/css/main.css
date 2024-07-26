@@ -246,8 +246,18 @@ button:not(.info-input button):hover {
     color: #ffffff;
 }
 
-.section-container {
-    margin-top: 20px;
+.section .content {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 1s ease, opacity 1s ease, padding-top 0.6s ease, padding-bottom 0.6s ease;
+}
+
+.section.fixed .content {
+    max-height: 1000px; /* 可以根據需要調整 */
+    opacity: 1;
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .inline-container {
