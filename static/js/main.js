@@ -38,6 +38,11 @@ function toggleFixed(event, element) {
 function toggleSection(event, sectionId) {
     event.preventDefault();
     const section = document.querySelector(sectionId);
+    if (!section) {
+        console.error('Section not found:', sectionId);
+        return;
+    }
+
     const overlay = document.querySelector('.overlay');
     const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)');
 
