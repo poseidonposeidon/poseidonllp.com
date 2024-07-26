@@ -681,11 +681,11 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-let incomeStatementChartInstances = {}; // 使用对象来存储不同国家的图表实例
+let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
 function fetchIncomeStatement() {
     stockSymbol = fetchStock();
-    const period = document.getElementById('period').value;  // 获取选择的时段
+    const period = document.getElementById('period').value;  // 獲取選擇的時段
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -693,26 +693,26 @@ function fetchIncomeStatement() {
         return;
     }
 
-    const apiUrl = https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey};
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period);
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', 'epsChart', period);
 }
 
 function fetchJPIncomeStatement() {
     stockSymbol = fetchJPStock();
-    const period = document.getElementById('periodJP').value;  // 获取选择的时段
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替换为你的实际 API 密钥
+    const period = document.getElementById('periodJP').value;  // 獲取選擇的時段
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
         return;
     }
 
-    const apiUrl = https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey};
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period);
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', 'epsChartJP', period);
 }
 
 async function fetchTWIncomeStatement() {
-    stockSymbol = await fetchTWStock();  // 确保 fetchTWStock 是 async 并等待它完成
+    stockSymbol = await fetchTWStock();  // 確保 fetchTWStock 是 async 並等待它完成
     const period = document.getElementById('periodTW').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
@@ -721,22 +721,22 @@ async function fetchTWIncomeStatement() {
         return;
     }
 
-    const apiUrl = https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey};
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period);
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', 'epsChartTW', period);
 }
 
-function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period) {
+function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, epsChartId, period) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            // 检查响应数据是否为 undefined 或非数组
+            // 檢查回應資料是否為 undefined 或非陣列
             if (data === undefined || !Array.isArray(data)) {
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container, chartId, operatingChartId, period);  // 修改这里以传递整个数据数组和选择的时段
+                    callback(data, container, chartId, operatingChartId, epsChartId, period);  // 修改這裡以傳遞整個數據陣列和選擇的時段
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -748,7 +748,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
         });
 }
 
-function displayIncomeStatement(data, container, chartId, operatingChartId, period) {
+function displayIncomeStatement(data, container, chartId, operatingChartId, epsChartId, period) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
@@ -800,10 +800,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
         link: ['Report Link'],
         finalLink: ['Final Link'],
-        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根据选择的时段设置字段名称
+        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根據選擇的時段設定欄位名稱
     };
 
-    // 填充行数据
+    // 填充行數據
     data.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -841,10 +841,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.epsdiluted.push(entry.epsdiluted || 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
-        rows.link.push(<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>);
-        rows.finalLink.push(<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>);
+        rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
 
-        // 计算增长率
+        // 計算增長率
         if (index > 0) {
             let lastRevenue = data[index - 1].revenue;
             if (entry.revenue && lastRevenue) {
@@ -858,19 +858,19 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     });
 
-    // 构建 HTML 表格
+    // 構建 HTML 表格
     let tableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
-        tableHtml += <tr><th>${rows[key][0]}</th>;
-            rows[key].slice(1).forEach(value => {
-                tableHtml += <td>${value}</td>;
-            });
-            tableHtml += <th>${rows[key][0]}</th>; // 在最右侧添加字段名称
-            tableHtml += '</tr>';
+        tableHtml += `<tr><th>${rows[key][0]}</th>`;
+        rows[key].slice(1).forEach(value => {
+            tableHtml += `<td>${value}</td>`;
+        });
+        tableHtml += `<th>${rows[key][0]}</th>`; // 在最右側添加欄位名稱
+        tableHtml += '</tr>';
     });
     tableHtml += '</table>';
 
-    // 创建容器结构
+    // 創建容器結構
     container.innerHTML = `
         <div class="scroll-container-x">
             <table id="IncomeStatementTable" border="1">
@@ -885,27 +885,31 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         <div id="chartContainer" style="margin-top: 20px;">
             <canvas id="${chartId}"></canvas>
         </div>
+        <div id="epsChartContainer" style="margin-top: 20px;">
+            <canvas id="${epsChartId}"></canvas>
+        </div>
     `;
 
-    // 创建图表
+    // 創建圖表
     createOperatingChart(data, operatingChartId);
     createIncomeStatementChart(data, chartId);
+    createEPSChart(data, epsChartId);
 
     const expandButton = document.getElementById('expandButton_Income');
-    if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
+    if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
 }
 
 function createOperatingChart(data, chartId) {
-    // 首先，按日期从旧到新排序数据
+    // 首先，按日期從舊到新排序數據
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 计算增长率
+    // 計算增長率
     data.forEach((entry, index) => {
         if (index > 0) {
             let lastRevenue = data[index - 1].revenue;
             if (entry.revenue && lastRevenue) {
                 let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                entry.growthRate = growthRate.toFixed(2); // 这里将增长率加入数据集
+                entry.growthRate = growthRate.toFixed(2); // 這裡將增長率加入數據集
             } else {
                 entry.growthRate = 'N/A';
             }
@@ -916,13 +920,13 @@ function createOperatingChart(data, chartId) {
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 销毁现有图表实例（如果存在）
+    // 銷毀現有圖表實例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
 
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
-        type: 'bar', // 主要图表类型设为柱状图
+        type: 'bar', // 主要圖表類型設為柱狀圖
         data: {
             labels: data.map(entry => entry.date),
             datasets: [
@@ -930,36 +934,36 @@ function createOperatingChart(data, chartId) {
                     label: 'Revenue',
                     data: data.map(entry => entry.revenue),
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Cost of Revenue',
                     data: data.map(entry => entry.costOfRevenue),
                     borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Expenses',
                     data: data.map(entry => entry.operatingExpenses),
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Income',
                     data: data.map(entry => entry.operatingIncome),
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Growth Rate',
                     data: data.map(entry => entry.growthRate),
-                    type: 'line', // 单独设置为折线图
+                    type: 'line', // 單獨設置為折線圖
                     borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y1'
                 }
             ]
@@ -972,7 +976,7 @@ function createOperatingChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 确保x轴不是反转的
+                    reverse: false // 確保x軸不是反轉的
                 },
                 y: {
                     beginAtZero: true,
@@ -999,18 +1003,18 @@ function createOperatingChart(data, chartId) {
 }
 
 function createIncomeStatementChart(data, chartId) {
-    // 首先，按日期从旧到新排序数据
+    // 首先，按日期從舊到新排序數據
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 销毁现有图表实例（如果存在）
+    // 銷毀現有圖表實例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
 
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
-        type: 'bar', // 将主要图表类型设置为柱状图
+        type: 'line',
         data: {
             labels: data.map(entry => entry.date),
             datasets: [
@@ -1018,27 +1022,26 @@ function createIncomeStatementChart(data, chartId) {
                     label: 'Gross Profit Ratio',
                     data: data.map(entry => entry.grossProfitRatio * 100),
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
                     yAxisID: 'y1'
                 },
                 {
                     label: 'Operating Income Ratio',
                     data: data.map(entry => entry.operatingIncomeRatio * 100),
                     borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
                     yAxisID: 'y1'
                 },
                 {
                     label: 'Net Income Ratio',
                     data: data.map(entry => entry.netIncomeRatio * 100),
                     borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(255, 159, 64, 0.2)',
                     yAxisID: 'y1'
                 },
                 {
                     label: 'EPS',
                     data: data.map(entry => entry.eps),
-                    type: 'line', // 单独设置为折线图
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
                     yAxisID: 'y'
@@ -1053,7 +1056,7 @@ function createIncomeStatementChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 确保x轴不是反转的
+                    reverse: false // 確保x軸不是反轉的
                 },
                 y: {
                     beginAtZero: true,
@@ -1079,10 +1082,63 @@ function createIncomeStatementChart(data, chartId) {
     });
 }
 
+function createEPSChart(data, chartId) {
+    // 首先，按日期從舊到新排序數據
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const ctx = document.getElementById(chartId).getContext('2d');
+
+    // 銷毀現有圖表實例（如果存在）
+    if (incomeStatementChartInstances[chartId]) {
+        incomeStatementChartInstances[chartId].destroy();
+    }
+
+    incomeStatementChartInstances[chartId] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(entry => entry.date),
+            datasets: [
+                {
+                    label: 'EPS',
+                    data: data.map(entry => entry.eps),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                },
+                {
+                    label: 'EPS Diluted',
+                    data: data.map(entry => entry.epsdiluted),
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    },
+                    reverse: false // 確保x軸不是反轉的
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Value'
+                    }
+                }
+            }
+        }
+    });
+}
+
 function formatNumber(value) {
-    // 检查值是否为数字并格式化，否则返回 'N/A'
+    // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
+
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
