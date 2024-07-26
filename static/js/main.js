@@ -838,11 +838,11 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
                 </div>
             </table>
         </div>
-        <div id="operatingChartContainer" style="margin-top: 20px;">
-            <canvas id="${operatingChartId}"></canvas>
-        </div>
         <div id="chartContainer" style="margin-top: 20px;">
             <canvas id="${chartId}"></canvas>
+        </div>
+        <div id="operatingChartContainer" style="margin-top: 20px;">
+            <canvas id="${operatingChartId}"></canvas>
         </div>
         <div id="epsChartContainer" style="margin-top: 20px;">
             <canvas id="${epsChartId}"></canvas>
@@ -1059,8 +1059,6 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
-
-
 
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
