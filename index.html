@@ -158,6 +158,8 @@
 		const username = document.getElementById('username').value;
 		const password = document.getElementById('password').value;
 
+		console.log('Login attempt with username:', username);
+
 		fetch('https://api.poseidonllp.com/api/login', {
 			method: 'POST',
 			headers: {
@@ -165,8 +167,15 @@
 			},
 			body: JSON.stringify({ username, password })
 		})
-				.then(response => response.json())
+				.then(response => {
+					console.log('Response status:', response.status);
+					if (!response.ok) {
+						return response.json().then(data => { throw new Error(data.message); });
+					}
+					return response.json();
+				})
 				.then(data => {
+					console.log('Response data:', data);
 					if (data.message === "Login successful") {
 						localStorage.setItem('authToken', data.token);
 						window.location.href = "/templates/home";
@@ -177,7 +186,7 @@
 				})
 				.catch(error => {
 					console.error('Error:', error);
-					alert('An error occurred during login');
+					alert('An error occurred during login: ' + error.message);
 				});
 	});
 </script>
