@@ -226,6 +226,8 @@ button:not(.info-input button):hover {
     margin: 5px 0;
     color: #90caf9;
     text-decoration: none;
+    transition: all 0.3s ease;
+
 }
 
 .info-column a:hover {
@@ -235,6 +237,8 @@ button:not(.info-input button):hover {
 .styled-link {
     color: #90caf9;
     text-decoration: none;
+    transition: all 0.3s ease;
+
 }
 
 .styled-link:hover {
@@ -247,6 +251,8 @@ button:not(.info-input button):hover {
 #companyProfileContainerJP a,
 #companyProfileContainerTW a {
     color: #90caf9;
+    transition: all 0.3s ease;
+
 }
 
 /* 設置連結在懸停時的顏色 */
