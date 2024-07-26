@@ -931,20 +931,6 @@ function createOperatingChart(data, chartId) {
             labels: data.map(entry => entry.date),
             datasets: [
                 {
-                    label: 'Operating Expenses',
-                    data: data.map(entry => entry.operatingExpenses),
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使顏色更加鮮明
-                    yAxisID: 'y'
-                },
-                {
-                    label: 'Operating Income',
-                    data: data.map(entry => entry.operatingIncome),
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使顏色更加鮮明
-                    yAxisID: 'y'
-                },
-                {
                     label: 'Revenue',
                     data: data.map(entry => entry.revenue),
                     borderColor: 'rgba(75, 192, 192, 1)',
@@ -958,6 +944,21 @@ function createOperatingChart(data, chartId) {
                     backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
+                {
+                    label: 'Operating Expenses',
+                    data: data.map(entry => entry.operatingExpenses),
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Operating Income',
+                    data: data.map(entry => entry.operatingIncome),
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    yAxisID: 'y'
+                },
+
                 {
                     label: 'Growth Rate',
                     data: data.map(entry => entry.growthRate),
