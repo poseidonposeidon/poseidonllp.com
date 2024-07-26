@@ -232,6 +232,16 @@ button:not(.info-input button):hover {
     color: white;
 }
 
+.styled-link {
+    color: #90caf9;
+    text-decoration: none;
+}
+
+.styled-link:hover {
+    color: white;
+}
+
+
 /* 設置連結的默認顏色 */
 #companyProfileContainer a,
 #companyProfileContainerJP a,

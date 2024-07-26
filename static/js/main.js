@@ -814,8 +814,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
         rows.epsdiluted.push(entry.epsdiluted || 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
-        rows.link.push(`<a href="${entry.link}" target="_blank">View Report</a>`);
-        rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
+        rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
     // 構建 HTML 表格
