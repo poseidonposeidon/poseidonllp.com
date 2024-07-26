@@ -898,6 +898,101 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, epsC
     if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
 }
 
+function createOperatingChart(data, chartId, growthRates) {
+    // 首先，按日期從舊到新排序數據
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const ctx = document.getElementById(chartId).getContext('2d');
+
+    // 銷毀現有圖表實例（如果存在）
+    if (incomeStatementChartInstances[chartId]) {
+        incomeStatementChartInstances[chartId].destroy();
+    }
+
+    incomeStatementChartInstances[chartId] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(entry => entry.date),
+            datasets: [
+                {
+                    label: 'Operating Expenses',
+                    data: data.map(entry => entry.operatingExpenses),
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    yAxisID: 'y',
+                },
+                {
+                    label: 'Operating Income',
+                    data: data.map(entry => entry.operatingIncome),
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    yAxisID: 'y',
+                },
+                {
+                    label: 'Revenue',
+                    data: data.map(entry => entry.revenue),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    yAxisID: 'y',
+                },
+                {
+                    label: 'Cost of Revenue',
+                    data: data.map(entry => entry.costOfRevenue),
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                    yAxisID: 'y',
+                },
+                {
+                    label: growthRates.label,
+                    data: growthRates.values,
+                    borderColor: 'rgba(255, 206, 86, 1)',
+                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                    yAxisID: 'y1',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    },
+                    reverse: false // 確保x軸不是反轉的
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Value'
+                    }
+                },
+                y1: {
+                    beginAtZero: true,
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Growth Rate (%)'
+                    }
+                }
+            }
+        }
+    });
+}
+// 例如這樣調用這個函數
+const growthRates = {
+    label: period === 'annual' ? 'YoY Growth' : 'QoQ Growth',
+    values: data.map((entry, index) => {
+        if (index > 0) {
+            let lastRevenue = data[index - 1].revenue;
+            return (entry.revenue && lastRevenue) ? ((entry.revenue - lastRevenue) / lastRevenue) * 100 : NaN;
+        } else {
+            return NaN;
+        }
+    })
+};
+createOperatingChart(data, 'yourChartId', growthRates);
 
 function createIncomeStatementChart(data, chartId) {
     // 首先，按日期从旧到新排序数据
@@ -950,70 +1045,6 @@ function createIncomeStatementChart(data, chartId) {
                     title: {
                         display: true,
                         text: 'Percentage (%)'
-                    }
-                }
-            }
-        }
-    });
-}
-
-function createOperatingChart(data, chartId) {
-    // 首先，按日期从旧到新排序数据
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    const ctx = document.getElementById(chartId).getContext('2d');
-
-    // 销毁现有图表实例（如果存在）
-    if (incomeStatementChartInstances[chartId]) {
-        incomeStatementChartInstances[chartId].destroy();
-    }
-
-    incomeStatementChartInstances[chartId] = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.map(entry => entry.date),
-            datasets: [
-                {
-                    label: 'Operating Expenses',
-                    data: data.map(entry => entry.operatingExpenses),
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                },
-                {
-                    label: 'Operating Income',
-                    data: data.map(entry => entry.operatingIncome),
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                },
-                {
-                    label: 'Revenue',
-                    data: data.map(entry => entry.revenue),
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                },
-                {
-                    label: 'Cost of Revenue',
-                    data: data.map(entry => entry.costOfRevenue),
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.2)',
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    },
-                    reverse: false // 确保x轴不是反转的
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Value'
                     }
                 }
             }
@@ -1077,9 +1108,6 @@ function formatNumber(value) {
     // 检查值是否为数字并格式化，否则返回 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
-
-
-
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
