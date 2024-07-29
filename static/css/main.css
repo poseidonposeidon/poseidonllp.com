@@ -419,11 +419,13 @@ button:not(.info-input button):hover {
     background-color: #121212;
     padding: 20px;
     border-radius: 10px;
-    margin: 20px auto;
+    margin: 0 auto; /* 確保容器水平居中 */
     max-width: 80%;
-    position: relative; /* 修改為相對定位 */
+    height: auto; /* 自適應高度 */
+    position: absolute; /* 絕對定位 */
     top: 50%; /* 使其在父容器高度的中間 */
-    transform: translateY(-50%); /* 垂直居中 */
+    left: 50%; /* 使其在父容器寬度的中間 */
+    transform: translate(-50%, -50%); /* 水平和垂直居中 */
     z-index: 997;
 }
 
@@ -437,6 +439,7 @@ button:not(.info-input button):hover {
     transform: scale(1.1); /* 放大效果 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 陰影效果 */
 }
+
 
 #trend_notification_app {
     display: none;
