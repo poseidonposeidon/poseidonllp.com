@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function loadSection(sectionId) {
     const sections = {
         'income-statement': `
-            <div class="section" id="income-statement">
+            <div class="section" id="income-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Income Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="period">Select Period:</label>
@@ -106,7 +106,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'balance-sheet': `
-            <div class="section" id="balance-sheet">
+            <div class="section" id="balance-sheet" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Balance Sheet Statements</h2>
                 <div class="content scroll-container-x">
                     <label for="period_2">Select Period:</label>
@@ -119,8 +119,8 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'cashflow-statement': `
-            <div class="section" id="cashflow-statement">
-                <h2>Cashflow Statement</h2>
+            <div class="section" id="cashflow-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+                <h2>Cashflow Sheet Statements</h2>
                 <div class="content scroll-container-x">
                     <label for="period_3">Select Period:</label>
                     <select id="period_3">
@@ -136,7 +136,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'earnings-call-transcript': `
-            <div class="section" id="earnings-call-transcript">
+            <div class="section" id="earnings-call-transcript" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Earnings Call Transcript</h2>
                 <div class="content">
                     <input type="number" id="yearInput" placeholder="Enter Year">
@@ -148,7 +148,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'earnings-call-calendar': `
-            <div class="section" id="earnings-call-calendar">
+            <div class="section" id="earnings-call-calendar" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Earnings Call Calendar</h2>
                 <div class="content">
                     <input type="date" id="fromDate" placeholder="From Date">
@@ -160,7 +160,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'historical-earnings': `
-            <div class="section" id="historical-earnings">
+            <div class="section" id="historical-earnings" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Historical and Future Earnings</h2>
                 <div class="content">
                     <input type="date" id="fromDate_1" placeholder="From Date">
@@ -172,7 +172,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'dividend-calendar': `
-            <div class="section" id="dividend-calendar">
+            <div class="section" id="dividend-calendar" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Dividend Calendar</h2>
                 <div class="content">
                     <input type="date" id="fromDate_2" placeholder="From Date">
@@ -184,7 +184,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'insider-trades': `
-            <div class="section" id="insider-trades">
+            <div class="section" id="insider-trades" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Insider Trades</h2>
                 <div class="content">
                     <button onclick="fetchInsiderTrades()">Load Table</button>
@@ -202,7 +202,7 @@ function loadSection(sectionId) {
 function loadSectionJP(sectionId) {
     const sections = {
         'income-statement': `
-            <div class="section" id="income-statement-JP">
+            <div class="section" id="income-statement-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Income Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="periodJP">Select Period:</label>
@@ -219,7 +219,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'balance-sheet': `
-            <div class="section" id="balance-sheet-JP">
+            <div class="section" id="balance-sheet-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Balance Sheet Statements</h2>
                 <div class="content scroll-container-x">
                     <label for="periodJP_2">Select Period:</label>
@@ -232,7 +232,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'cashflow-statement': `
-            <div class="section" id="cashflow-statement-JP">
+            <div class="section" id="cashflow-statement-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Cashflow Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="periodJP_3">Select Period:</label>
@@ -249,7 +249,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'earnings-call-transcript': `
-            <div class="section" id="earnings-call-transcript-JP">
+            <div class="section" id="earnings-call-transcript-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Earnings Call Transcript</h2>
                 <div class="content">
                     <input type="number" id="yearInputJP" placeholder="Enter Year">
@@ -261,7 +261,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'earnings-call-calendar': `
-            <div class="section" id="earnings-call-calendar-JP">
+            <div class="section" id="earnings-call-calendar-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Earnings Call Calendar</h2>
                 <div class="content">
                     <input type="date" id="fromDateJP" placeholder="From Date">
@@ -273,7 +273,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'historical-earnings': `
-            <div class="section" id="historical-earnings-JP">
+            <div class="section" id="historical-earnings-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Historical and Future Earnings</h2>
                 <div class="content">
                     <input type="date" id="fromDateJP_1" placeholder="From Date">
@@ -285,7 +285,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'dividend-calendar': `
-            <div class="section" id="dividend-calendar-JP">
+            <div class="section" id="dividend-calendar-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Dividend Calendar</h2>
                 <div class="content">
                     <input type="date" id="fromDate_2-JP" placeholder="From Date">
@@ -297,7 +297,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'insider-trades': `
-            <div class="section" id="insider-trades-JP">
+            <div class="section" id="insider-trades-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Insider Trades</h2>
                 <div class="content">
                     <button onclick="fetchJPInsiderTrades()">Load Table</button>
@@ -315,7 +315,7 @@ function loadSectionJP(sectionId) {
 function loadSectionTW(sectionId) {
     const sections = {
         'income-statement': `
-            <div class="section" id="income-statement-TW">
+            <div class="section" id="income-statement-TW" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Income Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="periodTW">Select Period:</label>
@@ -332,7 +332,7 @@ function loadSectionTW(sectionId) {
                 </div>
             </div>`,
         'balance-sheet': `
-            <div class="section" id="balance-sheet-TW">
+            <div class="section" id="balance-sheet-TW" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Balance Sheet Statements</h2>
                 <div class="content scroll-container-x">
                     <label for="periodTW_2">Select Period:</label>
@@ -345,7 +345,7 @@ function loadSectionTW(sectionId) {
                 </div>
             </div>`,
         'cashflow-statement': `
-            <div class="section" id="cashflow-statement-TW">
+            <div class="section" id="cashflow-statement-TW" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Cashflow Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="periodTW_3">Select Period:</label>
@@ -370,7 +370,7 @@ function loadSectionTW(sectionId) {
 function loadAIBoxSection(sectionId) {
     const sections = {
         'audio-transcription': `
-            <div class="section" id="audio-transcription">
+            <div class="section" id="audio-transcription" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
                 <h2>Audio Transcription</h2>
                 <div class="content">
                     <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
@@ -418,7 +418,6 @@ function loadAIBoxSection(sectionId) {
         setInterval(updateQueueLength, 5000); // 每5秒更新一次排程長度
     }
 }
-
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
@@ -682,6 +681,7 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
+
 let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
 function fetchIncomeStatement() {
@@ -737,6 +737,8 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
             } else {
                 if (data.length > 0) {
                     callback(data, container, chartId, operatingChartId, period);
+                    const scrollContainer = document.getElementById(containerId).querySelector('.scroll-container-x');
+                    scrollContainer.scrollLeft = scrollContainer.scrollWidth;
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -877,35 +879,25 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     });
 
     // 構建 HTML 表格
-    let tableHtml = `
-        <div class="table-container">
-            <div class="fixed-column">
-                <table border="1" style="border-collapse: collapse;">
-                    ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
-                </table>
-            </div>
-            <div class="scroll-container-x">
-                <table border="1" style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        ${Object.keys(rows).map(key => `<th>${rows[key][0]}</th>`).join('')}
-                    </thead>
-                    <tbody>
-                        ${data.map((entry, rowIndex) =>
-        `<tr>${Object.keys(rows).map(key =>
-            `<td>${rows[key][rowIndex + 1] || 'N/A'}</td>`).join('')}</tr>`
-    ).join('')}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    `;
+    let tableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
+    Object.keys(rows).forEach(key => {
+        tableHtml += `<tr><th>${rows[key][0]}</th>`;
+        rows[key].slice(1).forEach(value => {
+            tableHtml += `<td>${value}</td>`;
+        });
+        tableHtml += `<th>${rows[key][0]}</th>`; // 在最右側添加欄位名稱
+        tableHtml += '</tr>';
+    });
+    tableHtml += '</table>';
 
     // 創建容器結構
     container.innerHTML = `
-        <div class="scroll-container-x" id="${chartId}ScrollContainer">
-            <div id="${chartId}Container">
-                ${tableHtml}
-            </div>
+        <div class="scroll-container-x" id="scrollContainer">
+            <table id="IncomeStatementTable" border="1">
+                <div id="${chartId}Container">
+                    ${tableHtml}
+                </div>
+            </table>
         </div>
         <div id="operatingChartContainer" style="margin-top: 20px;">
             <canvas id="${operatingChartId}"></canvas>
@@ -916,7 +908,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     `;
 
     // 設置scroll位置
-    const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
+    const scrollContainer = document.getElementById('scrollContainer');
     scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
     // 創建圖表
@@ -1277,8 +1269,8 @@ function displayBalanceSheet(data, container) {
         rows.totalInvestments.push(formatNumber(entry.totalInvestments));
         rows.totalDebt.push(formatNumber(entry.totalDebt));
         rows.netDebt.push(formatNumber(entry.netDebt));
-        rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
-        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+        rows.link.push(`<a href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
     let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
@@ -1458,8 +1450,8 @@ function displayCashflow(data, container) {
         rows.operatingCashFlow.push(formatNumber(entry.operatingCashFlow));
         rows.capitalExpenditure.push(formatNumber(entry.capitalExpenditure));
         rows.freeCashFlow.push(formatNumber(entry.freeCashFlow));
-        rows.link.push(`<a  class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
-        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+        rows.link.push(`<a href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
     // 构建 HTML 表格

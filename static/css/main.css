@@ -449,39 +449,3 @@ button:not(.info-input button):hover {
 .transcript-button:last-child {
     margin-right: 0; /* 最後一個按鈕不需要右側間距 */
 }
-
-/* 新增的表格样式 */
-.scroll-container-x {
-    overflow-x: auto;
-    white-space: nowrap;
-}
-
-.table-container {
-    display: flex;
-}
-
-.fixed-column {
-    position: sticky;
-    left: 0;
-    background: #1e1e1e;
-    z-index: 1;
-}
-
-.fixed-column th, .fixed-column td {
-    background: #1e1e1e;
-    border-right: 1px solid #333;
-    min-width: 150px;
-    white-space: nowrap;
-}
-
-.scroll-container-x table {
-    border-collapse: collapse;
-    table-layout: fixed;
-    width: 100%;
-}
-
-.scroll-container-x th, .scroll-container-x td {
-    min-width: 150px;
-    white-space: nowrap;
-    border: 1px solid #333;
-}
