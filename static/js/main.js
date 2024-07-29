@@ -873,7 +873,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     // 創建容器結構
     container.innerHTML = `
-        <div class="scroll-container-x">
+        <div class="scroll-container-x" id="scrollContainer">
             <table id="IncomeStatementTable" border="1">
                 <div id="${chartId}Container">
                     ${tableHtml}
@@ -887,6 +887,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             <canvas id="${chartId}"></canvas>
         </div>
     `;
+
+    // 設置scroll位置
+    const scrollContainer = document.getElementById('scrollContainer');
+    scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
     // 創建圖表
     createOperatingChart(data, operatingChartId);
