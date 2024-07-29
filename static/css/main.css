@@ -414,13 +414,17 @@ button:not(.info-input button):hover {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-wrap: wrap; /* 確保在較小屏幕上能自適應 */
     gap: 30px; /* 調整 logo 之間的間距 */
     background-color: #121212;
     padding: 20px;
     border-radius: 10px;
     margin: 20px auto;
     max-width: 80%;
-    flex-wrap: wrap; /* 確保在較小屏幕上能自適應 */
+    position: relative; /* 修改為相對定位 */
+    top: 50%; /* 使其在父容器高度的中間 */
+    transform: translateY(-50%); /* 垂直居中 */
+    z-index: 997;
 }
 
 .logo-container-new img {
