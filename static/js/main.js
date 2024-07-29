@@ -681,7 +681,6 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-
 let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
 function fetchIncomeStatement() {
@@ -737,8 +736,6 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
             } else {
                 if (data.length > 0) {
                     callback(data, container, chartId, operatingChartId, period);
-                    const scrollContainer = document.getElementById(containerId).querySelector('.scroll-container-x');
-                    scrollContainer.scrollLeft = scrollContainer.scrollWidth;
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -892,7 +889,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     // 創建容器結構
     container.innerHTML = `
-        <div class="scroll-container-x" id="scrollContainer">
+        <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <table id="IncomeStatementTable" border="1">
                 <div id="${chartId}Container">
                     ${tableHtml}
@@ -908,7 +905,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     `;
 
     // 設置scroll位置
-    const scrollContainer = document.getElementById('scrollContainer');
+    const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
     scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
     // 創建圖表
@@ -1109,6 +1106,7 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
+
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
