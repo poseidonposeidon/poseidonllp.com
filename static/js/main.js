@@ -882,9 +882,9 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 構建 HTML 表格
     let tableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
-        tableHtml += `<tr><th>${rows[key][0]}</th>`;
+        tableHtml += `<tr><th style="white-space: nowrap;">${rows[key][0]}</th>`;
         rows[key].slice(1).forEach(value => {
-            tableHtml += `<td>${value}</td>`;
+            tableHtml += `<td style="white-space: nowrap;">${value}</td>`;
         });
         tableHtml += '</tr>';
     });
