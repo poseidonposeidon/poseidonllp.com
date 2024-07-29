@@ -448,3 +448,7 @@ button:not(.info-input button):hover {
 .transcript-button:last-child {
     margin-right: 0;
 }
+
+table {
+    white-space: nowrap;
+}
