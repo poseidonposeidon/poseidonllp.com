@@ -803,7 +803,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
         link: ['Report Link'],
         finalLink: ['Final Link'],
-        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth']
+        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根據選擇的時段設定欄位名稱
     };
 
     // 填充行數據
@@ -881,14 +881,14 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     // 構建 HTML 表格
     let tableHtml = `
-        <div style="display: flex;">
-            <div style="background: white; z-index: 1;">
-                <table border="1" style="border-collapse: collapse; white-space: nowrap;">
+        <div style="position: relative;">
+            <div style="position: absolute; top: 0; left: 0; background: white; z-index: 1;">
+                <table border="1" style="border-collapse: collapse;">
                     ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
                 </table>
             </div>
             <div class="scroll-container-x" style="overflow-x: auto;">
-                <table border="1" style="border-collapse: collapse; white-space: nowrap;">
+                <table border="1" style="width: 100%; border-collapse: collapse;">
                     ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
                 </table>
             </div>
