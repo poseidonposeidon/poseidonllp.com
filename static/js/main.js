@@ -1086,9 +1086,9 @@ function createIncomeStatementChart(data, chartId) {
     });
 }
 
-function formatNumber(num) {
-    if (num === null || num === undefined) return 'N/A';
-    return num.toLocaleString('en-US', {maximumFractionDigits: 0});
+function formatNumber(value) {
+    // Check if the value is numeric and format it, otherwise return 'N/A'
+    return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
