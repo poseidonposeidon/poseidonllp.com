@@ -433,6 +433,7 @@ button:not(.info-input button):hover {
 }
 
 .body-container {
+    background-color: #121212;
     display: flex;
     flex-direction: column;
     justify-content: center;
