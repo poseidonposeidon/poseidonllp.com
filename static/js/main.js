@@ -848,12 +848,30 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
         // 計算增長率
         if (index > 0) {
-            let lastRevenue = data[index - 1].revenue;
-            if (entry.revenue && lastRevenue) {
-                let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                rows.growthRate.push(growthRate.toFixed(2) + '%');
+            if (period === 'annual') {
+                let lastRevenue = data[index - 1].revenue;
+                if (entry.revenue && lastRevenue) {
+                    let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
+                    rows.growthRate.push(growthRate.toFixed(2) + '%');
+                } else {
+                    rows.growthRate.push('N/A');
+                }
             } else {
-                rows.growthRate.push('N/A');
+                // 查找去年同季度的數據
+                let previousYearSameQuarterIndex = data.findIndex((e, i) => {
+                    return e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period;
+                });
+                if (previousYearSameQuarterIndex !== -1) {
+                    let lastRevenue = data[previousYearSameQuarterIndex].revenue;
+                    if (entry.revenue && lastRevenue) {
+                        let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
+                        rows.growthRate.push(growthRate.toFixed(2) + '%');
+                    } else {
+                        rows.growthRate.push('N/A');
+                    }
+                } else {
+                    rows.growthRate.push('N/A');
+                }
             }
         } else {
             rows.growthRate.push('N/A');
