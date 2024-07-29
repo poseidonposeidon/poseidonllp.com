@@ -803,81 +803,103 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
         link: ['Report Link'],
         finalLink: ['Final Link'],
-        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth']
+        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根據選擇的時段設定欄位名稱
     };
 
-    // 填充行数据
+    // 填充行數據
     data.forEach((entry, index) => {
-        Object.keys(rows).forEach(key => {
-            if (key === 'growthRate') {
-                if (index > 0) {
-                    if (period === 'annual') {
-                        let lastRevenue = data[index - 1].revenue;
-                        if (entry.revenue && lastRevenue) {
-                            let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                            rows[key].push(growthRate.toFixed(2) + '%');
-                        } else {
-                            rows[key].push('N/A');
-                        }
+        rows.date.push(entry.date || 'N/A');
+        rows.symbol.push(entry.symbol || 'N/A');
+        rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
+        rows.cik.push(entry.cik || 'N/A');
+        rows.fillingDate.push(entry.fillingDate || 'N/A');
+        rows.acceptedDate.push(entry.acceptedDate || 'N/A');
+        rows.calendarYear.push(entry.calendarYear || 'N/A');
+        rows.period.push(entry.period || 'N/A');
+        rows.revenue.push(formatNumber(entry.revenue));
+        rows.costOfRevenue.push(formatNumber(entry.costOfRevenue));
+        rows.grossProfit.push(formatNumber(entry.grossProfit));
+        rows.grossProfitRatio.push(entry.grossProfitRatio ? (entry.grossProfitRatio * 100).toFixed(2) + '%' : 'N/A');
+        rows.researchAndDevelopmentExpenses.push(formatNumber(entry.researchAndDevelopmentExpenses));
+        rows.generalAndAdministrativeExpenses.push(formatNumber(entry.generalAndAdministrativeExpenses));
+        rows.sellingAndMarketingExpenses.push(formatNumber(entry.sellingAndMarketingExpenses));
+        rows.sellingGeneralAndAdministrativeExpenses.push(formatNumber(entry.sellingGeneralAndAdministrativeExpenses));
+        rows.otherExpenses.push(formatNumber(entry.otherExpenses));
+        rows.operatingExpenses.push(formatNumber(entry.operatingExpenses));
+        rows.costAndExpenses.push(formatNumber(entry.costAndExpenses));
+        rows.interestIncome.push(formatNumber(entry.interestIncome));
+        rows.interestExpense.push(formatNumber(entry.interestExpense));
+        rows.depreciationAndAmortization.push(formatNumber(entry.depreciationAndAmortization));
+        rows.ebitda.push(formatNumber(entry.ebitda));
+        rows.ebitdaratio.push(entry.ebitdaratio ? (entry.ebitdaratio * 100).toFixed(2) + '%' : 'N/A');
+        rows.operatingIncome.push(formatNumber(entry.operatingIncome));
+        rows.operatingIncomeRatio.push(entry.operatingIncomeRatio ? (entry.operatingIncomeRatio * 100).toFixed(2) + '%' : 'N/A');
+        rows.totalOtherIncomeExpensesNet.push(formatNumber(entry.totalOtherIncomeExpensesNet));
+        rows.incomeBeforeTax.push(formatNumber(entry.incomeBeforeTax));
+        rows.incomeBeforeTaxRatio.push(entry.incomeBeforeTaxRatio ? (entry.incomeBeforeTaxRatio * 100).toFixed(2) + '%' : 'N/A');
+        rows.incomeTaxExpense.push(formatNumber(entry.incomeTaxExpense));
+        rows.netIncome.push(formatNumber(entry.netIncome));
+        rows.netIncomeRatio.push(entry.netIncomeRatio ? (entry.netIncomeRatio * 100).toFixed(2) + '%' : 'N/A');
+        rows.eps.push(entry.eps || 'N/A');
+        rows.epsdiluted.push(entry.epsdiluted || 'N/A');
+        rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
+        rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
+        rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+
+        // 計算增長率
+        if (index > 0) {
+            if (period === 'annual') {
+                let lastRevenue = data[index - 1].revenue;
+                if (entry.revenue && lastRevenue) {
+                    let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
+                    rows.growthRate.push(growthRate.toFixed(2) + '%');
+                } else {
+                    rows.growthRate.push('N/A');
+                }
+            } else {
+                // 查找去年同季度的數據
+                let previousYearSameQuarterIndex = data.findIndex((e, i) => {
+                    return e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period;
+                });
+                if (previousYearSameQuarterIndex !== -1) {
+                    let lastRevenue = data[previousYearSameQuarterIndex].revenue;
+                    if (entry.revenue && lastRevenue) {
+                        let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
+                        rows.growthRate.push(growthRate.toFixed(2) + '%');
                     } else {
-                        let previousYearSameQuarterIndex = data.findIndex((e, i) => {
-                            return e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period;
-                        });
-                        if (previousYearSameQuarterIndex !== -1) {
-                            let lastRevenue = data[previousYearSameQuarterIndex].revenue;
-                            if (entry.revenue && lastRevenue) {
-                                let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                                rows[key].push(growthRate.toFixed(2) + '%');
-                            } else {
-                                rows[key].push('N/A');
-                            }
-                        } else {
-                            rows[key].push('N/A');
-                        }
+                        rows.growthRate.push('N/A');
                     }
                 } else {
-                    rows[key].push('N/A');
+                    rows.growthRate.push('N/A');
                 }
-            } else if (key === 'grossProfitRatio' || key === 'ebitdaratio' || key === 'operatingIncomeRatio' || key === 'incomeBeforeTaxRatio' || key === 'netIncomeRatio') {
-                rows[key].push(entry[key] ? (entry[key] * 100).toFixed(2) + '%' : 'N/A');
-            } else if (key === 'link' || key === 'finalLink') {
-                rows[key].push(`<a class="styled-link" href="${entry[key]}" target="_blank">${key === 'link' ? 'View Report' : 'Final Report'}</a>`);
-            } else {
-                rows[key].push(formatNumber(entry[key]) || 'N/A');
             }
-        });
+        } else {
+            rows.growthRate.push('N/A');
+        }
     });
 
-    // 转置数据
-    const transposedData = Object.keys(rows).map(key => rows[key]);
+    // 構建 HTML 表格
+    let tableHtml = `
+        <div style="position: relative;">
+            <div style="position: absolute; top: 0; left: 0; background: white; z-index: 1;">
+                <table border="1" style="border-collapse: collapse;">
+                    ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
+                </table>
+            </div>
+            <div class="scroll-container-x" style="overflow-x: auto;">
+                <table border="1" style="width: 100%; border-collapse: collapse;">
+                    ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
+                </table>
+            </div>
+        </div>
+    `;
 
-    // 构建 HTML 表格
-    let leftTableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
-    for (let i = 0; i < transposedData.length; i++) {
-        leftTableHtml += `<tr><th style="white-space: nowrap;">${transposedData[i][0]}</th></tr>`;
-    }
-    leftTableHtml += '</table>';
-
-    let rightTableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
-    for (let i = 1; i < transposedData[0].length; i++) {
-        rightTableHtml += '<tr>';
-        for (let j = 0; j < transposedData.length; j++) {
-            rightTableHtml += `<td style="white-space: nowrap;">${transposedData[j][i]}</td>`;
-        }
-        rightTableHtml += '</tr>';
-    }
-    rightTableHtml += '</table>';
-
-    // 创建容器结构
+    // 創建容器結構
     container.innerHTML = `
-        <div style="position: relative; overflow-x: auto;">
-            <div style="display: flex;">
-                <div style="position: sticky; left: 0; background-color: white; z-index: 10;">
-                    ${leftTableHtml}
-                </div>
-                <div class="scroll-container-x" id="scrollContainer">
-                    ${rightTableHtml}
-                </div>
+        <div class="scroll-container-x" id="${chartId}ScrollContainer">
+            <div id="${chartId}Container">
+                ${tableHtml}
             </div>
         </div>
         <div id="operatingChartContainer" style="margin-top: 20px;">
@@ -888,16 +910,16 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         </div>
     `;
 
-    // 设置scroll位置
-    const scrollContainer = document.getElementById('scrollContainer');
+    // 設置scroll位置
+    const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
     scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
-    // 创建图表
+    // 創建圖表
     createOperatingChart(data, operatingChartId);
     createIncomeStatementChart(data, chartId);
 
     const expandButton = document.getElementById('expandButton_Income');
-    if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
+    if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
 }
 
 function createOperatingChart(data, chartId) {
