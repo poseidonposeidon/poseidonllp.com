@@ -886,7 +886,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows[key].slice(1).forEach(value => {
             tableHtml += `<td>${value}</td>`;
         });
-        tableHtml += `<th>${rows[key][0]}</th>`; // 在最右側添加欄位名稱
         tableHtml += '</tr>';
     });
     tableHtml += '</table>';
