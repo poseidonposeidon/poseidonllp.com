@@ -879,19 +879,22 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     });
 
+    // 轉置數據
+    const transposedData = Object.keys(rows).map(key => rows[key]);
+
     // 構建 HTML 表格
     let leftTableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
-    Object.keys(rows).forEach(key => {
-        leftTableHtml += `<tr><th style="white-space: nowrap;">${rows[key][0]}</th></tr>`;
-    });
+    for (let i = 0; i < transposedData.length; i++) {
+        leftTableHtml += `<tr><th style="white-space: nowrap;">${transposedData[i][0]}</th></tr>`;
+    }
     leftTableHtml += '</table>';
 
     let rightTableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
-    for (let i = 1; i < rows.date.length; i++) {
+    for (let i = 0; i < transposedData[0].length; i++) {
         rightTableHtml += '<tr>';
-        Object.keys(rows).forEach(key => {
-            rightTableHtml += `<td style="white-space: nowrap;">${rows[key][i]}</td>`;
-        });
+        for (let j = 0; j < transposedData.length; j++) {
+            rightTableHtml += `<td style="white-space: nowrap;">${transposedData[j][i]}</td>`;
+        }
         rightTableHtml += '</tr>';
     }
     rightTableHtml += '</table>';
