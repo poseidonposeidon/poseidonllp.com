@@ -886,7 +886,12 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             </div>
             <div class="scroll-container-x">
                 <table border="1" style="width: 100%; border-collapse: collapse;">
-                    ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
+                    <thead>
+                        ${Object.keys(rows).map(key => `<th>${rows[key][0]}</th>`).join('')}
+                    </thead>
+                    <tbody>
+                        ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
+                    </tbody>
                 </table>
             </div>
         </div>
