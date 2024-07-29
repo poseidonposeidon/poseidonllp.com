@@ -886,14 +886,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             </div>
             <div class="scroll-container-x">
                 <table border="1" style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr>
-                            ${Object.keys(rows).map(key => `<th>${rows[key][0]}</th>`).join('')}
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
-                    </tbody>
+                    ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
                 </table>
             </div>
         </div>
@@ -1116,7 +1109,6 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
-
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
