@@ -882,28 +882,25 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 構建 HTML 表格
     let tableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
-        tableHtml += `<tr><th style="white-space: nowrap;">${rows[key][0]}</th>`;
-        rows[key].slice(1).forEach(value => {
-            tableHtml += `<td style="white-space: nowrap;">${value}</td>`;
-        });
-        tableHtml += '</tr>';
+        tableHtml += `<tr><th style="white-space: nowrap;">${rows[key][0]}</th></tr>`;
     });
     tableHtml += '</table>';
 
     // 創建容器結構
     container.innerHTML = `
         <div style="position: relative; overflow-x: auto;">
-            <div style="position: sticky; top: 0; background-color: white; z-index: 10;">
-                <table border="1" style="width: 100%; border-collapse: collapse;">
-                    <tr>
-                        ${Object.keys(rows).map(key => `<th style="white-space: nowrap;">${rows[key][0]}</th>`).join('')}
-                    </tr>
-                </table>
-            </div>
-            <div class="scroll-container-x" id="scrollContainer">
-                <table id="IncomeStatementTable" border="1">
-                    ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="white-space: nowrap;">${value}</td>`).join('')}</tr>`).join('')}
-                </table>
+            <div style="display: flex;">
+                <div style="position: sticky; left: 0; background-color: white; z-index: 10;">
+                    ${tableHtml}
+                </div>
+                <div class="scroll-container-x" id="scrollContainer">
+                    <table id="IncomeStatementTable" border="1">
+                        <tr>
+                            ${Object.keys(rows).map(key => `<th style="white-space: nowrap;">${rows[key][0]}</th>`).join('')}
+                        </tr>
+                        ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="white-space: nowrap;">${value}</td>`).join('')}</tr>`).join('')}
+                    </table>
+                </div>
             </div>
         </div>
         <div id="operatingChartContainer" style="margin-top: 20px;">
