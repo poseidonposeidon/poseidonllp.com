@@ -880,9 +880,17 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     });
 
     // 構建 HTML 表格
+    let headerHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
+    headerHtml += '<tr>';
+    Object.keys(rows).forEach(key => {
+        headerHtml += `<th style="white-space: nowrap;">${rows[key][0]}</th>`;
+    });
+    headerHtml += '</tr>';
+    headerHtml += '</table>';
+
     let tableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
-        tableHtml += `<tr><th style="white-space: nowrap;">${rows[key][0]}</th></tr>`;
+        tableHtml += `<tr>${rows[key].slice(1).map(value => `<td style="white-space: nowrap;">${value}</td>`).join('')}</tr>`;
     });
     tableHtml += '</table>';
 
@@ -891,15 +899,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         <div style="position: relative; overflow-x: auto;">
             <div style="display: flex;">
                 <div style="position: sticky; left: 0; background-color: white; z-index: 10;">
-                    ${tableHtml}
+                    ${headerHtml}
                 </div>
                 <div class="scroll-container-x" id="scrollContainer">
-                    <table id="IncomeStatementTable" border="1">
-                        <tr>
-                            ${Object.keys(rows).map(key => `<th style="white-space: nowrap;">${rows[key][0]}</th>`).join('')}
-                        </tr>
-                        ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="white-space: nowrap;">${value}</td>`).join('')}</tr>`).join('')}
-                    </table>
+                    ${tableHtml}
                 </div>
             </div>
         </div>
