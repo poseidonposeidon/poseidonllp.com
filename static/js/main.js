@@ -887,10 +887,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     leftTableHtml += '</table>';
 
     let rightTableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
-    for (let i = 0; i < data.length; i++) {
+    for (let i = 1; i < rows.date.length; i++) {
         rightTableHtml += '<tr>';
         Object.keys(rows).forEach(key => {
-            rightTableHtml += `<td style="white-space: nowrap;">${rows[key][i + 1]}</td>`;
+            rightTableHtml += `<td style="white-space: nowrap;">${rows[key][i]}</td>`;
         });
         rightTableHtml += '</tr>';
     }
