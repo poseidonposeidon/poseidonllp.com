@@ -449,3 +449,24 @@ button:not(.info-input button):hover {
 .transcript-button:last-child {
     margin-right: 0; /* 最後一個按鈕不需要右側間距 */
 }
+
+/* 新增的表格样式 */
+.table-container {
+    display: flex;
+}
+
+.fixed-column {
+    position: sticky;
+    left: 0;
+    background: #1e1e1e;
+    z-index: 1;
+}
+
+.fixed-column th, .fixed-column td {
+    background: #1e1e1e;
+    border-right: 1px solid #333;
+}
+
+.scroll-container-x {
+    overflow-x: auto;
+}

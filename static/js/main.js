@@ -878,13 +878,13 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     // 構建 HTML 表格
     let tableHtml = `
-        <div style="position: relative;">
-            <div style="position: absolute; top: 0; left: 0; background: white; z-index: 1;">
+        <div class="table-container">
+            <div class="fixed-column">
                 <table border="1" style="border-collapse: collapse;">
                     ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
                 </table>
             </div>
-            <div class="scroll-container-x" style="overflow-x: auto;">
+            <div class="scroll-container-x">
                 <table border="1" style="width: 100%; border-collapse: collapse;">
                     ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
                 </table>
