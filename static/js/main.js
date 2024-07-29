@@ -686,7 +686,7 @@ let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的�
 
 function fetchIncomeStatement() {
     stockSymbol = fetchStock();
-    const period = document.getElementById('period').value;  // 獲取選擇的時段
+    const period = document.getElementById('period').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -700,8 +700,8 @@ function fetchIncomeStatement() {
 
 function fetchJPIncomeStatement() {
     stockSymbol = fetchJPStock();
-    const period = document.getElementById('periodJP').value;  // 獲取選擇的時段
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+    const period = document.getElementById('periodJP').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -713,7 +713,7 @@ function fetchJPIncomeStatement() {
 }
 
 async function fetchTWIncomeStatement() {
-    stockSymbol = await fetchTWStock();  // 確保 fetchTWStock 是 async 並等待它完成
+    stockSymbol = await fetchTWStock();
     const period = document.getElementById('periodTW').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
@@ -732,12 +732,13 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            // 檢查回應資料是否為 undefined 或非陣列
             if (data === undefined || !Array.isArray(data)) {
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container, chartId, operatingChartId, period);  // 修改這裡以傳遞整個數據陣列和選擇的時段
+                    callback(data, container, chartId, operatingChartId, period);
+                    const scrollContainer = document.getElementById(containerId).querySelector('.scroll-container-x');
+                    scrollContainer.scrollLeft = scrollContainer.scrollWidth;
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
