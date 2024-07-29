@@ -880,29 +880,31 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     });
 
     // 構建 HTML 表格
-    let headerHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
-    headerHtml += '<tr>';
+    let leftTableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
-        headerHtml += `<th style="white-space: nowrap;">${rows[key][0]}</th>`;
+        leftTableHtml += `<tr><th style="white-space: nowrap;">${rows[key][0]}</th></tr>`;
     });
-    headerHtml += '</tr>';
-    headerHtml += '</table>';
+    leftTableHtml += '</table>';
 
-    let tableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
-    Object.keys(rows).forEach(key => {
-        tableHtml += `<tr>${rows[key].slice(1).map(value => `<td style="white-space: nowrap;">${value}</td>`).join('')}</tr>`;
-    });
-    tableHtml += '</table>';
+    let rightTableHtml = '<table border="1" style="width: 100%; border-collapse: collapse;">';
+    for (let i = 0; i < data.length; i++) {
+        rightTableHtml += '<tr>';
+        Object.keys(rows).forEach(key => {
+            rightTableHtml += `<td style="white-space: nowrap;">${rows[key][i + 1]}</td>`;
+        });
+        rightTableHtml += '</tr>';
+    }
+    rightTableHtml += '</table>';
 
     // 創建容器結構
     container.innerHTML = `
         <div style="position: relative; overflow-x: auto;">
             <div style="display: flex;">
                 <div style="position: sticky; left: 0; background-color: white; z-index: 10;">
-                    ${headerHtml}
+                    ${leftTableHtml}
                 </div>
                 <div class="scroll-container-x" id="scrollContainer">
-                    ${tableHtml}
+                    ${rightTableHtml}
                 </div>
             </div>
         </div>
