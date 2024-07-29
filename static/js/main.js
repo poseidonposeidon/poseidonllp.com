@@ -890,7 +890,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                         ${Object.keys(rows).map(key => `<th>${rows[key][0]}</th>`).join('')}
                     </thead>
                     <tbody>
-                        ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
+                        ${data.map((entry, rowIndex) =>
+        `<tr>${Object.keys(rows).map(key =>
+            `<td>${rows[key][rowIndex + 1] || 'N/A'}</td>`).join('')}</tr>`
+    ).join('')}
                     </tbody>
                 </table>
             </div>
