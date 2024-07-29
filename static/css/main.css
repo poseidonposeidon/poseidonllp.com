@@ -465,8 +465,22 @@ button:not(.info-input button):hover {
 .fixed-column th, .fixed-column td {
     background: #1e1e1e;
     border-right: 1px solid #333;
+    min-width: 150px; /* 確保每列最小寬度一致 */
+    white-space: nowrap; /* 防止內容換行 */
 }
 
 .scroll-container-x {
     overflow-x: auto;
+}
+
+.scroll-container-x table {
+    border-collapse: collapse;
+    table-layout: fixed; /* 固定表格佈局 */
+    width: 100%;
+}
+
+.scroll-container-x th, .scroll-container-x td {
+    min-width: 150px; /* 確保每列最小寬度一致 */
+    white-space: nowrap; /* 防止內容換行 */
+    border: 1px solid #333;
 }
