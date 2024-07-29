@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', () => {
 function loadSection(sectionId) {
     const sections = {
         'income-statement': `
-            <div class="section" id="income-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="income-statement">
                 <h2>Income Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="period">Select Period:</label>
@@ -106,7 +106,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'balance-sheet': `
-            <div class="section" id="balance-sheet" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="balance-sheet">
                 <h2>Balance Sheet Statements</h2>
                 <div class="content scroll-container-x">
                     <label for="period_2">Select Period:</label>
@@ -119,8 +119,8 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'cashflow-statement': `
-            <div class="section" id="cashflow-statement" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
-                <h2>Cashflow Sheet Statements</h2>
+            <div class="section" id="cashflow-statement">
+                <h2>Cashflow Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="period_3">Select Period:</label>
                     <select id="period_3">
@@ -136,7 +136,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'earnings-call-transcript': `
-            <div class="section" id="earnings-call-transcript" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="earnings-call-transcript">
                 <h2>Earnings Call Transcript</h2>
                 <div class="content">
                     <input type="number" id="yearInput" placeholder="Enter Year">
@@ -148,7 +148,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'earnings-call-calendar': `
-            <div class="section" id="earnings-call-calendar" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="earnings-call-calendar">
                 <h2>Earnings Call Calendar</h2>
                 <div class="content">
                     <input type="date" id="fromDate" placeholder="From Date">
@@ -160,7 +160,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'historical-earnings': `
-            <div class="section" id="historical-earnings" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="historical-earnings">
                 <h2>Historical and Future Earnings</h2>
                 <div class="content">
                     <input type="date" id="fromDate_1" placeholder="From Date">
@@ -172,7 +172,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'dividend-calendar': `
-            <div class="section" id="dividend-calendar" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="dividend-calendar">
                 <h2>Dividend Calendar</h2>
                 <div class="content">
                     <input type="date" id="fromDate_2" placeholder="From Date">
@@ -184,7 +184,7 @@ function loadSection(sectionId) {
                 </div>
             </div>`,
         'insider-trades': `
-            <div class="section" id="insider-trades" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="insider-trades">
                 <h2>Insider Trades</h2>
                 <div class="content">
                     <button onclick="fetchInsiderTrades()">Load Table</button>
@@ -202,7 +202,7 @@ function loadSection(sectionId) {
 function loadSectionJP(sectionId) {
     const sections = {
         'income-statement': `
-            <div class="section" id="income-statement-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="income-statement-JP">
                 <h2>Income Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="periodJP">Select Period:</label>
@@ -219,7 +219,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'balance-sheet': `
-            <div class="section" id="balance-sheet-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="balance-sheet-JP">
                 <h2>Balance Sheet Statements</h2>
                 <div class="content scroll-container-x">
                     <label for="periodJP_2">Select Period:</label>
@@ -232,7 +232,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'cashflow-statement': `
-            <div class="section" id="cashflow-statement-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="cashflow-statement-JP">
                 <h2>Cashflow Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="periodJP_3">Select Period:</label>
@@ -249,7 +249,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'earnings-call-transcript': `
-            <div class="section" id="earnings-call-transcript-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="earnings-call-transcript-JP">
                 <h2>Earnings Call Transcript</h2>
                 <div class="content">
                     <input type="number" id="yearInputJP" placeholder="Enter Year">
@@ -261,7 +261,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'earnings-call-calendar': `
-            <div class="section" id="earnings-call-calendar-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="earnings-call-calendar-JP">
                 <h2>Earnings Call Calendar</h2>
                 <div class="content">
                     <input type="date" id="fromDateJP" placeholder="From Date">
@@ -273,7 +273,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'historical-earnings': `
-            <div class="section" id="historical-earnings-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="historical-earnings-JP">
                 <h2>Historical and Future Earnings</h2>
                 <div class="content">
                     <input type="date" id="fromDateJP_1" placeholder="From Date">
@@ -285,7 +285,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'dividend-calendar': `
-            <div class="section" id="dividend-calendar-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="dividend-calendar-JP">
                 <h2>Dividend Calendar</h2>
                 <div class="content">
                     <input type="date" id="fromDate_2-JP" placeholder="From Date">
@@ -297,7 +297,7 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'insider-trades': `
-            <div class="section" id="insider-trades-JP" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="insider-trades-JP">
                 <h2>Insider Trades</h2>
                 <div class="content">
                     <button onclick="fetchJPInsiderTrades()">Load Table</button>
@@ -315,7 +315,7 @@ function loadSectionJP(sectionId) {
 function loadSectionTW(sectionId) {
     const sections = {
         'income-statement': `
-            <div class="section" id="income-statement-TW" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="income-statement-TW">
                 <h2>Income Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="periodTW">Select Period:</label>
@@ -332,7 +332,7 @@ function loadSectionTW(sectionId) {
                 </div>
             </div>`,
         'balance-sheet': `
-            <div class="section" id="balance-sheet-TW" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="balance-sheet-TW">
                 <h2>Balance Sheet Statements</h2>
                 <div class="content scroll-container-x">
                     <label for="periodTW_2">Select Period:</label>
@@ -345,7 +345,7 @@ function loadSectionTW(sectionId) {
                 </div>
             </div>`,
         'cashflow-statement': `
-            <div class="section" id="cashflow-statement-TW" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="cashflow-statement-TW">
                 <h2>Cashflow Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="periodTW_3">Select Period:</label>
@@ -370,7 +370,7 @@ function loadSectionTW(sectionId) {
 function loadAIBoxSection(sectionId) {
     const sections = {
         'audio-transcription': `
-            <div class="section" id="audio-transcription" onmouseover="expandSection(this)" onmouseleave="collapseSection(this)" onclick="toggleFixed(event, this)">
+            <div class="section" id="audio-transcription">
                 <h2>Audio Transcription</h2>
                 <div class="content">
                     <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
@@ -418,6 +418,7 @@ function loadAIBoxSection(sectionId) {
         setInterval(updateQueueLength, 5000); // 每5秒更新一次排程長度
     }
 }
+
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
