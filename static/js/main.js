@@ -1240,6 +1240,9 @@ function displayBalanceSheet(data, container) {
         finalLink: ['Final Link']
     };
 
+    // 按日期升序排序
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     data.forEach(entry => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -1293,8 +1296,8 @@ function displayBalanceSheet(data, container) {
         rows.totalInvestments.push(formatNumber(entry.totalInvestments));
         rows.totalDebt.push(formatNumber(entry.totalDebt));
         rows.netDebt.push(formatNumber(entry.netDebt));
-        rows.link.push(`<a href="${entry.link}" target="_blank">View Report</a>`);
-        rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
+        rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
     let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
@@ -1474,8 +1477,8 @@ function displayCashflow(data, container) {
         rows.operatingCashFlow.push(formatNumber(entry.operatingCashFlow));
         rows.capitalExpenditure.push(formatNumber(entry.capitalExpenditure));
         rows.freeCashFlow.push(formatNumber(entry.freeCashFlow));
-        rows.link.push(`<a href="${entry.link}" target="_blank">View Report</a>`);
-        rows.finalLink.push(`<a href="${entry.finalLink}" target="_blank">Final Report</a>`);
+        rows.link.push(`<a  class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a  class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
     // 构建 HTML 表格
