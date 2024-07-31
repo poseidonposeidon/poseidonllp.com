@@ -881,19 +881,20 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     // 構建 HTML 表格
     let tableHtml = `
-        <div style="position: relative;">
-            <div style="position: absolute; top: 0; left: 0; background: white; z-index: 1;">
-                <table border="1" style="border-collapse: collapse;">
-                    ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
-                </table>
-            </div>
-            <div class="scroll-container-x" style="overflow-x: auto;">
-                <table border="1" style="width: 100%; border-collapse: collapse;">
-                    ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
-                </table>
-            </div>
+    <div style="display: flex; overflow-x: auto;">
+        <div style="flex-shrink: 0; background: white; z-index: 1; border-right: 1px solid #000;">
+            <table border="1" style="border-collapse: collapse;">
+                ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
+            </table>
         </div>
+        <div class="scroll-container-x" style="overflow-x: auto;">
+            <table border="1" style="width: 100%; border-collapse: collapse;">
+                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
+            </table>
+        </div>
+    </div>
     `;
+
 
     // 創建容器結構
     container.innerHTML = `
