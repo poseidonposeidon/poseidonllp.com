@@ -419,6 +419,8 @@ button:not(.info-input button):hover {
     padding: 0; /* 移除容器內邊距 */
     margin: 0 auto; /* 確保容器本身居中 */
     max-width: 100%; /* 確保容器寬度不超過屏幕 */
+    background-color: #121212;
+
 }
 
 .logo-container-new a {
