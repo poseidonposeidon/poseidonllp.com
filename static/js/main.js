@@ -739,16 +739,16 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                 if (data.length > 0) {
                     callback(data, container, chartId, operatingChartId, period);
 
-                    // 確保滾動條移動到最右邊
+                    // 确保滚动条移动到最右边
                     setTimeout(() => {
                         const scrollContainer = document.getElementById(containerId).querySelector('.scroll-container-x');
                         scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
 
-                        // 再次確認是否滾動到最右邊
+                        // 再次确认是否滚动到最右边
                         if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
                             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
                         }
-                    }, 200); // 延長等待時間以確保元素完全渲染
+                    }, 300); // 延长等待时间以确保元素完全渲染
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
