@@ -467,6 +467,7 @@ button:not(.info-input button):hover {
     margin-right: 0;
 }
 
+
 #chartContainer, #operatingChartContainer {
     width: 100%;
     height: auto;
