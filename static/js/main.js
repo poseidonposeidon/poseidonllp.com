@@ -921,8 +921,15 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     `;
 
     // 設置scroll位置
-    const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
-    scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+    setTimeout(() => {
+        const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
+        scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+
+        // 再次確認是否滾動到最右邊
+        if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
+            scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+        }
+    }, 300); // 延長等待時間以確保元素完全渲染
 
     // 創建圖表
     createOperatingChart(data, operatingChartId);
