@@ -475,3 +475,11 @@ button:not(.info-input button):hover {
     width: 100%; /* 確保容器寬度為 100% */
     height: auto; /* 高度自適應內容 */
 }
+
+.scroll-right {
+    direction: rtl;
+}
+
+.scroll-right > * {
+    direction: ltr;
+}
