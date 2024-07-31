@@ -423,8 +423,8 @@ button:not(.info-input button):hover {
 }
 
 .logo-container-new a {
-    flex: 1 0 22%; /* 调整这个比例，使得 logo 占用更小的空间，例如 1 0 20% */
-    max-width: 22%; /* 确保这个值也相应调整 */
+    flex: 1 0 20%; /* 将此值减少以减少每个 logo 项的占用空间，例如 1 0 18% */
+    max-width: 20%; /* 相应地减少 max-width */
     box-sizing: border-box;
     text-align: center;
     margin: 0; /* 确保没有额外的 margin */
@@ -432,11 +432,12 @@ button:not(.info-input button):hover {
 }
 
 .logo-container-new img {
-    max-height: 120px; /* 調整 logo 的最大高度，使它們看起來更大 */
+    max-height: 120px; /* 确保高度适当 */
     width: auto;
-    margin: 0 auto;
+    margin: 0; /* 确保没有 margin */
     display: block;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
+    object-fit: contain; /* 确保图片适应其容器 */
 }
 
 .logo-container-new img:hover {
