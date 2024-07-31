@@ -415,7 +415,7 @@ button:not(.info-input button):hover {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 3px; /* 調整為 3px 或 0px, 來減少 logo 之間的間距 */
+    gap: 0px; /* 調整為 3px 或 0px, 來減少 logo 之間的間距 */
     background-color: #121212;
     padding: 20px; /* 可調整此值來控制內邊距 */
     border-radius: 10px;
