@@ -420,20 +420,20 @@ button:not(.info-input button):hover {
     padding: 20px;
     border-radius: 10px;
     max-width: 80%;
-    width: 600px; /* 設定固定的寬度 */
 }
 
 .logo-container-new a {
-    flex: 1 1 25%; /* 每個logo占用四分之一的空間 */
-    max-width: 25%; /* 每個logo最大寬度為四分之一 */
+    flex: 1 0 25%; /* 每個 logo 占用四分之一的空間 */
+    max-width: 25%; /* 每個 logo 最大寬度為四分之一 */
     text-align: center; /* 對齊 logo 內容 */
 }
 
 .logo-container-new img {
     max-height: 100px; /* 調整 logo 的高度 */
-    margin: 0 20px;
+    width: auto; /* 保持圖像比例 */
+    margin: 0 auto;
+    display: block;
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* 過渡效果 */
-    max-width: 100%; /* 保持圖像比例 */
 }
 
 .logo-container-new img:hover {
