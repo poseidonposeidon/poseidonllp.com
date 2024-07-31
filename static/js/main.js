@@ -739,7 +739,8 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                 if (data.length > 0) {
                     callback(data, container, chartId, operatingChartId, period);
                     const scrollContainer = document.getElementById(containerId).querySelector('.scroll-container-x');
-                    scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+                    // 設置scroll位置到最右邊
+                    scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
