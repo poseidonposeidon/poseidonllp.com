@@ -415,21 +415,21 @@ button:not(.info-input button):hover {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0px; /* 調整為 3px 或 0px, 來減少 logo 之間的間距 */
-    background-color: #121212;
-    padding: 20px; /* 可調整此值來控制內邊距 */
-    border-radius: 10px;
-    width: 100%;
+    gap: 0px; /* 確保 gap 為 0px，去除間距 */
+    padding: 0; /* 移除容器內邊距 */
+    margin: 0 auto; /* 確保容器本身居中 */
+    max-width: 100%; /* 確保容器寬度不超過屏幕 */
 }
 
 .logo-container-new a {
-    flex: 1 0 20%; /* 将此值减少以减少每个 logo 项的占用空间，例如 1 0 18% */
-    max-width: 20%; /* 相应地减少 max-width */
+    flex: 1 0 auto; /* 自適應寬度 */
+    max-width: 20%; /* 視需要調整 */
     box-sizing: border-box;
     text-align: center;
-    margin: 0; /* 确保没有额外的 margin */
-    padding: 0; /* 确保没有额外的 padding */
+    margin: 0; /* 確保沒有外邊距 */
+    padding: 0; /* 確保沒有內邊距 */
 }
+
 
 .logo-container-new img {
     max-height: 120px; /* 确保高度适当 */
