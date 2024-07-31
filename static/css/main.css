@@ -449,7 +449,7 @@ button:not(.info-input button):hover {
     justify-content: center;
     align-items: center;
     height: 100vh; /* 使容器佔滿整個視窗高度 */
-    gap: 50px; /* 調整兩個區塊之間的間距 */
+    gap: 25px; /* 調整兩個區塊之間的間距 */
 }
 
 #trend_notification_app {
