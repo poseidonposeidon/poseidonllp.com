@@ -1437,6 +1437,9 @@ function displayCashflow(data, container) {
         finalLink: ['Final Link']
     };
 
+    // 按日期升序排序
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     // 填充行数据
     data.forEach(entry => {
         rows.date.push(entry.date || 'N/A');
@@ -1477,8 +1480,8 @@ function displayCashflow(data, container) {
         rows.operatingCashFlow.push(formatNumber(entry.operatingCashFlow));
         rows.capitalExpenditure.push(formatNumber(entry.capitalExpenditure));
         rows.freeCashFlow.push(formatNumber(entry.freeCashFlow));
-        rows.link.push(`<a  class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
-        rows.finalLink.push(`<a  class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+        rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
     });
 
     // 构建 HTML 表格
