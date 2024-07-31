@@ -421,12 +421,14 @@ button:not(.info-input button):hover {
     border-radius: 10px;
     width: 100%;
 }
+
 .logo-container-new a {
     flex: 1 0 22%; /* 調整為四個logo在一行 */
     max-width: 22%; /* 每個 logo 最大寬度為22%，讓四個logo能完全顯示在一行 */
     box-sizing: border-box; /* 包含 padding 和 border */
     text-align: center; /* 對齊 logo 內容 */
 }
+
 .logo-container-new img {
     max-height: 80px; /* 調整 logo 的最大高度 */
     width: auto; /* 保持圖像比例 */
@@ -434,6 +436,7 @@ button:not(.info-input button):hover {
     display: block;
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* 過渡效果 */
 }
+
 .logo-container-new img:hover {
     transform: scale(1.1); /* 放大效果 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 陰影效果 */
@@ -459,4 +462,9 @@ button:not(.info-input button):hover {
 
 .transcript-button:last-child {
     margin-right: 0; /* 最後一個按鈕不需要右側間距 */
+}
+
+#chartContainer, #operatingChartContainer {
+    width: 100%; /* 確保容器寬度為 100% */
+    height: auto; /* 高度自適應內容 */
 }
