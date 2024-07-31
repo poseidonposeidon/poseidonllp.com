@@ -748,7 +748,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                         if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
                             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
                         }
-                    }, 100); // 延長等待時間以確保元素完全渲染
+                    }, 200); // 延長等待時間以確保元素完全渲染
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
