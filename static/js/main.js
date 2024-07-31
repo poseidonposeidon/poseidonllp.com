@@ -904,7 +904,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     </div>
     `;
 
-
     // 創建容器結構
     container.innerHTML = `
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
@@ -920,7 +919,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         </div>
     `;
 
-    // 設置scroll位置
+// 設置scroll位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
@@ -932,6 +931,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             }
         }
     }, 100);
+
+
 
     // 創建圖表
     createOperatingChart(data, operatingChartId);
