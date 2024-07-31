@@ -415,7 +415,7 @@ button:not(.info-input button):hover {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 10px; /* 調整 logo 之間的間距 */
+    gap: 5px; /* 減少 logo 之間的間距 */
     background-color: #121212;
     padding: 20px;
     border-radius: 10px;
@@ -430,7 +430,7 @@ button:not(.info-input button):hover {
 }
 
 .logo-container-new img {
-    max-height: 80px; /* 調整 logo 的最大高度，使得它們之間更加靠近 */
+    max-height: 120px; /* 調整 logo 的最大高度，使它們看起來更大 */
     width: auto;
     margin: 0 auto;
     display: block;
@@ -441,6 +441,7 @@ button:not(.info-input button):hover {
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
 
 
 .body-container {
