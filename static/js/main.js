@@ -2215,7 +2215,7 @@ function displayInsiderTrades(data, container) {
         rows.securityName.push(item.securityName || 'N/A');
         rows.price.push(item.price ? `$${item.price.toFixed(2)}` : 'N/A');
         rows.formType.push(item.formType || 'N/A');
-        rows.link.push(item.link ? `<a href="${item.link}" target="_blank">View Form</a>` : 'N/A');
+        rows.link.push(item.link ? `<a  class="styled-link" href="${item.link}" target="_blank">View Form</a>` : 'N/A');
     });
 
     // 构建 HTML 表格
@@ -2264,7 +2264,7 @@ function displayInsiderTrades_JP(data, container) {
         rows.securityName.push(item.securityName || 'N/A');
         rows.price.push(item.price ? `$${item.price.toFixed(2)}` : 'N/A');
         rows.formType.push(item.formType || 'N/A');
-        rows.link.push(item.link ? `<a href="${item.link}" target="_blank">View Form</a>` : 'N/A');
+        rows.link.push(item.link ? `<a class="styled-link" href="${item.link}" target="_blank">View Form</a>` : 'N/A');
     });
 
     // 构建 HTML 表格
