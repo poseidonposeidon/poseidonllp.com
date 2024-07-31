@@ -419,23 +419,21 @@ button:not(.info-input button):hover {
     background-color: #121212;
     padding: 20px;
     border-radius: 10px;
-    max-width: 80%;
+    width: 100%;
 }
-
 .logo-container-new a {
-    flex: 1 0 25%; /* 每個 logo 占用四分之一的空間 */
-    max-width: 25%; /* 每個 logo 最大寬度為四分之一 */
+    flex: 1 0 22%; /* 調整為四個logo在一行 */
+    max-width: 22%; /* 每個 logo 最大寬度為22%，讓四個logo能完全顯示在一行 */
+    box-sizing: border-box; /* 包含 padding 和 border */
     text-align: center; /* 對齊 logo 內容 */
 }
-
 .logo-container-new img {
-    max-height: 100px; /* 調整 logo 的高度 */
+    max-height: 80px; /* 調整 logo 的最大高度 */
     width: auto; /* 保持圖像比例 */
     margin: 0 auto;
     display: block;
     transition: transform 0.3s ease, box-shadow 0.3s ease; /* 過渡效果 */
 }
-
 .logo-container-new img:hover {
     transform: scale(1.1); /* 放大效果 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 陰影效果 */
