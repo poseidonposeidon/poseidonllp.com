@@ -738,9 +738,12 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
             } else {
                 if (data.length > 0) {
                     callback(data, container, chartId, operatingChartId, period);
-                    const scrollContainer = document.getElementById(containerId).querySelector('.scroll-container-x');
-                    // 設置scroll位置到最右邊
-                    scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+
+                    // 將滾動到最右邊的部分移到回调後
+                    setTimeout(() => {
+                        const scrollContainer = document.getElementById(containerId).querySelector('.scroll-container-x');
+                        scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+                    }, 0);
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
