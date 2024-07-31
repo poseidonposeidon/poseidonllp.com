@@ -1061,7 +1061,7 @@ function createIncomeStatementChart(data, chartId) {
             labels: data.map(entry => entry.date),
             datasets: [
                 {
-                    type: 'bar',
+                    type: 'line',
                     label: 'Gross Profit Ratio',
                     data: data.map(entry => entry.grossProfitRatio * 100),
                     borderColor: 'rgba(75, 192, 192, 1)',
@@ -1069,7 +1069,7 @@ function createIncomeStatementChart(data, chartId) {
                     yAxisID: 'y1'
                 },
                 {
-                    type: 'bar',
+                    type: 'line',
                     label: 'Operating Income Ratio',
                     data: data.map(entry => entry.operatingIncomeRatio * 100),
                     borderColor: 'rgba(153, 102, 255, 1)',
@@ -1077,7 +1077,7 @@ function createIncomeStatementChart(data, chartId) {
                     yAxisID: 'y1'
                 },
                 {
-                    type: 'bar',
+                    type: 'line',
                     label: 'Net Income Ratio',
                     data: data.map(entry => entry.netIncomeRatio * 100),
                     borderColor: 'rgba(255, 159, 64, 1)',
@@ -1085,7 +1085,7 @@ function createIncomeStatementChart(data, chartId) {
                     yAxisID: 'y1'
                 },
                 {
-                    type: 'line',
+                    type: 'bar',
                     label: 'EPS',
                     data: data.map(entry => entry.eps),
                     borderColor: 'rgba(255, 99, 132, 1)',
