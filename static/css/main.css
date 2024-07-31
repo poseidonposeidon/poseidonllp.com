@@ -275,6 +275,23 @@ button:not(.info-input button):hover {
 
 .scroll-container-x {
     overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+    -webkit-overflow-scrolling: touch;
+}
+
+.scroll-container-x::-webkit-scrollbar {
+    height: 10px;
+}
+
+.scroll-container-x::-webkit-scrollbar-thumb {
+    background-color: #888;
+}
+
+.scroll-container-x::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
 }
 
 .scroll-container-y {
