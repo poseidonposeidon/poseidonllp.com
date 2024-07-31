@@ -77,22 +77,21 @@ div {
 }
 
 .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000; /* 確保導航欄在其他元素之上 */
+    background-color: #121212;
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #121212;
     padding: 5px 10px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    width: 100%;
-    margin-bottom: 10px;
     transition: background-color 0.3s ease;
-    position: relative;
-    top: -10px;
-    z-index: 1000;
-    flex-wrap: wrap; /* 修改以適應小螢幕 */
+    flex-wrap: wrap;
 }
-
 .logo-container {
     display: flex;
     align-items: center;
@@ -154,12 +153,9 @@ div {
 }
 
 .info-input {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-bottom: 10px;
+    position: relative;
+    z-index: 1001; /* 設置比導航欄高的 z-index */
 }
-
 #stockSymbol {
     width: 300px;
     box-sizing: border-box;
