@@ -48,6 +48,7 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: filter 0.3s ease;
+    height: 100%;
 }
 
 h1, h2 {
@@ -88,25 +89,27 @@ div {
     transition: background-color 0.3s ease;
     position: relative;
     top: -10px;
-    z-index: 1000; /* 提升導航欄的層級 */
+    z-index: 1000;
+    flex-wrap: wrap; /* 修改以適應小螢幕 */
 }
 
 .logo-container {
     display: flex;
     align-items: center;
-    margin-right: 20px; /* 確保 logo 和連結之間有一點空間 */
+    margin-right: 20px;
 }
 
 .logo {
     height: 40px;
     width: auto;
-    margin-right: 50px; /* 默認情況下的 margin */
+    margin-right: 50px;
 }
 
 .navbar-links {
     display: flex;
     justify-content: center;
     background-color: #121212;
+    flex-wrap: wrap; /* 修改以適應小螢幕 */
 }
 
 .navbar-links a {
@@ -115,7 +118,7 @@ div {
     justify-content: center;
     text-decoration: none;
     color: white;
-    margin: 0 10px; /* 增加 margin 來讓連結之間有些空間 */
+    margin: 0 10px;
     padding: 5px 10px;
     border-radius: 5px;
     transition: all 0.3s ease;
@@ -205,7 +208,7 @@ button:not(.info-input button):hover {
     padding: 20px;
     background-color: #1e1e1e;
     border-radius: 5px;
-    max-width: 100%; /* 控制寬度 */
+    max-width: 100%;
 }
 
 .info-content {
@@ -336,7 +339,7 @@ button:not(.info-input button):hover {
     }
 
     .logo {
-        margin-right: 30px; /* 平板設備上的 margin */
+        margin-right: 30px;
     }
 }
 
@@ -345,7 +348,7 @@ button:not(.info-input button):hover {
         flex-wrap: nowrap;
     }
     .logo {
-        margin-right: 500px; /* 桌面設備上的 margin */
+        margin-right: 500px;
     }
 }
 
@@ -359,7 +362,7 @@ button:not(.info-input button):hover {
 }
 
 .ai-box-section.active {
-    max-height: 80%; /* 修改為80% */
+    max-height: 80%;
     opacity: 1;
     padding: 20px;
 }
@@ -368,7 +371,7 @@ button:not(.info-input button):hover {
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-wrap: wrap; /* 確保在較小屏幕上能自適應 */
+    flex-wrap: wrap;
 }
 
 /* 新增的樣式 */
@@ -381,9 +384,9 @@ button:not(.info-input button):hover {
     padding: 10px;
     border-radius: 5px;
     position: relative;
-    max-width: 800px; /* 限制容器的最大寬度 */
-    margin-left: auto; /* 中心對齊 */
-    margin-right: auto; /* 中心對齊 */
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .text-block {
@@ -392,8 +395,8 @@ button:not(.info-input button):hover {
     padding: 20px;
     z-index: 1;
     width: 70%;
-    max-width: 500px; /* 限制文字區塊的最大寬度 */
-    margin: auto; /* 中心對齊 */
+    max-width: 500px;
+    margin: auto;
 }
 
 .image-block {
@@ -416,31 +419,29 @@ button:not(.info-input button):hover {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0px; /* 確保 gap 為 0px，去除間距 */
-    padding: 0; /* 移除容器內邊距 */
-    margin: 0 auto; /* 確保容器本身居中 */
-    max-width: 100%; /* 確保容器寬度不超過屏幕 */
+    gap: 0px;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 100%;
     background-color: #121212;
-
 }
 
 .logo-container-new a {
-    flex: 1 0 auto; /* 自適應寬度 */
-    max-width: 20%; /* 視需要調整 */
+    flex: 1 0 auto;
+    max-width: 20%;
     box-sizing: border-box;
     text-align: center;
-    margin: 0; /* 確保沒有外邊距 */
-    padding: 0; /* 確保沒有內邊距 */
+    margin: 0;
+    padding: 0;
 }
 
-
 .logo-container-new img {
-    max-height: 120px; /* 确保高度适当 */
+    max-height: 120px;
     width: auto;
-    margin: 0; /* 确保没有 margin */
+    margin: 0;
     display: block;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    object-fit: contain; /* 确保图片适应其容器 */
+    object-fit: contain;
 }
 
 .logo-container-new img:hover {
@@ -448,16 +449,14 @@ button:not(.info-input button):hover {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-
-
 .body-container {
     background-color: #121212;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* 使容器佔滿整個視窗高度 */
-    gap: 50px; /* 調整兩個區塊之間的間距 */
+    height: 100vh;
+    gap: 50px;
 }
 
 #trend_notification_app {
@@ -465,16 +464,16 @@ button:not(.info-input button):hover {
 }
 
 .transcript-button {
-    margin-right: 10px; /* 每個按鈕之間增加間距 */
+    margin-right: 10px;
 }
 
 .transcript-button:last-child {
-    margin-right: 0; /* 最後一個按鈕不需要右側間距 */
+    margin-right: 0;
 }
 
 #chartContainer, #operatingChartContainer {
-    width: 100%; /* 確保容器寬度為 100% */
-    height: auto; /* 高度自適應內容 */
+    width: 100%;
+    height: auto;
 }
 
 .scroll-right {
