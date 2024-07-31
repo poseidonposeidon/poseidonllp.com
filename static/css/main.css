@@ -415,7 +415,7 @@ button:not(.info-input button):hover {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 30px; /* 調整 logo 之間的間距 */
+    gap: 15px; /* 調整 logo 之間的間距 */
     background-color: #121212;
     padding: 20px;
     border-radius: 10px;
@@ -449,7 +449,7 @@ button:not(.info-input button):hover {
     justify-content: center;
     align-items: center;
     height: 100vh; /* 使容器佔滿整個視窗高度 */
-    gap: 25px; /* 調整兩個區塊之間的間距 */
+    gap: 50px; /* 調整兩個區塊之間的間距 */
 }
 
 #trend_notification_app {
