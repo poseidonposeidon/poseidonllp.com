@@ -421,11 +421,14 @@ button:not(.info-input button):hover {
     border-radius: 10px;
     width: 100%;
 }
+
 .logo-container-new a {
-    flex: 1 0 22%; /* 每個 logo 所占的寬度 */
-    max-width: 22%; /* 每個 logo 的最大寬度 */
+    flex: 1 0 22%; /* 调整这个比例，使得 logo 占用更小的空间，例如 1 0 20% */
+    max-width: 22%; /* 确保这个值也相应调整 */
     box-sizing: border-box;
     text-align: center;
+    margin: 0; /* 确保没有额外的 margin */
+    padding: 0; /* 确保没有额外的 padding */
 }
 
 .logo-container-new img {
