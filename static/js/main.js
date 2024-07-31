@@ -882,7 +882,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 構建 HTML 表格
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
-        <div style="flex-shrink: 0; background: white; z-index: 1; border-right: 1px solid #000;">
+        <div style="flex-shrink: 0; background: #121212; z-index: 1; border-right: 1px solid #000;">
             <table border="1" style="border-collapse: collapse;">
                 ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
             </table>
