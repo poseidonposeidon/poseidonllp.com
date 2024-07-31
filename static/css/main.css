@@ -415,13 +415,12 @@ button:not(.info-input button):hover {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 5px; /* 減少 logo 之間的間距 */
+    gap: 3px; /* 調整為 3px 或 0px, 來減少 logo 之間的間距 */
     background-color: #121212;
-    padding: 20px;
+    padding: 20px; /* 可調整此值來控制內邊距 */
     border-radius: 10px;
     width: 100%;
 }
-
 .logo-container-new a {
     flex: 1 0 22%; /* 每個 logo 所占的寬度 */
     max-width: 22%; /* 每個 logo 的最大寬度 */
