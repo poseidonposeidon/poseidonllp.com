@@ -770,7 +770,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         reportedCurrency: ['Reported Currency'],
         cik: ['CIK'],
         fillingDate: ['Filling Date'],
-        acceptedDate: ['Accepted Date'],
+        // acceptedDate: ['Accepted Date'],
         calendarYear: ['Calendar Year'],
         period: ['Period'],
         revenue: ['Revenue'],
@@ -813,7 +813,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
         rows.cik.push(entry.cik || 'N/A');
         rows.fillingDate.push(entry.fillingDate || 'N/A');
-        rows.acceptedDate.push(entry.acceptedDate || 'N/A');
+        // rows.acceptedDate.push(entry.acceptedDate || 'N/A');
         rows.calendarYear.push(entry.calendarYear || 'N/A');
         rows.period.push(entry.period || 'N/A');
         rows.revenue.push(formatNumber(entry.revenue));
