@@ -415,7 +415,7 @@ button:not(.info-input button):hover {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 15px; /* 調整 logo 之間的間距 */
+    gap: 10px; /* 調整 logo 之間的間距 */
     background-color: #121212;
     padding: 20px;
     border-radius: 10px;
@@ -423,24 +423,25 @@ button:not(.info-input button):hover {
 }
 
 .logo-container-new a {
-    flex: 1 0 22%; /* 調整為四個logo在一行 */
-    max-width: 22%; /* 每個 logo 最大寬度為22%，讓四個logo能完全顯示在一行 */
-    box-sizing: border-box; /* 包含 padding 和 border */
-    text-align: center; /* 對齊 logo 內容 */
+    flex: 1 0 22%; /* 每個 logo 所占的寬度 */
+    max-width: 22%; /* 每個 logo 的最大寬度 */
+    box-sizing: border-box;
+    text-align: center;
 }
 
 .logo-container-new img {
-    max-height: 100px; /* 調整 logo 的最大高度 */
-    width: auto; /* 保持圖像比例 */
+    max-height: 80px; /* 調整 logo 的最大高度，使得它們之間更加靠近 */
+    width: auto;
     margin: 0 auto;
     display: block;
-    transition: transform 0.3s ease, box-shadow 0.3s ease; /* 過渡效果 */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .logo-container-new img:hover {
-    transform: scale(1.1); /* 放大效果 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* 陰影效果 */
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
 
 .body-container {
     background-color: #121212;
