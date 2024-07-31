@@ -430,7 +430,7 @@ button:not(.info-input button):hover {
 }
 
 .logo-container-new img {
-    max-height: 80px; /* 調整 logo 的最大高度 */
+    max-height: 100px; /* 調整 logo 的最大高度 */
     width: auto; /* 保持圖像比例 */
     margin: 0 auto;
     display: block;
