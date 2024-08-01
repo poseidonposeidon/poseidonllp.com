@@ -682,7 +682,8 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-let incomeStatementChartInstances = {}; // 使用对象来存储不同国家的图表实例
+
+let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
 function fetchIncomeStatement() {
     stockSymbol = fetchStock();
@@ -737,17 +738,15 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
             } else {
                 if (data.length > 0) {
                     callback(data, container, chartId, operatingChartId, period);
-                    addScrollListeners();
+
                     // 确保滚动条移动到最右边
                     setTimeout(() => {
-                        const scrollContainer = container.querySelector('.scroll-container-x');
-                        if (scrollContainer) {
-                            scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+                        const scrollContainer = document.getElementById(containerId).querySelector('.scroll-container-x');
+                        scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
 
-                            // 再次确认是否滚动到最右边
-                            if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
-                                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-                            }
+                        // 再次确认是否滚动到最右边
+                        if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
+                            scrollContainer.scrollLeft = scrollContainer.scrollWidth;
                         }
                     }, 300); // 延长等待时间以确保元素完全渲染
                 } else {
@@ -813,10 +812,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
         link: ['Report Link'],
         finalLink: ['Final Link'],
-        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根据选择的时段设置栏位名称
+        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根據選擇的時段設定欄位名稱
     };
 
-    // 填充行数据
+    // 填充行數據
     data.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -857,7 +856,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
         rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
 
-        // 计算增长率
+        // 計算增長率
         if (index > 0) {
             if (period === 'annual') {
                 let lastRevenue = data[index - 1].revenue;
@@ -868,7 +867,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                     rows.growthRate.push('N/A');
                 }
             } else {
-                // 查找去年同季度的数据
+                // 查找去年同季度的數據
                 let previousYearSameQuarterIndex = data.findIndex((e, i) => {
                     return e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period;
                 });
@@ -889,15 +888,15 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     });
 
-    // 构建 HTML 表格
+    // 構建 HTML 表格
     let tableHtml = `
-    <div style="display: flex;">
+    <div style="display: flex; overflow-x: auto;">
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
             <table border="1" style="border-collapse: collapse;">
                 ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
             </table>
         </div>
-        <div class="scroll-right">
+        <div class="scroll-right" style="overflow-x: auto;">
             <table border="1" style="width: 100%; border-collapse: collapse;">
                 ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
             </table>
@@ -905,11 +904,11 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     </div>
     `;
 
+    // 創建容器結構
     container.innerHTML = `
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
-            
             <div id="${chartId}Container">
-                <div class="drag-overlay">${tableHtml}</div>
+                ${tableHtml}
             </div>
         </div>
         <div id="operatingChartContainer" style="margin-top: 20px;">
@@ -919,45 +918,41 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             <canvas id="${chartId}"></canvas>
         </div>
     `;
-    addScrollListeners();
 
-// 设置 scroll 位置
+// 設置scroll位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
-        const innerContainer = document.getElementById(`${chartId}Container`);
-        if (innerContainer.offsetWidth > scrollContainer.offsetWidth) {
-            scrollContainer.style.cursor = 'grab';
-        }
-
         if (scrollContainer) {
             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
-            // 再次确认是否滚动到最右边
+            // 再次確認是否滾動到最右邊
             if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
                 scrollContainer.scrollLeft = scrollContainer.scrollWidth;
             }
         }
     }, 100);
 
-    // 创建图表
+
+
+    // 創建圖表
     createOperatingChart(data, operatingChartId);
     createIncomeStatementChart(data, chartId);
 
     const expandButton = document.getElementById('expandButton_Income');
-    if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
+    if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
 }
 
 function createOperatingChart(data, chartId) {
-    // 首先，按日期从旧到新排序数据
+    // 首先，按日期從舊到新排序數據
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 计算增长率
+    // 計算增長率
     data.forEach((entry, index) => {
         if (index > 0) {
             let lastRevenue = data[index - 1].revenue;
             if (entry.revenue && lastRevenue) {
                 let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                entry.growthRate = growthRate.toFixed(2); // 这里将增长率加入数据集
+                entry.growthRate = growthRate.toFixed(2); // 這裡將增長率加入數據集
             } else {
                 entry.growthRate = 'N/A';
             }
@@ -968,13 +963,13 @@ function createOperatingChart(data, chartId) {
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 销毁现有图表实例（如果存在）
+    // 銷毀現有圖表實例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
 
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
-        type: 'bar', // 主要图表类型设为柱状图
+        type: 'bar', // 主要圖表類型設為柱狀圖
         data: {
             labels: data.map(entry => entry.date),
             datasets: [
@@ -982,36 +977,36 @@ function createOperatingChart(data, chartId) {
                     label: 'Revenue',
                     data: data.map(entry => entry.revenue),
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Cost of Revenue',
                     data: data.map(entry => entry.costOfRevenue),
                     borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Expenses',
                     data: data.map(entry => entry.operatingExpenses),
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Income',
                     data: data.map(entry => entry.operatingIncome),
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Growth Rate',
                     data: data.map(entry => entry.growthRate),
-                    type: 'line', // 单独设置为折线图
+                    type: 'line', // 單獨設置為折線圖
                     borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使颜色更加鲜明
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使顏色更加鮮明
                     yAxisID: 'y1'
                 }
             ]
@@ -1024,7 +1019,7 @@ function createOperatingChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 确保x轴不是反转的
+                    reverse: false // 確保x軸不是反轉的
                 },
                 y: {
                     beginAtZero: true,
@@ -1051,12 +1046,12 @@ function createOperatingChart(data, chartId) {
 }
 
 function createIncomeStatementChart(data, chartId) {
-    // 首先，按日期从旧到新排序数据
+    // 首先，按日期從舊到新排序數據
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 销毁现有图表实例（如果存在）
+    // 銷毀現有圖表實例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
@@ -1097,6 +1092,7 @@ function createIncomeStatementChart(data, chartId) {
                     backgroundColor: 'rgba(255, 159, 64, 0.6)',
                     yAxisID: 'y1'
                 }
+
             ]
         },
         options: {
@@ -1107,7 +1103,7 @@ function createIncomeStatementChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 确保x轴不是反转的
+                    reverse: false // 確保x軸不是反轉的
                 },
                 y: {
                     beginAtZero: true,
@@ -1137,47 +1133,6 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
-
-function addScrollListeners() {
-    const scrollContainers = document.querySelectorAll('.scroll-container-x');
-    scrollContainers.forEach(scrollContainer => {
-        let isDown = false;
-        let startX;
-        let scrollLeft;
-
-        const onMouseDown = (e) => {
-            isDown = true;
-            startX = e.pageX - scrollContainer.offsetLeft;
-            scrollLeft = scrollContainer.scrollLeft;
-            scrollContainer.style.cursor = 'grabbing'; // 改變鼠標樣式
-            e.preventDefault(); // 防止選中文本等默認行為
-        };
-
-        const onMouseUp = () => {
-            isDown = false;
-            scrollContainer.style.cursor = 'grab';
-        };
-
-        const onMouseMove = (e) => {
-            if (!isDown) return;
-            const x = e.pageX - scrollContainer.offsetLeft;
-            const walk = (x - startX) * 2; // 滾動速度調整
-            scrollContainer.scrollLeft = scrollLeft - walk;
-        };
-
-        const dragOverlay = scrollContainer.querySelector('.drag-overlay');
-        if (dragOverlay) {
-            dragOverlay.addEventListener('mousedown', onMouseDown);
-            dragOverlay.addEventListener('mouseleave', onMouseUp);
-            dragOverlay.addEventListener('mouseup', onMouseUp);
-            dragOverlay.addEventListener('mousemove', onMouseMove);
-        }
-    });
-}
-// document.addEventListener('DOMContentLoaded', () => {
-//     addScrollListeners();
-// });
-
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
