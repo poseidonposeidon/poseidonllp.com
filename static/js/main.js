@@ -1338,6 +1338,8 @@ function displayBalanceSheet(data, container, chartId) {
 
     // 設置scroll位置
     setTimeout(() => {
+        // 創建圖表
+        createCombinedBalanceSheetChart(data, chartId);
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
@@ -1349,8 +1351,7 @@ function displayBalanceSheet(data, container, chartId) {
         }
     }, 100);
 
-    // 創建圖表
-    createCombinedBalanceSheetChart(data, chartId);
+
 }
 
 function fetchData_BalanceSheet(apiUrl, callback, containerId) {
