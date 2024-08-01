@@ -1135,7 +1135,7 @@ function formatNumber(value) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const scrollContainers = document.querySelectorAll('.scroll-container-x'); // 確保選擇所有相關容器
+    const scrollContainers = document.querySelectorAll('.scroll-container-x');
 
     scrollContainers.forEach(scrollContainer => {
         let isDown = false;
@@ -1147,20 +1147,29 @@ document.addEventListener('DOMContentLoaded', () => {
             scrollContainer.classList.add('active');
             startX = e.pageX - scrollContainer.offsetLeft;
             scrollLeft = scrollContainer.scrollLeft;
+
+            // 禁用選取
+            document.body.style.userSelect = 'none';
         });
 
         scrollContainer.addEventListener('mouseleave', () => {
             isDown = false;
             scrollContainer.classList.remove('active');
+
+            // 重新啟用選取
+            document.body.style.userSelect = 'auto';
         });
 
         scrollContainer.addEventListener('mouseup', () => {
             isDown = false;
             scrollContainer.classList.remove('active');
+
+            // 重新啟用選取
+            document.body.style.userSelect = 'auto';
         });
 
         scrollContainer.addEventListener('mousemove', (e) => {
-            if (!isDown) return; // 如果沒有按下滑鼠按鈕，則返回
+            if (!isDown) return;
             e.preventDefault();
             const x = e.pageX - scrollContainer.offsetLeft;
             const walk = (x - startX) * 2; // 滾動速度倍數
