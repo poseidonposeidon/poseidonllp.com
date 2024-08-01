@@ -481,7 +481,7 @@ button:not(.info-input button):hover {
 }
 
 .scroll-right {
-    direction: rtl;
+    overflow-x: auto;
 }
 
 .scroll-right > * {
@@ -504,7 +504,6 @@ button:not(.info-input button):hover {
     width: 100%;
     height: 100%;
     cursor: grab;
-    z-index: 1;
+    z-index: 2; /* 確保在表格之上 */
     background: rgba(0, 0, 0, 0); /* 確保透明 */
-    pointer-events: none; /* 確保不干擾其他事件 */
 }

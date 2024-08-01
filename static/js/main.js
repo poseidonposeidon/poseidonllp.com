@@ -891,13 +891,13 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     // 构建 HTML 表格
     let tableHtml = `
-    <div style="display: flex; overflow-x: auto;">
+    <div style="display: flex;">
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
             <table border="1" style="border-collapse: collapse;">
                 ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
             </table>
         </div>
-        <div class="scroll-right" style="overflow-x: auto;">
+        <div class="scroll-right">
             <table border="1" style="width: 100%; border-collapse: collapse;">
                 ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
             </table>
@@ -905,7 +905,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     </div>
     `;
 
-    // 创建容器结构
     container.innerHTML = `
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div class="drag-overlay"></div>
@@ -1148,26 +1147,24 @@ function addScrollListeners() {
 
         const onMouseDown = (e) => {
             isDown = true;
-            scrollContainer.classList.add('active');
             startX = e.pageX - scrollContainer.offsetLeft;
             scrollLeft = scrollContainer.scrollLeft;
-            e.preventDefault();
+            scrollContainer.style.cursor = 'grabbing'; // 改變鼠標樣式
+            e.preventDefault(); // 防止選中文本等默認行為
         };
 
         const onMouseUp = () => {
             isDown = false;
-            scrollContainer.classList.remove('active');
+            scrollContainer.style.cursor = 'grab';
         };
 
         const onMouseMove = (e) => {
             if (!isDown) return;
-            e.preventDefault();
             const x = e.pageX - scrollContainer.offsetLeft;
             const walk = (x - startX) * 2; // 滾動速度調整
             scrollContainer.scrollLeft = scrollLeft - walk;
         };
 
-        // 註冊事件到 `drag-overlay`
         const dragOverlay = scrollContainer.querySelector('.drag-overlay');
         if (dragOverlay) {
             dragOverlay.addEventListener('mousedown', onMouseDown);
@@ -1177,7 +1174,6 @@ function addScrollListeners() {
         }
     });
 }
-
 // document.addEventListener('DOMContentLoaded', () => {
 //     addScrollListeners();
 // });
