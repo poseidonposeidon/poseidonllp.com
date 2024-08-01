@@ -274,16 +274,11 @@ button:not(.info-input button):hover {
 }
 
 .scroll-container-x {
-    overflow-x: auto;
-    overflow-y: hidden;
-    white-space: nowrap;
+    overflow-x: hidden; /* 隱藏滾動條 */
+    position: relative;
     width: 100%;
     cursor: grab;
-    user-select: none; /* 禁用文本選擇 */
-    -webkit-user-select: none; /* 禁用文本選擇 for Safari */
-    -moz-user-select: none; /* 禁用文本選擇 for Firefox */
-    -ms-user-select: none; /* 禁用文本選擇 for IE */
-    position: relative;
+    user-select: none;
 }
 
 .scroll-container-y {
