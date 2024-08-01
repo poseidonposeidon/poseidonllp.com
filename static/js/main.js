@@ -737,7 +737,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
             } else {
                 if (data.length > 0) {
                     callback(data, container, chartId, operatingChartId, period);
-
+                    addScrollListeners();
                     // 确保滚动条移动到最右边
                     setTimeout(() => {
                         const scrollContainer = container.querySelector('.scroll-container-x');
@@ -924,6 +924,11 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 // 设置 scroll 位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
+        const innerContainer = document.getElementById(`${chartId}Container`);
+        if (innerContainer.offsetWidth > scrollContainer.offsetWidth) {
+            scrollContainer.style.cursor = 'grab';
+        }
+
         if (scrollContainer) {
             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
@@ -1145,27 +1150,32 @@ function addScrollListeners() {
             startX = e.pageX - scrollContainer.offsetLeft;
             scrollLeft = scrollContainer.scrollLeft;
             scrollContainer.style.cursor = 'grabbing';
+            e.preventDefault(); // 防止文本選擇
         });
 
-        scrollContainer.addEventListener('mouseleave', () => {
+        document.addEventListener('mouseup', () => {
             isDown = false;
             scrollContainer.style.cursor = 'grab';
         });
 
-        scrollContainer.addEventListener('mouseup', () => {
-            isDown = false;
-            scrollContainer.style.cursor = 'grab';
-        });
-
-        scrollContainer.addEventListener('mousemove', (e) => {
+        document.addEventListener('mousemove', (e) => {
             if (!isDown) return;
             e.preventDefault();
             const x = e.pageX - scrollContainer.offsetLeft;
             const walk = (x - startX) * 2;
             scrollContainer.scrollLeft = scrollLeft - walk;
         });
+
+        // 防止點擊事件干擾滾動
+        scrollContainer.addEventListener('click', (e) => {
+            if (Math.abs(scrollContainer.scrollLeft - scrollLeft) > 5) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+        }, true);
     });
 }
+
 document.addEventListener('DOMContentLoaded', () => {
     addScrollListeners();
 });

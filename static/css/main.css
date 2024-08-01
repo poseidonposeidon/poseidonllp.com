@@ -275,6 +275,8 @@ button:not(.info-input button):hover {
 
 .scroll-container-x {
     overflow-x: auto;
+    overflow-y: hidden;
+    white-space: nowrap;
     width: 100%;
     cursor: grab;
     user-select: none; /* 禁用文本選擇 */
