@@ -48,7 +48,6 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     transition: filter 0.3s ease;
-    cursor: none; /* 隱藏預設游標 */
 }
 
 h1, h2 {
@@ -335,29 +334,6 @@ button:not(.info-input button):hover {
     color: black;
 }
 
-/* 自訂圓形游標 */
-.custom-cursor {
-    position: fixed;
-    width: 20px; /* 調整游標大小 */
-    height: 20px;
-    background-color: rgba(255, 255, 255, 0.8); /* 調整顏色和透明度 */
-    border-radius: 50%;
-    pointer-events: none; /* 確保游標不影響點擊事件 */
-    z-index: 9999; /* 確保游標在最前面 */
-    transform: translate(-50%, -50%);
-    transition: background-color 0.3s ease;
-    mix-blend-mode: difference; /* 使游標在深色背景上可見 */
-}
-
-/* 當滑鼠按下時的樣式 */
-.custom-cursor.active {
-    background-color: rgba(255, 255, 255, 0.5); /* 按下時變色 */
-}
-
-.scroll-container-x.active {
-    cursor: grabbing; /* 當滑鼠按下時改變游標狀態 */
-}
-
 /* Media Queries */
 @media (min-width: 768px) {
     .info-column {
@@ -450,6 +426,7 @@ button:not(.info-input button):hover {
     margin: 0 auto; /* 確保容器本身居中 */
     max-width: 100%; /* 確保容器寬度不超過屏幕 */
     background-color: #121212;
+
 }
 
 .logo-container-new a {
@@ -460,6 +437,7 @@ button:not(.info-input button):hover {
     margin: 0; /* 確保沒有外邊距 */
     padding: 0; /* 確保沒有內邊距 */
 }
+
 
 .logo-container-new img {
     max-height: 120px; /* 确保高度适当 */
@@ -474,6 +452,8 @@ button:not(.info-input button):hover {
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+
+
 
 .body-container {
     background-color: #121212;
@@ -508,4 +488,8 @@ button:not(.info-input button):hover {
 
 .scroll-right > * {
     direction: ltr;
+}
+
+.scroll-container-x.active {
+    cursor: grabbing;
 }
