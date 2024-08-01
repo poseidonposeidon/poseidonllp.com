@@ -1561,8 +1561,8 @@ function displayCashflow(data, container) {
         capitalExpenditure: ['Capital Expenditure'],
         freeCashFlow: ['Free Cash Flow'],
         link: ['Report Link'],
-        finalLink: ['Final Link']
-        capexToOperatingCashFlow: ['Capex to Operating Cash Flow'], // 新增欄位
+        finalLink: ['Final Link'],
+        capexToOperatingCashFlow: ['Capex to Operating Cash Flow'] // 新增欄位
 
     };
 
