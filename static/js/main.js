@@ -1325,7 +1325,7 @@ function displayBalanceSheet(data, container, chartId) {
         let totalLiabilities = entry.totalLiabilities || 0;
         let totalAssets = entry.totalAssets || 0;
         let debtToAssetRate = totalAssets ? (totalLiabilities / totalAssets) : 0;
-        rows.debtToAssetRate.push((debtToAssetRate * 100).toFixed(2) + '%');
+        rows.debtToAssetRate.push(debtToAssetRate * 100);
     });
 
     let tableHtml = `
