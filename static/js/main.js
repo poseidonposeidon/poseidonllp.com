@@ -1135,9 +1135,6 @@ function formatNumber(value) {
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    addScrollListeners();
-});
 
 function addScrollListeners() {
     const scrollContainers = document.querySelectorAll('.scroll-container-x');
@@ -1173,11 +1170,9 @@ function addScrollListeners() {
     });
 }
 
-
-
-
-// 在每次動態加載內容後呼叫 addScrollListeners
-
+document.addEventListener('DOMContentLoaded', () => {
+    addScrollListeners();
+});
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
