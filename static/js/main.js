@@ -1134,6 +1134,40 @@ function formatNumber(value) {
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
+document.addEventListener('DOMContentLoaded', () => {
+    const scrollContainer = document.querySelector('.scroll-container-x');
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    scrollContainer.addEventListener('mousedown', (e) => {
+        isDown = true;
+        scrollContainer.classList.add('active'); // 添加活躍狀態樣式
+        startX = e.pageX - scrollContainer.offsetLeft;
+        scrollLeft = scrollContainer.scrollLeft;
+    });
+
+    scrollContainer.addEventListener('mouseleave', () => {
+        isDown = false;
+        scrollContainer.classList.remove('active');
+    });
+
+    scrollContainer.addEventListener('mouseup', () => {
+        isDown = false;
+        scrollContainer.classList.remove('active');
+    });
+
+    scrollContainer.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - scrollContainer.offsetLeft;
+        const walk = (x - startX) * 2; // 滾動速度
+        scrollContainer.scrollLeft = scrollLeft - walk;
+    });
+});
+
+
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
     stockSymbol = fetchStock();

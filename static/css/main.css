@@ -484,3 +484,7 @@ button:not(.info-input button):hover {
 .scroll-right > * {
     direction: ltr;
 }
+
+.scroll-container-x.active {
+    cursor: grabbing;
+}
