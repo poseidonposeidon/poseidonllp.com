@@ -1356,24 +1356,24 @@ function displayBalanceSheet(data, container, chartId) {
     `;
 
     setTimeout(() => {
-        const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
-        if (scrollContainer) {
-            scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-
-            if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
-                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-            }
-        }
-
-        // 确认 canvas 元素存在后再调用创建图表函数
         const canvas = document.getElementById(chartId);
-        if (canvas) {
+        if (canvas && canvas instanceof HTMLCanvasElement) {
             createCombinedBalanceSheetChart(data, chartId);
         } else {
-            console.error(`Canvas element with id ${chartId} not found.`);
+            console.error(`Canvas element with id ${chartId} not found or is not a canvas element.`);
+            // 嘗試重新創建 canvas 元素
+            const container = document.getElementById('chartContainer');
+            if (container) {
+                container.innerHTML = `<canvas id="${chartId}"></canvas>`;
+                const newCanvas = document.getElementById(chartId);
+                if (newCanvas && newCanvas instanceof HTMLCanvasElement) {
+                    createCombinedBalanceSheetChart(data, chartId);
+                } else {
+                    console.error(`Failed to create canvas element with id ${chartId}.`);
+                }
+            }
         }
-    }, 300);
-}
+    }, 500); // 增加延遲時間
 
 function createCombinedBalanceSheetChart(data, chartId) {
     const canvas = document.getElementById(chartId);
