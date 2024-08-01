@@ -1179,7 +1179,7 @@ async function fetchTWBalanceSheet() {
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW');
 }
 
-function fetchData_BalanceSheet(apiUrl, callback, containerId) {
+function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
     fetch(apiUrl)
@@ -1189,7 +1189,7 @@ function fetchData_BalanceSheet(apiUrl, callback, containerId) {
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container, containerId);
+                    callback(data, container, chartId);
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
