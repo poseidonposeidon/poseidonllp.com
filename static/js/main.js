@@ -1418,7 +1418,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
                 },
                 {
                     label: 'Debt to Asset Rate',
-                    data: data.map(entry => parseFloat(entry.debtToAssetRate)),
+                    data: data.map(entry => entry.debtToAssetRate),
                     type: 'line',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
