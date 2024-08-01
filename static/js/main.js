@@ -1153,8 +1153,8 @@ function fetchBalanceSheet() {
 
 function fetchJPBalanceSheet() {
     const stockSymbol = fetchJPStock();
-    const period = document.getElementById('periodJP_2').value;  // 獲取選擇的時段
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+    const period = document.getElementById('periodJP_2').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -1179,13 +1179,34 @@ async function fetchTWBalanceSheet() {
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW');
 }
 
+function fetchData_BalanceSheet(apiUrl, callback, containerId) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '<p>Loading...</p>';
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data === undefined || !Array.isArray(data)) {
+                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
+            } else {
+                if (data.length > 0) {
+                    callback(data, container, containerId);
+                } else {
+                    container.innerHTML = '<p>No data found for this symbol.</p>';
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data: ', error);
+            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
+        });
+}
+
 function displayBalanceSheet(data, container, chartId) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         return;
     }
 
-    // 按日期升序排序
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let rows = {
@@ -1246,8 +1267,7 @@ function displayBalanceSheet(data, container, chartId) {
         debtToAssetRate: ['Debt to Asset Rate']
     };
 
-    // 填充行數據
-    data.forEach((entry, index) => {
+    data.forEach((entry) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
@@ -1305,10 +1325,9 @@ function displayBalanceSheet(data, container, chartId) {
         let totalLiabilities = entry.totalLiabilities || 0;
         let totalAssets = entry.totalAssets || 0;
         let debtToAssetRate = totalAssets ? (totalLiabilities / totalAssets) : 0;
-        rows.debtToAssetRate.push((debtToAssetRate * 100).toFixed(2) + '%'); // 格式化為百分比
+        rows.debtToAssetRate.push((debtToAssetRate * 100).toFixed(2) + '%');
     });
 
-    // 構建 HTML 表格
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
@@ -1324,7 +1343,6 @@ function displayBalanceSheet(data, container, chartId) {
     </div>
     `;
 
-    // 創建容器結構
     container.innerHTML = `
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div id="${chartId}Container">
@@ -1332,58 +1350,31 @@ function displayBalanceSheet(data, container, chartId) {
             </div>
         </div>
         <div id="chartContainer" style="margin-top: 20px;">
-            <canvas id="balanceSheetContainer"></canvas>
+            <canvas id="${chartId}"></canvas>
         </div>
     `;
 
-    // 設置scroll位置並創建圖表
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
-            // 再次確認是否滾動到最右邊
             if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
                 scrollContainer.scrollLeft = scrollContainer.scrollWidth;
             }
         }
 
-        // 確保畫布已經存在
         if (document.getElementById(chartId)) {
-            createCombinedBalanceSheetChart(data, 'balanceSheetContainer');
+            createCombinedBalanceSheetChart(data, chartId);
         } else {
             console.error(`Canvas element with id ${chartId} not found.`);
         }
-    }, 300); // 將延遲時間設為300毫秒或更長，以確保DOM渲染完成
-}
-
-function fetchData_BalanceSheet(apiUrl, callback, containerId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '<p>Loading...</p>';
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data === undefined || !Array.isArray(data)) {
-                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
-            } else {
-                if (data.length > 0) {
-                    callback(data, container, containerId); // 這裡傳遞 containerId 作為 chartId
-                } else {
-                    container.innerHTML = '<p>No data found for this symbol.</p>';
-                }
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching data: ', error);
-            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
-        });
+    }, 300);
 }
 
 function createCombinedBalanceSheetChart(data, chartId) {
-    // 獲取 canvas 元素
     const canvas = document.getElementById(chartId);
 
-    // 確認 canvas 元素存在且類型正確
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
         console.error(`Canvas element with id ${chartId} not found or is not a canvas element.`);
         return;
@@ -1391,12 +1382,10 @@ function createCombinedBalanceSheetChart(data, chartId) {
 
     const ctx = canvas.getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
     if (balanceSheetChartInstances[chartId]) {
         balanceSheetChartInstances[chartId].destroy();
     }
 
-    // 創建圖表
     balanceSheetChartInstances[chartId] = new Chart(ctx, {
         type: 'bar',
         data: {
@@ -1459,7 +1448,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     },
                     position: 'right',
                     grid: {
-                        drawOnChartArea: false // 只在左侧绘制网格
+                        drawOnChartArea: false
                     }
                 }
             }
@@ -1467,12 +1456,10 @@ function createCombinedBalanceSheetChart(data, chartId) {
     });
 }
 
-
-
 function formatNumber(value) {
-    // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
+
 
 ///////////////////////////////////現金流表Cashflow///////////////
 function fetchCashflow() {
