@@ -1635,11 +1635,12 @@ function displayCashflow(data, containerId, chartId) {
         // 計算 Capex to Operating Cash Flow
         let capex = entry.capitalExpenditure || 0;
         let operatingCashFlow = entry.operatingCashFlow || 0;
-        let capexToOperatingCashFlow = operatingCashFlow !== 0 ? (capex / operatingCashFlow) * 100 : 0;
+        let capexToOperatingCashFlow = operatingCashFlow !== 0 ? Math.abs(capex / operatingCashFlow) * 100 : 0;
         rows.capexToOperatingCashFlow.push((capexToOperatingCashFlow || 0).toFixed(2) + '%');
 
         // 保存數值版本以供圖表使用
         entry.capexToOperatingCashFlowValue = capexToOperatingCashFlow;
+
     });
 
     // 構建 HTML 表格
