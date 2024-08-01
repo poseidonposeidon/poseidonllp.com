@@ -153,6 +153,14 @@
 				});
 	});
 
+	document.getElementById('loginForm').addEventListener('keyup', function(event) {
+		if (event.key === 'Enter') {
+			// 阻止預設行為並提交表單
+			event.preventDefault();
+			this.submit();
+		}
+	});
+
 	document.getElementById('loginForm').addEventListener('submit', function (event) {
 		event.preventDefault();
 		const username = document.getElementById('username').value;
