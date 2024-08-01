@@ -1237,7 +1237,8 @@ function displayBalanceSheet(data, container) {
         totalDebt: ['Total Debt'],
         netDebt: ['Net Debt'],
         link: ['Report Link'],
-        finalLink: ['Final Link']
+        finalLink: ['Final Link'],
+        debtToAssetRate: ['Debt to Asset Rate']
     };
 
     // 按日期升序排序
@@ -1298,6 +1299,10 @@ function displayBalanceSheet(data, container) {
         rows.netDebt.push(formatNumber(entry.netDebt));
         rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
         rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+        let totalLiabilities = entry.totalLiabilities || 0;
+        let totalAssets = entry.totalAssets || 0;
+        let debtToAssetRate = totalAssets ? (totalLiabilities / totalAssets) : 0;
+        rows.debtToAssetRate.push((debtToAssetRate * 100).toFixed(2) + '%'); // 格式化為百分比
     });
 
     // 構建 HTML 表格
@@ -1843,7 +1848,6 @@ function fetchJPHistoricalEarnings() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?apikey=${apiKey}`;
     fetchData_historical_earning_calendar(apiUrl, display_historical_earning_calendar_JP, 'historicalEarningsContainerJP');
 }
-
 
 function display_historical_earning_calendar(data, container) {
     const fromDate = document.getElementById('fromDate_1').value;
