@@ -1471,7 +1471,7 @@ function formatNumber(value) {
 ///////////////////////////////////現金流表Cashflow///////////////
 function fetchCashflow() {
     const stockSymbol = fetchStock();
-    const period = document.getElementById('period_3').value;  // 獲取選擇的時段
+    const period = document.getElementById('period_3').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -1480,13 +1480,13 @@ function fetchCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainer');
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainer', 'cashflowChartUS'));
 }
 
 function fetchJPCashflow() {
     const stockSymbol = fetchJPStock();
-    const period = document.getElementById('periodJP_3').value;  // 獲取選擇的時段
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+    const period = document.getElementById('periodJP_3').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -1494,13 +1494,13 @@ function fetchJPCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerJP');
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerJP', 'cashflowChartJP'));
 }
 
 async function fetchTWCashflow() {
-    const stockSymbol = await fetchTWStock();  // 正確使用 fetchTWStock 函式
-    const period = document.getElementById('periodTW_3').value;  // 獲取選擇的時段
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+    const stockSymbol = await fetchTWStock();
+    const period = document.getElementById('periodTW_3').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -1508,14 +1508,31 @@ async function fetchTWCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerTW');
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerTW', 'cashflowChartTW'));
 }
 
-function displayCashflow(data, container) {
+function fetchData_Cashflow(apiUrl, callback) {
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data === undefined || !Array.isArray(data)) {
+                console.error('Error loading data: Data is not an array or is undefined.');
+            } else if (data.length > 0) {
+                callback(data);
+            } else {
+                console.error('No data found for this symbol.');
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching data: ', error);
+        });
+}
+
+function displayCashflow(data, containerId, chartId) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Cashflow');
-        if (expandButton) expandButton.style.display = 'none'; // 隐藏按钮
+        if (expandButton) expandButton.style.display = 'none'; // 隱藏按钮
         const collapseButton = document.getElementById('collapseButton_Cashflow');
         if (collapseButton) collapseButton.style.display = 'none';
         return;
@@ -1563,7 +1580,6 @@ function displayCashflow(data, container) {
         link: ['Report Link'],
         finalLink: ['Final Link'],
         capexToOperatingCashFlow: ['Capex to Operating Cash Flow'] // 新增欄位
-
     };
 
     // 按日期升序排序
@@ -1611,6 +1627,7 @@ function displayCashflow(data, container) {
         rows.freeCashFlow.push(formatNumber(entry.freeCashFlow));
         rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
         rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+
         // 計算 Capex to Operating Cash Flow
         let capex = entry.capitalExpenditure || 0;
         let operatingCashFlow = entry.operatingCashFlow || 0;
@@ -1636,10 +1653,13 @@ function displayCashflow(data, container) {
 
     // 創建容器結構
     container.innerHTML = `
-        <div class="scroll-container-x" id="cashflowScrollContainer">
-            <div id="cashflowContainer">
+        <div class="scroll-container-x" id="${chartId}ScrollContainer">
+            <div id="${chartId}Container">
                 ${tableHtml}
             </div>
+        </div>
+        <div id="cashflowChartContainer" style="margin-top: 20px;">
+            <canvas id="${chartId}"></canvas>
         </div>
     `;
 
@@ -1658,29 +1678,93 @@ function displayCashflow(data, container) {
 
     const expandButton = document.getElementById('expandButton_Cashflow');
     if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
+
+    // 繪製圖表
+    createCashflowChart(data, chartId);
 }
 
-function fetchData_Cashflow(apiUrl, callback, containerId) {
-    const container = document.getElementById(containerId);
-    container.innerHTML = '<p>Loading...</p>';
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            // 檢查回應資料是否為 undefined 或非陣列
-            if (data === undefined || !Array.isArray(data)) {
-                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
-            } else {
-                if (data.length > 0) {
-                    callback(data, container);  // 修改這裡以傳遞整個數據陣列
-                } else {
-                    container.innerHTML = '<p>No data found for this symbol.</p>';
+function createCashflowChart(data, chartId) {
+    const canvas = document.getElementById(chartId);
+
+    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+        console.error(`Canvas element not found or is not a canvas element.`);
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    // 清除現有的圖表實例（如果存在）
+    if (window[`cashflowChartInstance${chartId}`]) {
+        window[`cashflowChartInstance${chartId}`].destroy();
+    }
+
+    window[`cashflowChartInstance${chartId}`] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(entry => entry.date),
+            datasets: [
+                {
+                    label: 'Operating Cash Flow',
+                    data: data.map(entry => entry.operatingCashFlow),
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Capital Expenditure',
+                    data: data.map(entry => entry.capitalExpenditure),
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Free Cash Flow',
+                    data: data.map(entry => entry.freeCashFlow),
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    yAxisID: 'y'
+                },
+                {
+                    label: 'Capex to Operating Cash Flow',
+                    data: data.map(entry => entry.capexToOperatingCashFlow.replace('%', '')),
+                    type: 'line',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    yAxisID: 'y1'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Value'
+                    },
+                    position: 'left'
+                },
+                y1: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Percentage (%)'
+                    },
+                    position: 'right',
+                    grid: {
+                        drawOnChartArea: false
+                    }
                 }
             }
-        })
-        .catch(error => {
-            console.error('Error fetching data: ', error);
-            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
-        });
+        }
+    });
 }
 
 function formatNumber(value) {
