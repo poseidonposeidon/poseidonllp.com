@@ -1373,7 +1373,8 @@ function displayBalanceSheet(data, container, chartId) {
                 }
             }
         }
-    }, 500); // 增加延遲時間
+    }, 500);
+}
 
 function createCombinedBalanceSheetChart(data, chartId) {
     const canvas = document.getElementById(chartId);
