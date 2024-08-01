@@ -907,9 +907,9 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     container.innerHTML = `
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
-            <div class="drag-overlay"></div>
+            
             <div id="${chartId}Container">
-                ${tableHtml}
+                <div class="drag-overlay">${tableHtml}</div>
             </div>
         </div>
         <div id="operatingChartContainer" style="margin-top: 20px;">
