@@ -1469,6 +1469,8 @@ function formatNumber(value) {
 
 
 ///////////////////////////////////現金流表Cashflow///////////////
+let cashflowChartInstances = {}; // 用於存儲不同國家的圖表實例
+
 function fetchCashflow() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period_3').value;
@@ -1537,10 +1539,6 @@ function displayCashflow(data, containerId, chartId) {
 
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
-        const expandButton = document.getElementById('expandButton_Cashflow');
-        if (expandButton) expandButton.style.display = 'none'; // 隱藏按钮
-        const collapseButton = document.getElementById('collapseButton_Cashflow');
-        if (collapseButton) collapseButton.style.display = 'none';
         return;
     }
 
@@ -1682,9 +1680,6 @@ function displayCashflow(data, containerId, chartId) {
         }
     }, 100);
 
-    const expandButton = document.getElementById('expandButton_Cashflow');
-    if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
-
     // 繪製圖表
     createCashflowChart(data, chartId);
 }
@@ -1700,11 +1695,11 @@ function createCashflowChart(data, chartId) {
     const ctx = canvas.getContext('2d');
 
     // 清除現有的圖表實例（如果存在）
-    if (window[`cashflowChartInstance${chartId}`]) {
-        window[`cashflowChartInstance${chartId}`].destroy();
+    if (cashflowChartInstances[chartId]) {
+        cashflowChartInstances[chartId].destroy();
     }
 
-    window[`cashflowChartInstance${chartId}`] = new Chart(ctx, {
+    cashflowChartInstances[chartId] = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: data.map(entry => entry.date),
@@ -1732,7 +1727,7 @@ function createCashflowChart(data, chartId) {
                 },
                 {
                     label: 'Capex to Operating Cash Flow',
-                    data: data.map(entry => entry.capexToOperatingCashFlow.replace('%', '')),
+                    data: data.map(entry => parseFloat(entry.capexToOperatingCashFlow.replace('%', ''))),
                     type: 'line',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
@@ -1777,6 +1772,7 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
+
 
 //////////////法說會逐字稿 Earnings Call Transcript/////////////////
 function fetchEarningsCallTranscript() {
