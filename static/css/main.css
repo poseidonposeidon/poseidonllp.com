@@ -330,52 +330,22 @@ button:not(.info-input button):hover {
 }
 
 /* Media Queries */
-@media (max-width: 768px) {
-    .scroll-container-x {
-        display: block;
-        overflow-x: auto;
+@media (min-width: 768px) {
+    .info-column {
+        width: 30%;
     }
-    .scroll-container-x table {
-        display: block;
-        width: 100%;
-    }
-    .scroll-container-x thead,
-    .scroll-container-x tbody {
-        display: block;
-        width: 100%;
-    }
-    .scroll-container-x tr {
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-    }
-    .scroll-container-x th,
-    .scroll-container-x td {
-        width: 100%;
-        box-sizing: border-box; /* 確保padding和border計算在內 */
-    }
-    .scroll-container-x th {
-        background-color: #333; /* 設定標題背景色以區分 */
-        color: white; /* 標題文字顏色 */
-    }
-    .scroll-right {
-        direction: ltr; /* 使得表格滾動條從左到右 */
-    }
-    .scroll-right > * {
-        direction: ltr;
+
+    .logo {
+        margin-right: 30px; /* 平板設備上的 margin */
     }
 }
 
-@media (min-width: 768px) and (max-width: 1024px) {
-    .scroll-container-x {
-        overflow-x: auto;
-        width: 100%;
+@media (min-width: 1024px) {
+    .navbar {
+        flex-wrap: nowrap;
     }
-    .scroll-right {
-        direction: rtl; /* 使得表格滾動條從右到左 */
-    }
-    .scroll-right > * {
-        direction: ltr; /* 使得表格內容從左到右 */
+    .logo {
+        margin-right: 500px; /* 桌面設備上的 margin */
     }
 }
 
@@ -479,6 +449,7 @@ button:not(.info-input button):hover {
 }
 
 
+
 .body-container {
     background-color: #121212;
     display: flex;
@@ -512,9 +483,4 @@ button:not(.info-input button):hover {
 
 .scroll-right > * {
     direction: ltr;
-}
-
-.scroll-container-x table {
-    width: 100%;
-    border-collapse: collapse;
 }
