@@ -1162,7 +1162,7 @@ function addScrollListeners() {
             if (!isDown) return;
             e.preventDefault();
             const x = e.pageX - scrollContainer.offsetLeft;
-            const walk = (x - startX) * 2;
+            const walk = (x - startX) * 2; // Adjust the drag speed if necessary
             scrollContainer.scrollLeft = scrollLeft - walk;
         };
 
@@ -1171,16 +1171,20 @@ function addScrollListeners() {
         scrollContainer.addEventListener('mouseup', onMouseUp);
         scrollContainer.addEventListener('mousemove', onMouseMove);
 
-        // 移除之前的事件監聽器（如果有的話）
-        scrollContainer.removeEventListener('click', scrollContainer.clickHandler);
+        // Remove previous click handler if exists to prevent memory leaks
+        if (scrollContainer.clickHandler) {
+            scrollContainer.removeEventListener('click', scrollContainer.clickHandler);
+        }
 
-        // 添加新的點擊事件處理器
+        // Define new click handler
         scrollContainer.clickHandler = (e) => {
             if (Math.abs(scrollContainer.scrollLeft - scrollLeft) > 5) {
                 e.preventDefault();
                 e.stopPropagation();
             }
         };
+
+        // Add new click handler
         scrollContainer.addEventListener('click', scrollContainer.clickHandler, true);
     });
 }
