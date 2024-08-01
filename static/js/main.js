@@ -1636,7 +1636,10 @@ function displayCashflow(data, containerId, chartId) {
         let capex = entry.capitalExpenditure || 0;
         let operatingCashFlow = entry.operatingCashFlow || 0;
         let capexToOperatingCashFlow = operatingCashFlow !== 0 ? (capex / operatingCashFlow) * 100 : 0;
-        rows.capexToOperatingCashFlow.push(capexToOperatingCashFlow.toFixed(2) + '%');
+        rows.capexToOperatingCashFlow.push((capexToOperatingCashFlow || 0).toFixed(2) + '%');
+
+        // 保存數值版本以供圖表使用
+        entry.capexToOperatingCashFlowValue = capexToOperatingCashFlow;
     });
 
     // 構建 HTML 表格
@@ -1694,12 +1697,12 @@ function createCashflowChart(data, chartId) {
 
     const ctx = canvas.getContext('2d');
 
-    // 清除現有的圖表實例（如果存在）
-    if (window[`cashflowChartInstance${chartId}`]) {
-        window[`cashflowChartInstance${chartId}`].destroy();
+    // 銷毀現有圖表實例（如果存在）
+    if (cashflowChartInstances[chartId]) {
+        cashflowChartInstances[chartId].destroy();
     }
 
-    window[`cashflowChartInstance${chartId}`] = new Chart(ctx, {
+    cashflowChartInstances[chartId] = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: data.map(entry => entry.date),
@@ -1727,7 +1730,7 @@ function createCashflowChart(data, chartId) {
                 },
                 {
                     label: 'Capex to Operating Cash Flow',
-                    data: data.map(entry => parseFloat(entry.capexToOperatingCashFlow.replace('%', ''))),
+                    data: data.map(entry => entry.capexToOperatingCashFlowValue), // 使用數值數據
                     type: 'line',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
