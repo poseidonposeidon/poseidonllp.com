@@ -1135,29 +1135,7 @@ function formatNumber(value) {
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    // 創建自訂游標元素
-    const customCursor = document.createElement('div');
-    customCursor.classList.add('custom-cursor');
-    document.body.appendChild(customCursor);
-
-    // 更新游標位置
-    document.addEventListener('mousemove', (e) => {
-        customCursor.style.left = `${e.pageX}px`;
-        customCursor.style.top = `${e.pageY}px`;
-    });
-
-    // 當滑鼠按下時更改游標樣式
-    document.addEventListener('mousedown', () => {
-        customCursor.classList.add('active');
-    });
-
-    // 當滑鼠放開時還原游標樣式
-    document.addEventListener('mouseup', () => {
-        customCursor.classList.remove('active');
-    });
-
-    // 添加滑鼠滾動控制
+document.addEventListener('DOMContentLoaded', () => {
     addScrollListeners();
 });
 
@@ -1176,8 +1154,8 @@ function addScrollListeners() {
         });
 
         scrollContainer.addEventListener('mousemove', (e) => {
-            if (!isDown) return;
-            e.preventDefault();
+            if (!isDown) return; // 如果不是在拖拽狀態，直接返回
+            e.preventDefault(); // 防止選中文本等默認行為
             const x = e.pageX - scrollContainer.offsetLeft;
             const walk = (x - startX) * 2; // 調整滑動速度
             scrollContainer.scrollLeft = scrollLeft - walk;
@@ -1194,6 +1172,7 @@ function addScrollListeners() {
         });
     });
 }
+
 
 
 
