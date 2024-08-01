@@ -1325,7 +1325,9 @@ function displayBalanceSheet(data, container, chartId) {
         let totalLiabilities = entry.totalLiabilities || 0;
         let totalAssets = entry.totalAssets || 0;
         let debtToAssetRate = totalAssets ? (totalLiabilities / totalAssets) : 0;
-        rows.debtToAssetRate.push(debtToAssetRate * 100);
+        rows.debtToAssetRate.push((debtToAssetRate * 100).toFixed(2) + '%');
+
+        entry.debtToAssetRateValue = debtToAssetRate * 100;
     });
 
     let tableHtml = `
@@ -1418,7 +1420,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
                 },
                 {
                     label: 'Debt to Asset Rate',
-                    data: data.map(entry => entry.debtToAssetRate),
+                    data: data.map(entry => entry.debtToAssetRateValue), // 使用數值數據
                     type: 'line',
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
