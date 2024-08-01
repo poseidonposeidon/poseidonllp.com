@@ -1135,47 +1135,32 @@ function formatNumber(value) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const scrollContainers = document.querySelectorAll('.scroll-container-x');
+    const scrollContainer = document.querySelector('.scroll-container-x');
 
-    scrollContainers.forEach(scrollContainer => {
-        let isDown = false;
-        let startX;
-        let scrollLeft;
+    let isDown = false;
+    let startX;
+    let scrollLeft;
 
-        scrollContainer.addEventListener('mousedown', (e) => {
-            isDown = true;
-            scrollContainer.classList.add('active');
-            startX = e.pageX - scrollContainer.offsetLeft; // 記錄按下時的橫向位置
-            scrollLeft = scrollContainer.scrollLeft; // 記錄按下時的滾動位置
+    scrollContainer.addEventListener('mousedown', (e) => {
+        isDown = true;
+        startX = e.pageX - scrollContainer.offsetLeft;
+        scrollLeft = scrollContainer.scrollLeft;
+    });
 
-            // 禁用文本選取
-            document.body.style.userSelect = 'none';
-        });
+    scrollContainer.addEventListener('mouseleave', () => {
+        isDown = false;
+    });
 
-        scrollContainer.addEventListener('mouseleave', () => {
-            isDown = false;
-            scrollContainer.classList.remove('active');
+    scrollContainer.addEventListener('mouseup', () => {
+        isDown = false;
+    });
 
-            // 恢復文本選取
-            document.body.style.userSelect = 'auto';
-        });
-
-        scrollContainer.addEventListener('mouseup', () => {
-            isDown = false;
-            scrollContainer.classList.remove('active');
-
-            // 恢復文本選取
-            document.body.style.userSelect = 'auto';
-        });
-
-        scrollContainer.addEventListener('mousemove', (e) => {
-            if (!isDown) return; // 如果滑鼠按鈕沒有按下則返回
-            e.preventDefault();
-
-            const x = e.pageX - scrollContainer.offsetLeft; // 當前滑鼠位置
-            const walk = (x - startX) * 1.5; // 滾動速度調節，這裡的 1.5 是速度倍數
-            scrollContainer.scrollLeft = scrollLeft - walk; // 設定新的滾動位置
-        });
+    scrollContainer.addEventListener('mousemove', (e) => {
+        if (!isDown) return;
+        e.preventDefault();
+        const x = e.pageX - scrollContainer.offsetLeft;
+        const walk = (x - startX) * 3; // scroll-fast
+        scrollContainer.scrollLeft = scrollLeft - walk;
     });
 });
 
