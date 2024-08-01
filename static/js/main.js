@@ -1135,35 +1135,37 @@ function formatNumber(value) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const scrollContainer = document.querySelector('.scroll-container-x');
+    const scrollContainers = document.querySelectorAll('.scroll-container-x'); // 確保選擇所有相關容器
 
-    let isDown = false;
-    let startX;
-    let scrollLeft;
+    scrollContainers.forEach(scrollContainer => {
+        let isDown = false;
+        let startX;
+        let scrollLeft;
 
-    scrollContainer.addEventListener('mousedown', (e) => {
-        isDown = true;
-        scrollContainer.classList.add('active'); // 添加活躍狀態樣式
-        startX = e.pageX - scrollContainer.offsetLeft;
-        scrollLeft = scrollContainer.scrollLeft;
-    });
+        scrollContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            scrollContainer.classList.add('active');
+            startX = e.pageX - scrollContainer.offsetLeft;
+            scrollLeft = scrollContainer.scrollLeft;
+        });
 
-    scrollContainer.addEventListener('mouseleave', () => {
-        isDown = false;
-        scrollContainer.classList.remove('active');
-    });
+        scrollContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+            scrollContainer.classList.remove('active');
+        });
 
-    scrollContainer.addEventListener('mouseup', () => {
-        isDown = false;
-        scrollContainer.classList.remove('active');
-    });
+        scrollContainer.addEventListener('mouseup', () => {
+            isDown = false;
+            scrollContainer.classList.remove('active');
+        });
 
-    scrollContainer.addEventListener('mousemove', (e) => {
-        if (!isDown) return;
-        e.preventDefault();
-        const x = e.pageX - scrollContainer.offsetLeft;
-        const walk = (x - startX) * 2; // 滾動速度
-        scrollContainer.scrollLeft = scrollLeft - walk;
+        scrollContainer.addEventListener('mousemove', (e) => {
+            if (!isDown) return; // 如果沒有按下滑鼠按鈕，則返回
+            e.preventDefault();
+            const x = e.pageX - scrollContainer.offsetLeft;
+            const walk = (x - startX) * 2; // 滾動速度倍數
+            scrollContainer.scrollLeft = scrollLeft - walk;
+        });
     });
 });
 

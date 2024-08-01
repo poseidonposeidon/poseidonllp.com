@@ -276,6 +276,7 @@ button:not(.info-input button):hover {
 .scroll-container-x {
     overflow-x: auto;
     width: 100%;
+    cursor: grab;
 }
 
 .scroll-container-y {
