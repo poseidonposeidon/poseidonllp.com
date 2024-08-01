@@ -682,7 +682,7 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
+let incomeStatementChartInstances = {}; // 使用对象来存储不同国家的图表实例
 
 function fetchIncomeStatement() {
     stockSymbol = fetchStock();
@@ -738,18 +738,18 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                 if (data.length > 0) {
                     callback(data, container, chartId, operatingChartId, period);
 
-                    // 確保滾動條移動到最右邊
+                    // 确保滚动条移动到最右边
                     setTimeout(() => {
                         const scrollContainer = container.querySelector('.scroll-container-x');
                         if (scrollContainer) {
                             scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
 
-                            // 再次確認是否滾動到最右邊
+                            // 再次确认是否滚动到最右边
                             if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
                                 scrollContainer.scrollLeft = scrollContainer.scrollWidth;
                             }
                         }
-                    }, 300); // 延長等待時間以確保元素完全渲染
+                    }, 300); // 延长等待时间以确保元素完全渲染
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -813,10 +813,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
         link: ['Report Link'],
         finalLink: ['Final Link'],
-        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根據選擇的時段設定欄位名稱
+        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根据选择的时段设置栏位名称
     };
 
-    // 填充行數據
+    // 填充行数据
     data.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -857,7 +857,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
         rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
 
-        // 計算增長率
+        // 计算增长率
         if (index > 0) {
             if (period === 'annual') {
                 let lastRevenue = data[index - 1].revenue;
@@ -868,7 +868,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                     rows.growthRate.push('N/A');
                 }
             } else {
-                // 查找去年同季度的數據
+                // 查找去年同季度的数据
                 let previousYearSameQuarterIndex = data.findIndex((e, i) => {
                     return e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period;
                 });
@@ -889,7 +889,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     });
 
-    // 構建 HTML 表格
+    // 构建 HTML 表格
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
@@ -905,7 +905,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     </div>
     `;
 
-    // 創建容器結構
+    // 创建容器结构
     container.innerHTML = `
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div id="${chartId}Container">
@@ -920,40 +920,38 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         </div>
     `;
 
-// 設置scroll位置
+// 设置 scroll 位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
-            // 再次確認是否滾動到最右邊
+            // 再次确认是否滚动到最右边
             if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
                 scrollContainer.scrollLeft = scrollContainer.scrollWidth;
             }
         }
     }, 100);
 
-
-
-    // 創建圖表
+    // 创建图表
     createOperatingChart(data, operatingChartId);
     createIncomeStatementChart(data, chartId);
 
     const expandButton = document.getElementById('expandButton_Income');
-    if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
+    if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
 }
 
 function createOperatingChart(data, chartId) {
-    // 首先，按日期從舊到新排序數據
+    // 首先，按日期从旧到新排序数据
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 計算增長率
+    // 计算增长率
     data.forEach((entry, index) => {
         if (index > 0) {
             let lastRevenue = data[index - 1].revenue;
             if (entry.revenue && lastRevenue) {
                 let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                entry.growthRate = growthRate.toFixed(2); // 這裡將增長率加入數據集
+                entry.growthRate = growthRate.toFixed(2); // 这里将增长率加入数据集
             } else {
                 entry.growthRate = 'N/A';
             }
@@ -964,13 +962,13 @@ function createOperatingChart(data, chartId) {
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
+    // 销毁现有图表实例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
 
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
-        type: 'bar', // 主要圖表類型設為柱狀圖
+        type: 'bar', // 主要图表类型设为柱状图
         data: {
             labels: data.map(entry => entry.date),
             datasets: [
@@ -978,36 +976,36 @@ function createOperatingChart(data, chartId) {
                     label: 'Revenue',
                     data: data.map(entry => entry.revenue),
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Cost of Revenue',
                     data: data.map(entry => entry.costOfRevenue),
                     borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Expenses',
                     data: data.map(entry => entry.operatingExpenses),
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Income',
                     data: data.map(entry => entry.operatingIncome),
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Growth Rate',
                     data: data.map(entry => entry.growthRate),
-                    type: 'line', // 單獨設置為折線圖
+                    type: 'line', // 单独设置为折线图
                     borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y1'
                 }
             ]
@@ -1020,7 +1018,7 @@ function createOperatingChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 確保x軸不是反轉的
+                    reverse: false // 确保x轴不是反转的
                 },
                 y: {
                     beginAtZero: true,
@@ -1047,12 +1045,12 @@ function createOperatingChart(data, chartId) {
 }
 
 function createIncomeStatementChart(data, chartId) {
-    // 首先，按日期從舊到新排序數據
+    // 首先，按日期从旧到新排序数据
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
+    // 销毁现有图表实例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
@@ -1093,7 +1091,6 @@ function createIncomeStatementChart(data, chartId) {
                     backgroundColor: 'rgba(255, 159, 64, 0.6)',
                     yAxisID: 'y1'
                 }
-
             ]
         },
         options: {
@@ -1104,7 +1101,7 @@ function createIncomeStatementChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 確保x軸不是反轉的
+                    reverse: false // 确保x轴不是反转的
                 },
                 y: {
                     beginAtZero: true,
@@ -1135,7 +1132,6 @@ function formatNumber(value) {
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
-
 function addScrollListeners() {
     const scrollContainers = document.querySelectorAll('.scroll-container-x');
     scrollContainers.forEach(scrollContainer => {
@@ -1151,10 +1147,10 @@ function addScrollListeners() {
         });
 
         scrollContainer.addEventListener('mousemove', (e) => {
-            if (!isDown) return; // 如果不是在拖拽狀態，直接返回
-            e.preventDefault(); // 防止選中文本等默認行為
+            if (!isDown) return; // 如果不是在拖拽状态，直接返回
+            e.preventDefault(); // 防止选中文本等默认行为
             const x = e.pageX - scrollContainer.offsetLeft;
-            const walk = (x - startX) * 2; // 調整滑動速度
+            const walk = (x - startX) * 2; // 调整滑动速度
             scrollContainer.scrollLeft = scrollLeft - walk;
         });
 
@@ -1173,6 +1169,7 @@ function addScrollListeners() {
 document.addEventListener('DOMContentLoaded', () => {
     addScrollListeners();
 });
+
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
