@@ -1185,6 +1185,9 @@ function displayBalanceSheet(data, container, chartId) {
         return;
     }
 
+    // 按日期升序排序
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     let rows = {
         date: ['Date'],
         symbol: ['Symbol'],
@@ -1243,10 +1246,8 @@ function displayBalanceSheet(data, container, chartId) {
         debtToAssetRate: ['Debt to Asset Rate']
     };
 
-    // 按日期升序排序
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    data.forEach(entry => {
+    // 填充行數據
+    data.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
@@ -1325,16 +1326,19 @@ function displayBalanceSheet(data, container, chartId) {
 
     // 創建容器結構
     container.innerHTML = `
-        <div class="scroll-container-x" id="balanceSheetScrollContainer">
-            <div id="balanceSheetContainer">
+        <div class="scroll-container-x" id="${chartId}ScrollContainer">
+            <div id="${chartId}Container">
                 ${tableHtml}
             </div>
+        </div>
+        <div id="chartContainer" style="margin-top: 20px;">
+            <canvas id="${chartId}"></canvas>
         </div>
     `;
 
     // 設置scroll位置
     setTimeout(() => {
-        const scrollContainer = document.getElementById('balanceSheetScrollContainer');
+        const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
@@ -1345,6 +1349,7 @@ function displayBalanceSheet(data, container, chartId) {
         }
     }, 100);
 
+    // 創建圖表
     createCombinedBalanceSheetChart(data, chartId);
 }
 
