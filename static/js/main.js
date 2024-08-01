@@ -1380,11 +1380,15 @@ function fetchData_BalanceSheet(apiUrl, callback, containerId) {
 }
 
 function createCombinedBalanceSheetChart(data, chartId) {
+    // 獲取 canvas 元素
     const canvas = document.getElementById(chartId);
-    if (!canvas) {
-        console.error(`Canvas element with id ${chartId} not found.`);
+
+    // 確認 canvas 元素存在且類型正確
+    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+        console.error(`Canvas element with id ${chartId} not found or is not a canvas element.`);
         return;
     }
+
     const ctx = canvas.getContext('2d');
 
     // 銷毀現有圖表實例（如果存在）
@@ -1392,6 +1396,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
         balanceSheetChartInstances[chartId].destroy();
     }
 
+    // 創建圖表
     balanceSheetChartInstances[chartId] = new Chart(ctx, {
         type: 'bar',
         data: {
