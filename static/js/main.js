@@ -1179,7 +1179,7 @@ async function fetchTWBalanceSheet() {
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW');
 }
 
-function displayBalanceSheet(data, container) {
+function displayBalanceSheet(data, container, chartId) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         return;
@@ -1354,12 +1354,11 @@ function fetchData_BalanceSheet(apiUrl, callback, containerId) {
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            // 檢查回應資料是否為 undefined 或非陣列
             if (data === undefined || !Array.isArray(data)) {
                 container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
             } else {
                 if (data.length > 0) {
-                    callback(data, container);  // 修改這裡以傳遞整個數據陣列
+                    callback(data, container, containerId); // 這裡傳遞 containerId 作為 chartId
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
