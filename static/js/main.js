@@ -1144,18 +1144,16 @@ document.addEventListener('DOMContentLoaded', function () {
     scrollContainer.addEventListener('mousedown', (e) => {
         isDown = true;
         scrollContainer.classList.add('active');
-        // 設定初始位置
-        startX = e.pageX - scrollContainer.offsetLeft;
-        scrollLeft = scrollContainer.scrollLeft;
+        startX = e.pageX - scrollContainer.offsetLeft; // 設定初始位置
+        scrollLeft = scrollContainer.scrollLeft; // 記錄初始 scroll 位置
     });
 
     // 當滑鼠移動時
     scrollContainer.addEventListener('mousemove', (e) => {
         if (!isDown) return; // 停止函數執行
         e.preventDefault();
-        // 計算滑鼠移動距離
         const x = e.pageX - scrollContainer.offsetLeft;
-        const walk = (x - startX) * 2; // 2 是滑動速度調整
+        const walk = (x - startX) * 2; // 滑動速度調整
         scrollContainer.scrollLeft = scrollLeft - walk;
     });
 
@@ -1169,6 +1167,7 @@ document.addEventListener('DOMContentLoaded', function () {
         scrollContainer.classList.remove('active');
     });
 });
+
 
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
