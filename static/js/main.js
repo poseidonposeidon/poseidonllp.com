@@ -1138,8 +1138,8 @@ function formatNumber(value) {
 let balanceSheetChartInstances = {}; // 用於存儲不同國家的圖表實例
 
 function fetchBalanceSheet() {
-    const stockSymbol = fetchStock();
-    const period = document.getElementById('period').value;
+    stockSymbol = fetchStock();
+    const period = document.getElementById('period_2').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -1148,13 +1148,13 @@ function fetchBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainer', 'balanceSheetChart', period);
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainer');
 }
 
 function fetchJPBalanceSheet() {
     const stockSymbol = fetchJPStock();
-    const period = document.getElementById('periodJP').value;
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const period = document.getElementById('periodJP_2').value;  // 獲取選擇的時段
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -1162,12 +1162,12 @@ function fetchJPBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerJP', 'balanceSheetChartJP', period);
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerJP');
 }
 
 async function fetchTWBalanceSheet() {
     const stockSymbol = await fetchTWStock();
-    const period = document.getElementById('periodTW').value;
+    const period = document.getElementById('periodTW_2').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -1176,7 +1176,7 @@ async function fetchTWBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW', 'balanceSheetChartTW', period);
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW');
 }
 
 function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId, period) {
