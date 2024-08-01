@@ -1450,7 +1450,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Debt to Asset Rate (%)'
+                        text: 'Percentage (%)'
                     },
                     position: 'right',
                     grid: {
