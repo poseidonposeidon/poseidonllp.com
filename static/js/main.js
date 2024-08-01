@@ -1343,6 +1343,7 @@ function displayBalanceSheet(data, container, chartId) {
     </div>
     `;
 
+    // 更新容器结构
     container.innerHTML = `
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div id="${chartId}Container">
@@ -1350,7 +1351,7 @@ function displayBalanceSheet(data, container, chartId) {
             </div>
         </div>
         <div id="chartContainer" style="margin-top: 20px;">
-            <canvas id="${chartId}"></canvas>
+            <canvas id="${chartId}"></canvas> <!-- 这里确认canvas元素存在 -->
         </div>
     `;
 
@@ -1364,7 +1365,9 @@ function displayBalanceSheet(data, container, chartId) {
             }
         }
 
-        if (document.getElementById(chartId)) {
+        // 确认 canvas 元素存在后再调用创建图表函数
+        const canvas = document.getElementById(chartId);
+        if (canvas) {
             createCombinedBalanceSheetChart(data, chartId);
         } else {
             console.error(`Canvas element with id ${chartId} not found.`);
