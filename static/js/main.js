@@ -1695,11 +1695,11 @@ function createCashflowChart(data, chartId) {
     const ctx = canvas.getContext('2d');
 
     // 清除現有的圖表實例（如果存在）
-    if (cashflowChartInstances[chartId]) {
-        cashflowChartInstances[chartId].destroy();
+    if (window[`cashflowChartInstance${chartId}`]) {
+        window[`cashflowChartInstance${chartId}`].destroy();
     }
 
-    cashflowChartInstances[chartId] = new Chart(ctx, {
+    window[`cashflowChartInstance${chartId}`] = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: data.map(entry => entry.date),
