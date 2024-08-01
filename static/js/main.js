@@ -1135,6 +1135,8 @@ function formatNumber(value) {
 }
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
+let balanceSheetChartInstances = {}; // 用於存儲不同國家的圖表實例
+
 function fetchBalanceSheet() {
     stockSymbol = fetchStock();
     const period = document.getElementById('period_2').value;
