@@ -483,7 +483,8 @@ button:not(.info-input button):hover {
 }
 
 .scroll-right {
-    direction: rtl;
+    /*direction: rtl;*/
+    display: inline-block;
 }
 
 .scroll-right > * {
