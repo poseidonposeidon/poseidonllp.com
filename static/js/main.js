@@ -1163,31 +1163,18 @@ function addScrollListeners() {
             if (!isDown) return;
             e.preventDefault();
             const x = e.pageX - scrollContainer.offsetLeft;
-            const walk = (x - startX) * 2;
+            const walk = (x - startX) * 2; // 滾動速度調整
             scrollContainer.scrollLeft = scrollLeft - walk;
         };
 
-        // 添加到父级容器的事件监听器
-        scrollContainer.addEventListener('mousedown', onMouseDown);
-        scrollContainer.addEventListener('mouseleave', onMouseUp);
-        scrollContainer.addEventListener('mouseup', onMouseUp);
-        scrollContainer.addEventListener('mousemove', onMouseMove);
-
-        // 移除之前的事件监听器（如果有的话）
-        if (scrollContainer.clickHandler) {
-            scrollContainer.removeEventListener('click', scrollContainer.clickHandler);
+        // 註冊事件到 `drag-overlay`
+        const dragOverlay = scrollContainer.querySelector('.drag-overlay');
+        if (dragOverlay) {
+            dragOverlay.addEventListener('mousedown', onMouseDown);
+            dragOverlay.addEventListener('mouseleave', onMouseUp);
+            dragOverlay.addEventListener('mouseup', onMouseUp);
+            dragOverlay.addEventListener('mousemove', onMouseMove);
         }
-
-        // 添加新的点击事件处理器
-        scrollContainer.clickHandler = (e) => {
-            if (Math.abs(scrollContainer.scrollLeft - scrollLeft) > 5) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
-        };
-
-        // 添加点击事件处理器
-        scrollContainer.addEventListener('click', scrollContainer.clickHandler, true);
     });
 }
 

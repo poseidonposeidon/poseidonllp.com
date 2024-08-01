@@ -510,5 +510,6 @@ button:not(.info-input button):hover {
     height: 100%;
     cursor: grab;
     z-index: 1;
-    background: rgba(0, 0, 0, 0); /* 透明背景 */
+    background: rgba(0, 0, 0, 0); /* 確保透明 */
+    pointer-events: none; /* 確保不干擾其他事件 */
 }
