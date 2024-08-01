@@ -471,7 +471,7 @@ button:not(.info-input button):hover {
     margin-right: 0; /* 最後一個按鈕不需要右側間距 */
 }
 
-#chartContainer, #operatingChartContainer {
+#chartContainer, #operatingChartContainer #balanceSheetContainer {
     width: 100%; /* 確保容器寬度為 100% */
     height: auto; /* 高度自適應內容 */
 }

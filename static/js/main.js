@@ -1332,7 +1332,7 @@ function displayBalanceSheet(data, container, chartId) {
             </div>
         </div>
         <div id="chartContainer" style="margin-top: 20px;">
-            <canvas id="${chartId}"></canvas>
+            <canvas id="balanceSheetContainer"></canvas>
         </div>
     `;
 
@@ -1350,7 +1350,7 @@ function displayBalanceSheet(data, container, chartId) {
 
         // 確保畫布已經存在
         if (document.getElementById(chartId)) {
-            createCombinedBalanceSheetChart(data, chartId);
+            createCombinedBalanceSheetChart(data, 'balanceSheetContainer');
         } else {
             console.error(`Canvas element with id ${chartId} not found.`);
         }
@@ -1466,6 +1466,8 @@ function createCombinedBalanceSheetChart(data, chartId) {
         }
     });
 }
+
+
 
 function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
