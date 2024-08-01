@@ -853,8 +853,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.epsdiluted.push(entry.epsdiluted || 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
-        rows.link.push(<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>);
-        rows.finalLink.push(<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>);
+        rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
+        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
 
         // 計算增長率
         if (index > 0) {
@@ -889,39 +889,39 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     });
 
     // 構建 HTML 表格
-    let tableHtml =
-        <div style="display: flex; overflow-x: auto;">
-            <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
-                <table border="1" style="border-collapse: collapse;">
-                    ${Object.keys(rows).map(key => <tr><th>${rows[key][0]}</th></tr>).join('')}
-                </table>
-            </div>
-            <div class="scroll-right" style="overflow-x: auto;">
-                <table border="1" style="width: 100%; border-collapse: collapse;">
-                    ${Object.keys(rows).map(key => <tr>${rows[key].slice(1).map(value => <td>${value}</td>).join('')}</tr>).join('')}
-                </table>
-            </div>
+    let tableHtml = `
+    <div style="display: flex; overflow-x: auto;">
+        <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
+            <table border="1" style="border-collapse: collapse;">
+                ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
+            </table>
         </div>
-    ;
+        <div class="scroll-right" style="overflow-x: auto;">
+            <table border="1" style="width: 100%; border-collapse: collapse;">
+                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
+            </table>
+        </div>
+    </div>
+    `;
 
     // 創建容器結構
-    container.innerHTML =
+    container.innerHTML = `
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div id="${chartId}Container">
                 ${tableHtml}
             </div>
         </div>
-    <div id="operatingChartContainer" style="margin-top: 20px;">
-        <canvas id="${operatingChartId}"></canvas>
-    </div>
-    <div id="chartContainer" style="margin-top: 20px;">
-        <canvas id="${chartId}"></canvas>
-    </div>
-    ;
+        <div id="operatingChartContainer" style="margin-top: 20px;">
+            <canvas id="${operatingChartId}"></canvas>
+        </div>
+        <div id="chartContainer" style="margin-top: 20px;">
+            <canvas id="${chartId}"></canvas>
+        </div>
+    `;
 
 // 設置scroll位置
     setTimeout(() => {
-        const scrollContainer = document.getElementById(${chartId}ScrollContainer);
+        const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
@@ -1133,7 +1133,6 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
-
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
