@@ -1138,7 +1138,7 @@ function formatNumber(value) {
 let balanceSheetChartInstances = {}; // 用於存儲不同國家的圖表實例
 
 function fetchBalanceSheet() {
-    stockSymbol = fetchStock();
+    const stockSymbol = fetchStock();
     const period = document.getElementById('period_2').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
@@ -1148,7 +1148,7 @@ function fetchBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainer');
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainer', 'balanceSheetChartUS');
 }
 
 function fetchJPBalanceSheet() {
@@ -1162,7 +1162,7 @@ function fetchJPBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerJP');
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerJP', 'balanceSheetChartJP');
 }
 
 async function fetchTWBalanceSheet() {
@@ -1176,7 +1176,7 @@ async function fetchTWBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW');
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW', 'balanceSheetChartTW');
 }
 
 function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId) {
@@ -1353,7 +1353,7 @@ function displayBalanceSheet(data, container, chartId) {
             </div>
         </div>
         <div id="chartContainer" style="margin-top: 20px;">
-            <canvas id="${chartId}"></canvas> <!-- 这里确认canvas元素存在 -->
+            <canvas id="${chartId}"></canvas>
         </div>
     `;
 
@@ -1388,6 +1388,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
 
     const ctx = canvas.getContext('2d');
 
+    // 銷毀現有圖表實例（如果存在）
     if (balanceSheetChartInstances[chartId]) {
         balanceSheetChartInstances[chartId].destroy();
     }
