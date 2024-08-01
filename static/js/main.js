@@ -908,6 +908,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 创建容器结构
     container.innerHTML = `
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
+            <div class="drag-overlay"></div>
             <div id="${chartId}Container">
                 ${tableHtml}
             </div>
@@ -1162,21 +1163,22 @@ function addScrollListeners() {
             if (!isDown) return;
             e.preventDefault();
             const x = e.pageX - scrollContainer.offsetLeft;
-            const walk = (x - startX) * 2; // Adjust the drag speed if necessary
+            const walk = (x - startX) * 2;
             scrollContainer.scrollLeft = scrollLeft - walk;
         };
 
+        // 添加到父级容器的事件监听器
         scrollContainer.addEventListener('mousedown', onMouseDown);
         scrollContainer.addEventListener('mouseleave', onMouseUp);
         scrollContainer.addEventListener('mouseup', onMouseUp);
         scrollContainer.addEventListener('mousemove', onMouseMove);
 
-        // Remove previous click handler if exists to prevent memory leaks
+        // 移除之前的事件监听器（如果有的话）
         if (scrollContainer.clickHandler) {
             scrollContainer.removeEventListener('click', scrollContainer.clickHandler);
         }
 
-        // Define new click handler
+        // 添加新的点击事件处理器
         scrollContainer.clickHandler = (e) => {
             if (Math.abs(scrollContainer.scrollLeft - scrollLeft) > 5) {
                 e.preventDefault();
@@ -1184,7 +1186,7 @@ function addScrollListeners() {
             }
         };
 
-        // Add new click handler
+        // 添加点击事件处理器
         scrollContainer.addEventListener('click', scrollContainer.clickHandler, true);
     });
 }
