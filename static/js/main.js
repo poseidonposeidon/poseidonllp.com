@@ -682,7 +682,6 @@ function displayCompanyProfile(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-
 let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
 function fetchIncomeStatement() {
@@ -1133,6 +1132,44 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    // 取得表格區塊的元素
+    const scrollContainer = document.querySelector('.scroll-container-x');
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    // 當滑鼠按下時
+    scrollContainer.addEventListener('mousedown', (e) => {
+        isDown = true;
+        scrollContainer.classList.add('active');
+        // 設定初始位置
+        startX = e.pageX - scrollContainer.offsetLeft;
+        scrollLeft = scrollContainer.scrollLeft;
+    });
+
+    // 當滑鼠移動時
+    scrollContainer.addEventListener('mousemove', (e) => {
+        if (!isDown) return; // 停止函數執行
+        e.preventDefault();
+        // 計算滑鼠移動距離
+        const x = e.pageX - scrollContainer.offsetLeft;
+        const walk = (x - startX) * 2; // 2 是滑動速度調整
+        scrollContainer.scrollLeft = scrollLeft - walk;
+    });
+
+    // 當滑鼠按鍵放開或滑鼠離開元素時
+    scrollContainer.addEventListener('mouseleave', () => {
+        isDown = false;
+        scrollContainer.classList.remove('active');
+    });
+    scrollContainer.addEventListener('mouseup', () => {
+        isDown = false;
+        scrollContainer.classList.remove('active');
+    });
+});
+
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
 function fetchBalanceSheet() {
