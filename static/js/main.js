@@ -738,16 +738,18 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                 if (data.length > 0) {
                     callback(data, container, chartId, operatingChartId, period);
 
-                    // 确保滚动条移动到最右边
+                    // 確保滾動條移動到最右邊
                     setTimeout(() => {
-                        const scrollContainer = document.getElementById(containerId).querySelector('.scroll-container-x');
-                        scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+                        const scrollContainer = container.querySelector('.scroll-container-x');
+                        if (scrollContainer) {
+                            scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
 
-                        // 再次确认是否滚动到最右边
-                        if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
-                            scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+                            // 再次確認是否滾動到最右邊
+                            if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
+                                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+                            }
                         }
-                    }, 300); // 延长等待时间以确保元素完全渲染
+                    }, 300); // 延長等待時間以確保元素完全渲染
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -1134,40 +1136,44 @@ function formatNumber(value) {
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-    // 取得表格區塊的元素
-    const scrollContainer = document.querySelector('.scroll-container-x');
-    let isDown = false;
-    let startX;
-    let scrollLeft;
-
-    // 當滑鼠按下時
-    scrollContainer.addEventListener('mousedown', (e) => {
-        isDown = true;
-        scrollContainer.classList.add('active');
-        startX = e.pageX - scrollContainer.offsetLeft; // 設定初始位置
-        scrollLeft = scrollContainer.scrollLeft; // 記錄初始 scroll 位置
-    });
-
-    // 當滑鼠移動時
-    scrollContainer.addEventListener('mousemove', (e) => {
-        if (!isDown) return; // 停止函數執行
-        e.preventDefault();
-        const x = e.pageX - scrollContainer.offsetLeft;
-        const walk = (x - startX) * 2; // 滑動速度調整
-        scrollContainer.scrollLeft = scrollLeft - walk;
-    });
-
-    // 當滑鼠按鍵放開或滑鼠離開元素時
-    scrollContainer.addEventListener('mouseleave', () => {
-        isDown = false;
-        scrollContainer.classList.remove('active');
-    });
-    scrollContainer.addEventListener('mouseup', () => {
-        isDown = false;
-        scrollContainer.classList.remove('active');
-    });
+    addScrollListeners(); // 初始化時綁定事件監聽器
 });
 
+function addScrollListeners() {
+    const scrollContainers = document.querySelectorAll('.scroll-container-x');
+    scrollContainers.forEach(scrollContainer => {
+        let isDown = false;
+        let startX;
+        let scrollLeft;
+
+        scrollContainer.addEventListener('mousedown', (e) => {
+            isDown = true;
+            scrollContainer.classList.add('active');
+            startX = e.pageX - scrollContainer.offsetLeft;
+            scrollLeft = scrollContainer.scrollLeft;
+        });
+
+        scrollContainer.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - scrollContainer.offsetLeft;
+            const walk = (x - startX) * 2; // adjust scroll speed
+            scrollContainer.scrollLeft = scrollLeft - walk;
+        });
+
+        scrollContainer.addEventListener('mouseleave', () => {
+            isDown = false;
+            scrollContainer.classList.remove('active');
+        });
+
+        scrollContainer.addEventListener('mouseup', () => {
+            isDown = false;
+            scrollContainer.classList.remove('active');
+        });
+    });
+}
+
+// 在每次動態加載內容後呼叫 addScrollListeners
 
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
