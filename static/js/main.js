@@ -1336,7 +1336,7 @@ function displayBalanceSheet(data, container, chartId) {
         </div>
     `;
 
-    // 設置scroll位置
+    // 設置scroll位置並創建圖表
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
@@ -1348,11 +1348,13 @@ function displayBalanceSheet(data, container, chartId) {
             }
         }
 
-        // 創建圖表
-        createCombinedBalanceSheetChart(data, chartId);
+        // 確保畫布已經存在
+        if (document.getElementById(chartId)) {
+            createCombinedBalanceSheetChart(data, chartId);
+        } else {
+            console.error(`Canvas element with id ${chartId} not found.`);
+        }
     }, 300); // 將延遲時間設為300毫秒或更長，以確保DOM渲染完成
-
-
 }
 
 function fetchData_BalanceSheet(apiUrl, callback, containerId) {
