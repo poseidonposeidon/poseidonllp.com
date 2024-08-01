@@ -1529,6 +1529,12 @@ function fetchData_Cashflow(apiUrl, callback) {
 }
 
 function displayCashflow(data, containerId, chartId) {
+    const container = document.getElementById(containerId);
+    if (!container) {
+        console.error(`Container element with id ${containerId} not found.`);
+        return;
+    }
+
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Cashflow');
@@ -1579,7 +1585,7 @@ function displayCashflow(data, containerId, chartId) {
         freeCashFlow: ['Free Cash Flow'],
         link: ['Report Link'],
         finalLink: ['Final Link'],
-        capexToOperatingCashFlow: ['Capex to Operating Cash Flow'] // 新增欄位
+        capexToOperatingCashFlow: ['Capex to Operating Cash Flow']
     };
 
     // 按日期升序排序
@@ -1665,7 +1671,7 @@ function displayCashflow(data, containerId, chartId) {
 
     // 設置scroll位置
     setTimeout(() => {
-        const scrollContainer = document.getElementById('cashflowScrollContainer');
+        const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
@@ -1687,7 +1693,7 @@ function createCashflowChart(data, chartId) {
     const canvas = document.getElementById(chartId);
 
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
-        console.error(`Canvas element not found or is not a canvas element.`);
+        console.error(`Canvas element with id ${chartId} not found or is not a canvas element.`);
         return;
     }
 
