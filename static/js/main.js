@@ -1562,12 +1562,14 @@ function displayCashflow(data, container) {
         freeCashFlow: ['Free Cash Flow'],
         link: ['Report Link'],
         finalLink: ['Final Link']
+        capexToOperatingCashFlow: ['Capex to Operating Cash Flow'], // 新增欄位
+
     };
 
     // 按日期升序排序
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 填充行数据
+    // 填充行數據
     data.forEach(entry => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -1609,6 +1611,11 @@ function displayCashflow(data, container) {
         rows.freeCashFlow.push(formatNumber(entry.freeCashFlow));
         rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
         rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+        // 計算 Capex to Operating Cash Flow
+        let capex = entry.capitalExpenditure || 0;
+        let operatingCashFlow = entry.operatingCashFlow || 0;
+        let capexToOperatingCashFlow = operatingCashFlow !== 0 ? (capex / operatingCashFlow) * 100 : 0;
+        rows.capexToOperatingCashFlow.push(capexToOperatingCashFlow.toFixed(2) + '%');
     });
 
     // 構建 HTML 表格
