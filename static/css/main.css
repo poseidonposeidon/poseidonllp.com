@@ -277,7 +277,10 @@ button:not(.info-input button):hover {
     overflow-x: auto;
     width: 100%;
     cursor: grab;
-
+    user-select: none; /* 禁用文本選擇 */
+    -webkit-user-select: none; /* 禁用文本選擇 for Safari */
+    -moz-user-select: none; /* 禁用文本選擇 for Firefox */
+    -ms-user-select: none; /* 禁用文本選擇 for IE */
 }
 
 .scroll-container-y {
