@@ -1380,7 +1380,12 @@ function fetchData_BalanceSheet(apiUrl, callback, containerId) {
 }
 
 function createCombinedBalanceSheetChart(data, chartId) {
-    const ctx = document.getElementById(chartId).getContext('2d');
+    const canvas = document.getElementById(chartId);
+    if (!canvas) {
+        console.error(`Canvas element with id ${chartId} not found.`);
+        return;
+    }
+    const ctx = canvas.getContext('2d');
 
     // 銷毀現有圖表實例（如果存在）
     if (balanceSheetChartInstances[chartId]) {
