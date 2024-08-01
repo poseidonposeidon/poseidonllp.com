@@ -920,6 +920,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         </div>
     `;
 
+    addScrollListeners();
 // 设置 scroll 位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
@@ -1141,31 +1142,30 @@ function addScrollListeners() {
 
         scrollContainer.addEventListener('mousedown', (e) => {
             isDown = true;
-            scrollContainer.classList.add('active');
             startX = e.pageX - scrollContainer.offsetLeft;
             scrollLeft = scrollContainer.scrollLeft;
-        });
-
-        scrollContainer.addEventListener('mousemove', (e) => {
-            if (!isDown) return; // 如果不是在拖拽状态，直接返回
-            e.preventDefault(); // 防止选中文本等默认行为
-            const x = e.pageX - scrollContainer.offsetLeft;
-            const walk = (x - startX) * 2; // 调整滑动速度
-            scrollContainer.scrollLeft = scrollLeft - walk;
+            scrollContainer.style.cursor = 'grabbing';
         });
 
         scrollContainer.addEventListener('mouseleave', () => {
             isDown = false;
-            scrollContainer.classList.remove('active');
+            scrollContainer.style.cursor = 'grab';
         });
 
         scrollContainer.addEventListener('mouseup', () => {
             isDown = false;
-            scrollContainer.classList.remove('active');
+            scrollContainer.style.cursor = 'grab';
+        });
+
+        scrollContainer.addEventListener('mousemove', (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.pageX - scrollContainer.offsetLeft;
+            const walk = (x - startX) * 2;
+            scrollContainer.scrollLeft = scrollLeft - walk;
         });
     });
 }
-
 document.addEventListener('DOMContentLoaded', () => {
     addScrollListeners();
 });
