@@ -919,8 +919,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             <canvas id="${chartId}"></canvas>
         </div>
     `;
-
     addScrollListeners();
+
 // 设置 scroll 位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
@@ -1145,40 +1145,49 @@ function addScrollListeners() {
         let startX;
         let scrollLeft;
 
-        scrollContainer.addEventListener('mousedown', (e) => {
+        const onMouseDown = (e) => {
             isDown = true;
+            scrollContainer.classList.add('active');
             startX = e.pageX - scrollContainer.offsetLeft;
             scrollLeft = scrollContainer.scrollLeft;
-            scrollContainer.style.cursor = 'grabbing';
-            e.preventDefault(); // 防止文本選擇
-        });
+            e.preventDefault();
+        };
 
-        document.addEventListener('mouseup', () => {
+        const onMouseUp = () => {
             isDown = false;
-            scrollContainer.style.cursor = 'grab';
-        });
+            scrollContainer.classList.remove('active');
+        };
 
-        document.addEventListener('mousemove', (e) => {
+        const onMouseMove = (e) => {
             if (!isDown) return;
             e.preventDefault();
             const x = e.pageX - scrollContainer.offsetLeft;
             const walk = (x - startX) * 2;
             scrollContainer.scrollLeft = scrollLeft - walk;
-        });
+        };
 
-        // 防止點擊事件干擾滾動
-        scrollContainer.addEventListener('click', (e) => {
+        scrollContainer.addEventListener('mousedown', onMouseDown);
+        scrollContainer.addEventListener('mouseleave', onMouseUp);
+        scrollContainer.addEventListener('mouseup', onMouseUp);
+        scrollContainer.addEventListener('mousemove', onMouseMove);
+
+        // 移除之前的事件監聽器（如果有的話）
+        scrollContainer.removeEventListener('click', scrollContainer.clickHandler);
+
+        // 添加新的點擊事件處理器
+        scrollContainer.clickHandler = (e) => {
             if (Math.abs(scrollContainer.scrollLeft - scrollLeft) > 5) {
                 e.preventDefault();
                 e.stopPropagation();
             }
-        }, true);
+        };
+        scrollContainer.addEventListener('click', scrollContainer.clickHandler, true);
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    addScrollListeners();
-});
+// document.addEventListener('DOMContentLoaded', () => {
+//     addScrollListeners();
+// });
 
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////

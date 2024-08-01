@@ -283,6 +283,7 @@ button:not(.info-input button):hover {
     -webkit-user-select: none; /* 禁用文本選擇 for Safari */
     -moz-user-select: none; /* 禁用文本選擇 for Firefox */
     -ms-user-select: none; /* 禁用文本選擇 for IE */
+    position: relative;
 }
 
 .scroll-container-y {
@@ -494,4 +495,9 @@ button:not(.info-input button):hover {
 
 .scroll-container-x.active {
     cursor: grabbing;
+}
+
+#chartContainer {
+    display: inline-block;
+    min-width: 100%;
 }
