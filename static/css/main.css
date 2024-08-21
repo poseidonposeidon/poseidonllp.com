@@ -192,14 +192,16 @@ button:not(.info-input button):hover {
 
 #outputSymbol,
 #outputSymbolJP,
-#outputSymbolTW {
+#outputSymbolTW ,
+#outputSymbolEU{
     text-align: center;
     margin: 10px 0;
 }
 
 #companyProfileContainer,
 #companyProfileContainerJP,
-#companyProfileContainerTW {
+#companyProfileContainerTW,
+#companyProfileContainerEU{
     text-align: center;
     margin: 10px auto;
     padding: 20px;
@@ -246,7 +248,8 @@ button:not(.info-input button):hover {
 /* 設置連結的默認顏色 */
 #companyProfileContainer a,
 #companyProfileContainerJP a,
-#companyProfileContainerTW a {
+#companyProfileContainerTW a,
+#companyProfileContainerEU a{
     color: #90caf9;
     transition: all 0.3s ease;
 }
@@ -254,7 +257,8 @@ button:not(.info-input button):hover {
 /* 設置連結在懸停時的顏色 */
 #companyProfileContainer a:hover,
 #companyProfileContainerJP a:hover,
-#companyProfileContainerTW a:hover {
+#companyProfileContainerTW a:hover,
+#companyProfileContainerEU a:hover{
     color: #ffffff;
 }
 
