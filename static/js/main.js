@@ -543,6 +543,11 @@ function fetchStock() {
             companyProfileContainer.innerHTML = '';
         }
 
+        const priceContainer = document.getElementById('PriceContainer');
+        if (priceContainer) {
+            priceContainer.innerHTML = ''; // Clear previous price data
+        }
+
         const containers = [
             'incomeStatementContainer',
             'balanceSheetContainer',
@@ -574,7 +579,6 @@ function fetchStock() {
 
     return stockSymbol;
 }
-
 
 function fetchJPStock() {
     const stockSymbol = document.getElementById('jpStockSymbol').value.trim() + ".T";
@@ -856,22 +860,35 @@ function fetchCompanyPrice(stockSymbol) {
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
+            const priceContainer = document.getElementById('PriceContainer');
             if (data && data.length > 0) {
-                displayCompanyPrice(data[0]);  // Pass the first item in the array to the display function
+                displayCompanyPrice(data[0], priceContainer);  // Pass the first item in the array to the display function
             } else {
-                document.getElementById('price').innerText = 'Price: N/A';
-                document.getElementById('yearHigh').innerText = '52-Week High: N/A';
-                document.getElementById('yearLow').innerText = '52-Week Low: N/A';
+                priceContainer.innerHTML = '<p>No data found.</p>';
             }
         })
         .catch(error => console.error('Error fetching data:', error));
 }
 
-function displayCompanyPrice(data) {
-    // Display the price, yearHigh, and yearLow in the respective <p> elements
-    document.getElementById('price').innerText = `Price: $${data.price || 'N/A'}`;
-    document.getElementById('yearHigh').innerText = `Year High: $${data.yearHigh || 'N/A'}`;
-    document.getElementById('yearLow').innerText = `Year Low: $${data.yearLow || 'N/A'}`;
+function displayCompanyPrice(data, container) {
+    if (!data || typeof data !== 'object') {
+        container.innerHTML = '<p>Data not available.</p>';
+        return;
+    }
+
+    const price = data.price || 'N/A';
+    const yearHigh = data.yearHigh || 'N/A';
+    const yearLow = data.yearLow || 'N/A';
+
+    // 清除之前的資料
+    container.innerHTML = '';
+
+    // 插入新的資料到 container 中
+    container.innerHTML = `
+        <p><strong>Current Price:</strong> $${price}</p>
+        <p><strong>52-Week High:</strong> $${yearHigh}</p>
+        <p><strong>52-Week Low:</strong> $${yearLow}</p>
+    `;
 }
 
 
