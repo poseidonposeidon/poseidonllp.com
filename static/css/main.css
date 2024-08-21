@@ -201,7 +201,8 @@ button:not(.info-input button):hover {
 #companyProfileContainer,
 #companyProfileContainerJP,
 #companyProfileContainerTW,
-#companyProfileContainerEU{
+#companyProfileContainerEU,
+#PriceContainer{
     text-align: center;
     margin: 10px auto;
     padding: 20px;
