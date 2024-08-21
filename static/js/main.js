@@ -821,11 +821,15 @@ addEnterKeyListener("euStockSymbol", "#euStockButton");
 //////////////////建議/////////////////
 document.getElementById('stockSymbol').addEventListener('input', async function() {
     const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainer = document.getElementById('suggestions');
+
     if (stockSymbol.length > 0) {
         const stockData = await fetchStockSuggestions(stockSymbol);
         displaySuggestions(stockData);
+        suggestionsContainer.classList.add('active'); // 显示建议框
     } else {
-        clearSuggestions(); // 清空建议列表
+        clearSuggestions(); // 清空并隐藏建议列表
+        suggestionsContainer.classList.remove('active');
     }
 });
 
@@ -857,22 +861,22 @@ function displaySuggestions(suggestions) {
             suggestionDiv.textContent = symbol;
             suggestionDiv.addEventListener('click', () => {
                 document.getElementById('stockSymbol').value = symbol;
-                clearSuggestions(); // 选择后清空建议列表
+                clearSuggestions(); // 选择后清空并隐藏建议列表
+                suggestionsContainer.classList.remove('active');
             });
             suggestionsContainer.appendChild(suggestionDiv);
         });
-        suggestionsContainer.style.display = 'block';
+        suggestionsContainer.classList.add('active'); // 显示建议框
     } else {
-        suggestionsContainer.style.display = 'none';
+        suggestionsContainer.classList.remove('active'); // 如果没有建议，隐藏建议框
     }
 }
 
 function clearSuggestions() {
     const suggestionsContainer = document.getElementById('suggestions');
     suggestionsContainer.innerHTML = '';
-    suggestionsContainer.style.display = 'none';
+    suggestionsContainer.classList.remove('active'); // 隐藏建议框
 }
-
 
 //////////////////////////////Profile//////////////////////////////////////////////
 

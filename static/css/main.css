@@ -493,13 +493,18 @@ button:not(.info-input button):hover {
 }
 
 .suggestions-list {
+    display: none; /* 默认隐藏 */
     position: absolute;
     border: 1px solid #ccc;
-    background-color: #1c1c1c; /* 使其符合你页面的黑色主题 */
+    background-color: #1c1c1c; /* 符合黑色主题 */
     max-height: 200px;
     overflow-y: auto;
-    width: calc(100% - 22px); /* 根据输入框宽度调整 */
+    width: 100%; /* 与输入框宽度一致 */
     z-index: 1000;
+}
+
+.suggestions-list.active {
+    display: block; /* 激活时显示 */
 }
 
 .suggestions-list div {
