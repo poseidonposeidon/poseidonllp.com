@@ -1032,7 +1032,7 @@ async function fetchStockSuggestionsTW(stockSymbol) {
         const data = await response.json();
         // 过滤条件：只返回 currency 为 TWD 的股票符号
         const filteredData = data.filter(stock => stock.currency === 'TWD');
-        return filteredData.map(stock => stock.symbol.replace('.TW', '').replace('.TWO', '').replace(/[^\w]/g, '')); // 仅返回不含 ".TW" 或 ".TWO" 的股票符号，并移除任何非字母数字字符
+        return filteredData.map(stock => stock.symbol.replace(/\.TW|\.TWO/g, '')); // 确保 ".TW" 或 ".TWO" 被移除
     } catch (error) {
         console.error('Error fetching stock data:', error);
         return [];
