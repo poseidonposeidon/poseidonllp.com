@@ -719,7 +719,6 @@ async function fetchTWStock() {
     return fullStockSymbol;
 }
 
-
 function fetchEUStock() {
     const stockSymbol = document.getElementById('euStockSymbol').value.trim().toUpperCase();
     const previousSymbol = document.getElementById('outputSymbolEU').getAttribute('data-last-symbol');
@@ -772,7 +771,6 @@ function fetchEUStock() {
 }
 
 
-
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('authToken');
     if (!token) {
@@ -820,6 +818,59 @@ addEnterKeyListener("stockSymbol", "#usStockButton");
 addEnterKeyListener("jpStockSymbol", "#jpStockButton");
 addEnterKeyListener("twStockSymbol", "#twStockButton");
 addEnterKeyListener("euStockSymbol", "#euStockButton");
+//////////////////建議/////////////////
+document.getElementById('stockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestions(stockSymbol);
+        displaySuggestions(stockData);
+    } else {
+        clearSuggestions(); // 清空建议列表
+    }
+});
+
+async function fetchStockSuggestions(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data.map(stock => stock.symbol); // 返回匹配的股票符号
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
+function displaySuggestions(suggestions) {
+    const suggestionsContainer = document.getElementById('suggestions');
+    suggestionsContainer.innerHTML = ''; // 清空之前的建议列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol;
+            suggestionDiv.addEventListener('click', () => {
+                document.getElementById('stockSymbol').value = symbol;
+                clearSuggestions(); // 选择后清空建议列表
+            });
+            suggestionsContainer.appendChild(suggestionDiv);
+        });
+        suggestionsContainer.style.display = 'block';
+    } else {
+        suggestionsContainer.style.display = 'none';
+    }
+}
+
+function clearSuggestions() {
+    const suggestionsContainer = document.getElementById('suggestions');
+    suggestionsContainer.innerHTML = '';
+    suggestionsContainer.style.display = 'none';
+}
+
 
 //////////////////////////////Profile//////////////////////////////////////////////
 

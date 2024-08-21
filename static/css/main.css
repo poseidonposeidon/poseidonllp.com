@@ -491,3 +491,22 @@ button:not(.info-input button):hover {
 .scroll-right > * {
     direction: ltr;
 }
+
+.suggestions-list {
+    position: absolute;
+    border: 1px solid #ccc;
+    background-color: #1c1c1c; /* 使其符合你页面的黑色主题 */
+    max-height: 200px;
+    overflow-y: auto;
+    width: calc(100% - 22px); /* 根据输入框宽度调整 */
+    z-index: 1000;
+}
+
+.suggestions-list div {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.suggestions-list div:hover {
+    background-color: #333;
+}
