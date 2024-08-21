@@ -952,7 +952,6 @@ function fetchEUIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period);
 }
 
-
 function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
@@ -1005,7 +1004,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         reportedCurrency: ['Reported Currency'],
         cik: ['CIK'],
         fillingDate: ['Filling Date'],
-        // acceptedDate: ['Accepted Date'],
         calendarYear: ['Calendar Year'],
         period: ['Period'],
         revenue: ['Revenue'],
@@ -1036,19 +1034,16 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         epsdiluted: ['EPS Diluted'],
         weightedAverageShsOut: ['Weighted Average Shares Outstanding'],
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
-        // link: ['Report Link'],
-        // finalLink: ['Final Link'],
-        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根據選擇的時段設定欄位名稱
+        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth']
     };
 
-    // 填充行數據
+    // 填充行數據並計算增長率
     data.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
         rows.cik.push(entry.cik || 'N/A');
         rows.fillingDate.push(entry.fillingDate || 'N/A');
-        // rows.acceptedDate.push(entry.acceptedDate || 'N/A');
         rows.calendarYear.push(entry.calendarYear || 'N/A');
         rows.period.push(entry.period || 'N/A');
         rows.revenue.push(formatNumber(entry.revenue));
@@ -1079,8 +1074,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.epsdiluted.push(entry.epsdiluted || 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
-        // rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
-        // rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
 
         // 計算增長率
         if (index > 0) {
@@ -1088,7 +1081,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                 let lastRevenue = data[index - 1].revenue;
                 if (entry.revenue && lastRevenue) {
                     let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                    rows.growthRate.push(growthRate.toFixed(2) + '%');
+                    rows.growthRate.push(parseFloat(growthRate.toFixed(2)));
                 } else {
                     rows.growthRate.push('N/A');
                 }
@@ -1101,7 +1094,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                     let lastRevenue = data[previousYearSameQuarterIndex].revenue;
                     if (entry.revenue && lastRevenue) {
                         let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                        rows.growthRate.push(growthRate.toFixed(2) + '%');
+                        rows.growthRate.push(parseFloat(growthRate.toFixed(2)));
                     } else {
                         rows.growthRate.push('N/A');
                     }
@@ -1145,7 +1138,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         </div>
     `;
 
-// 設置scroll位置
+    // 設置scroll位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
@@ -1157,8 +1150,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             }
         }
     }, 100);
-
-
 
     // 創建圖表
     createOperatingChart(data, operatingChartId);
@@ -1172,13 +1163,13 @@ function createOperatingChart(data, chartId) {
     // 首先，按日期從舊到新排序數據
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 計算增長率
+    // 確保增長率為數字格式
     data.forEach((entry, index) => {
         if (index > 0) {
             let lastRevenue = data[index - 1].revenue;
             if (entry.revenue && lastRevenue) {
                 let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                entry.growthRate = growthRate.toFixed(2); // 這裡將增長率加入數據集
+                entry.growthRate = parseFloat(growthRate.toFixed(2)); // 確保為數字格式
             } else {
                 entry.growthRate = 'N/A';
             }
@@ -1270,6 +1261,7 @@ function createOperatingChart(data, chartId) {
         }
     });
 }
+
 
 function createIncomeStatementChart(data, chartId) {
     // 首先，按日期從舊到新排序數據
