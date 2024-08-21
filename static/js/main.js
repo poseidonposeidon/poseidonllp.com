@@ -813,6 +813,7 @@ function addEnterKeyListener(inputId, buttonSelector) {
 
             // 隐藏建议框
             clearSuggestions();
+            clearSuggestionsEU();
         }
     });
 }
@@ -879,6 +880,65 @@ function clearSuggestions() {
     const suggestionsContainer = document.getElementById('suggestions');
     suggestionsContainer.innerHTML = '';
     suggestionsContainer.classList.remove('active'); // 隐藏建议框
+}
+
+document.getElementById('euStockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainerEU = document.getElementById('suggestionsEU');
+
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestionsEU(stockSymbol);
+        displaySuggestionsEU(stockData);
+        suggestionsContainerEU.classList.add('active'); // 显示建议框
+    } else {
+        clearSuggestionsEU(); // 清空并隐藏建议列表
+        suggestionsContainerEU.classList.remove('active');
+    }
+});
+
+async function fetchStockSuggestionsEU(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 过滤条件：只返回 currency 为 EUR 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'EUR');
+        return filteredData.map(stock => stock.symbol); // 仅返回股票符号
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
+function displaySuggestionsEU(suggestions) {
+    const suggestionsContainerEU = document.getElementById('suggestionsEU');
+    suggestionsContainerEU.innerHTML = ''; // 清空之前的建议列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol;
+            suggestionDiv.addEventListener('click', () => {
+                document.getElementById('euStockSymbol').value = symbol;
+                clearSuggestionsEU(); // 选择后清空并隐藏建议列表
+                suggestionsContainerEU.classList.remove('active');
+            });
+            suggestionsContainerEU.appendChild(suggestionDiv);
+        });
+        suggestionsContainerEU.classList.add('active'); // 显示建议框
+    } else {
+        suggestionsContainerEU.classList.remove('active'); // 如果没有建议，隐藏建议框
+    }
+}
+
+function clearSuggestionsEU() {
+    const suggestionsContainerEU = document.getElementById('suggestionsEU');
+    suggestionsContainerEU.innerHTML = '';
+    suggestionsContainerEU.classList.remove('active'); // 隐藏建议框
 }
 
 //////////////////////////////Profile//////////////////////////////////////////////
