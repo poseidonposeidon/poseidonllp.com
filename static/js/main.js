@@ -886,8 +886,8 @@ function displayCompanyPrice(data, container) {
     // 插入新的資料到 container 中
     container.innerHTML = `
         <p><strong>Current Price:</strong> $${price}</p>
-        <p><strong>52-Week High:</strong> $${yearHigh}</p>
-        <p><strong>52-Week Low:</strong> $${yearLow}</p>
+        <p><strong>Year High:</strong> $${yearHigh}</p>
+        <p><strong>Year Low:</strong> $${yearLow}</p>
     `;
 }
 
