@@ -1032,12 +1032,19 @@ async function fetchStockSuggestionsTW(stockSymbol) {
         const data = await response.json();
         // 过滤条件：只返回 currency 为 TWD 的股票符号
         const filteredData = data.filter(stock => stock.currency === 'TWD');
-        return filteredData.map(stock => stock.symbol.replace(/\.TW|\.TWO/g, '')); // 确保 ".TW" 或 ".TWO" 被移除
+
+        // 先去除 ".TW"
+        let symbols = filteredData.map(stock => stock.symbol.replace('.TW', ''));
+        // 再处理 ".TWO" 的 "O"
+        symbols = symbols.map(symbol => symbol.replace('O', ''));
+
+        return symbols;
     } catch (error) {
         console.error('Error fetching stock data:', error);
         return [];
     }
 }
+
 
 function displaySuggestionsTW(suggestions) {
     const suggestionsContainerTW = document.getElementById('suggestionsTW');
