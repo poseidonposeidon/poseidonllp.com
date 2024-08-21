@@ -2015,6 +2015,21 @@ function fetchJPEarningsCallTranscript() {
     fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerJP');
 }
 
+function fetchEUEarningsCallTranscript() {
+    const stockSymbol = fetchEUStock();
+    const year = document.getElementById('yearInputEU').value;
+    const quarter = document.getElementById('quarterInputEU').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+
+    if (stockSymbol.length === 0 || year.length === 0 || quarter.length === 0) {
+        alert('請輸入股票代碼、年份及季度。');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_call_transcript/${stockSymbol}?year=${year}&quarter=${quarter}&apikey=${apiKey}`;
+    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerEU');
+}
+
 function splitTranscriptIntoParagraphs(content) {
     // 使用正則表達式檢測常見的講者名稱或段落開頭
     const regex = /(Operator:|[A-Z][a-z]+ [A-Z][a-z]+:)/g;
