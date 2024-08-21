@@ -785,6 +785,7 @@ function addEnterKeyListener(inputId, buttonSelector) {
 addEnterKeyListener("stockSymbol", "#usStockButton");
 addEnterKeyListener("jpStockSymbol", "#jpStockButton");
 addEnterKeyListener("twStockSymbol", "#twStockButton");
+addEnterKeyListener("euStockSymbol", "#euStockButton");
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
