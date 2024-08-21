@@ -814,6 +814,8 @@ function addEnterKeyListener(inputId, buttonSelector) {
             // 隐藏建议框
             clearSuggestions();
             clearSuggestionsEU();
+            clearSuggestionsJP()
+            clearSuggestionsTW()
         }
     });
 }
@@ -1004,7 +1006,65 @@ function clearSuggestionsJP() {
     suggestionsContainerJP.classList.remove('active'); // 隱藏建議框
 }
 
+//台股
+document.getElementById('twStockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainerTW = document.getElementById('suggestionsTW');
 
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestionsTW(stockSymbol);
+        displaySuggestionsTW(stockData);
+        suggestionsContainerTW.classList.add('active'); // 显示建议框
+    } else {
+        clearSuggestionsTW(); // 清空并隐藏建议列表
+        suggestionsContainerTW.classList.remove('active');
+    }
+});
+
+async function fetchStockSuggestionsTW(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 过滤条件：只返回 currency 为 TWD 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'TWD');
+        return filteredData.map(stock => stock.symbol.replace('.TW', '').replace('.TWO', '')); // 仅返回不含 ".TW" 或 ".TWO" 的股票符号
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
+function displaySuggestionsTW(suggestions) {
+    const suggestionsContainerTW = document.getElementById('suggestionsTW');
+    suggestionsContainerTW.innerHTML = ''; // 清空之前的建议列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol; // 显示去除 ".TW" 和 ".TWO" 的股票符号
+            suggestionDiv.addEventListener('click', () => {
+                document.getElementById('twStockSymbol').value = symbol; // 选中后也不包含 ".TW" 或 ".TWO"
+                clearSuggestionsTW(); // 选择后清空并隐藏建议列表
+                suggestionsContainerTW.classList.remove('active');
+            });
+            suggestionsContainerTW.appendChild(suggestionDiv);
+        });
+        suggestionsContainerTW.classList.add('active'); // 显示建议框
+    } else {
+        suggestionsContainerTW.classList.remove('active'); // 如果没有建议，隐藏建议框
+    }
+}
+
+function clearSuggestionsTW() {
+    const suggestionsContainerTW = document.getElementById('suggestionsTW');
+    suggestionsContainerTW.innerHTML = '';
+    suggestionsContainerTW.classList.remove('active'); // 隐藏建议框
+}
 //////////////////////////////Profile//////////////////////////////////////////////
 
 function fetchCompanyProfile(stockSymbol) {
@@ -1113,7 +1173,6 @@ function fetchTWCompanyPrice(fullStockSymbol) {
         })
         .catch(error => console.error('Error fetching data:', error));
 }
-
 
 function fetchEUCompanyPrice(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
