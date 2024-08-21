@@ -952,9 +952,9 @@ document.getElementById('jpStockSymbol').addEventListener('input', async functio
     if (stockSymbol.length > 0) {
         const stockData = await fetchStockSuggestionsJP(stockSymbol);
         displaySuggestionsJP(stockData);
-        suggestionsContainerJP.classList.add('active'); // 显示建议框
+        suggestionsContainerJP.classList.add('active'); // 顯示建議框
     } else {
-        clearSuggestionsJP(); // 清空并隐藏建议列表
+        clearSuggestionsJP(); // 清空並隱藏建議列表
         suggestionsContainerJP.classList.remove('active');
     }
 });
@@ -968,9 +968,9 @@ async function fetchStockSuggestionsJP(stockSymbol) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        // 过滤条件：只返回 currency 为 JPY 的股票符号
+        // 過濾條件：只返回 currency 為 JPY 的股票符號
         const filteredData = data.filter(stock => stock.currency === 'JPY');
-        return filteredData.map(stock => stock.symbol); // 仅返回股票符号
+        return filteredData.map(stock => stock.symbol); // 僅返回股票符號
     } catch (error) {
         console.error('Error fetching stock data:', error);
         return [];
@@ -979,30 +979,31 @@ async function fetchStockSuggestionsJP(stockSymbol) {
 
 function displaySuggestionsJP(suggestions) {
     const suggestionsContainerJP = document.getElementById('suggestionsJP');
-    suggestionsContainerJP.innerHTML = ''; // 清空之前的建议列表
+    suggestionsContainerJP.innerHTML = ''; // 清空之前的建議列表
 
     if (suggestions.length > 0) {
         suggestions.forEach(symbol => {
             const suggestionDiv = document.createElement('div');
-            suggestionDiv.textContent = symbol;
+            suggestionDiv.textContent = symbol.replace('.T', ''); // 移除顯示中的 ".T"
             suggestionDiv.addEventListener('click', () => {
-                document.getElementById('jpStockSymbol').value = symbol;
-                clearSuggestionsJP(); // 选择后清空并隐藏建议列表
+                document.getElementById('jpStockSymbol').value = symbol.replace('.T', ''); // 移除輸入框中的 ".T"
+                clearSuggestionsJP(); // 選擇後清空並隱藏建議列表
                 suggestionsContainerJP.classList.remove('active');
             });
             suggestionsContainerJP.appendChild(suggestionDiv);
         });
-        suggestionsContainerJP.classList.add('active'); // 显示建议框
+        suggestionsContainerJP.classList.add('active'); // 顯示建議框
     } else {
-        suggestionsContainerJP.classList.remove('active'); // 如果没有建议，隐藏建议框
+        suggestionsContainerJP.classList.remove('active'); // 如果沒有建議，隱藏建議框
     }
 }
 
 function clearSuggestionsJP() {
     const suggestionsContainerJP = document.getElementById('suggestionsJP');
     suggestionsContainerJP.innerHTML = '';
-    suggestionsContainerJP.classList.remove('active'); // 隐藏建议框
+    suggestionsContainerJP.classList.remove('active'); // 隱藏建議框
 }
+
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
