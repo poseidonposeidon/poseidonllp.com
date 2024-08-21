@@ -1357,6 +1357,20 @@ async function fetchTWBalanceSheet() {
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW', 'balanceSheetChartTW');
 }
 
+function fetchEUBalanceSheet() {
+    const stockSymbol = fetchEUStock();
+    const period = document.getElementById('period_2EU').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerEU', 'balanceSheetChartEU');
+}
+
 function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
@@ -1689,6 +1703,20 @@ async function fetchTWCashflow() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerTW', 'cashflowChartTW'));
+}
+
+function fetchEUCashflow() {
+    const stockSymbol = fetchEUStock();
+    const period = document.getElementById('period_3EU').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerEU', 'cashflowChartEU'));
 }
 
 function fetchData_Cashflow(apiUrl, callback) {
