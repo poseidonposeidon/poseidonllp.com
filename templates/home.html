@@ -112,7 +112,41 @@
     </div>
 </div>
 
+<!--/////////////////////////////////歐股/////////////////////////////////-->
 
+<div id="eu-info-section" class="info-section" style="display: none;">
+    <div class="info-input">
+        <input type="text" id="euStockSymbol" placeholder="Input EU Stock" pattern="[A-Z0-9\.\-]*">
+        <button id="euStockButton" onclick="fetchEUStock()">
+            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
+        </button>
+    </div>
+    <p id="outputSymbolEU" data-last-symbol="">Current query : </p>
+    <div id="companyProfileContainerEU"></div>
+    <div class="info-content">
+        <div class="info-column">
+            <a href="#" onclick="loadSectionEU('income-statement')">Income Statement</a>
+            <a href="#" onclick="loadSectionEU('balance-sheet')">Balance Sheet</a>
+            <a href="#" onclick="loadSectionEU('cashflow-statement')">Cash Flow Statement</a>
+        </div>
+        <div class="info-column">
+            <a href="#" onclick="loadSectionEU('earnings-call-transcript')">Earnings Call Transcript</a>
+            <a href="#" onclick="loadSectionEU('earnings-call-calendar')">Earnings Call Calendar</a>
+            <a href="#" onclick="loadSectionEU('historical-earnings')">Historical and Future Earnings</a>
+        </div>
+        <div class="info-column">
+            <a href="#" onclick="loadSectionEU('dividend-calendar')">Dividend Calendar</a>
+            <a href="#" onclick="loadSectionEU('insider-trades')">Insider Trades</a>
+        </div>
+    </div>
+    <div id="section-container-EU" class="section-container">
+        <!-- Dynamic content loading -->
+    </div>
+</div>
+
+
+
+<!--/////////////////////////////////AI 資訊/////////////////////////////////-->
 <div id="ai_box" class="ai-box-section" style="display: none;">
     <div class="info-content">
         <div class="info-column">
@@ -124,7 +158,7 @@
         <!-- Dynamic content loading -->
     </div>
 </div>
-
+<!--/////////////////////////////////body資料/////////////////////////////////-->
 <div class="body-container">
     <div class="logo-container-new center">
         <a href="https://www.businessweekly.com.tw/Archive/" target="_blank"><img src="/static/img/Business_Weekly-remove.png" alt="businessweek"></a>

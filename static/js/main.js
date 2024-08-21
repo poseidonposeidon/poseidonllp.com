@@ -2,15 +2,15 @@
 let activeSection = null;
 
 /////////////////////////////////////////////
-function expandSection(element) {
-    const content = element.querySelector('.content');
-    if (!element.classList.contains('fixed')) {
-        content.style.maxHeight = '1000px';
-        content.style.opacity = '1';
-        content.style.paddingTop = '20px';
-        content.style.paddingBottom = '20px';
-    }
-}
+// function expandSection(element) {
+//     const content = element.querySelector('.content');
+//     if (!element.classList.contains('fixed')) {
+//         content.style.maxHeight = '1000px';
+//         content.style.opacity = '1';
+//         content.style.paddingTop = '20px';
+//         content.style.paddingBottom = '20px';
+//     }
+// }
 
 function collapseSection(element) {
     const content = element.querySelector('.content');
@@ -22,18 +22,18 @@ function collapseSection(element) {
     }
 }
 
-function toggleFixed(event, element) {
-    if (event.target.tagName === 'SELECT' || event.target.tagName === 'BUTTON' || event.target.tagName === 'INPUT') {
-        return;
-    }
-    const content = element.querySelector('.content');
-    if (content.style.maxHeight !== '0px' && !element.classList.contains('fixed')) {
-        element.classList.add('fixed');
-    } else {
-        element.classList.remove('fixed');
-        collapseSection(element);
-    }
-}
+// function toggleFixed(event, element) {
+//     if (event.target.tagName === 'SELECT' || event.target.tagName === 'BUTTON' || event.target.tagName === 'INPUT') {
+//         return;
+//     }
+//     const content = element.querySelector('.content');
+//     if (content.style.maxHeight !== '0px' && !element.classList.contains('fixed')) {
+//         element.classList.add('fixed');
+//     } else {
+//         element.classList.remove('fixed');
+//         collapseSection(element);
+//     }
+// }
 
 function toggleSection(event, sectionId) {
     event.preventDefault();
@@ -367,6 +367,115 @@ function loadSectionTW(sectionId) {
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
 
+function loadSectionEU(sectionId) {
+    const sectionsEU = {
+        'income-statement': `
+            <div class="section" id="income-statement-eu">
+                <h2>Income Statement (EU)</h2>
+                <div class="content scroll-container-x">
+                    <label for="periodEU">Select Period:</label>
+                    <select id="periodEU">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchEUIncomeStatement()">Load Statement</button>
+                    <div id="incomeStatementContainerEU"></div>
+                </div>
+            </div>`,
+        'balance-sheet': `
+            <div class="section" id="balance-sheet-eu">
+                <h2>Balance Sheet Statements (EU)</h2>
+                <div class="content scroll-container-x">
+                    <label for="period_2EU">Select Period:</label>
+                    <select id="period_2EU">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchEUBalanceSheet()">Load Statement</button>
+                    <div id="balanceSheetContainerEU"></div>
+                </div>
+            </div>`,
+        'cashflow-statement': `
+            <div class="section" id="cashflow-statement-eu">
+                <h2>Cashflow Statement (EU)</h2>
+                <div class="content scroll-container-x">
+                    <label for="period_3EU">Select Period:</label>
+                    <select id="period_3EU">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchEUCashflow()">Load Statement</button>
+                    <div class="scroll-container-x">
+                        <table id="cashflowTableEU" border="1">
+                            <div id="cashflowContainerEU"></div>
+                        </table>
+                    </div>
+                </div>
+            </div>`,
+        'earnings-call-transcript': `
+            <div class="section" id="earnings-call-transcript-eu">
+                <h2>Earnings Call Transcript (EU)</h2>
+                <div class="content">
+                    <input type="number" id="yearInputEU" placeholder="Enter Year">
+                    <input type="number" id="quarterInputEU" placeholder="Enter Quarter">
+                    <button onclick="fetchEUEarningsCallTranscript()">Load Transcript</button>
+                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainerEU">
+                        <!-- Transcription content will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'earnings-call-calendar': `
+            <div class="section" id="earnings-call-calendar-eu">
+                <h2>Earnings Call Calendar (EU)</h2>
+                <div class="content">
+                    <input type="date" id="fromDateEU" placeholder="From Date">
+                    <input type="date" id="toDateEU" placeholder="To Date">
+                    <button onclick="fetchEUEarningsCallCalendar()">Load Calendar</button>
+                    <div class="scroll-container">
+                        <div id="earningsCallCalendarContainerEU"></div>
+                    </div>
+                </div>
+            </div>`,
+        'historical-earnings': `
+            <div class="section" id="historical-earnings-eu">
+                <h2>Historical and Future Earnings (EU)</h2>
+                <div class="content">
+                    <input type="date" id="fromDate_1EU" placeholder="From Date">
+                    <input type="date" id="toDate_1EU" placeholder="To Date">
+                    <button onclick="fetchEUHistoricalEarnings()">Load Calendar</button>
+                    <div class="scroll-container" id="historicalEarningsContainerEU">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'dividend-calendar': `
+            <div class="section" id="dividend-calendar-eu">
+                <h2>Dividend Calendar (EU)</h2>
+                <div class="content">
+                    <input type="date" id="fromDate_2EU" placeholder="From Date">
+                    <input type="date" id="toDate_2EU" placeholder="To Date">
+                    <button onclick="fetchEUDividendCalendar()">Load Calendar</button>
+                    <div class="scroll-container" id="stockDividendCalendarContainerEU">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'insider-trades': `
+            <div class="section" id="insider-trades-eu">
+                <h2>Insider Trades (EU)</h2>
+                <div class="content">
+                    <button onclick="fetchEUInsiderTrades()">Load Table</button>
+                    <div class="scroll-container-x" id="insiderTradesContainerEU">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`
+    };
+
+    const sectionContainerEU = document.getElementById('section-container-EU');
+    sectionContainerEU.innerHTML = sectionsEU[sectionId] || '<p>Section not found</p>';
+}
+
 function loadAIBoxSection(sectionId) {
     const sections = {
         'audio-transcription': `
@@ -586,6 +695,50 @@ async function fetchTWStock() {
     return fullStockSymbol;
 }
 
+function fetchEUStock() {
+    const stockSymbol = document.getElementById('euStockSymbol').value.trim().toUpperCase();
+    const previousSymbol = document.getElementById('outputSymbolEU').getAttribute('data-last-symbol');
+
+    if (stockSymbol !== previousSymbol) {
+        document.getElementById('outputSymbolEU').innerText = 'Current query: ' + stockSymbol;
+        document.getElementById('outputSymbolEU').setAttribute('data-last-symbol', stockSymbol);
+
+        // Clear previous company data
+        const companyProfileContainerEU = document.getElementById('companyProfileContainerEU');
+        if (companyProfileContainerEU) {
+            companyProfileContainerEU.innerHTML = '';
+        }
+
+        const containersEU = [
+            'incomeStatementContainerEU',
+            'balanceSheetContainerEU',
+            'cashflowContainerEU',
+            'earningsCallTranscriptContainerEU',
+            'earningsCallCalendarContainerEU',
+            'historicalEarningsContainerEU',
+            'stockDividendCalendarContainerEU',
+            'insiderTradesContainerEU'
+        ];
+
+        containersEU.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '';
+            }
+        });
+
+        const sectionsEU = document.querySelectorAll('.section');
+        sectionsEU.forEach(section => {
+            section.classList.remove('fixed');
+            collapseSection(section);
+        });
+    }
+
+    fetchEUCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchEUCompanyProfile
+    return stockSymbol;
+}
+
+
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('authToken');
     if (!token) {
@@ -664,6 +817,17 @@ function fetchTWCompanyProfile(stockSymbol) {
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerTW')))
         .catch(error => console.error('Error fetching data:', error));
 }
+
+function fetchEUCompanyProfile(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerEU')))
+        .catch(error => console.error('Error fetching data:', error));
+}
+
 
 function displayCompanyProfile(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
