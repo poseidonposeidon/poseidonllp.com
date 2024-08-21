@@ -838,7 +838,9 @@ async function fetchStockSuggestions(stockSymbol) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        return data.map(stock => stock.symbol); // 返回匹配的股票符号
+        // 过滤条件：只返回 currency 为 USD 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'USD');
+        return filteredData.map(stock => stock.symbol); // 仅返回股票符号
     } catch (error) {
         console.error('Error fetching stock data:', error);
         return [];
