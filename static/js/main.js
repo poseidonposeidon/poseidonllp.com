@@ -1030,9 +1030,9 @@ async function fetchStockSuggestionsTW(stockSymbol) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        // 过滤条件：只返回 currency 为 TWD 的股票符号，并去除 ".TW" 和 ".TWO"
+        // 过滤条件：只返回 currency 为 TWD 的股票符号
         const filteredData = data.filter(stock => stock.currency === 'TWD');
-        return filteredData.map(stock => stock.symbol.replace('.TW', '').replace('.TWO', '')); // 仅返回不含 ".TW" 或 ".TWO" 的股票符号
+        return filteredData.map(stock => stock.symbol.replace('.TW', '').replace('.TWO', '').replace(/[^\w]/g, '')); // 仅返回不含 ".TW" 或 ".TWO" 的股票符号，并移除任何非字母数字字符
     } catch (error) {
         console.error('Error fetching stock data:', error);
         return [];
@@ -1065,6 +1065,7 @@ function clearSuggestionsTW() {
     suggestionsContainerTW.innerHTML = '';
     suggestionsContainerTW.classList.remove('active'); // 隐藏建议框
 }
+
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
