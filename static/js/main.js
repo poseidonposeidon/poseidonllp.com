@@ -810,6 +810,9 @@ function addEnterKeyListener(inputId, buttonSelector) {
         if (event.key === "Enter") {
             event.preventDefault(); // Prevent form submission
             document.querySelector(buttonSelector).click(); // Trigger button click event
+
+            // 隐藏建议框
+            clearSuggestions();
         }
     });
 }
