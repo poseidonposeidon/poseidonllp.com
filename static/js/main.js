@@ -823,6 +823,7 @@ addEnterKeyListener("jpStockSymbol", "#jpStockButton");
 addEnterKeyListener("twStockSymbol", "#twStockButton");
 addEnterKeyListener("euStockSymbol", "#euStockButton");
 //////////////////建議/////////////////
+//美股
 document.getElementById('stockSymbol').addEventListener('input', async function() {
     const stockSymbol = this.value.trim().toUpperCase();
     const suggestionsContainer = document.getElementById('suggestions');
@@ -882,6 +883,7 @@ function clearSuggestions() {
     suggestionsContainer.classList.remove('active'); // 隐藏建议框
 }
 
+//歐股
 document.getElementById('euStockSymbol').addEventListener('input', async function() {
     const stockSymbol = this.value.trim().toUpperCase();
     const suggestionsContainerEU = document.getElementById('suggestionsEU');
@@ -905,14 +907,15 @@ async function fetchStockSuggestionsEU(stockSymbol) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        // 过滤条件：只返回 currency 为 EUR 的股票符号
-        const filteredData = data.filter(stock => stock.currency === 'EUR');
+        // 过滤条件：只返回 currency 为 EUR 或 GBp 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'EUR' || stock.currency === 'GBp');
         return filteredData.map(stock => stock.symbol); // 仅返回股票符号
     } catch (error) {
         console.error('Error fetching stock data:', error);
         return [];
     }
 }
+
 
 function displaySuggestionsEU(suggestions) {
     const suggestionsContainerEU = document.getElementById('suggestionsEU');
@@ -939,6 +942,66 @@ function clearSuggestionsEU() {
     const suggestionsContainerEU = document.getElementById('suggestionsEU');
     suggestionsContainerEU.innerHTML = '';
     suggestionsContainerEU.classList.remove('active'); // 隐藏建议框
+}
+
+//日股
+document.getElementById('jpStockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainerJP = document.getElementById('suggestionsJP');
+
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestionsJP(stockSymbol);
+        displaySuggestionsJP(stockData);
+        suggestionsContainerJP.classList.add('active'); // 显示建议框
+    } else {
+        clearSuggestionsJP(); // 清空并隐藏建议列表
+        suggestionsContainerJP.classList.remove('active');
+    }
+});
+
+async function fetchStockSuggestionsJP(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 过滤条件：只返回 currency 为 JPY 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'JPY');
+        return filteredData.map(stock => stock.symbol); // 仅返回股票符号
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
+function displaySuggestionsJP(suggestions) {
+    const suggestionsContainerJP = document.getElementById('suggestionsJP');
+    suggestionsContainerJP.innerHTML = ''; // 清空之前的建议列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol;
+            suggestionDiv.addEventListener('click', () => {
+                document.getElementById('jpStockSymbol').value = symbol;
+                clearSuggestionsJP(); // 选择后清空并隐藏建议列表
+                suggestionsContainerJP.classList.remove('active');
+            });
+            suggestionsContainerJP.appendChild(suggestionDiv);
+        });
+        suggestionsContainerJP.classList.add('active'); // 显示建议框
+    } else {
+        suggestionsContainerJP.classList.remove('active'); // 如果没有建议，隐藏建议框
+    }
+}
+
+function clearSuggestionsJP() {
+    const suggestionsContainerJP = document.getElementById('suggestionsJP');
+    suggestionsContainerJP.innerHTML = '';
+    suggestionsContainerJP.classList.remove('active'); // 隐藏建议框
 }
 
 //////////////////////////////Profile//////////////////////////////////////////////
