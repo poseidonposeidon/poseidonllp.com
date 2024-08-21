@@ -83,7 +83,7 @@ function hideSection(section) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box,#jp-info-section,#tw-info-section').forEach(section => {
+    document.querySelectorAll('#info-section, #ai_box,#jp-info-section,#tw-info-section,#eu-info-section').forEach(section => {
         section.style.display = 'none';
     });
 });
