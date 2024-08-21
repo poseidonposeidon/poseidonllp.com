@@ -2139,6 +2139,21 @@ function fetchJPEarningsCallCalendar() {
     fetchData_2(apiUrl, (data) => displayEarningsCallCalendar_JP(data, 'earningsCallCalendarContainerJP', stockSymbol), 'earningsCallCalendarContainerJP');
 }
 
+function fetchEUEarningsCallCalendar() {
+    const fromDate = document.getElementById('fromDateEU').value;
+    const toDate = document.getElementById('toDateEU').value;
+    const stockSymbol = fetchEUStock();
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+
+    if (!fromDate || !toDate) {
+        alert('請輸入開始和結束日期。');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
+    fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainerEU', stockSymbol), 'earningsCallCalendarContainerEU');
+}
+
 function displayEarningsCallCalendar(data, containerId, stockSymbol) {
     const container = document.getElementById(containerId);
     if (!container) {
