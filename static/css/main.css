@@ -202,7 +202,10 @@ button:not(.info-input button):hover {
 #companyProfileContainerJP,
 #companyProfileContainerTW,
 #companyProfileContainerEU,
-#PriceContainer{
+#PriceContainer,
+#PriceJPContainer,
+#PriceTWContainer,
+#PriceEUContainer{
     text-align: center;
     margin: 10px auto;
     padding: 20px;

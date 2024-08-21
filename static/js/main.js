@@ -594,6 +594,11 @@ function fetchJPStock() {
             companyProfileContainerJP.innerHTML = '';
         }
 
+        const priceContainerJP = document.getElementById('PriceContainerJP');
+        if (priceContainerJP) {
+            priceContainerJP.innerHTML = ''; // Clear previous price data
+        }
+
         const containers = [
             'incomeStatementContainerJP',
             'balanceSheetContainerJP',
@@ -617,9 +622,12 @@ function fetchJPStock() {
             section.classList.remove('fixed');
             collapseSection(section);
         });
+
+        // Fetch and display company profile and price information
+        fetchJPCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchJPCompanyProfile
+        fetchJPCompanyPrice(stockSymbol);    // Fetch and display stock price information
     }
 
-    fetchJPCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchJPCompanyProfile
     return stockSymbol;
 }
 
@@ -652,10 +660,10 @@ async function fetchTWStock() {
     const stockSymbol = document.getElementById('twStockSymbol').value.trim();
     const previousSymbol = document.getElementById('outputSymbolTW').getAttribute('data-last-symbol');
 
-    // 調用 API 來判斷交易所類型
+    // 调用 API 来判断交易所类型
     const exchangeShortName = await fetchStockExchange(stockSymbol);
     if (!exchangeShortName) {
-        alert('無法判斷股票代碼所屬的交易所');
+        alert('无法判断股票代码所属的交易所');
         return null;
     }
 
@@ -665,7 +673,7 @@ async function fetchTWStock() {
     } else if (exchangeShortName === 'TWO') {
         fullStockSymbol = stockSymbol + '.TWO';
     } else {
-        alert('未知的交易所類型');
+        alert('未知的交易所类型');
         return null;
     }
 
@@ -673,10 +681,15 @@ async function fetchTWStock() {
         document.getElementById('outputSymbolTW').innerText = 'Current query: ' + fullStockSymbol;
         document.getElementById('outputSymbolTW').setAttribute('data-last-symbol', fullStockSymbol);
 
-        // 清除之前的公司資料
+        // 清除之前的公司资料
         const companyProfileContainerTW = document.getElementById('companyProfileContainerTW');
         if (companyProfileContainerTW) {
             companyProfileContainerTW.innerHTML = '';
+        }
+
+        const priceContainerTW = document.getElementById('PriceContainerTW');
+        if (priceContainerTW) {
+            priceContainerTW.innerHTML = ''; // 清除之前的价格资料
         }
 
         const containers = [
@@ -697,11 +710,15 @@ async function fetchTWStock() {
             section.classList.remove('fixed');
             collapseSection(section);
         });
+
+        // Fetch and display company profile and price information
+        fetchTWCompanyProfile(fullStockSymbol);  // 传递 fullStockSymbol 给 fetchTWCompanyProfile
+        fetchTWCompanyPrice(fullStockSymbol);    // 获取并显示股票价格信息
     }
 
-    fetchTWCompanyProfile(fullStockSymbol);  // 傳遞 fullStockSymbol 給 fetchTWCompanyProfile
     return fullStockSymbol;
 }
+
 
 function fetchEUStock() {
     const stockSymbol = document.getElementById('euStockSymbol').value.trim().toUpperCase();
@@ -715,6 +732,11 @@ function fetchEUStock() {
         const companyProfileContainerEU = document.getElementById('companyProfileContainerEU');
         if (companyProfileContainerEU) {
             companyProfileContainerEU.innerHTML = '';
+        }
+
+        const priceContainerEU = document.getElementById('PriceContainerEU');
+        if (priceContainerEU) {
+            priceContainerEU.innerHTML = ''; // Clear previous price data
         }
 
         const containersEU = [
@@ -740,11 +762,15 @@ function fetchEUStock() {
             section.classList.remove('fixed');
             collapseSection(section);
         });
+
+        // Fetch and display company profile and price information
+        fetchEUCompanyProfile(stockSymbol);  // 获取并显示公司简介
+        fetchEUCompanyPrice(stockSymbol);    // 获取并显示股票价格信息
     }
 
-    fetchEUCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchEUCompanyProfile
     return stockSymbol;
 }
+
 
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -865,6 +891,58 @@ function fetchCompanyPrice(stockSymbol) {
                 displayCompanyPrice(data[0], priceContainer);  // Pass the first item in the array to the display function
             } else {
                 priceContainer.innerHTML = '<p>No data found.</p>';
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
+function fetchJPCompanyPrice(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const priceContainerJP = document.getElementById('PriceContainerJP');
+            if (data && data.length > 0) {
+                displayCompanyPrice(data[0], priceContainerJP);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
+            } else {
+                priceContainerJP.innerHTML = '<p>No data found.</p>';
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
+function fetchTWCompanyPrice(fullStockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${fullStockSymbol}?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const priceContainerTW = document.getElementById('PriceContainerTW');
+            if (data && data.length > 0) {
+                displayCompanyPrice(data[0], priceContainerTW);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
+            } else {
+                priceContainerTW.innerHTML = '<p>No data found.</p>';
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
+
+function fetchEUCompanyPrice(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const priceContainerEU = document.getElementById('PriceContainerEU');
+            if (data && data.length > 0) {
+                displayCompanyPrice(data[0], priceContainerEU);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
+            } else {
+                priceContainerEU.innerHTML = '<p>No data found.</p>';
             }
         })
         .catch(error => console.error('Error fetching data:', error));
