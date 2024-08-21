@@ -566,11 +566,15 @@ function fetchStock() {
             section.classList.remove('fixed');
             collapseSection(section);
         });
+
+        // Fetch and display company profile and price information
+        fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
+        fetchCompanyPrice(stockSymbol);    // Fetch and display stock price information
     }
 
-    fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
     return stockSymbol;
 }
+
 
 function fetchJPStock() {
     const stockSymbol = document.getElementById('jpStockSymbol').value.trim() + ".T";
@@ -844,6 +848,32 @@ function displayCompanyProfile(data, container) {
     // 插入新的資料到 container 中
     container.innerHTML = `<p>Official Website: <a href="${website}" target="_blank">${website}</a></p>`;
 }
+//////////////////////////////Price//////////////////////////////////////////////
+function fetchCompanyPrice(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.length > 0) {
+                displayCompanyPrice(data[0]);  // Pass the first item in the array to the display function
+            } else {
+                document.getElementById('price').innerText = 'Price: N/A';
+                document.getElementById('yearHigh').innerText = '52-Week High: N/A';
+                document.getElementById('yearLow').innerText = '52-Week Low: N/A';
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
+function displayCompanyPrice(data) {
+    // Display the price, yearHigh, and yearLow in the respective <p> elements
+    document.getElementById('price').innerText = `Price: $${data.price || 'N/A'}`;
+    document.getElementById('yearHigh').innerText = `Year High: $${data.yearHigh || 'N/A'}`;
+    document.getElementById('yearLow').innerText = `Year Low: $${data.yearLow || 'N/A'}`;
+}
+
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
 
