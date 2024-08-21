@@ -371,7 +371,7 @@ function loadSectionEU(sectionId) {
     const sectionsEU = {
         'income-statement': `
             <div class="section" id="income-statement-eu">
-                <h2>Income Statement (EU)</h2>
+                <h2>Income Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="periodEU">Select Period:</label>
                     <select id="periodEU">
@@ -384,7 +384,7 @@ function loadSectionEU(sectionId) {
             </div>`,
         'balance-sheet': `
             <div class="section" id="balance-sheet-eu">
-                <h2>Balance Sheet Statements (EU)</h2>
+                <h2>Balance Sheet Statements</h2>
                 <div class="content scroll-container-x">
                     <label for="period_2EU">Select Period:</label>
                     <select id="period_2EU">
@@ -397,7 +397,7 @@ function loadSectionEU(sectionId) {
             </div>`,
         'cashflow-statement': `
             <div class="section" id="cashflow-statement-eu">
-                <h2>Cashflow Statement (EU)</h2>
+                <h2>Cashflow Statement</h2>
                 <div class="content scroll-container-x">
                     <label for="period_3EU">Select Period:</label>
                     <select id="period_3EU">
@@ -414,7 +414,7 @@ function loadSectionEU(sectionId) {
             </div>`,
         'earnings-call-transcript': `
             <div class="section" id="earnings-call-transcript-eu">
-                <h2>Earnings Call Transcript (EU)</h2>
+                <h2>Earnings Call Transcript</h2>
                 <div class="content">
                     <input type="number" id="yearInputEU" placeholder="Enter Year">
                     <input type="number" id="quarterInputEU" placeholder="Enter Quarter">
@@ -426,7 +426,7 @@ function loadSectionEU(sectionId) {
             </div>`,
         'earnings-call-calendar': `
             <div class="section" id="earnings-call-calendar-eu">
-                <h2>Earnings Call Calendar (EU)</h2>
+                <h2>Earnings Call Calendar</h2>
                 <div class="content">
                     <input type="date" id="fromDateEU" placeholder="From Date">
                     <input type="date" id="toDateEU" placeholder="To Date">
@@ -438,7 +438,7 @@ function loadSectionEU(sectionId) {
             </div>`,
         'historical-earnings': `
             <div class="section" id="historical-earnings-eu">
-                <h2>Historical and Future Earnings (EU)</h2>
+                <h2>Historical and Future Earnings</h2>
                 <div class="content">
                     <input type="date" id="fromDate_1EU" placeholder="From Date">
                     <input type="date" id="toDate_1EU" placeholder="To Date">
@@ -450,7 +450,7 @@ function loadSectionEU(sectionId) {
             </div>`,
         'dividend-calendar': `
             <div class="section" id="dividend-calendar-eu">
-                <h2>Dividend Calendar (EU)</h2>
+                <h2>Dividend Calendar</h2>
                 <div class="content">
                     <input type="date" id="fromDate_2EU" placeholder="From Date">
                     <input type="date" id="toDate_2EU" placeholder="To Date">
@@ -462,7 +462,7 @@ function loadSectionEU(sectionId) {
             </div>`,
         'insider-trades': `
             <div class="section" id="insider-trades-eu">
-                <h2>Insider Trades (EU)</h2>
+                <h2>Insider Trades</h2>
                 <div class="content">
                     <button onclick="fetchEUInsiderTrades()">Load Table</button>
                     <div class="scroll-container-x" id="insiderTradesContainerEU">
@@ -828,7 +828,6 @@ function fetchEUCompanyProfile(stockSymbol) {
         .catch(error => console.error('Error fetching data:', error));
 }
 
-
 function displayCompanyProfile(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
@@ -890,6 +889,21 @@ async function fetchTWIncomeStatement() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period);
 }
+
+function fetchEUIncomeStatement() {
+    const stockSymbol = document.getElementById('euStockSymbol').value.trim().toUpperCase();
+    const period = document.getElementById('periodEU').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period);
+}
+
 
 function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period) {
     const container = document.getElementById(containerId);
