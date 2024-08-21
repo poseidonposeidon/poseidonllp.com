@@ -499,7 +499,9 @@ button:not(.info-input button):hover {
     background-color: #1c1c1c; /* 符合黑色主题 */
     max-height: 200px;
     overflow-y: auto;
-    width: 100%; /* 与输入框宽度一致 */
+    width: calc(100% - 20px); /* 使宽度比输入框小20px */
+    left: 10px; /* 左侧距离10px */
+    right: 10px; /* 右侧距离10px */
     z-index: 1000;
 }
 
