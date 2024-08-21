@@ -810,8 +810,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         epsdiluted: ['EPS Diluted'],
         weightedAverageShsOut: ['Weighted Average Shares Outstanding'],
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
-        link: ['Report Link'],
-        finalLink: ['Final Link'],
+        // link: ['Report Link'],
+        // finalLink: ['Final Link'],
         growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth'] // 根據選擇的時段設定欄位名稱
     };
 
@@ -853,8 +853,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.epsdiluted.push(entry.epsdiluted || 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
-        rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
-        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+        // rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
+        // rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
 
         // 計算增長率
         if (index > 0) {
@@ -1262,8 +1262,8 @@ function displayBalanceSheet(data, container, chartId) {
         totalInvestments: ['Total Investments'],
         totalDebt: ['Total Debt'],
         netDebt: ['Net Debt'],
-        link: ['Report Link'],
-        finalLink: ['Final Link'],
+        // link: ['Report Link'],
+        // finalLink: ['Final Link'],
         debtToAssetRate: ['Debt to Asset Rate']
     };
 
@@ -1320,8 +1320,8 @@ function displayBalanceSheet(data, container, chartId) {
         rows.totalInvestments.push(formatNumber(entry.totalInvestments));
         rows.totalDebt.push(formatNumber(entry.totalDebt));
         rows.netDebt.push(formatNumber(entry.netDebt));
-        rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
-        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+        // rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
+        // rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
         let totalLiabilities = entry.totalLiabilities || 0;
         let totalAssets = entry.totalAssets || 0;
         let debtToAssetRate = totalAssets ? (totalLiabilities / totalAssets) : 0;
@@ -1581,8 +1581,8 @@ function displayCashflow(data, containerId, chartId) {
         operatingCashFlow: ['Operating Cash Flow'],
         capitalExpenditure: ['Capital Expenditure'],
         freeCashFlow: ['Free Cash Flow'],
-        link: ['Report Link'],
-        finalLink: ['Final Link'],
+        // link: ['Report Link'],
+        // finalLink: ['Final Link'],
         capexToOperatingCashFlow: ['Capex to Operating Cash Flow']
     };
 
@@ -1629,8 +1629,8 @@ function displayCashflow(data, containerId, chartId) {
         rows.operatingCashFlow.push(formatNumber(entry.operatingCashFlow));
         rows.capitalExpenditure.push(formatNumber(entry.capitalExpenditure));
         rows.freeCashFlow.push(formatNumber(entry.freeCashFlow));
-        rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
-        rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+        // rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
+        // rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
 
         // 計算 Capex to Operating Cash Flow
         let capex = entry.capitalExpenditure || 0;
