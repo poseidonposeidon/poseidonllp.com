@@ -1087,9 +1087,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                 }
             } else {
                 // 查找去年同季度的數據
-                let previousYearSameQuarterIndex = data.findIndex((e, i) => {
-                    return e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period;
-                });
+                let previousYearSameQuarterIndex = data.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
                 if (previousYearSameQuarterIndex !== -1) {
                     let lastRevenue = data[previousYearSameQuarterIndex].revenue;
                     if (entry.revenue && lastRevenue) {
@@ -1163,13 +1161,19 @@ function createOperatingChart(data, chartId) {
     // 首先，按日期從舊到新排序數據
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 確保增長率為數字格式
+    // 計算增長率
     data.forEach((entry, index) => {
         if (index > 0) {
-            let lastRevenue = data[index - 1].revenue;
-            if (entry.revenue && lastRevenue) {
-                let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                entry.growthRate = parseFloat(growthRate.toFixed(2)); // 確保為數字格式
+            // 查找去年同季度的數據
+            let previousYearSameQuarterIndex = data.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
+            if (previousYearSameQuarterIndex !== -1) {
+                let lastRevenue = data[previousYearSameQuarterIndex].revenue;
+                if (entry.revenue && lastRevenue) {
+                    let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
+                    entry.growthRate = parseFloat(growthRate.toFixed(2)); // 確保為數字格式
+                } else {
+                    entry.growthRate = 'N/A';
+                }
             } else {
                 entry.growthRate = 'N/A';
             }
@@ -1261,7 +1265,6 @@ function createOperatingChart(data, chartId) {
         }
     });
 }
-
 
 function createIncomeStatementChart(data, chartId) {
     // 首先，按日期從舊到新排序數據
