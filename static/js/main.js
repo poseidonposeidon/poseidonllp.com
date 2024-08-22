@@ -211,11 +211,7 @@ function loadSectionJP(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchJPIncomeStatement()">Load Statement</button>
-                    <div class="scroll-container-x">
-                        <table id="IncomeStatementTableJP" border="1">
-                            <div id="incomeStatementContainerJP"></div>
-                        </table>
-                    </div>
+                    <div id="incomeStatementContainerJP"></div>
                 </div>
             </div>`,
         'balance-sheet': `
