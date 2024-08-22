@@ -694,7 +694,7 @@ function loadAIBoxSection(sectionId) {
                     <div class="scroll-container" id="transcriptionResult">
                         <!-- Transcription results will be displayed here -->
                     </div>
-                    <<div id="buttonContainer" style="display: none; gap: 10px; margin-top: 10px;">
+                    <div id="buttonContainer" style="display: none; gap: 10px; margin-top: 10px;">
                         <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
                         <button id="readMoreBtn" onclick="toggleReadMore()">Read More</button>
                         <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
