@@ -1337,6 +1337,17 @@ function fetchEUCompanyProfile(stockSymbol) {
         .catch(error => console.error('Error fetching data:', error));
 }
 
+function fetchKRCompanyProfile(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerKR')))
+        .catch(error => console.error('Error fetching data:', error));
+}
+
+
 function displayCompanyProfile(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
@@ -1420,6 +1431,24 @@ function fetchEUCompanyPrice(stockSymbol) {
         })
         .catch(error => console.error('Error fetching data:', error));
 }
+
+function fetchKRCompanyPrice(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const priceContainerKR = document.getElementById('PriceContainerKR');
+            if (data && data.length > 0) {
+                displayCompanyPrice(data[0], priceContainerKR);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
+            } else {
+                priceContainerKR.innerHTML = '<p>No data found.</p>';
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
 
 function displayCompanyPrice(data, container) {
     if (!data || typeof data !== 'object') {
