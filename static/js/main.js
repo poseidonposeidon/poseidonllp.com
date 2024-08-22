@@ -1685,7 +1685,7 @@ function fetchKRCompanyPrice(stockSymbol) {
 
 function fetchHKCompanyPrice(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}.HK?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
