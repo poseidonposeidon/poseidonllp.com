@@ -194,7 +194,8 @@ button:not(.info-input button):hover {
 #outputSymbolJP,
 #outputSymbolTW ,
 #outputSymbolEU,
-#outputSymbolKR{
+#outputSymbolKR,
+#outputSymbolHK{
     text-align: center;
     margin: 10px 0;
 }
