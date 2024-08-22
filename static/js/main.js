@@ -4066,6 +4066,14 @@ function displayTranscription(data) {
         const transcriptionText = data.text.replace(/\n/g, '<br>');
         container.innerHTML = `<p>${transcriptionText}</p>`;
 
+        const copyBtn = document.createElement('button');
+        copyBtn.innerText = 'Copy';
+        copyBtn.onclick = function() {
+            copyToClipboard(data.text);
+        };
+
+        container.appendChild(copyBtn);
+
         if (container.scrollHeight > container.clientHeight) {
             readMoreBtn.classList.remove('hidden');
         } else {
@@ -4082,6 +4090,7 @@ function displayTranscription(data) {
     showAlert('Transcription completed');
 }
 
+
 function toggleReadMore() {
     const container = document.getElementById('transcriptionResult');
     const readMoreBtn = document.getElementById('readMoreBtn');
@@ -4096,6 +4105,22 @@ function toggleReadMore() {
         readLessBtn.classList.remove('hidden');
     }
 }
+
+function copyToClipboard(text) {
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    document.body.appendChild(textarea);
+    textarea.select();
+    try {
+        document.execCommand('copy');
+        showAlert('Text copied to clipboard');
+    } catch (err) {
+        console.error('Failed to copy text', err);
+        showAlert('Failed to copy text');
+    }
+    document.body.removeChild(textarea);
+}
+
 
 function downloadTextFile() {
     const select = document.getElementById('textFileSelect');
