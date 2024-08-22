@@ -20,6 +20,7 @@
         <a href="#jp-info-section" onclick="toggleSection(event, '#jp-info-section')">JP Stock </a>
         <a href="#tw-info-section" onclick="toggleSection(event, '#tw-info-section')">TW Stock </a>
         <a href="#eu-info-section" onclick="toggleSection(event, '#eu-info-section')">EU Stock </a>
+        <a href="#kr-info-section" onclick="toggleSection(event, '#er-info-section')">KR Stock </a>
         <a href="#ai_box" onclick="toggleSection(event, '#ai_box')">AI Research</a>
         <a href="../index.html">Home</a>
     </div>
@@ -156,6 +157,36 @@
 <!--        </div>-->
     </div>
     <div id="section-container-EU" class="section-container">
+        <!-- Dynamic content loading -->
+    </div>
+</div>
+
+<!--/////////////////////////////////韓股/////////////////////////////////-->
+
+<div id="kr-info-section" class="info-section" style="display: none;">
+    <div class="info-input">
+        <input type="text" id="krStockSymbol" placeholder="Input KR Stock" pattern="[A-Z0-9]{1,6}">
+        <button id="krStockButton" onclick="fetchKRStock()">
+            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
+        </button>
+    </div>
+    <div id="suggestionsKR" class="suggestions-list"></div> <!-- 建議框容器 -->
+    <p id="outputSymbolKR" data-last-symbol="">Current query : </p>
+
+    <div id="companyProfileContainerKR"></div>
+    <div id="PriceContainerKR"></div> <!-- 新增的價格容器 -->
+    <div class="info-content">
+        <div class="info-column">
+            <a href="#" onclick="loadSectionKR('income-statement')">Income Statement</a>
+            <a href="#" onclick="loadSectionKR('balance-sheet')">Balance Sheet</a>
+            <a href="#" onclick="loadSectionKR('cashflow-statement')">Cash Flow Statement</a>
+        </div>
+        <div class="info-column">
+            <a href="#" onclick="loadSectionKR('earnings-call-transcript')">Earnings Call Transcript</a>
+            <a href="#" onclick="loadSectionKR('earnings-call-calendar')">Earnings Call Calendar</a>
+        </div>
+    </div>
+    <div id="section-container-KR" class="section-container">
         <!-- Dynamic content loading -->
     </div>
 </div>

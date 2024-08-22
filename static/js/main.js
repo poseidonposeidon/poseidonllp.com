@@ -476,6 +476,115 @@ function loadSectionEU(sectionId) {
     sectionContainerEU.innerHTML = sectionsEU[sectionId] || '<p>Section not found</p>';
 }
 
+function loadSectionKR(sectionId) {
+    const sectionsKR = {
+        'income-statement': `
+            <div class="section" id="income-statement-kr">
+                <h2>Income Statement</h2>
+                <div class="content scroll-container-x">
+                    <label for="periodKR">Select Period:</label>
+                    <select id="periodKR">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchKRIncomeStatement()">Load Statement</button>
+                    <div id="incomeStatementContainerKR"></div>
+                </div>
+            </div>`,
+        'balance-sheet': `
+            <div class="section" id="balance-sheet-kr">
+                <h2>Balance Sheet Statements</h2>
+                <div class="content scroll-container-x">
+                    <label for="period_2KR">Select Period:</label>
+                    <select id="period_2KR">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchKRBalanceSheet()">Load Statement</button>
+                    <div id="balanceSheetContainerKR"></div>
+                </div>
+            </div>`,
+        'cashflow-statement': `
+            <div class="section" id="cashflow-statement-kr">
+                <h2>Cashflow Statement</h2>
+                <div class="content scroll-container-x">
+                    <label for="period_3KR">Select Period:</label>
+                    <select id="period_3KR">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchKRCashflow()">Load Statement</button>
+                    <div class="scroll-container-x">
+                        <table id="cashflowTableKR" border="1">
+                            <div id="cashflowContainerKR"></div>
+                        </table>
+                    </div>
+                </div>
+            </div>`,
+        'earnings-call-transcript': `
+            <div class="section" id="earnings-call-transcript-kr">
+                <h2>Earnings Call Transcript</h2>
+                <div class="content">
+                    <input type="number" id="yearInputKR" placeholder="Enter Year">
+                    <input type="number" id="quarterInputKR" placeholder="Enter Quarter">
+                    <button onclick="fetchKREarningsCallTranscript()">Load Transcript</button>
+                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainerKR">
+                        <!-- Transcription content will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'earnings-call-calendar': `
+            <div class="section" id="earnings-call-calendar-kr">
+                <h2>Earnings Call Calendar</h2>
+                <div class="content">
+                    <input type="date" id="fromDateKR" placeholder="From Date">
+                    <input type="date" id="toDateKR" placeholder="To Date">
+                    <button onclick="fetchKREarningsCallCalendar()">Load Calendar</button>
+                    <div class="scroll-container">
+                        <div id="earningsCallCalendarContainerKR"></div>
+                    </div>
+                </div>
+            </div>`,
+        'historical-earnings': `
+            <div class="section" id="historical-earnings-kr">
+                <h2>Historical and Future Earnings</h2>
+                <div class="content">
+                    <input type="date" id="fromDate_1KR" placeholder="From Date">
+                    <input type="date" id="toDate_1KR" placeholder="To Date">
+                    <button onclick="fetchKRHistoricalEarnings()">Load Calendar</button>
+                    <div class="scroll-container" id="historicalEarningsContainerKR">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'dividend-calendar': `
+            <div class="section" id="dividend-calendar-kr">
+                <h2>Dividend Calendar</h2>
+                <div class="content">
+                    <input type="date" id="fromDate_2KR" placeholder="From Date">
+                    <input type="date" id="toDate_2KR" placeholder="To Date">
+                    <button onclick="fetchKRDividendCalendar()">Load Calendar</button>
+                    <div class="scroll-container" id="stockDividendCalendarContainerKR">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'insider-trades': `
+            <div class="section" id="insider-trades-kr">
+                <h2>Insider Trades</h2>
+                <div class="content">
+                    <button onclick="fetchKRInsiderTrades()">Load Table</button>
+                    <div class="scroll-container-x" id="insiderTradesContainerKR">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`
+    };
+
+    const sectionContainerKR = document.getElementById('section-container-KR');
+    sectionContainerKR.innerHTML = sectionsKR[sectionId] || '<p>Section not found</p>';
+}
+
 function loadAIBoxSection(sectionId) {
     const sections = {
         'audio-transcription': `
@@ -770,6 +879,56 @@ function fetchEUStock() {
     return stockSymbol;
 }
 
+function fetchKRStock() {
+    const stockSymbol = document.getElementById('krStockSymbol').value.trim().toUpperCase();
+    const previousSymbol = document.getElementById('outputSymbolKR').getAttribute('data-last-symbol');
+
+    if (stockSymbol !== previousSymbol) {
+        document.getElementById('outputSymbolKR').innerText = 'Current query: ' + stockSymbol;
+        document.getElementById('outputSymbolKR').setAttribute('data-last-symbol', stockSymbol);
+
+        // Clear previous company data
+        const companyProfileContainerKR = document.getElementById('companyProfileContainerKR');
+        if (companyProfileContainerKR) {
+            companyProfileContainerKR.innerHTML = '';
+        }
+
+        const priceContainerKR = document.getElementById('PriceContainerKR');
+        if (priceContainerKR) {
+            priceContainerKR.innerHTML = ''; // Clear previous price data
+        }
+
+        const containersKR = [
+            'incomeStatementContainerKR',
+            'balanceSheetContainerKR',
+            'cashflowContainerKR',
+            'earningsCallTranscriptContainerKR',
+            'earningsCallCalendarContainerKR',
+            'historicalEarningsContainerKR',
+            'stockDividendCalendarContainerKR',
+            'insiderTradesContainerKR'
+        ];
+
+        containersKR.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '';
+            }
+        });
+
+        const sectionsKR = document.querySelectorAll('.section');
+        sectionsKR.forEach(section => {
+            section.classList.remove('fixed');
+            collapseSection(section);
+        });
+
+        // Fetch and display company profile and price information
+        fetchKRCompanyProfile(stockSymbol);  // 获取并显示公司简介
+        fetchKRCompanyPrice(stockSymbol);    // 获取并显示股票价格信息
+    }
+
+    return stockSymbol;
+}
 
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('authToken');
@@ -814,8 +973,9 @@ function addEnterKeyListener(inputId, buttonSelector) {
             // 隐藏建议框
             clearSuggestions();
             clearSuggestionsEU();
-            clearSuggestionsJP()
-            clearSuggestionsTW()
+            clearSuggestionsJP();
+            clearSuggestionsTW();
+            clearSuggestionsKR();
         }
     });
 }
@@ -824,6 +984,7 @@ addEnterKeyListener("stockSymbol", "#usStockButton");
 addEnterKeyListener("jpStockSymbol", "#jpStockButton");
 addEnterKeyListener("twStockSymbol", "#twStockButton");
 addEnterKeyListener("euStockSymbol", "#euStockButton");
+addEnterKeyListener("krStockSymbol", "#krStockButton");
 //////////////////建議/////////////////
 //美股
 document.getElementById('stockSymbol').addEventListener('input', async function() {
@@ -1073,6 +1234,66 @@ function clearSuggestionsTW() {
     suggestionsContainerTW.classList.remove('active'); // 隐藏建议框
 }
 
+// 韓股
+document.getElementById('krStockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainerKR = document.getElementById('suggestionsKR');
+
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestionsKR(stockSymbol);
+        displaySuggestionsKR(stockData);
+        suggestionsContainerKR.classList.add('active'); // 显示建议框
+    } else {
+        clearSuggestionsKR(); // 清空并隐藏建议列表
+        suggestionsContainerKR.classList.remove('active');
+    }
+});
+
+async function fetchStockSuggestionsKR(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 过滤条件：只返回 currency 为 KRW 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'KRW');
+        return filteredData.map(stock => stock.symbol); // 仅返回股票符号
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
+function displaySuggestionsKR(suggestions) {
+    const suggestionsContainerKR = document.getElementById('suggestionsKR');
+    suggestionsContainerKR.innerHTML = ''; // 清空之前的建议列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol;
+            suggestionDiv.addEventListener('click', () => {
+                document.getElementById('krStockSymbol').value = symbol;
+                clearSuggestionsKR(); // 选择后清空并隐藏建议列表
+                suggestionsContainerKR.classList.remove('active');
+            });
+            suggestionsContainerKR.appendChild(suggestionDiv);
+        });
+        suggestionsContainerKR.classList.add('active'); // 显示建议框
+    } else {
+        suggestionsContainerKR.classList.remove('active'); // 如果没有建议，隐藏建议框
+    }
+}
+
+function clearSuggestionsKR() {
+    const suggestionsContainerKR = document.getElementById('suggestionsKR');
+    suggestionsContainerKR.innerHTML = '';
+    suggestionsContainerKR.classList.remove('active'); // 隐藏建议框
+}
+
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
@@ -1280,6 +1501,20 @@ function fetchEUIncomeStatement() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period);
+}
+
+function fetchKRIncomeStatement() {
+    const stockSymbol = document.getElementById('krStockSymbol').value.trim().toUpperCase();
+    const period = document.getElementById('periodKR').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period);
 }
 
 function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period) {
@@ -1742,6 +1977,20 @@ function fetchEUBalanceSheet() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerEU', 'balanceSheetChartEU');
+}
+
+function fetchKRBalanceSheet() {
+    const stockSymbol = fetchKRStock();
+    const period = document.getElementById('period_2KR').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerKR', 'balanceSheetChartKR');
 }
 
 function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId) {
@@ -2403,6 +2652,22 @@ function fetchEUEarningsCallTranscript() {
     fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerEU');
 }
 
+function fetchKREarningsCallTranscript() {
+    const stockSymbol = fetchKRStock();
+    const year = document.getElementById('yearInputKR').value;
+    const quarter = document.getElementById('quarterInputKR').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+
+    if (stockSymbol.length === 0 || year.length === 0 || quarter.length === 0) {
+        alert('請輸入股票代碼、年份及季度。');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_call_transcript/${stockSymbol}?year=${year}&quarter=${quarter}&apikey=${apiKey}`;
+    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerKR');
+}
+
+
 function splitTranscriptIntoParagraphs(content) {
     // 使用正則表達式檢測常見的講者名稱或段落開頭
     const regex = /(Operator:|[A-Z][a-z]+ [A-Z][a-z]+:)/g;
@@ -2526,6 +2791,22 @@ function fetchEUEarningsCallCalendar() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
     fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainerEU', stockSymbol), 'earningsCallCalendarContainerEU');
 }
+
+function fetchKREarningsCallCalendar() {
+    const fromDate = document.getElementById('fromDateKR').value;
+    const toDate = document.getElementById('toDateKR').value;
+    const stockSymbol = fetchKRStock();
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
+
+    if (!fromDate || !toDate) {
+        alert('請輸入開始和結束日期。');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
+    fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainerKR', stockSymbol), 'earningsCallCalendarContainerKR');
+}
+
 
 function displayEarningsCallCalendar(data, containerId, stockSymbol) {
     const container = document.getElementById(containerId);
