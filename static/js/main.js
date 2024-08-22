@@ -1464,9 +1464,9 @@ document.getElementById('hkStockSymbol').addEventListener('input', async functio
     if (stockSymbol.length > 0) {
         const stockData = await fetchStockSuggestionsHK(stockSymbol);
         displaySuggestionsHK(stockData);
-        suggestionsContainerHK.classList.add('active'); // 显示建议框
+        suggestionsContainerHK.classList.add('active'); // 顯示建議框
     } else {
-        clearSuggestionsHK(); // 清空并隐藏建议列表
+        clearSuggestionsHK(); // 清空並隱藏建議列表
         suggestionsContainerHK.classList.remove('active');
     }
 });
@@ -1480,9 +1480,9 @@ async function fetchStockSuggestionsHK(stockSymbol) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        // 过滤条件：只返回 currency 为 HKD 的股票符号
+        // 過濾條件：只返回 currency 為 HKD 的股票符號
         const filteredData = data.filter(stock => stock.currency === 'HKD');
-        return filteredData.map(stock => stock.symbol); // 仅返回股票符号
+        return filteredData.map(stock => stock.symbol); // 僅返回股票符號
     } catch (error) {
         console.error('Error fetching stock data:', error);
         return [];
@@ -1491,30 +1491,32 @@ async function fetchStockSuggestionsHK(stockSymbol) {
 
 function displaySuggestionsHK(suggestions) {
     const suggestionsContainerHK = document.getElementById('suggestionsHK');
-    suggestionsContainerHK.innerHTML = ''; // 清空之前的建议列表
+    suggestionsContainerHK.innerHTML = ''; // 清空之前的建議列表
 
     if (suggestions.length > 0) {
         suggestions.forEach(symbol => {
+            const cleanSymbol = symbol.replace('.HK', ''); // 移除顯示中的 ".HK"
             const suggestionDiv = document.createElement('div');
-            suggestionDiv.textContent = symbol;
+            suggestionDiv.textContent = cleanSymbol;
             suggestionDiv.addEventListener('click', () => {
-                document.getElementById('hkStockSymbol').value = symbol;
-                clearSuggestionsHK(); // 选择后清空并隐藏建议列表
+                document.getElementById('hkStockSymbol').value = cleanSymbol; // 移除輸入框中的 ".HK"
+                clearSuggestionsHK(); // 選擇後清空並隱藏建議列表
                 suggestionsContainerHK.classList.remove('active');
             });
             suggestionsContainerHK.appendChild(suggestionDiv);
         });
-        suggestionsContainerHK.classList.add('active'); // 显示建议框
+        suggestionsContainerHK.classList.add('active'); // 顯示建議框
     } else {
-        suggestionsContainerHK.classList.remove('active'); // 如果没有建议，隐藏建议框
+        suggestionsContainerHK.classList.remove('active'); // 如果沒有建議，隱藏建議框
     }
 }
 
 function clearSuggestionsHK() {
     const suggestionsContainerHK = document.getElementById('suggestionsHK');
     suggestionsContainerHK.innerHTML = '';
-    suggestionsContainerHK.classList.remove('active'); // 隐藏建议框
+    suggestionsContainerHK.classList.remove('active'); // 隱藏建議框
 }
+
 
 
 
