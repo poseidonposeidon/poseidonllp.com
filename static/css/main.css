@@ -527,3 +527,9 @@ button:not(.info-input button):hover {
 .suggestions-list div:hover {
     background-color: #333;
 }
+
+#buttonContainer {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}

@@ -694,9 +694,11 @@ function loadAIBoxSection(sectionId) {
                     <div class="scroll-container" id="transcriptionResult">
                         <!-- Transcription results will be displayed here -->
                     </div>
-                    <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
-                    <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">Read More</button>
-                    <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
+                    <div id="buttonContainer" style="display: flex; gap: 10px; margin-top: 10px;">
+                        <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
+                        <button id="readMoreBtn" onclick="toggleReadMore()">Read More</button>
+                        <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
+                    </div>
                     <div id="alert-box" style="display: none;" class="alert">
                         <span id="alert-message"></span>
                         <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
@@ -4089,6 +4091,7 @@ function displayTranscription(data) {
     showAlert('Transcription completed');
 }
 
+
 function toggleReadMore() {
     const container = document.getElementById('transcriptionResult');
     const readMoreBtn = document.getElementById('readMoreBtn');
@@ -4104,6 +4107,7 @@ function toggleReadMore() {
         readLessBtn.classList.remove('hidden');
     }
 }
+
 
 function copyToClipboard(text) {
     const textarea = document.createElement('textarea');
