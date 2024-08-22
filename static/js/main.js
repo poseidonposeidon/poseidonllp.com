@@ -1173,7 +1173,7 @@ function fetchHKStock() {
 }
 
 function fetchCNStock() {
-    const stockSymbol = document.getElementById('cnStockSymbol').value.trim() + ".CN";
+    const stockSymbol = document.getElementById('cnStockSymbol').value.trim();
     const previousSymbol = document.getElementById('outputSymbolCN').getAttribute('data-last-symbol');
 
     if (stockSymbol !== previousSymbol) {
