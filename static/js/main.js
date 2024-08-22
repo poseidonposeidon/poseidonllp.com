@@ -3939,6 +3939,10 @@ function uploadToFTP() {
 function transcribeFromFTP() {
     const select = document.getElementById('ftpFileSelect');
     const encodedFilename = select.value;
+
+    const buttonContainer = document.getElementById('buttonContainer');
+    buttonContainer.style.display = 'none';
+    
     currentOriginalFileName = originalFileNames[encodedFilename];
 
     if (!encodedFilename) {
