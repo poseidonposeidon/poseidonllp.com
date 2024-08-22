@@ -1770,7 +1770,7 @@ async function fetchTWIncomeStatement() {
 }
 
 function fetchEUIncomeStatement() {
-    const stockSymbol = document.getElementById('euStockSymbol').value.trim().toUpperCase();
+    const stockSymbol = fetchEUStock();
     const period = document.getElementById('periodEU').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
@@ -1784,7 +1784,7 @@ function fetchEUIncomeStatement() {
 }
 
 function fetchKRIncomeStatement() {
-    const stockSymbol = document.getElementById('krStockSymbol').value.trim().toUpperCase();
+    const stockSymbol = fetchKRStock();
     const period = document.getElementById('periodKR').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
@@ -1798,7 +1798,7 @@ function fetchKRIncomeStatement() {
 }
 
 function fetchHKIncomeStatement() {
-    const stockSymbol = document.getElementById('hkStockSymbol').value.trim().toUpperCase();
+    const stockSymbol = fetchHKStock();
     const period = document.getElementById('periodHK').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
