@@ -4068,18 +4068,22 @@ function displayTranscription(data) {
 
         const buttonContainer = document.createElement('div');
         buttonContainer.style.display = 'flex';
-        buttonContainer.style.gap = '10px'; // 讓按鈕之間保持一定距離
+        buttonContainer.style.gap = '10px'; // 按鈕之間的距離
+        buttonContainer.style.alignItems = 'center'; // 垂直方向上居中對齊
 
+        // Create the Copy button
         const copyBtn = document.createElement('button');
         copyBtn.innerText = 'Copy';
         copyBtn.onclick = function() {
             copyToClipboard(data.text);
         };
 
+        // Append the buttons to the container
         buttonContainer.appendChild(copyBtn);
         buttonContainer.appendChild(readMoreBtn);
         buttonContainer.appendChild(readLessBtn);
 
+        // Append the button container to the transcription result container
         container.appendChild(buttonContainer);
 
         if (container.scrollHeight > container.clientHeight) {
@@ -4098,11 +4102,11 @@ function displayTranscription(data) {
     showAlert('Transcription completed');
 }
 
+
 function toggleReadMore() {
     const container = document.getElementById('transcriptionResult');
     const readMoreBtn = document.getElementById('readMoreBtn');
     const readLessBtn = document.getElementById('readLessBtn');
-    const copyBtn = document.querySelector('button[text="Copy"]'); // 確保 Copy 按鈕存在
 
     if (readMoreBtn.classList.contains('hidden')) {
         container.style.maxHeight = '200px';
@@ -4114,6 +4118,7 @@ function toggleReadMore() {
         readLessBtn.classList.remove('hidden');
     }
 }
+
 
 function copyToClipboard(text) {
     const textarea = document.createElement('textarea');
