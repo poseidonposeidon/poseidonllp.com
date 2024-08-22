@@ -4095,7 +4095,6 @@ function displayTranscription(data) {
     showAlert('Transcription completed');
 }
 
-
 function toggleReadMore() {
     const container = document.getElementById('transcriptionResult');
     const readMoreBtn = document.getElementById('readMoreBtn');

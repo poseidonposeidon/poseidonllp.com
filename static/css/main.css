@@ -532,4 +532,5 @@ button:not(.info-input button):hover {
     display: flex;
     gap: 10px;
     align-items: center;
+    display: none; /* 初始状态下隐藏 */
 }
