@@ -4066,13 +4066,21 @@ function displayTranscription(data) {
         const transcriptionText = data.text.replace(/\n/g, '<br>');
         container.innerHTML = `<p>${transcriptionText}</p>`;
 
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.display = 'flex';
+        buttonContainer.style.gap = '10px'; // 讓按鈕之間保持一定距離
+
         const copyBtn = document.createElement('button');
         copyBtn.innerText = 'Copy';
         copyBtn.onclick = function() {
             copyToClipboard(data.text);
         };
 
-        container.appendChild(copyBtn);
+        buttonContainer.appendChild(copyBtn);
+        buttonContainer.appendChild(readMoreBtn);
+        buttonContainer.appendChild(readLessBtn);
+
+        container.appendChild(buttonContainer);
 
         if (container.scrollHeight > container.clientHeight) {
             readMoreBtn.classList.remove('hidden');
@@ -4090,11 +4098,12 @@ function displayTranscription(data) {
     showAlert('Transcription completed');
 }
 
-
 function toggleReadMore() {
     const container = document.getElementById('transcriptionResult');
     const readMoreBtn = document.getElementById('readMoreBtn');
     const readLessBtn = document.getElementById('readLessBtn');
+    const copyBtn = document.querySelector('button[text="Copy"]'); // 確保 Copy 按鈕存在
+
     if (readMoreBtn.classList.contains('hidden')) {
         container.style.maxHeight = '200px';
         readMoreBtn.classList.remove('hidden');
