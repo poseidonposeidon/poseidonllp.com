@@ -694,7 +694,7 @@ function loadAIBoxSection(sectionId) {
                     <div class="scroll-container" id="transcriptionResult">
                         <!-- Transcription results will be displayed here -->
                     </div>
-                    <div id="buttonContainer" style="display: flex; gap: 10px; margin-top: 10px;">
+                    <<div id="buttonContainer" style="display: none; gap: 10px; margin-top: 10px;">
                         <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
                         <button id="readMoreBtn" onclick="toggleReadMore()">Read More</button>
                         <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
@@ -4060,6 +4060,7 @@ function clearPreviousResult() {
 
 function displayTranscription(data) {
     const container = document.getElementById('transcriptionResult');
+    const buttonContainer = document.getElementById('buttonContainer');
     const readMoreBtn = document.getElementById('readMoreBtn');
     const readLessBtn = document.getElementById('readLessBtn');
     const copyBtn = document.getElementById('copyBtn');
@@ -4074,23 +4075,26 @@ function displayTranscription(data) {
             copyToClipboard(data.text);
         };
 
+        // 显示按钮容器
+        buttonContainer.style.display = 'flex';
+
         // 检查文本高度以确定是否需要显示 "Read More" 或 "Read Less" 按钮
         if (container.scrollHeight > 200) {
             readMoreBtn.classList.remove('hidden');
             readLessBtn.classList.add('hidden');
         } else {
             readMoreBtn.classList.add('hidden');
-            readLessBtn.classList.add('hidden');  // 两个按钮都隐藏
+            readLessBtn.classList.add('hidden');
         }
     } else {
         container.innerHTML = '<p>No transcription content</p>';
-        readMoreBtn.classList.add('hidden');
-        readLessBtn.classList.add('hidden');
+        buttonContainer.style.display = 'none';  // 没有文本时隐藏按钮
     }
 
     document.getElementById('transcription-progress-container').style.display = 'none';
     showAlert('Transcription completed');
 }
+
 
 function toggleReadMore() {
     const container = document.getElementById('transcriptionResult');
