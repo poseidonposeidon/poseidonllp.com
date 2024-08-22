@@ -22,6 +22,7 @@
         <a href="#eu-info-section" onclick="toggleSection(event, '#eu-info-section')">EU Stock </a>
         <a href="#kr-info-section" onclick="toggleSection(event, '#kr-info-section')">KR Stock </a>
         <a href="#hk-info-section" onclick="toggleSection(event, '#hk-info-section')">HK Stock </a>
+        <a href="#cn-info-section" onclick="toggleSection(event, '#cn-info-section')">CN Stock </a>
         <a href="#ai_box" onclick="toggleSection(event, '#ai_box')">AI Research</a>
         <a href="../index.html">Home</a>
     </div>
@@ -222,7 +223,35 @@
     </div>
 </div>
 
+<!--/////////////////////////////////中國股票/////////////////////////////////-->
 
+<div id="cn-info-section" class="info-section" style="display: none;">
+    <div class="info-input">
+        <input type="text" id="cnStockSymbol" placeholder="Input CN Stock" pattern="^(60[0-9]{4}|(00|30)[0-9]{4}|002[0-9]{3})$" title="请输入有效的上海或深圳交易所股票代码">
+        <button id="cnStockButton" onclick="fetchCNStock()">
+            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
+        </button>
+    </div>
+    <div id="suggestionsCN" class="suggestions-list"></div> <!-- 建議框容器 -->
+    <p id="outputSymbolCN" data-last-symbol="">Current query : </p>
+
+    <div id="companyProfileContainerCN"></div>
+    <div id="PriceContainerCN"></div> <!-- 新增的價格容器 -->
+    <div class="info-content">
+        <div class="info-column">
+            <a href="#" onclick="loadSectionCN('income-statement')">Income Statement</a>
+            <a href="#" onclick="loadSectionCN('balance-sheet')">Balance Sheet</a>
+            <a href="#" onclick="loadSectionCN('cashflow-statement')">Cash Flow Statement</a>
+        </div>
+        <div class="info-column">
+            <a href="#" onclick="loadSectionCN('earnings-call-transcript')">Earnings Call Transcript</a>
+            <a href="#" onclick="loadSectionCN('earnings-call-calendar')">Earnings Call Calendar</a>
+        </div>
+    </div>
+    <div id="section-container-CN" class="section-container">
+        <!-- Dynamic content loading -->
+    </div>
+</div>
 
 
 <!--/////////////////////////////////AI 資訊/////////////////////////////////-->

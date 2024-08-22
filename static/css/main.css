@@ -195,7 +195,8 @@ button:not(.info-input button):hover {
 #outputSymbolTW ,
 #outputSymbolEU,
 #outputSymbolKR,
-#outputSymbolHK{
+#outputSymbolHK,
+#outputSymbolCN{
     text-align: center;
     margin: 10px 0;
 }
@@ -206,12 +207,14 @@ button:not(.info-input button):hover {
 #companyProfileContainerEU,
 #companyProfileContainerKR,
 #companyProfileContainerHK,
+#companyProfileContainerCN,
 #PriceContainer,
 #PriceContainerJP,
 #PriceContainerTW,
 #PriceContainerEU,
 #PriceContainerKR,
-#PriceContainerHK{
+#PriceContainerHK,
+#PriceContainerCN{
     text-align: center;
     margin: 10px auto;
     padding: 20px;
@@ -261,7 +264,8 @@ button:not(.info-input button):hover {
 #companyProfileContainerTW a,
 #companyProfileContainerEU a,
 #companyProfileContainerKR a,
-#companyProfileContainerHK a{
+#companyProfileContainerHK a,
+#companyProfileContainerCN a{
     color: #90caf9;
     transition: all 0.3s ease;
 }
@@ -272,7 +276,8 @@ button:not(.info-input button):hover {
 #companyProfileContainerTW a:hover,
 #companyProfileContainerEU a:hover,
 #companyProfileContainerKR a:hover,
-#companyProfileContainerHK a:hover{
+#companyProfileContainerHK a:hover,
+#companyProfileContainerCN a:hover{
     color: #ffffff;
 }
 
@@ -464,8 +469,6 @@ button:not(.info-input button):hover {
     transform: scale(1.1);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-
-
 
 .body-container {
     background-color: #121212;

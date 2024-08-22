@@ -83,7 +83,7 @@ function hideSection(section) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box,#jp-info-section,#tw-info-section,#eu-info-section,#kr-info-section,#hk-info-section').forEach(section => {
+    document.querySelectorAll('#info-section, #ai_box,#jp-info-section,#tw-info-section,#eu-info-section,#kr-info-section,#hk-info-section,#cn-info-section').forEach(section => {
         section.style.display = 'none';
     });
 });
@@ -662,6 +662,111 @@ function loadSectionHK(sectionId) {
     sectionContainerHK.innerHTML = sectionsHK[sectionId] || '<p>Section not found</p>';
 }
 
+function loadSectionCN(sectionId) {
+    const sectionsCN = {
+        'income-statement': `
+            <div class="section" id="income-statement-cn">
+                <h2>Income Statement</h2>
+                <div class="content scroll-container-x">
+                    <label for="periodCN">Select Period:</label>
+                    <select id="periodCN">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchCNIncomeStatement()">Load Statement</button>
+                    <div id="incomeStatementContainerCN"></div>
+                </div>
+            </div>`,
+        'balance-sheet': `
+            <div class="section" id="balance-sheet-cn">
+                <h2>Balance Sheet Statements</h2>
+                <div class="content scroll-container-x">
+                    <label for="period_2CN">Select Period:</label>
+                    <select id="period_2CN">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchCNBalanceSheet()">Load Statement</button>
+                    <div id="balanceSheetContainerCN"></div>
+                </div>
+            </div>`,
+        'cashflow-statement': `
+            <div class="section" id="cashflow-statement-cn">
+                <h2>Cashflow Statement</h2>
+                <div class="content scroll-container-x">
+                    <label for="period_3CN">Select Period:</label>
+                    <select id="period_3CN">
+                        <option value="annual">Annual</option>
+                        <option value="quarter">Quarter</option>
+                    </select>
+                    <button onclick="fetchCNCashflow()">Load Statement</button>
+                    <div id="cashflowContainerCN"></div>
+                </div>
+            </div>`,
+        'earnings-call-transcript': `
+            <div class="section" id="earnings-call-transcript-cn">
+                <h2>Earnings Call Transcript</h2>
+                <div class="content">
+                    <input type="number" id="yearInputCN" placeholder="Enter Year">
+                    <input type="number" id="quarterInputCN" placeholder="Enter Quarter">
+                    <button onclick="fetchCNEarningsCallTranscript()">Load Transcript</button>
+                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainerCN">
+                        <!-- Transcription content will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'earnings-call-calendar': `
+            <div class="section" id="earnings-call-calendar-cn">
+                <h2>Earnings Call Calendar</h2>
+                <div class="content">
+                    <input type="date" id="fromDateCN" placeholder="From Date">
+                    <input type="date" id="toDateCN" placeholder="To Date">
+                    <button onclick="fetchCNEarningsCallCalendar()">Load Calendar</button>
+                    <div class="scroll-container">
+                        <div id="earningsCallCalendarContainerCN"></div>
+                    </div>
+                </div>
+            </div>`,
+        'historical-earnings': `
+            <div class="section" id="historical-earnings-cn">
+                <h2>Historical and Future Earnings</h2>
+                <div class="content">
+                    <input type="date" id="fromDate_1CN" placeholder="From Date">
+                    <input type="date" id="toDate_1CN" placeholder="To Date">
+                    <button onclick="fetchCNHistoricalEarnings()">Load Calendar</button>
+                    <div class="scroll-container" id="historicalEarningsContainerCN">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'dividend-calendar': `
+            <div class="section" id="dividend-calendar-cn">
+                <h2>Dividend Calendar</h2>
+                <div class="content">
+                    <input type="date" id="fromDate_2CN" placeholder="From Date">
+                    <input type="date" id="toDate_2CN" placeholder="To Date">
+                    <button onclick="fetchCNDividendCalendar()">Load Calendar</button>
+                    <div class="scroll-container" id="stockDividendCalendarContainerCN">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'insider-trades': `
+            <div class="section" id="insider-trades-cn">
+                <h2>Insider Trades</h2>
+                <div class="content">
+                    <button onclick="fetchCNInsiderTrades()">Load Table</button>
+                    <div class="scroll-container-x" id="insiderTradesContainerCN">
+                        <!-- Data table will be displayed here -->
+                    </div>
+                </div>
+            </div>`
+    };
+
+    const sectionContainerCN = document.getElementById('section-container-CN');
+    sectionContainerCN.innerHTML = sectionsCN[sectionId] || '<p>Section not found</p>';
+}
+
 function loadAIBoxSection(sectionId) {
     const sections = {
         'audio-transcription': `
@@ -1067,6 +1172,58 @@ function fetchHKStock() {
     return stockSymbol;
 }
 
+function fetchCNStock() {
+    const stockSymbol = document.getElementById('cnStockSymbol').value.trim() + ".CN";
+    const previousSymbol = document.getElementById('outputSymbolCN').getAttribute('data-last-symbol');
+
+    if (stockSymbol !== previousSymbol) {
+        document.getElementById('outputSymbolCN').innerText = 'Current query: ' + stockSymbol;
+        document.getElementById('outputSymbolCN').setAttribute('data-last-symbol', stockSymbol);
+
+        // 清除之前的公司数据
+        const companyProfileContainerCN = document.getElementById('companyProfileContainerCN');
+        if (companyProfileContainerCN) {
+            companyProfileContainerCN.innerHTML = '';
+        }
+
+        const priceContainerCN = document.getElementById('PriceContainerCN');
+        if (priceContainerCN) {
+            priceContainerCN.innerHTML = ''; // 清除之前的价格数据
+        }
+
+        const containersCN = [
+            'incomeStatementContainerCN',
+            'balanceSheetContainerCN',
+            'cashflowContainerCN',
+            'earningsCallTranscriptContainerCN',
+            'earningsCallCalendarContainerCN',
+            'historicalEarningsContainerCN',
+            'stockDividendCalendarContainerCN',
+            'insiderTradesContainerCN'
+        ];
+
+        containersCN.forEach(containerId => {
+            const container = document.getElementById(containerId);
+            if (container) {
+                container.innerHTML = '';
+            }
+        });
+
+        const sectionsCN = document.querySelectorAll('.section');
+        sectionsCN.forEach(section => {
+            section.classList.remove('fixed');
+            collapseSection(section);
+        });
+
+        // 获取并显示公司简介和价格信息
+        fetchCNCompanyProfile(stockSymbol);  // 获取并显示公司简介
+        fetchCNCompanyPrice(stockSymbol);    // 获取并显示股票价格信息
+        clearSuggestionsCN();
+    }
+
+    return stockSymbol;
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const token = localStorage.getItem('authToken');
     if (!token) {
@@ -1123,6 +1280,7 @@ addEnterKeyListener("twStockSymbol", "#twStockButton");
 addEnterKeyListener("euStockSymbol", "#euStockButton");
 addEnterKeyListener("krStockSymbol", "#krStockButton");
 addEnterKeyListener("hkStockSymbol", "#hkStockButton");
+addEnterKeyListener("cnStockSymbol", "#cnStockButton");
 
 //////////////////建議/////////////////
 //美股
@@ -1217,7 +1375,6 @@ async function fetchStockSuggestionsEU(stockSymbol) {
         return [];
     }
 }
-
 
 function displaySuggestionsEU(suggestions) {
     const suggestionsContainerEU = document.getElementById('suggestionsEU');
@@ -1494,7 +1651,65 @@ function clearSuggestionsHK() {
     suggestionsContainerHK.classList.remove('active'); // 隱藏建議框
 }
 
+// 中國股
+document.getElementById('cnStockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainerCN = document.getElementById('suggestionsCN');
 
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestionsCN(stockSymbol);
+        displaySuggestionsCN(stockData);
+        suggestionsContainerCN.classList.add('active'); // 显示建议框
+    } else {
+        clearSuggestionsCN(); // 清空并隐藏建议列表
+        suggestionsContainerCN.classList.remove('active');
+    }
+});
+
+async function fetchStockSuggestionsCN(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 过滤条件：只返回 currency 为 CNY 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'CNY');
+        return filteredData.map(stock => stock.symbol); // 仅返回股票符号
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
+function displaySuggestionsCN(suggestions) {
+    const suggestionsContainerCN = document.getElementById('suggestionsCN');
+    suggestionsContainerCN.innerHTML = ''; // 清空之前的建议列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol;
+            suggestionDiv.addEventListener('click', () => {
+                document.getElementById('cnStockSymbol').value = symbol;
+                clearSuggestionsCN(); // 选择后清空并隐藏建议列表
+                suggestionsContainerCN.classList.remove('active');
+            });
+            suggestionsContainerCN.appendChild(suggestionDiv);
+        });
+        suggestionsContainerCN.classList.add('active'); // 显示建议框
+    } else {
+        suggestionsContainerCN.classList.remove('active'); // 如果没有建议，隐藏建议框
+    }
+}
+
+function clearSuggestionsCN() {
+    const suggestionsContainerCN = document.getElementById('suggestionsCN');
+    suggestionsContainerCN.innerHTML = '';
+    suggestionsContainerCN.classList.remove('active'); // 隐藏建议框
+}
 
 
 //////////////////////////////Profile//////////////////////////////////////////////
@@ -1558,6 +1773,17 @@ function fetchHKCompanyProfile(stockSymbol) {
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerHK')))
         .catch(error => console.error('Error fetching data:', error));
 }
+
+function fetchCNCompanyProfile(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerCN')))
+        .catch(error => console.error('Error fetching data:', error));
+}
+
 
 function displayCompanyProfile(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
@@ -1677,6 +1903,22 @@ function fetchHKCompanyPrice(stockSymbol) {
         .catch(error => console.error('Error fetching data:', error));
 }
 
+function fetchCNCompanyPrice(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const priceContainerCN = document.getElementById('PriceContainerCN');
+            if (data && data.length > 0) {
+                displayCompanyPrice(data[0], priceContainerCN);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
+            } else {
+                priceContainerCN.innerHTML = '<p>No data found.</p>';
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
 
 function displayCompanyPrice(data, container) {
     if (!data || typeof data !== 'object') {
@@ -1786,6 +2028,20 @@ function fetchHKIncomeStatement() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period);
+}
+
+function fetchCNIncomeStatement() {
+    const stockSymbol = fetchCNStock();  // 获取中国股票代码
+    const period = document.getElementById('periodCN').value;  // 获取选定的期间（年度或季度）
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period);
 }
 
 function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period) {
@@ -2278,6 +2534,20 @@ function fetchHKBalanceSheet() {
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerHK', 'balanceSheetChartHK');
 }
 
+function fetchCNBalanceSheet() {
+    const stockSymbol = fetchCNStock();  // 获取中国股票代码
+    const period = document.getElementById('period_2CN').value;  // 获取选定的期间（年度或季度）
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerCN', 'balanceSheetChartCN');
+}
+
 function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
@@ -2640,7 +2910,6 @@ function fetchKRCashflow() {
     fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerKR', 'cashflowChartKR'));
 }
 
-
 function fetchHKCashflow() {
     const stockSymbol = fetchHKStock();
     const period = document.getElementById('period_3HK').value;
@@ -2653,6 +2922,20 @@ function fetchHKCashflow() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerHK', 'cashflowChartHK'));
+}
+
+function fetchCNCashflow() {
+    const stockSymbol = fetchCNStock();  // 获取中国股票代码
+    const period = document.getElementById('period_3CN').value;  // 获取选定的期间（年度或季度）
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerCN', 'cashflowChartCN'));
 }
 
 function fetchData_Cashflow(apiUrl, callback) {
@@ -2996,6 +3279,21 @@ function fetchHKEarningsCallTranscript() {
     fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerHK');
 }
 
+function fetchCNEarningsCallTranscript() {
+    const stockSymbol = fetchCNStock();  // 获取中国股票代码
+    const year = document.getElementById('yearInputCN').value;  // 获取用户输入的年份
+    const quarter = document.getElementById('quarterInputCN').value;  // 获取用户输入的季度
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的实际 API 密钥
+
+    if (stockSymbol.length === 0 || year.length === 0 || quarter.length === 0) {
+        alert('请输入股票代码、年份及季度。');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_call_transcript/${stockSymbol}?year=${year}&quarter=${quarter}&apikey=${apiKey}`;
+    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerCN');
+}
+
 function splitTranscriptIntoParagraphs(content) {
     // 使用正則表達式檢測常見的講者名稱或段落開頭
     const regex = /(Operator:|[A-Z][a-z]+ [A-Z][a-z]+:)/g;
@@ -3149,6 +3447,22 @@ function fetchHKEarningsCallCalendar() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
     fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainerHK', stockSymbol), 'earningsCallCalendarContainerHK');
 }
+
+function fetchCNEarningsCallCalendar() {
+    const fromDate = document.getElementById('fromDateCN').value;
+    const toDate = document.getElementById('toDateCN').value;
+    const stockSymbol = fetchCNStock();  // 获取中国股票代码
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的实际 API 密钥
+
+    if (!fromDate || !toDate) {
+        alert('请输入开始和结束日期。');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
+    fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainerCN', stockSymbol), 'earningsCallCalendarContainerCN');
+}
+
 
 function displayEarningsCallCalendar(data, containerId, stockSymbol) {
     const container = document.getElementById(containerId);
@@ -3942,7 +4256,7 @@ function transcribeFromFTP() {
 
     const buttonContainer = document.getElementById('buttonContainer');
     buttonContainer.style.display = 'none';
-    
+
     currentOriginalFileName = originalFileNames[encodedFilename];
 
     if (!encodedFilename) {
