@@ -694,6 +694,7 @@ function loadAIBoxSection(sectionId) {
                     <div class="scroll-container" id="transcriptionResult">
                         <!-- Transcription results will be displayed here -->
                     </div>
+                    <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
                     <button id="readMoreBtn" class="hidden" onclick="toggleReadMore()">Read More</button>
                     <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
                     <div id="alert-box" style="display: none;" class="alert">
@@ -4059,6 +4060,7 @@ function displayTranscription(data) {
     const container = document.getElementById('transcriptionResult');
     const readMoreBtn = document.getElementById('readMoreBtn');
     const readLessBtn = document.getElementById('readLessBtn');
+    const copyBtn = document.getElementById('copyBtn');
 
     container.innerHTML = '';
 
@@ -4066,32 +4068,17 @@ function displayTranscription(data) {
         const transcriptionText = data.text.replace(/\n/g, '<br>');
         container.innerHTML = `<p>${transcriptionText}</p>`;
 
-        const buttonContainer = document.createElement('div');
-        buttonContainer.style.display = 'flex';
-        buttonContainer.style.gap = '10px'; // 按鈕之間的距離
-        buttonContainer.style.alignItems = 'center'; // 垂直方向上居中對齊
-
-        // Create the Copy button
-        const copyBtn = document.createElement('button');
-        copyBtn.innerText = 'Copy';
         copyBtn.onclick = function() {
             copyToClipboard(data.text);
         };
 
-        // Append the buttons to the container
-        buttonContainer.appendChild(copyBtn);
-        buttonContainer.appendChild(readMoreBtn);
-        buttonContainer.appendChild(readLessBtn);
-
-        // Append the button container to the transcription result container
-        container.appendChild(buttonContainer);
-
         if (container.scrollHeight > container.clientHeight) {
             readMoreBtn.classList.remove('hidden');
+            readLessBtn.classList.add('hidden');
         } else {
             readMoreBtn.classList.add('hidden');
+            readLessBtn.classList.add('hidden');
         }
-        readLessBtn.classList.add('hidden');
     } else {
         container.innerHTML = '<p>No transcription content</p>';
         readMoreBtn.classList.add('hidden');
@@ -4101,7 +4088,6 @@ function displayTranscription(data) {
     document.getElementById('transcription-progress-container').style.display = 'none';
     showAlert('Transcription completed');
 }
-
 
 function toggleReadMore() {
     const container = document.getElementById('transcriptionResult');
@@ -4119,7 +4105,6 @@ function toggleReadMore() {
     }
 }
 
-
 function copyToClipboard(text) {
     const textarea = document.createElement('textarea');
     textarea.value = text;
@@ -4134,7 +4119,6 @@ function copyToClipboard(text) {
     }
     document.body.removeChild(textarea);
 }
-
 
 function downloadTextFile() {
     const select = document.getElementById('textFileSelect');
