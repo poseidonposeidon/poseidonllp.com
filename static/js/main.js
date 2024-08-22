@@ -233,11 +233,7 @@ function loadSectionJP(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchJPCashflow()">Load Statement</button>
-                    <div class="scroll-container-x">
-                        <table id="cashflowTableJP" border="1">
-                            <div id="cashflowContainerJP"></div>
-                        </table>
-                    </div>
+                    <div id="cashflowContainerJP"></div>
                 </div>
             </div>`,
         'earnings-call-transcript': `
@@ -316,11 +312,7 @@ function loadSectionTW(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchTWIncomeStatement()">Load Statement</button>
-                    <div class="scroll-container-x">
-                        <table id="IncomeStatementTableTW" border="1">
-                            <div id="incomeStatementContainerTW"></div>
-                        </table>
-                    </div>
+                    <div id="incomeStatementContainerTW"></div>
                 </div>
             </div>`,
         'balance-sheet': `
@@ -346,11 +338,7 @@ function loadSectionTW(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchTWCashflow()">Load Statement</button>
-                    <div class="scroll-container-x">
-                        <table id="cashflowTableTW" border="1">
-                            <div id="cashflowContainerTW"></div>
-                        </table>
-                    </div>
+                    <div id="cashflowContainerTW"></div>
                 </div>
             </div>`
     };
@@ -397,11 +385,7 @@ function loadSectionEU(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchEUCashflow()">Load Statement</button>
-                    <div class="scroll-container-x">
-                        <table id="cashflowTableEU" border="1">
-                            <div id="cashflowContainerEU"></div>
-                        </table>
-                    </div>
+                    <div id="cashflowContainerEU"></div>
                 </div>
             </div>`,
         'earnings-call-transcript': `
@@ -506,11 +490,7 @@ function loadSectionKR(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchKRCashflow()">Load Statement</button>
-                    <div class="scroll-container-x">
-                        <table id="cashflowTableKR" border="1">
-                            <div id="cashflowContainerKR"></div>
-                        </table>
-                    </div>
+                    <div id="cashflowContainerKR"></div>
                 </div>
             </div>`,
         'earnings-call-transcript': `
@@ -615,11 +595,7 @@ function loadSectionHK(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <button onclick="fetchHKCashflow()">Load Statement</button>
-                    <div class="scroll-container-x">
-                        <table id="cashflowTableHK" border="1">
-                            <div id="cashflowContainerHK"></div>
-                        </table>
-                    </div>
+                    <div id="cashflowContainerHK"></div>
                 </div>
             </div>`,
         'earnings-call-transcript': `
