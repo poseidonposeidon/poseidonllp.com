@@ -2655,6 +2655,21 @@ function fetchEUCashflow() {
     fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerEU', 'cashflowChartEU'));
 }
 
+function fetchKRCashflow() {
+    const stockSymbol = fetchKRStock();
+    const period = document.getElementById('period_3KR').value;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerKR', 'cashflowChartKR'));
+}
+
+
 function fetchHKCashflow() {
     const stockSymbol = fetchHKStock();
     const period = document.getElementById('period_3HK').value;
