@@ -1140,13 +1140,13 @@ function addEnterKeyListener(inputId, buttonSelector) {
         }
     });
 }
-
 addEnterKeyListener("stockSymbol", "#usStockButton");
 addEnterKeyListener("jpStockSymbol", "#jpStockButton");
 addEnterKeyListener("twStockSymbol", "#twStockButton");
 addEnterKeyListener("euStockSymbol", "#euStockButton");
 addEnterKeyListener("krStockSymbol", "#krStockButton");
 addEnterKeyListener("hkStockSymbol", "#hkStockButton");
+
 //////////////////建議/////////////////
 //美股
 document.getElementById('stockSymbol').addEventListener('input', async function() {
