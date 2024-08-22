@@ -4074,12 +4074,13 @@ function displayTranscription(data) {
             copyToClipboard(data.text);
         };
 
-        if (container.scrollHeight > container.clientHeight) {
+        // 检查文本高度以确定是否需要显示 "Read More" 或 "Read Less" 按钮
+        if (container.scrollHeight > 200) {
             readMoreBtn.classList.remove('hidden');
             readLessBtn.classList.add('hidden');
         } else {
             readMoreBtn.classList.add('hidden');
-            readLessBtn.classList.add('hidden');
+            readLessBtn.classList.add('hidden');  // 两个按钮都隐藏
         }
     } else {
         container.innerHTML = '<p>No transcription content</p>';
@@ -4091,23 +4092,21 @@ function displayTranscription(data) {
     showAlert('Transcription completed');
 }
 
-
 function toggleReadMore() {
     const container = document.getElementById('transcriptionResult');
     const readMoreBtn = document.getElementById('readMoreBtn');
     const readLessBtn = document.getElementById('readLessBtn');
 
     if (readMoreBtn.classList.contains('hidden')) {
-        container.style.maxHeight = '200px';
+        container.style.maxHeight = '200px';  // 设置最大高度以便显示 "Read More"
         readMoreBtn.classList.remove('hidden');
         readLessBtn.classList.add('hidden');
     } else {
-        container.style.maxHeight = 'none';
+        container.style.maxHeight = 'none';  // 移除最大高度限制以显示全部文本
         readMoreBtn.classList.add('hidden');
         readLessBtn.classList.remove('hidden');
     }
 }
-
 
 function copyToClipboard(text) {
     const textarea = document.createElement('textarea');
