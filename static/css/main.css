@@ -204,11 +204,13 @@ button:not(.info-input button):hover {
 #companyProfileContainerTW,
 #companyProfileContainerEU,
 #companyProfileContainerKR,
+#companyProfileContainerHK,
 #PriceContainer,
 #PriceContainerJP,
 #PriceContainerTW,
 #PriceContainerEU,
-#PriceContainerKR{
+#PriceContainerKR,
+#PriceContainerHK{
     text-align: center;
     margin: 10px auto;
     padding: 20px;
@@ -257,7 +259,8 @@ button:not(.info-input button):hover {
 #companyProfileContainerJP a,
 #companyProfileContainerTW a,
 #companyProfileContainerEU a,
-#companyProfileContainerKR a{
+#companyProfileContainerKR a,
+#companyProfileContainerHK a{
     color: #90caf9;
     transition: all 0.3s ease;
 }
@@ -267,7 +270,8 @@ button:not(.info-input button):hover {
 #companyProfileContainerJP a:hover,
 #companyProfileContainerTW a:hover,
 #companyProfileContainerEU a:hover,
-#companyProfileContainerKR a:hover{
+#companyProfileContainerKR a:hover,
+#companyProfileContainerHK a:hover{
     color: #ffffff;
 }
 

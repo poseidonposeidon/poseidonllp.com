@@ -21,6 +21,7 @@
         <a href="#tw-info-section" onclick="toggleSection(event, '#tw-info-section')">TW Stock </a>
         <a href="#eu-info-section" onclick="toggleSection(event, '#eu-info-section')">EU Stock </a>
         <a href="#kr-info-section" onclick="toggleSection(event, '#kr-info-section')">KR Stock </a>
+        <a href="#hk-info-section" onclick="toggleSection(event, '#hk-info-section')">Hk Stock </a>
         <a href="#ai_box" onclick="toggleSection(event, '#ai_box')">AI Research</a>
         <a href="../index.html">Home</a>
     </div>
@@ -190,6 +191,37 @@
         <!-- Dynamic content loading -->
     </div>
 </div>
+
+<!--/////////////////////////////////港股/////////////////////////////////-->
+
+<div id="hk-info-section" class="info-section" style="display: none;">
+    <div class="info-input">
+        <input type="text" id="hkStockSymbol" placeholder="Input HK Stock" pattern="[A-Z0-9]{1,6}">
+        <button id="hkStockButton" onclick="fetchHKStock()">
+            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
+        </button>
+    </div>
+    <div id="suggestionsHK" class="suggestions-list"></div> <!-- 建議框容器 -->
+    <p id="outputSymbolHK" data-last-symbol="">Current query : </p>
+
+    <div id="companyProfileContainerHK"></div>
+    <div id="PriceContainerHK"></div> <!-- 新增的價格容器 -->
+    <div class="info-content">
+        <div class="info-column">
+            <a href="#" onclick="loadSectionHK('income-statement')">Income Statement</a>
+            <a href="#" onclick="loadSectionHK('balance-sheet')">Balance Sheet</a>
+            <a href="#" onclick="loadSectionHK('cashflow-statement')">Cash Flow Statement</a>
+        </div>
+        <div class="info-column">
+            <a href="#" onclick="loadSectionHK('earnings-call-transcript')">Earnings Call Transcript</a>
+            <a href="#" onclick="loadSectionHK('earnings-call-calendar')">Earnings Call Calendar</a>
+        </div>
+    </div>
+    <div id="section-container-HK" class="section-container">
+        <!-- Dynamic content loading -->
+    </div>
+</div>
+
 
 
 
