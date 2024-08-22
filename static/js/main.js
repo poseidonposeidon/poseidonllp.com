@@ -1040,7 +1040,7 @@ function fetchKRStock() {
 }
 
 function fetchHKStock() {
-    const stockSymbol = document.getElementById('hkStockSymbol').value.trim().toUpperCase();
+    const stockSymbol = document.getElementById('hkStockSymbol').value.trim() + ".HK";
     const previousSymbol = document.getElementById('outputSymbolHK').getAttribute('data-last-symbol');
 
     if (stockSymbol !== previousSymbol) {
@@ -1682,6 +1682,24 @@ function fetchKRCompanyPrice(stockSymbol) {
         })
         .catch(error => console.error('Error fetching data:', error));
 }
+
+function fetchHKCompanyPrice(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}.HK?apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            const priceContainerHK = document.getElementById('PriceContainerHK');
+            if (data && data.length > 0) {
+                displayCompanyPrice(data[0], priceContainerHK);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
+            } else {
+                priceContainerHK.innerHTML = '<p>No data found.</p>';
+            }
+        })
+        .catch(error => console.error('Error fetching data:', error));
+}
+
 
 function displayCompanyPrice(data, container) {
     if (!data || typeof data !== 'object') {
