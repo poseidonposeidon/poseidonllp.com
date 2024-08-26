@@ -101,6 +101,16 @@ function loadSection(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRange">Select Year Range:</label>
+                    <select id="yearRange" onchange="updateDisplayedYears()">
+                        <option value="3">Last 3 Years</option>
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
+                    
                     <button onclick="fetchIncomeStatement()">Load Statement</button>
                     <div id="incomeStatementContainer"></div>
                 </div>
@@ -2103,6 +2113,15 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
 }
 
 function displayIncomeStatement(data, container, chartId, operatingChartId, period) {
+    const yearRange = parseInt(document.getElementById('yearRange').value);
+    const currentYear = new Date().getFullYear();
+
+    // 過濾數據根據年份範圍
+    const filteredData = data.filter(entry => {
+        const entryYear = parseInt(entry.calendarYear);
+        return yearRange === 'all' || (currentYear - entryYear < yearRange);
+    });
+
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
@@ -2272,6 +2291,16 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
+}
+
+function updateDisplayedYears() {
+    const yearRange = parseInt(document.getElementById('yearRange').value);
+    const currentYear = new Date().getFullYear();
+    const filteredData = data.filter(entry => {
+        const entryYear = parseInt(entry.calendarYear);
+        return currentYear - entryYear < yearRange;
+    });
+    displayIncomeStatement(filteredData, container, chartId, operatingChartId, period);
 }
 
 function createOperatingChart(data, chartId) {
