@@ -216,6 +216,14 @@ function loadSectionJP(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    <label for="yearRange">Select Year Range:</label>
+                    <select id="yearRange" onchange="updateDisplayedYears()">
+                        <option value="3">Last 3 Years</option>
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
+                    
                     <button onclick="fetchJPIncomeStatement()">Load Statement</button>
                     <div id="incomeStatementContainerJP"></div>
                 </div>
@@ -1983,6 +1991,7 @@ let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的�
 function fetchIncomeStatement() {
     stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
+    const yearRange = document.getElementById('yearRange').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -1991,12 +2000,13 @@ function fetchIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
 }
 
 function fetchJPIncomeStatement() {
     stockSymbol = fetchJPStock();
     const period = document.getElementById('periodJP').value;
+    const yearRange = document.getElementById('yearRange').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2078,7 +2088,7 @@ function fetchCNIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period);
 }
 
-function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period) {
+function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period , yearRange) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
     fetch(apiUrl)
@@ -2111,8 +2121,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
         });
 }
 
-function displayIncomeStatement(data, container, chartId, operatingChartId, period) {
-    const yearRange = document.getElementById('yearRange').value;
+function displayIncomeStatement(data, container, chartId, operatingChartId, period , yearRange) {
     const currentYear = new Date().getFullYear();
 
     // 過濾數據根據年份範圍
