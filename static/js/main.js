@@ -2372,6 +2372,11 @@ function downloadExcel(rows) {
 }
 
 function updateDisplayedYears(data, container, chartId, operatingChartId, period) {
+    if (!data || !Array.isArray(data)) {
+        console.error("Data is undefined or not an array");
+        return;
+    }
+
     const yearRange = parseInt(document.getElementById('yearRange').value);
     const currentYear = new Date().getFullYear();
     const filteredData = data.filter(entry => {
