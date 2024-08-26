@@ -2363,13 +2363,12 @@ function createOperatingChart(data, chartId) {
     // 計算增長率
     data.forEach((entry, index) => {
         if (index > 0) {
-            // 查找去年同季度的數據
             let previousYearSameQuarterIndex = data.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
             if (previousYearSameQuarterIndex !== -1) {
                 let lastRevenue = data[previousYearSameQuarterIndex].revenue;
                 if (entry.revenue && lastRevenue) {
                     let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                    entry.growthRate = parseFloat(growthRate.toFixed(2)); // 確保為數字格式
+                    entry.growthRate = parseFloat(growthRate.toFixed(2));
                 } else {
                     entry.growthRate = 'N/A';
                 }
@@ -2381,6 +2380,9 @@ function createOperatingChart(data, chartId) {
         }
     });
 
+    // 過濾掉增長率為 'N/A' 的數據
+    const validData = data.filter(entry => entry.growthRate !== 'N/A');
+
     const ctx = document.getElementById(chartId).getContext('2d');
 
     // 銷毀現有圖表實例（如果存在）
@@ -2389,44 +2391,44 @@ function createOperatingChart(data, chartId) {
     }
 
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
-        type: 'bar', // 主要圖表類型設為柱狀圖
+        type: 'bar',
         data: {
-            labels: data.map(entry => entry.date),
+            labels: validData.map(entry => entry.date),
             datasets: [
                 {
                     label: 'Revenue',
-                    data: data.map(entry => entry.revenue),
+                    data: validData.map(entry => entry.revenue),
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
                     yAxisID: 'y'
                 },
                 {
                     label: 'Cost of Revenue',
-                    data: data.map(entry => entry.costOfRevenue),
+                    data: validData.map(entry => entry.costOfRevenue),
                     borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Expenses',
-                    data: data.map(entry => entry.operatingExpenses),
+                    data: validData.map(entry => entry.operatingExpenses),
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Income',
-                    data: data.map(entry => entry.operatingIncome),
+                    data: validData.map(entry => entry.operatingIncome),
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
                     yAxisID: 'y'
                 },
                 {
                     label: 'Growth Rate',
-                    data: data.map(entry => entry.growthRate),
-                    type: 'line', // 單獨設置為折線圖
+                    data: validData.map(entry => entry.growthRate),
+                    type: 'line',
                     borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)',
                     yAxisID: 'y1'
                 }
             ]
@@ -2439,7 +2441,7 @@ function createOperatingChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 確保x軸不是反轉的
+                    reverse: false
                 },
                 y: {
                     beginAtZero: true,
@@ -2457,7 +2459,7 @@ function createOperatingChart(data, chartId) {
                     },
                     position: 'right',
                     grid: {
-                        drawOnChartArea: false // 仅绘制 y1 网格
+                        drawOnChartArea: false
                     }
                 }
             }
@@ -2466,24 +2468,25 @@ function createOperatingChart(data, chartId) {
 }
 
 function createIncomeStatementChart(data, chartId) {
-    // 首先，按日期從舊到新排序數據
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // 過濾掉增長率為 'N/A' 的數據
+    const validData = data.filter(entry => entry.growthRate !== 'N/A');
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
 
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
         data: {
-            labels: data.map(entry => entry.date),
+            labels: validData.map(entry => entry.date),
             datasets: [
                 {
                     type: 'bar',
                     label: 'EPS',
-                    data: data.map(entry => entry.eps),
+                    data: validData.map(entry => entry.eps),
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
                     yAxisID: 'y'
@@ -2491,7 +2494,7 @@ function createIncomeStatementChart(data, chartId) {
                 {
                     type: 'line',
                     label: 'Gross Profit Ratio',
-                    data: data.map(entry => entry.grossProfitRatio * 100),
+                    data: validData.map(entry => entry.grossProfitRatio * 100),
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.6)',
                     yAxisID: 'y1'
@@ -2499,7 +2502,7 @@ function createIncomeStatementChart(data, chartId) {
                 {
                     type: 'line',
                     label: 'Operating Income Ratio',
-                    data: data.map(entry => entry.operatingIncomeRatio * 100),
+                    data: validData.map(entry => entry.operatingIncomeRatio * 100),
                     borderColor: 'rgba(153, 102, 255, 1)',
                     backgroundColor: 'rgba(153, 102, 255, 0.6)',
                     yAxisID: 'y1'
@@ -2507,12 +2510,11 @@ function createIncomeStatementChart(data, chartId) {
                 {
                     type: 'line',
                     label: 'Net Income Ratio',
-                    data: data.map(entry => entry.netIncomeRatio * 100),
+                    data: validData.map(entry => entry.netIncomeRatio * 100),
                     borderColor: 'rgba(255, 159, 64, 1)',
                     backgroundColor: 'rgba(255, 159, 64, 0.6)',
                     yAxisID: 'y1'
                 }
-
             ]
         },
         options: {
@@ -2523,7 +2525,7 @@ function createIncomeStatementChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 確保x軸不是反轉的
+                    reverse: false
                 },
                 y: {
                     beginAtZero: true,
@@ -2541,7 +2543,7 @@ function createIncomeStatementChart(data, chartId) {
                     },
                     position: 'right',
                     grid: {
-                        drawOnChartArea: false // 仅绘制 y1 网格
+                        drawOnChartArea: false
                     }
                 }
             }
