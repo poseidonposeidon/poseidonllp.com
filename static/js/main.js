@@ -891,9 +891,10 @@ function fetchStock() {
         });
 
         // Fetch and display company profile and price information
+        clearSuggestions();
         fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
         fetchCompanyPrice(stockSymbol);    // Fetch and display stock price information
-        clearSuggestions();
+
     }
 
     return stockSymbol;
