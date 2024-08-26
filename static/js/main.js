@@ -2088,7 +2088,7 @@ function fetchCNIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period);
 }
 
-function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period , yearRange) {
+function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period, yearRange) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
     fetch(apiUrl)
@@ -2103,13 +2103,18 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                     // 确保滚动条移动到最右边
                     setTimeout(() => {
                         const scrollContainer = document.getElementById(containerId).querySelector('.scroll-container-x');
-                        scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
 
-                        // 再次确认是否滚动到最右边
-                        if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
-                            scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+                        if (scrollContainer) {
+                            scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
+
+                            // 再次确认是否滚动到最右边
+                            if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
+                                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+                            }
+                        } else {
+                            console.error('Scroll container not found.');
                         }
-                    }, 300); // 延长等待时间以确保元素完全渲染
+                    }, 500); // 延长等待时间以确保元素完全渲染
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
