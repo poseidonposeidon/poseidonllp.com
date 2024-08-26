@@ -2169,7 +2169,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         epsdiluted: ['EPS Diluted'],
         weightedAverageShsOut: ['Weighted Average Shares Outstanding'],
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
-        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth']
+        growthRate: [period === 'annual' ? 'YoY Growth' : 'YoY Growth']
     };
 
     // 填充行數據並計算增長率
