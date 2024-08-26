@@ -329,6 +329,14 @@ function loadSectionTW(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <select id="yearRange" onchange="updateDisplayedYears()">
+                        <option value="3">Last 3 Years</option>
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
+                    
                     <button onclick="fetchTWIncomeStatement()">Load Statement</button>
                     <div id="incomeStatementContainerTW"></div>
                 </div>
@@ -400,6 +408,13 @@ function loadSectionEU(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    <select id="yearRange" onchange="updateDisplayedYears()">
+                        <option value="3">Last 3 Years</option>
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
+                    
                     <button onclick="fetchEUIncomeStatement()">Load Statement</button>
                     <div id="incomeStatementContainerEU"></div>
                 </div>
@@ -504,6 +519,13 @@ function loadSectionKR(sectionId) {
                     <select id="periodKR">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
+                    </select>
+                    
+                    <select id="yearRange" onchange="updateDisplayedYears()">
+                        <option value="3">Last 3 Years</option>
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
                     </select>
                     <button onclick="fetchKRIncomeStatement()">Load Statement</button>
                     <div id="incomeStatementContainerKR"></div>
@@ -610,6 +632,13 @@ function loadSectionHK(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <select id="yearRange" onchange="updateDisplayedYears()">
+                        <option value="3">Last 3 Years</option>
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
                     <button onclick="fetchHKIncomeStatement()">Load Statement</button>
                     <div id="incomeStatementContainerHK"></div>
                 </div>
@@ -714,6 +743,13 @@ function loadSectionCN(sectionId) {
                     <select id="periodCN">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
+                    </select>
+                    
+                    <select id="yearRange" onchange="updateDisplayedYears()">
+                        <option value="3">Last 3 Years</option>
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
                     </select>
                     <button onclick="fetchCNIncomeStatement()">Load Statement</button>
                     <div id="incomeStatementContainerCN"></div>
@@ -2021,6 +2057,7 @@ function fetchJPIncomeStatement() {
 async function fetchTWIncomeStatement() {
     stockSymbol = await fetchTWStock();
     const period = document.getElementById('periodTW').value;
+    const yearRange = document.getElementById('yearRange').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2029,12 +2066,13 @@ async function fetchTWIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period ,yearRange);
 }
 
 function fetchEUIncomeStatement() {
     const stockSymbol = fetchEUStock();
     const period = document.getElementById('periodEU').value;
+    const yearRange = document.getElementById('yearRange').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2043,12 +2081,13 @@ function fetchEUIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period ,yearRange);
 }
 
 function fetchKRIncomeStatement() {
     const stockSymbol = fetchKRStock();
     const period = document.getElementById('periodKR').value;
+    const yearRange = document.getElementById('yearRange').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2057,12 +2096,13 @@ function fetchKRIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period ,yearRange);
 }
 
 function fetchHKIncomeStatement() {
     const stockSymbol = fetchHKStock();
     const period = document.getElementById('periodHK').value;
+    const yearRange = document.getElementById('yearRange').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2071,12 +2111,13 @@ function fetchHKIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period ,yearRange);
 }
 
 function fetchCNIncomeStatement() {
     const stockSymbol = fetchCNStock();  // 获取中国股票代码
     const period = document.getElementById('periodCN').value;  // 获取选定的期间（年度或季度）
+    const yearRange = document.getElementById('yearRange').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2085,7 +2126,7 @@ function fetchCNIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
 }
 
 function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period, yearRange) {
