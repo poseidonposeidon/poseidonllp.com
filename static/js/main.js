@@ -2167,23 +2167,13 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
 function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange) {
     const currentYear = new Date().getFullYear();
 
-    // 根据年份范围过滤数据，多保留一年用于表格显示
+    // 根據年份範圍過濾數據，多保留一年用於表格顯示
     const filteredDataForTable = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
         return yearRange === 'all' || (currentYear - entryYear <= yearRange);
     }).slice(-yearRange - 1);
 
-    // 仅用于图表的数据（去除多保留的一年）
-    const filteredDataForChart = filteredDataForTable.slice(1);
-
-    if (!filteredDataForTable || !Array.isArray(filteredDataForTable) || filteredDataForTable.length === 0) {
-        container.innerHTML = '<p>Data not available.</p>';
-        return;
-    }
-
-    // 按日期升序排序
-    filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
-
+    // 计算增长率并填充表格数据
     let rows = {
         date: ['Date'],
         symbol: ['Symbol'],
@@ -2223,7 +2213,9 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         growthRate: [period === 'annual' ? 'YoY Growth' : 'YoY Growth']
     };
 
-    // 填充行数据并计算增长率
+    // 用於圖表的數據
+    const filteredDataForChart = [];
+
     filteredDataForTable.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -2261,23 +2253,24 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
 
-        // 计算增长率
+        // 計算增長率
+        let growthRate = 'N/A';
         if (index > 0) {
             if (period === 'annual') {
                 let lastRevenue = filteredDataForTable[index - 1].revenue;
                 if (entry.revenue && lastRevenue) {
-                    let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
+                    growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                     rows.growthRate.push(parseFloat(growthRate.toFixed(2)));
                 } else {
                     rows.growthRate.push('N/A');
                 }
             } else {
-                // 查找去年同季度的数据
+                // 查找去年同季度的數據
                 let previousYearSameQuarterIndex = filteredDataForTable.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
                 if (previousYearSameQuarterIndex !== -1) {
                     let lastRevenue = filteredDataForTable[previousYearSameQuarterIndex].revenue;
                     if (entry.revenue && lastRevenue) {
-                        let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
+                        growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                         rows.growthRate.push(parseFloat(growthRate.toFixed(2)));
                     } else {
                         rows.growthRate.push('N/A');
@@ -2288,6 +2281,11 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             }
         } else {
             rows.growthRate.push('N/A');
+        }
+
+        // 只有當 YoY Growth 不是 N/A 時，才加入到圖表數據
+        if (growthRate !== 'N/A') {
+            filteredDataForChart.push(entry);
         }
     });
 
@@ -2351,39 +2349,18 @@ function updateDisplayedYears() {
 }
 
 function createOperatingChart(data, chartId) {
-    // 首先，按日期從舊到新排序數據
+    // 按日期从旧到新排序数据
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    // 計算增長率
-    data.forEach((entry, index) => {
-        if (index > 0) {
-            // 查找去年同季度的數據
-            let previousYearSameQuarterIndex = data.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
-            if (previousYearSameQuarterIndex !== -1) {
-                let lastRevenue = data[previousYearSameQuarterIndex].revenue;
-                if (entry.revenue && lastRevenue) {
-                    let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                    entry.growthRate = parseFloat(growthRate.toFixed(2)); // 確保為數字格式
-                } else {
-                    entry.growthRate = 'N/A';
-                }
-            } else {
-                entry.growthRate = 'N/A';
-            }
-        } else {
-            entry.growthRate = 'N/A';
-        }
-    });
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
+    // 销毁现有图表实例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
 
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
-        type: 'bar', // 主要圖表類型設為柱狀圖
+        type: 'bar', // 主要图表类型设为柱状图
         data: {
             labels: data.map(entry => entry.date),
             datasets: [
@@ -2391,36 +2368,36 @@ function createOperatingChart(data, chartId) {
                     label: 'Revenue',
                     data: data.map(entry => entry.revenue),
                     borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Cost of Revenue',
                     data: data.map(entry => entry.costOfRevenue),
                     borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Expenses',
                     data: data.map(entry => entry.operatingExpenses),
                     borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Income',
                     data: data.map(entry => entry.operatingIncome),
                     borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Growth Rate',
                     data: data.map(entry => entry.growthRate),
-                    type: 'line', // 單獨設置為折線圖
+                    type: 'line', // 单独设置为折线图
                     borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使顏色更加鮮明
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y1'
                 }
             ]
@@ -2433,7 +2410,7 @@ function createOperatingChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 確保x軸不是反轉的
+                    reverse: false // 确保x轴不是反转的
                 },
                 y: {
                     beginAtZero: true,
@@ -2460,12 +2437,12 @@ function createOperatingChart(data, chartId) {
 }
 
 function createIncomeStatementChart(data, chartId) {
-    // 首先，按日期從舊到新排序數據
+    // 按日期从旧到新排序数据
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
+    // 销毁现有图表实例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
@@ -2517,7 +2494,7 @@ function createIncomeStatementChart(data, chartId) {
                         display: true,
                         text: 'Date'
                     },
-                    reverse: false // 確保x軸不是反轉的
+                    reverse: false // 确保x轴不是反转的
                 },
                 y: {
                     beginAtZero: true,
