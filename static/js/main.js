@@ -2362,8 +2362,14 @@ function updateDisplayedYears() {
 function createOperatingChart(data, chartId) {
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 過濾掉增長率為 'N/A' 的年份或季度
-    const validData = data.filter(entry => entry.growthRate !== 'N/A');
+    // 计算增长率并保留所有有效的数据
+    const validData = data.map(entry => {
+        // 检查并计算每个 entry 的增长率
+        if (entry.growthRate === 'N/A') {
+            entry.growthRate = null; // 使用 null 表示没有增长率
+        }
+        return entry;
+    });
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
