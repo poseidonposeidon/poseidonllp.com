@@ -1989,10 +1989,10 @@ function displayCompanyPrice(data, container) {
 let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
 function fetchIncomeStatement() {
-    stockSymbol = fetchStock();
+    const stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
     const yearRange = document.getElementById('yearRange').value;
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiKey = 'YOUR_API_KEY'; // 請替換為你的實際 API 密鑰
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -2091,34 +2091,25 @@ function fetchCNIncomeStatement() {
 function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period, yearRange) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            if (data === undefined || !Array.isArray(data)) {
-                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
-            } else {
-                if (data.length > 0) {
-                    callback(data, container, chartId, operatingChartId, period);
-
-                    // 确保滚动条移动到最右边
-                    setTimeout(() => {
-                        const scrollContainer = document.getElementById(containerId).querySelector('.scroll-container-x');
-
-                        if (scrollContainer) {
-                            scrollContainer.scrollLeft = scrollContainer.scrollWidth - scrollContainer.clientWidth;
-
-                            // 再次确认是否滚动到最右边
-                            if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
-                                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-                            }
-                        } else {
-                            console.error('Scroll container not found.');
-                        }
-                    }, 500); // 延长等待时间以确保元素完全渲染
-                } else {
-                    container.innerHTML = '<p>No data found for this symbol.</p>';
-                }
+            if (!Array.isArray(data) || data.length === 0) {
+                container.innerHTML = '<p>No data found for this symbol.</p>';
+                return;
             }
+
+            // 調用回調函數，傳遞所有必要參數
+            callback(data, container, chartId, operatingChartId, period, yearRange);
+
+            // 在回調函數執行完後，設置滾動條位置
+            setTimeout(() => {
+                const scrollContainer = container.querySelector('.scroll-right');
+                if (scrollContainer) {
+                    scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+                }
+            }, 500); // 延遲以確保元素已經完全渲染
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
