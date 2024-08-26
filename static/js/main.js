@@ -3292,7 +3292,7 @@ async function fetchTWEarningsCallTranscript() {
     const stockSymbol = await fetchTWStock(); // 獲取台股代碼
     const year = document.getElementById('yearInputTW').value;
     const quarter = document.getElementById('quarterInputTW').value;
-    const apiKey = 'YOUR_API_KEY';  // 替換為你的實際 API 密鑰
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
 
     if (stockSymbol.length === 0 || year.length === 0 || quarter.length === 0) {
         alert('請輸入股票代碼、年份及季度。');
@@ -3447,7 +3447,7 @@ async function fetchTWEarningsCallCalendar() {
     const fromDate = document.getElementById('fromDateTW').value;
     const toDate = document.getElementById('toDateTW').value;
     const stockSymbol = await fetchTWStock(); // 獲取台股代碼
-    const apiKey = 'YOUR_API_KEY';  // 替換為你的實際 API 密鑰
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';  // 替換為你的實際 API 密鑰
 
     if (!fromDate || !toDate) {
         alert('請輸入開始和結束日期。');
