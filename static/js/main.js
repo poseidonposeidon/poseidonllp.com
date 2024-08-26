@@ -2030,6 +2030,8 @@ function displayCompanyPrice(data, container) {
 
 let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
+let globalData = null;
+
 function fetchIncomeStatement() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
@@ -2147,16 +2149,18 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                 return;
             }
 
-            // 調用回調函數，傳遞所有必要參數
+            globalData = data;  // 将数据存储到全局变量中
+
+            // 调用回调函数，传递所有必要参数
             callback(data, container, chartId, operatingChartId, period, yearRange);
 
-            // 在回調函數執行完後，設置滾動條位置
+            // 在回调函数执行完后，设置滚动条位置
             setTimeout(() => {
                 const scrollContainer = container.querySelector('.scroll-right');
                 if (scrollContainer) {
                     scrollContainer.scrollLeft = scrollContainer.scrollWidth;
                 }
-            }, 500); // 延遲以確保元素已經完全渲染
+            }, 500); // 延迟以确保元素已经完全渲染
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
@@ -2341,16 +2345,21 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 function updateDisplayedYears() {
     const yearRange = parseInt(document.getElementById('yearRange').value);
     const currentYear = new Date().getFullYear();
-    const filteredData = data.filter(entry => {
+    const filteredData = globalData.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
         return currentYear - entryYear < yearRange;
     });
-    displayIncomeStatement(filteredData, container, chartId, operatingChartId, period);
+
+    // 再次调用 displayIncomeStatement 函数来更新显示
+    displayIncomeStatement(filteredData, container, chartId, operatingChartId, period, yearRange);
 }
 
 function createOperatingChart(data, chartId) {
+    // 过滤掉 YoY Growth 为 N/A 的数据
+    const filteredData = data.filter(entry => entry.growthRate !== 'N/A');
+
     // 按日期从旧到新排序数据
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+    filteredData.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
@@ -2362,39 +2371,39 @@ function createOperatingChart(data, chartId) {
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
         type: 'bar', // 主要图表类型设为柱状图
         data: {
-            labels: data.map(entry => entry.date),
+            labels: filteredData.map(entry => entry.date),
             datasets: [
                 {
                     label: 'Revenue',
-                    data: data.map(entry => entry.revenue),
+                    data: filteredData.map(entry => entry.revenue),
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Cost of Revenue',
-                    data: data.map(entry => entry.costOfRevenue),
+                    data: filteredData.map(entry => entry.costOfRevenue),
                     borderColor: 'rgba(153, 102, 255, 1)',
                     backgroundColor: 'rgba(153, 102, 255, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Expenses',
-                    data: data.map(entry => entry.operatingExpenses),
+                    data: filteredData.map(entry => entry.operatingExpenses),
                     borderColor: 'rgba(54, 162, 235, 1)',
                     backgroundColor: 'rgba(54, 162, 235, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Income',
-                    data: data.map(entry => entry.operatingIncome),
+                    data: filteredData.map(entry => entry.operatingIncome),
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.6)', // 增加不透明度，使颜色更加鲜明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Growth Rate',
-                    data: data.map(entry => entry.growthRate),
+                    data: filteredData.map(entry => entry.growthRate),
                     type: 'line', // 单独设置为折线图
                     borderColor: 'rgba(255, 159, 64, 1)',
                     backgroundColor: 'rgba(255, 159, 64, 0.6)', // 增加不透明度，使颜色更加鲜明
@@ -2437,8 +2446,11 @@ function createOperatingChart(data, chartId) {
 }
 
 function createIncomeStatementChart(data, chartId) {
+    // 过滤掉 YoY Growth 为 N/A 的数据
+    const filteredData = data.filter(entry => entry.growthRate !== 'N/A');
+
     // 按日期从旧到新排序数据
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+    filteredData.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
@@ -2449,12 +2461,12 @@ function createIncomeStatementChart(data, chartId) {
 
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
         data: {
-            labels: data.map(entry => entry.date),
+            labels: filteredData.map(entry => entry.date),
             datasets: [
                 {
                     type: 'bar',
                     label: 'EPS',
-                    data: data.map(entry => entry.eps),
+                    data: filteredData.map(entry => entry.eps),
                     borderColor: 'rgba(255, 99, 132, 1)',
                     backgroundColor: 'rgba(255, 99, 132, 0.2)',
                     yAxisID: 'y'
@@ -2462,7 +2474,7 @@ function createIncomeStatementChart(data, chartId) {
                 {
                     type: 'line',
                     label: 'Gross Profit Ratio',
-                    data: data.map(entry => entry.grossProfitRatio * 100),
+                    data: filteredData.map(entry => entry.grossProfitRatio * 100),
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.6)',
                     yAxisID: 'y1'
@@ -2470,7 +2482,7 @@ function createIncomeStatementChart(data, chartId) {
                 {
                     type: 'line',
                     label: 'Operating Income Ratio',
-                    data: data.map(entry => entry.operatingIncomeRatio * 100),
+                    data: filteredData.map(entry => entry.operatingIncomeRatio * 100),
                     borderColor: 'rgba(153, 102, 255, 1)',
                     backgroundColor: 'rgba(153, 102, 255, 0.6)',
                     yAxisID: 'y1'
@@ -2478,7 +2490,7 @@ function createIncomeStatementChart(data, chartId) {
                 {
                     type: 'line',
                     label: 'Net Income Ratio',
-                    data: data.map(entry => entry.netIncomeRatio * 100),
+                    data: filteredData.map(entry => entry.netIncomeRatio * 100),
                     borderColor: 'rgba(255, 159, 64, 1)',
                     backgroundColor: 'rgba(255, 159, 64, 0.6)',
                     yAxisID: 'y1'
