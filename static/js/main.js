@@ -1992,7 +1992,7 @@ function fetchIncomeStatement() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
     const yearRange = document.getElementById('yearRange').value;
-    const apiKey = 'YOUR_API_KEY'; // 請替換為你的實際 API 密鑰
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的實際 API 密鑰
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
