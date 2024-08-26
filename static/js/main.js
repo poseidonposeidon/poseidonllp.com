@@ -330,6 +330,7 @@ function loadSectionTW(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     
+                    <label for="yearRange">Select Year Range:</label>
                     <select id="yearRange" onchange="updateDisplayedYears()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
@@ -408,6 +409,8 @@ function loadSectionEU(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <label for="yearRange">Select Year Range:</label>
                     <select id="yearRange" onchange="updateDisplayedYears()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
@@ -521,6 +524,7 @@ function loadSectionKR(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     
+                    <label for="yearRange">Select Year Range:</label>
                     <select id="yearRange" onchange="updateDisplayedYears()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
@@ -633,6 +637,7 @@ function loadSectionHK(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     
+                    <label for="yearRange">Select Year Range:</label
                     <select id="yearRange" onchange="updateDisplayedYears()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
@@ -745,6 +750,7 @@ function loadSectionCN(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     
+                    <label for="yearRange">Select Year Range:</label                    
                     <select id="yearRange" onchange="updateDisplayedYears()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
