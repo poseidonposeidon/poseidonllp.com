@@ -2173,7 +2173,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         return yearRange === 'all' || (currentYear - entryYear <= yearRange); // 表格顯示多一年的數據
     });
 
-    const filteredDataForChart = filteredDataForTable.slice(1); // 去掉多出來的那一年數據，只保留選擇範圍內的數據
+    const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
+        return !(index === 0 && entry.growthRate === 'N/A');
+    });
+
 
     if (!filteredDataForTable || !Array.isArray(filteredDataForTable) || filteredDataForTable.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
@@ -2359,7 +2362,7 @@ function updateDisplayedYears() {
 function createOperatingChart(data, chartId) {
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 計算增長率並過濾掉 'N/A' 的年份
+    // 過濾掉增長率為 'N/A' 的年份或季度
     const validData = data.filter(entry => entry.growthRate !== 'N/A');
 
     const ctx = document.getElementById(chartId).getContext('2d');
