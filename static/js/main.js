@@ -340,6 +340,30 @@ function loadSectionTW(sectionId) {
                     <button onclick="fetchTWCashflow()">Load Statement</button>
                     <div id="cashflowContainerTW"></div>
                 </div>
+            </div>`,
+        'earnings-call-transcript': `
+            <div class="section" id="earnings-call-transcript-TW">
+                <h2>Earnings Call Transcript</h2>
+                <div class="content">
+                    <input type="number" id="yearInputTW" placeholder="Enter Year">
+                    <input type="number" id="quarterInputTW" placeholder="Enter Quarter">
+                    <button onclick="fetchTWEarningsCallTranscript()">Load Transcript</button>
+                    <div class="scroll-container-y scroll-container-x" id="earningsCallTranscriptContainerTW">
+                        <!-- Transcription content will be displayed here -->
+                    </div>
+                </div>
+            </div>`,
+        'earnings-call-calendar': `
+            <div class="section" id="earnings-call-calendar-TW">
+                <h2>Earnings Call Calendar</h2>
+                <div class="content">
+                    <input type="date" id="fromDateTW" placeholder="From Date">
+                    <input type="date" id="toDateTW" placeholder="To Date">
+                    <button onclick="fetchTWEarningsCallCalendar()">Load Calendar</button>
+                    <div class="scroll-container">
+                        <div id="earningsCallCalendarContainerTW"></div>
+                    </div>
+                </div>
             </div>`
     };
 
@@ -3264,6 +3288,22 @@ function fetchKREarningsCallTranscript() {
     fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerKR');
 }
 
+async function fetchTWEarningsCallTranscript() {
+    const stockSymbol = await fetchTWStock(); // 獲取台股代碼
+    const year = document.getElementById('yearInputTW').value;
+    const quarter = document.getElementById('quarterInputTW').value;
+    const apiKey = 'YOUR_API_KEY';  // 替換為你的實際 API 密鑰
+
+    if (stockSymbol.length === 0 || year.length === 0 || quarter.length === 0) {
+        alert('請輸入股票代碼、年份及季度。');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_call_transcript/${stockSymbol}?year=${year}&quarter=${quarter}&apikey=${apiKey}`;
+    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerTW');
+}
+
+
 function fetchHKEarningsCallTranscript() {
     const stockSymbol = fetchHKStock();
     const year = document.getElementById('yearInputHK').value;
@@ -3402,6 +3442,22 @@ function fetchJPEarningsCallCalendar() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
     fetchData_2(apiUrl, (data) => displayEarningsCallCalendar_JP(data, 'earningsCallCalendarContainerJP', stockSymbol), 'earningsCallCalendarContainerJP');
 }
+
+async function fetchTWEarningsCallCalendar() {
+    const fromDate = document.getElementById('fromDateTW').value;
+    const toDate = document.getElementById('toDateTW').value;
+    const stockSymbol = await fetchTWStock(); // 獲取台股代碼
+    const apiKey = 'YOUR_API_KEY';  // 替換為你的實際 API 密鑰
+
+    if (!fromDate || !toDate) {
+        alert('請輸入開始和結束日期。');
+        return;
+    }
+
+    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
+    fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainerTW', stockSymbol), 'earningsCallCalendarContainerTW');
+}
+
 
 function fetchEUEarningsCallCalendar() {
     const fromDate = document.getElementById('fromDateEU').value;
