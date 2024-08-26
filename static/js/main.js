@@ -2147,16 +2147,13 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                 return;
             }
 
-            // 調用回調函數，傳遞所有必要參數
-            callback(data, container, chartId, operatingChartId, period, yearRange);
+            // 保存數據供年份範圍篩選使用
+            document.getElementById('yearRange').onchange = function() {
+                updateDisplayedYears(data, container, chartId, operatingChartId, period);
+            };
 
-            // 在回調函數執行完後，設置滾動條位置
-            setTimeout(() => {
-                const scrollContainer = container.querySelector('.scroll-right');
-                if (scrollContainer) {
-                    scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-                }
-            }, 500); // 延遲以確保元素已經完全渲染
+            // 初始顯示
+            callback(data, container, chartId, operatingChartId, period, yearRange);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
@@ -2374,14 +2371,14 @@ function downloadExcel(rows) {
     XLSX.writeFile(wb, "Income_Statement.xlsx");
 }
 
-function updateDisplayedYears() {
+function updateDisplayedYears(data, container, chartId, operatingChartId, period) {
     const yearRange = parseInt(document.getElementById('yearRange').value);
     const currentYear = new Date().getFullYear();
     const filteredData = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
-        return currentYear - entryYear < yearRange;
+        return yearRange === 'all' || (currentYear - entryYear <= yearRange);
     });
-    displayIncomeStatement(filteredData, container, chartId, operatingChartId, period);
+    displayIncomeStatement(filteredData, container, chartId, operatingChartId, period, yearRange);
 }
 
 function createOperatingChart(data, chartId) {
