@@ -2164,16 +2164,18 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
         });
 }
 
-function displayIncomeStatement(data, container, chartId, operatingChartId, period , yearRange) {
+function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange) {
     const currentYear = new Date().getFullYear();
 
-    // 過濾數據根據年份範圍
-    const filteredData = data.filter(entry => {
+    // 過濾數據以包含多一年的數據
+    const filteredDataForTable = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear < yearRange);
+        return yearRange === 'all' || (currentYear - entryYear <= yearRange); // 表格顯示多一年的數據
     });
 
-    if (!filteredData || !Array.isArray(filteredData) || filteredData.length === 0) {
+    const filteredDataForChart = filteredDataForTable.slice(1); // 去掉多出來的那一年數據，只保留選擇範圍內的數據
+
+    if (!filteredDataForTable || !Array.isArray(filteredDataForTable) || filteredDataForTable.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
         if (expandButton) expandButton.style.display = 'none';
@@ -2183,7 +2185,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     }
 
     // 按日期升序排序
-    filteredData.sort((a, b) => new Date(a.date) - new Date(b.date));
+    filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let rows = {
         date: ['Date'],
@@ -2225,7 +2227,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     };
 
     // 填充行數據並計算增長率
-    filteredData.forEach((entry, index) => {
+    filteredDataForTable.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
@@ -2265,7 +2267,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         // 計算增長率
         if (index > 0) {
             if (period === 'annual') {
-                let lastRevenue = filteredData[index - 1].revenue;
+                let lastRevenue = filteredDataForTable[index - 1].revenue;
                 if (entry.revenue && lastRevenue) {
                     let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                     rows.growthRate.push(parseFloat(growthRate.toFixed(2)));
@@ -2274,9 +2276,9 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                 }
             } else {
                 // 查找去年同季度的數據
-                let previousYearSameQuarterIndex = filteredData.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
+                let previousYearSameQuarterIndex = filteredDataForTable.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
                 if (previousYearSameQuarterIndex !== -1) {
-                    let lastRevenue = filteredData[previousYearSameQuarterIndex].revenue;
+                    let lastRevenue = filteredDataForTable[previousYearSameQuarterIndex].revenue;
                     if (entry.revenue && lastRevenue) {
                         let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                         rows.growthRate.push(parseFloat(growthRate.toFixed(2)));
@@ -2336,9 +2338,9 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     }, 100);
 
-    // 創建圖表
-    createOperatingChart(filteredData, operatingChartId);
-    createIncomeStatementChart(filteredData, chartId);
+    // 創建圖表，僅使用篩選後的數據（刪除多出來的那一年）
+    createOperatingChart(filteredDataForChart, operatingChartId);
+    createIncomeStatementChart(filteredDataForChart, chartId);
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
