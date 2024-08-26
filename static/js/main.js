@@ -2173,7 +2173,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         return yearRange === 'all' || (currentYear - entryYear <= yearRange); // 表格显示多一年的数据
     });
 
-    // 保持所有数据项，包括那些 growthRate 为 'N/A' 的项，用于后续计算
     const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
         return !(index === 0 && entry.growthRate === 'N/A');
     });
@@ -2280,7 +2279,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                     rows.growthRate.push('N/A');
                 }
             } else {
-                // 查找去年同季度的数据
                 let previousYearSameQuarterIndex = filteredDataForTable.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
                 if (previousYearSameQuarterIndex !== -1) {
                     let lastRevenue = filteredDataForTable[previousYearSameQuarterIndex].revenue;
@@ -2332,6 +2330,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         <div id="chartContainer" style="margin-top: 20px;">
             <canvas id="${chartId}"></canvas>
         </div>
+        <button id="downloadBtn">Download as Excel</button>
     `;
 
     // 设置scroll位置
@@ -2339,8 +2338,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-
-            // 再次确认是否滚动到最右边
             if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
                 scrollContainer.scrollLeft = scrollContainer.scrollWidth;
             }
@@ -2352,7 +2349,28 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     createIncomeStatementChart(filteredDataForChart, chartId);
 
     const expandButton = document.getElementById('expandButton_Income');
-    if (expandButton) expandButton.style.display = 'inline'; // 显示 Read More 按钮
+    if (expandButton) expandButton.style.display = 'inline';
+
+    // 添加下载按钮事件
+    document.getElementById('downloadBtn').addEventListener('click', () => {
+        downloadExcel(rows);
+    });
+}
+
+// 下载 Excel 文件的函数
+function downloadExcel(rows) {
+    // 将 rows 对象转换为数组格式
+    const data = Object.keys(rows).map(key => rows[key]);
+
+    // 创建工作簿和工作表
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // 将工作表添加到工作簿
+    XLSX.utils.book_append_sheet(wb, ws, "Income Statement");
+
+    // 生成文件并触发下载
+    XLSX.writeFile(wb, "Income_Statement.xlsx");
 }
 
 function updateDisplayedYears() {
