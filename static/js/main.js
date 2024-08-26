@@ -1819,7 +1819,6 @@ function fetchCNCompanyProfile(stockSymbol) {
         .catch(error => console.error('Error fetching data:', error));
 }
 
-
 function displayCompanyProfile(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
@@ -2113,7 +2112,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
 }
 
 function displayIncomeStatement(data, container, chartId, operatingChartId, period) {
-    const yearRange = parseInt(document.getElementById('yearRange').value);
+    const yearRange = document.getElementById('yearRange').value;
     const currentYear = new Date().getFullYear();
 
     // 過濾數據根據年份範圍
@@ -2122,7 +2121,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         return yearRange === 'all' || (currentYear - entryYear < yearRange);
     });
 
-    if (!data || !Array.isArray(data) || data.length === 0) {
+    if (!filteredData || !Array.isArray(filteredData) || filteredData.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
         if (expandButton) expandButton.style.display = 'none';
@@ -2132,7 +2131,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     }
 
     // 按日期升序排序
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+    filteredData.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let rows = {
         date: ['Date'],
@@ -2170,11 +2169,11 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         epsdiluted: ['EPS Diluted'],
         weightedAverageShsOut: ['Weighted Average Shares Outstanding'],
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
-        growthRate: [period === 'annual' ? 'YoY Growth' : 'YoY Growth']
+        growthRate: [period === 'annual' ? 'YoY Growth' : 'QoQ Growth']
     };
 
     // 填充行數據並計算增長率
-    data.forEach((entry, index) => {
+    filteredData.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
@@ -2214,7 +2213,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         // 計算增長率
         if (index > 0) {
             if (period === 'annual') {
-                let lastRevenue = data[index - 1].revenue;
+                let lastRevenue = filteredData[index - 1].revenue;
                 if (entry.revenue && lastRevenue) {
                     let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                     rows.growthRate.push(parseFloat(growthRate.toFixed(2)));
@@ -2223,9 +2222,9 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                 }
             } else {
                 // 查找去年同季度的數據
-                let previousYearSameQuarterIndex = data.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
+                let previousYearSameQuarterIndex = filteredData.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
                 if (previousYearSameQuarterIndex !== -1) {
-                    let lastRevenue = data[previousYearSameQuarterIndex].revenue;
+                    let lastRevenue = filteredData[previousYearSameQuarterIndex].revenue;
                     if (entry.revenue && lastRevenue) {
                         let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                         rows.growthRate.push(parseFloat(growthRate.toFixed(2)));
@@ -2286,8 +2285,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     }, 100);
 
     // 創建圖表
-    createOperatingChart(data, operatingChartId);
-    createIncomeStatementChart(data, chartId);
+    createOperatingChart(filteredData, operatingChartId);
+    createIncomeStatementChart(filteredData, chartId);
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
