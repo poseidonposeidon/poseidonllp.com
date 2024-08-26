@@ -2167,20 +2167,17 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
 function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange) {
     const currentYear = new Date().getFullYear();
 
-    // 過濾數據以包含多一年的數據
+    // 根据年份范围过滤数据，多保留一年用于表格显示
     const filteredDataForTable = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= yearRange); // 表格顯示多一年的數據
-    });
+        return yearRange === 'all' || (currentYear - entryYear <= yearRange);
+    }).slice(-yearRange - 1);
 
-    const filteredDataForChart = filteredDataForTable.slice(1); // 去掉多出來的那一年數據，只保留選擇範圍內的數據
+    // 仅用于图表的数据（去除多保留的一年）
+    const filteredDataForChart = filteredDataForTable.slice(1);
 
     if (!filteredDataForTable || !Array.isArray(filteredDataForTable) || filteredDataForTable.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
-        const expandButton = document.getElementById('expandButton_Income');
-        if (expandButton) expandButton.style.display = 'none';
-        const collapseButton = document.getElementById('collapseButton_Income');
-        if (collapseButton) collapseButton.style.display = 'none';
         return;
     }
 
@@ -2226,7 +2223,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         growthRate: [period === 'annual' ? 'YoY Growth' : 'YoY Growth']
     };
 
-    // 填充行數據並計算增長率
+    // 填充行数据并计算增长率
     filteredDataForTable.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -2264,7 +2261,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
 
-        // 計算增長率
+        // 计算增长率
         if (index > 0) {
             if (period === 'annual') {
                 let lastRevenue = filteredDataForTable[index - 1].revenue;
@@ -2275,7 +2272,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                     rows.growthRate.push('N/A');
                 }
             } else {
-                // 查找去年同季度的數據
+                // 查找去年同季度的数据
                 let previousYearSameQuarterIndex = filteredDataForTable.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
                 if (previousYearSameQuarterIndex !== -1) {
                     let lastRevenue = filteredDataForTable[previousYearSameQuarterIndex].revenue;
@@ -2294,7 +2291,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     });
 
-    // 構建 HTML 表格
+    // 构建 HTML 表格
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
@@ -2310,7 +2307,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     </div>
     `;
 
-    // 創建容器結構
+    // 创建容器结构
     container.innerHTML = `
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div id="${chartId}Container">
@@ -2325,25 +2322,22 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         </div>
     `;
 
-    // 設置scroll位置
+    // 设置scroll位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
 
-            // 再次確認是否滾動到最右邊
+            // 再次确认是否滚动到最右边
             if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
                 scrollContainer.scrollLeft = scrollContainer.scrollWidth;
             }
         }
     }, 100);
 
-    // 創建圖表，僅使用篩選後的數據（刪除多出來的那一年）
+    // 创建图表，仅显示过滤后的数据（不包括多保留的一年）
     createOperatingChart(filteredDataForChart, operatingChartId);
     createIncomeStatementChart(filteredDataForChart, chartId);
-
-    const expandButton = document.getElementById('expandButton_Income');
-    if (expandButton) expandButton.style.display = 'inline'; // 顯示 Read More 按鈕
 }
 
 function updateDisplayedYears() {
