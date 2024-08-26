@@ -2319,6 +2319,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     // 创建容器结构
     container.innerHTML = `
+        <button id="downloadBtn">Download as Excel</button>
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div id="${chartId}Container">
                 ${tableHtml}
@@ -2330,7 +2331,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         <div id="chartContainer" style="margin-top: 20px;">
             <canvas id="${chartId}"></canvas>
         </div>
-        <button id="downloadBtn">Download as Excel</button>
+        
     `;
 
     // 设置scroll位置
