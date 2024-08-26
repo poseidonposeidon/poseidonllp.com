@@ -2357,35 +2357,13 @@ function updateDisplayedYears() {
 }
 
 function createOperatingChart(data, chartId) {
-    // 按日期排序資料
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 計算增長率
-    data.forEach((entry, index) => {
-        if (index > 0) {
-            let previousYearSameQuarterIndex = data.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
-            if (previousYearSameQuarterIndex !== -1) {
-                let lastRevenue = data[previousYearSameQuarterIndex].revenue;
-                if (entry.revenue && lastRevenue) {
-                    let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                    entry.growthRate = parseFloat(growthRate.toFixed(2));
-                } else {
-                    entry.growthRate = 'N/A';
-                }
-            } else {
-                entry.growthRate = 'N/A';
-            }
-        } else {
-            entry.growthRate = 'N/A';
-        }
-    });
-
-    // 過濾掉沒有收入數據的年份
-    const validData = data.filter(entry => entry.revenue != null);
+    // 計算增長率並過濾掉 'N/A' 的年份
+    const validData = data.filter(entry => entry.growthRate !== 'N/A');
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
