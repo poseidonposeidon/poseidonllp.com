@@ -2380,8 +2380,8 @@ function createOperatingChart(data, chartId) {
         }
     });
 
-    // 過濾掉增長率為 'N/A' 的數據
-    const validData = data.filter(entry => entry.growthRate !== 'N/A');
+    // 過濾掉增長率為 'N/A' 的年份，但保留其餘資料
+    const validData = data.filter(entry => entry.growthRate !== 'N/A' || (entry.growthRate === 'N/A' && entry.date.includes('2024')));
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
@@ -2466,6 +2466,7 @@ function createOperatingChart(data, chartId) {
         }
     });
 }
+
 
 function createIncomeStatementChart(data, chartId) {
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
