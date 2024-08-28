@@ -2042,7 +2042,10 @@ function fetchIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
+    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
+        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
+        bindDownloadButton(data, stockSymbol, 'downloadBtn');
+    }, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
 }
 
 function fetchJPIncomeStatement() {
@@ -2057,10 +2060,10 @@ function fetchJPIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period, yearRange);
-
-    // 修改下載按鈕綁定
-    bindDownloadButton(rows, stockSymbol, 'downloadBtnJP');
+    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
+        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
+        bindDownloadButton(data, stockSymbol, 'downloadBtnJP');
+    }, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period, yearRange);
 }
 
 async function fetchTWIncomeStatement() {
@@ -2075,10 +2078,11 @@ async function fetchTWIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period, yearRange);
 
-    // 修改下載按鈕綁定
-    bindDownloadButton(rows, stockSymbol, 'downloadBtnTW');
+    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
+        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
+        bindDownloadButton(data, stockSymbol, 'downloadBtnTW');
+    }, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period, yearRange);
 }
 
 function fetchEUIncomeStatement() {
@@ -2093,10 +2097,10 @@ function fetchEUIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period, yearRange);
-
-    // 修改下載按鈕綁定
-    bindDownloadButton(rows, stockSymbol, 'downloadBtnEU');
+    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
+        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
+        bindDownloadButton(data, stockSymbol, 'downloadBtnEU');
+    }, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period, yearRange);
 }
 
 function fetchKRIncomeStatement() {
@@ -2111,10 +2115,10 @@ function fetchKRIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period, yearRange);
-
-    // 修改下載按鈕綁定
-    bindDownloadButton(rows, stockSymbol, 'downloadBtnKR');
+    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
+        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
+        bindDownloadButton(data, stockSymbol, 'downloadBtnKR');
+    }, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period, yearRange);
 }
 
 function fetchHKIncomeStatement() {
@@ -2129,10 +2133,10 @@ function fetchHKIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period, yearRange);
-
-    // 修改下載按鈕綁定
-    bindDownloadButton(rows, stockSymbol, 'downloadBtnHK');
+    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
+        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
+        bindDownloadButton(data, stockSymbol, 'downloadBtnHK');
+    }, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period, yearRange);
 }
 
 function fetchCNIncomeStatement() {
@@ -2147,10 +2151,10 @@ function fetchCNIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period, yearRange);
-
-    // 修改下載按鈕綁定
-    bindDownloadButton(rows, stockSymbol, 'downloadBtnCN');
+    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
+        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
+        bindDownloadButton(data, stockSymbol, 'downloadBtnCN');
+    }, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period, yearRange);
 }
 
 function resetState(chartId, containerId) {
@@ -2185,7 +2189,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
             // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
             updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange);
 
-            // 调用 displayIncomeStatement 并传入所有需要的参数
+            // 调用传入的回调函数 (如 displayIncomeStatement)，并传入所有需要的参数
             callback(data, container, chartId, operatingChartId, period, yearRange);
         })
         .catch(error => {
