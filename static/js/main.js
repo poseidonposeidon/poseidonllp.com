@@ -217,7 +217,7 @@ function loadSectionJP(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRange" onchange="updateDisplayedYears()">
+                    <select id="yearRangeJP" onchange="updateDisplayedYears()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
@@ -331,7 +331,7 @@ function loadSectionTW(sectionId) {
                     </select>
                     
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRange" onchange="updateDisplayedYears()">
+                    <select id="yearRangeTW" onchange="updateDisplayedYears()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
@@ -411,7 +411,7 @@ function loadSectionEU(sectionId) {
                     </select>
                     
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRange" onchange="updateDisplayedYears()">
+                    <select id="yearRangeEU" onchange="updateDisplayedYears()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
@@ -525,7 +525,7 @@ function loadSectionKR(sectionId) {
                     </select>
                     
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRange" onchange="updateDisplayedYears()">
+                    <select id="yearRangKRe" onchange="updateDisplayedYears()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
@@ -638,7 +638,7 @@ function loadSectionHK(sectionId) {
                     </select>
                     
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRange" onchange="updateDisplayedYears()">
+                    <select id="yearRangeHK" onchange="updateDisplayedYears()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
@@ -751,7 +751,7 @@ function loadSectionCN(sectionId) {
                     </select>
                     
                     <label for="yearRange">Select Year Range:</label>             
-                    <select id="yearRange" onchange="updateDisplayedYears()">
+                    <select id="yearRangeCN" onchange="updateDisplayedYears()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
@@ -2046,9 +2046,9 @@ function fetchIncomeStatement() {
 }
 
 function fetchJPIncomeStatement() {
-    stockSymbol = fetchJPStock();
+    const stockSymbol = fetchJPStock();
     const period = document.getElementById('periodJP').value;
-    const yearRange = document.getElementById('yearRange').value;
+    const yearRange = document.getElementById('yearRangeJP').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2061,9 +2061,9 @@ function fetchJPIncomeStatement() {
 }
 
 async function fetchTWIncomeStatement() {
-    stockSymbol = await fetchTWStock();
+    const stockSymbol = await fetchTWStock();
     const period = document.getElementById('periodTW').value;
-    const yearRange = document.getElementById('yearRange').value;
+    const yearRange = document.getElementById('yearRangeTW').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2078,7 +2078,7 @@ async function fetchTWIncomeStatement() {
 function fetchEUIncomeStatement() {
     const stockSymbol = fetchEUStock();
     const period = document.getElementById('periodEU').value;
-    const yearRange = document.getElementById('yearRange').value;
+    const yearRange = document.getElementById('yearRangeEU').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2093,7 +2093,7 @@ function fetchEUIncomeStatement() {
 function fetchKRIncomeStatement() {
     const stockSymbol = fetchKRStock();
     const period = document.getElementById('periodKR').value;
-    const yearRange = document.getElementById('yearRange').value;
+    const yearRange = document.getElementById('yearRangeKR').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2108,7 +2108,7 @@ function fetchKRIncomeStatement() {
 function fetchHKIncomeStatement() {
     const stockSymbol = fetchHKStock();
     const period = document.getElementById('periodHK').value;
-    const yearRange = document.getElementById('yearRange').value;
+    const yearRange = document.getElementById('yearRangeHK').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2121,9 +2121,9 @@ function fetchHKIncomeStatement() {
 }
 
 function fetchCNIncomeStatement() {
-    const stockSymbol = fetchCNStock();  // 获取中国股票代码
-    const period = document.getElementById('periodCN').value;  // 获取选定的期间（年度或季度）
-    const yearRange = document.getElementById('yearRange').value;
+    const stockSymbol = fetchCNStock();
+    const period = document.getElementById('periodCN').value;
+    const yearRange = document.getElementById('yearRangeCN').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
