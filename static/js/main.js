@@ -2159,8 +2159,6 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
         });
 }
 
-
-
 function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange) {
     const currentYear = new Date().getFullYear();
 
@@ -2350,8 +2348,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     if (expandButton) expandButton.style.display = 'inline';
 
     // 绑定下载按钮的事件
-    const downloadBtn = document.getElementById('downloadBtn');
-    downloadBtn.replaceWith(downloadBtn.cloneNode(true));
+    // const downloadBtn = document.getElementById('downloadBtn');
+    // downloadBtn.replaceWith(downloadBtn.cloneNode(true));
     document.getElementById('downloadBtn').onclick = () => downloadExcel(rows, data[0].symbol);
 }
 // 下载 Excel 文件的函数
