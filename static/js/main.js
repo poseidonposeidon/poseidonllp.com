@@ -2135,19 +2135,24 @@ function fetchCNIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
 }
 
-function resetState(chartId) {
+function resetState(chartId, containerId) {
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
         delete incomeStatementChartInstances[chartId];
     }
-    // 可以在这里添加其他需要重置的全局状态
+
+    // 清除容器的内容，防止残留状态
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.innerHTML = '';
+    }
 }
 
 function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period, yearRange) {
     const container = document.getElementById(containerId);
 
-    // 重置狀態
-    resetState(chartId);
+    // 重置状态和清理容器
+    resetState(chartId, containerId);
 
     container.innerHTML = '<p>Loading...</p>';
 
@@ -2159,10 +2164,10 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                 return;
             }
 
-            // 使用傳入的 yearRange 參數，並調用 updateDisplayedYears
+            // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
             updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange);
 
-            // 調用 displayIncomeStatement 並傳入所有需要的參數
+            // 调用 displayIncomeStatement 并传入所有需要的参数
             callback(data, container, chartId, operatingChartId, period, yearRange);
         })
         .catch(error => {
@@ -2363,17 +2368,15 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 }
 
 function bindDownloadButton(rows, symbol) {
-    setTimeout(() => {
-        const oldDownloadBtn = document.getElementById('downloadBtn');
-        if (oldDownloadBtn) {
-            const newDownloadBtn = oldDownloadBtn.cloneNode(true);
-            oldDownloadBtn.replaceWith(newDownloadBtn);
-            newDownloadBtn.addEventListener('click', () => {
-                console.log("Button Clicked!");
-                downloadExcel(rows, symbol);
-            });
-        }
-    }, 0);
+    const downloadBtn = document.getElementById('downloadBtn');
+    if (downloadBtn) {
+        const newDownloadBtn = downloadBtn.cloneNode(true);  // 克隆节点以移除所有旧事件
+        downloadBtn.replaceWith(newDownloadBtn);  // 替换旧的节点
+        newDownloadBtn.addEventListener('click', () => {  // 重新绑定事件
+            console.log("Button Clicked!");
+            downloadExcel(rows, symbol);
+        });
+    }
 }
 // 下载 Excel 文件的函数
 function downloadExcel(rows, symbol) {
