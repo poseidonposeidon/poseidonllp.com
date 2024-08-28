@@ -2348,29 +2348,29 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     if (expandButton) expandButton.style.display = 'inline';
 
     // 绑定下载按钮的事件
-    // const downloadBtn = document.getElementById('downloadBtn');
-    // downloadBtn.replaceWith(downloadBtn.cloneNode(true));
+    const downloadBtn = document.getElementById('downloadBtn');
+    downloadBtn.replaceWith(downloadBtn.cloneNode(true));
     document.getElementById('downloadBtn').onclick = () => downloadExcel(rows, data[0].symbol);
 }
 // 下载 Excel 文件的函数
 function downloadExcel(rows, symbol) {
-    // 確保 rows 變數已經包含當前國家的數據
+    // Check if rows is defined and not empty
     if (!rows || Object.keys(rows).length === 0) {
         alert('No data available for download.');
         return;
     }
 
-    // 將 rows 對象轉換為數組格式
+    // Convert the rows object to an array format
     const data = Object.keys(rows).map(key => rows[key]);
 
-    // 創建工作簿和工作表
+    // Create workbook and worksheet
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(data);
 
-    // 將工作表添加到工作簿
+    // Add the worksheet to the workbook
     XLSX.utils.book_append_sheet(wb, ws, "Income Statement");
 
-    // 使用股票代碼來命名文件
+    // Use the stock symbol to name the file
     XLSX.writeFile(wb, `${symbol}_income_statement.xlsx`);
 }
 
@@ -2864,6 +2864,8 @@ function displayBalanceSheet(data, container, chartId) {
             }
         }
     }, 500);
+
+
 }
 
 function createCombinedBalanceSheetChart(data, chartId) {
