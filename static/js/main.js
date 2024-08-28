@@ -2186,7 +2186,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 按日期升序排序
     filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    rows = {
+    const rows = {
         date: ['Date'],
         symbol: ['Symbol'],
         reportedCurrency: ['Reported Currency'],
@@ -2349,14 +2349,11 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline';
 
-    // 添加下载按钮事件，传入当前股票代碼
-    document.getElementById('downloadBtn').addEventListener('click', () => {
-        downloadExcel(data[0].symbol);  // 使用传入的symbol来命名文件
-    });
+    // 绑定下载按钮的事件
+    document.getElementById('downloadBtn').onclick = () => downloadExcel(rows, data[0].symbol);
 }
-
 // 下载 Excel 文件的函数
-function downloadExcel(stockSymbol) {
+function downloadExcel(rows, symbol) {
     // 確保 rows 變數已經包含當前國家的數據
     if (!rows || Object.keys(rows).length === 0) {
         alert('No data available for download.');
@@ -2373,8 +2370,8 @@ function downloadExcel(stockSymbol) {
     // 將工作表添加到工作簿
     XLSX.utils.book_append_sheet(wb, ws, "Income Statement");
 
-    // 生成文件並觸發下載，文件名為 `stockSymbol_income_statement.xlsx`
-    XLSX.writeFile(wb, `${stockSymbol}_income_statement.xlsx`);
+    // 使用股票代碼來命名文件
+    XLSX.writeFile(wb, `${symbol}_income_statement.xlsx`);
 }
 
 function updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange) {
