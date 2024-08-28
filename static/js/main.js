@@ -2368,15 +2368,17 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 }
 
 function bindDownloadButton(rows, symbol) {
-    const downloadBtn = document.getElementById('downloadBtn');
-    if (downloadBtn) {
-        const newDownloadBtn = downloadBtn.cloneNode(true);  // 克隆节点以移除所有旧事件
-        downloadBtn.replaceWith(newDownloadBtn);  // 替换旧的节点
-        newDownloadBtn.addEventListener('click', () => {  // 重新绑定事件
-            console.log("Button Clicked!");
-            downloadExcel(rows, symbol);
-        });
-    }
+    setTimeout(() => {
+        const downloadBtn = document.getElementById('downloadBtn');
+        if (downloadBtn) {
+            const newDownloadBtn = downloadBtn.cloneNode(true);  // 克隆节点以移除所有旧事件
+            downloadBtn.replaceWith(newDownloadBtn);  // 替换旧的节点
+            newDownloadBtn.addEventListener('click', () => {  // 重新绑定事件
+                console.log("Button Clicked!");
+                downloadExcel(rows, symbol);
+            });
+        }
+    }, 100);  // 延迟执行确保DOM已经完全更新
 }
 // 下载 Excel 文件的函数
 function downloadExcel(rows, symbol) {
