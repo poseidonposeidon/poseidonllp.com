@@ -2326,7 +2326,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         <div id="chartContainer" style="margin-top: 20px;">
             <canvas id="${chartId}"></canvas>
         </div>
-        
     `;
 
     // 设置scroll位置
@@ -2348,14 +2347,15 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     if (expandButton) expandButton.style.display = 'inline';
 
     // 绑定下载按钮的事件
-    const downloadBtn = document.getElementById('downloadBtn');
-    downloadBtn.replaceWith(downloadBtn.cloneNode(true));
-    const newDownloadBtn = document.getElementById('downloadBtn');
-    newDownloadBtn.onclick = () => {
-        console.log("Button Clicked!");
-        downloadExcel(rows, data[0].symbol);
-    };
-
+    setTimeout(() => {
+        const downloadBtn = document.getElementById('downloadBtn');
+        downloadBtn.replaceWith(downloadBtn.cloneNode(true));  // 移除舊的事件並綁定新事件
+        const newDownloadBtn = document.getElementById('downloadBtn');
+        newDownloadBtn.onclick = () => {
+            console.log("Button Clicked!");
+            downloadExcel(rows, data[0].symbol);
+        };
+    }, 0);
 }
 // 下载 Excel 文件的函数
 function downloadExcel(rows, symbol) {
