@@ -2167,7 +2167,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 过滤数据以包含多两年的数据
     const filteredDataForTable = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 2)); // 表格显示多两年的数据
+        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 1)); // 表格显示多两年的数据
     });
 
     const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
