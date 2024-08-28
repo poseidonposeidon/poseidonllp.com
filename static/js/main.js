@@ -2186,7 +2186,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 按日期升序排序
     filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    const rows = {
+    let rows = {
         date: ['Date'],
         symbol: ['Symbol'],
         reportedCurrency: ['Reported Currency'],
