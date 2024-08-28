@@ -105,7 +105,7 @@ function loadSection(sectionId) {
                     <!-- 添加年份範圍選單 -->
                     <label for="yearRange">Select Year Range:</label>
                     <select id="yearRange" onchange="fetchIncomeStatement()">
-                        <option value="3">Last 3 Years</option>
+<!--                        <option value="3">Last 3 Years</option>-->
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -217,8 +217,8 @@ function loadSectionJP(sectionId) {
                         <option value="quarter">Quarter</option>
                     </select>
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRangeJP" onchange="updateDisplayedYears()">
-                        <option value="3">Last 3 Years</option>
+                    <select id="yearRangeJP" onchange="fetchJPIncomeStatement()">
+<!--                        <option value="3">Last 3 Years</option>-->
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -331,8 +331,8 @@ function loadSectionTW(sectionId) {
                     </select>
                     
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRangeTW" onchange="updateDisplayedYears()">
-                        <option value="3">Last 3 Years</option>
+                    <select id="yearRangeTW" onchange="fetchTWIncomeStatement()">
+<!--                        <option value="3">Last 3 Years</option>-->
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -411,8 +411,8 @@ function loadSectionEU(sectionId) {
                     </select>
                     
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRangeEU" onchange="updateDisplayedYears()">
-                        <option value="3">Last 3 Years</option>
+                    <select id="yearRangeEU" onchange="fetchEUIncomeStatement()">
+<!--                        <option value="3">Last 3 Years</option>-->
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -525,8 +525,8 @@ function loadSectionKR(sectionId) {
                     </select>
                     
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRangKR" onchange="updateDisplayedYears()">
-                        <option value="3">Last 3 Years</option>
+                    <select id="yearRangKR" onchange="fetchKRIncomeStatement()">
+<!--                        <option value="3">Last 3 Years</option>-->
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -638,8 +638,8 @@ function loadSectionHK(sectionId) {
                     </select>
                     
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRangeHK" onchange="updateDisplayedYears()">
-                        <option value="3">Last 3 Years</option>
+                    <select id="yearRangeHK" onchange="fetchHKIncomeStatement()">
+<!--                        <option value="3">Last 3 Years</option>-->
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -751,8 +751,8 @@ function loadSectionCN(sectionId) {
                     </select>
                     
                     <label for="yearRange">Select Year Range:</label>             
-                    <select id="yearRangeCN" onchange="updateDisplayedYears()">
-                        <option value="3">Last 3 Years</option>
+                    <select id="yearRangeCN" onchange="fetchCNIncomeStatement()">
+<!--                        <option value="3">Last 3 Years</option>-->
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
