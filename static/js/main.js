@@ -2042,16 +2042,13 @@ function fetchIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
-        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
-        bindDownloadButton(data, stockSymbol, 'downloadBtn');
-    }, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
 }
 
 function fetchJPIncomeStatement() {
     const stockSymbol = fetchJPStock();
     const period = document.getElementById('periodJP').value;
-    const yearRange = document.getElementById('yearRangeJP').value;
+    const yearRange = document.getElementById('yearRangeJP').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2060,16 +2057,13 @@ function fetchJPIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
-        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
-        bindDownloadButton(data, stockSymbol, 'downloadBtnJP');
-    }, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period, yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period , yearRange);
 }
 
 async function fetchTWIncomeStatement() {
     const stockSymbol = await fetchTWStock();
     const period = document.getElementById('periodTW').value;
-    const yearRange = document.getElementById('yearRangeTW').value;
+    const yearRange = document.getElementById('yearRangeTW').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2078,17 +2072,13 @@ async function fetchTWIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-
-    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
-        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
-        bindDownloadButton(data, stockSymbol, 'downloadBtnTW');
-    }, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period, yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period ,yearRange);
 }
 
 function fetchEUIncomeStatement() {
     const stockSymbol = fetchEUStock();
     const period = document.getElementById('periodEU').value;
-    const yearRange = document.getElementById('yearRangeEU').value;
+    const yearRange = document.getElementById('yearRangeEU').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2097,16 +2087,13 @@ function fetchEUIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
-        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
-        bindDownloadButton(data, stockSymbol, 'downloadBtnEU');
-    }, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period, yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period ,yearRange);
 }
 
 function fetchKRIncomeStatement() {
     const stockSymbol = fetchKRStock();
     const period = document.getElementById('periodKR').value;
-    const yearRange = document.getElementById('yearRangeKR').value;
+    const yearRange = document.getElementById('yearRangeKR').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2115,16 +2102,13 @@ function fetchKRIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
-        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
-        bindDownloadButton(data, stockSymbol, 'downloadBtnKR');
-    }, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period, yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period ,yearRange);
 }
 
 function fetchHKIncomeStatement() {
     const stockSymbol = fetchHKStock();
     const period = document.getElementById('periodHK').value;
-    const yearRange = document.getElementById('yearRangeHK').value;
+    const yearRange = document.getElementById('yearRangeHK').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2133,16 +2117,13 @@ function fetchHKIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
-        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
-        bindDownloadButton(data, stockSymbol, 'downloadBtnHK');
-    }, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period, yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period ,yearRange);
 }
 
 function fetchCNIncomeStatement() {
     const stockSymbol = fetchCNStock();
     const period = document.getElementById('periodCN').value;
-    const yearRange = document.getElementById('yearRangeCN').value;
+    const yearRange = document.getElementById('yearRangeCN').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2151,10 +2132,7 @@ function fetchCNIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, (data, container, chartId, operatingChartId, period, yearRange) => {
-        displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange);
-        bindDownloadButton(data, stockSymbol, 'downloadBtnCN');
-    }, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period, yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
 }
 
 function resetState(chartId, containerId) {
@@ -2189,7 +2167,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
             // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
             updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange);
 
-            // 调用传入的回调函数 (如 displayIncomeStatement)，并传入所有需要的参数
+            // 调用 displayIncomeStatement 并传入所有需要的参数
             callback(data, container, chartId, operatingChartId, period, yearRange);
         })
         .catch(error => {
@@ -2389,9 +2367,9 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     bindDownloadButton(rows, data[0].symbol);
 }
 
-function bindDownloadButton(rows, symbol, buttonId) {
+function bindDownloadButton(rows, symbol) {
     setTimeout(() => {
-        const downloadBtn = document.getElementById(buttonId);
+        const downloadBtn = document.getElementById('downloadBtn');
         if (downloadBtn) {
             const newDownloadBtn = downloadBtn.cloneNode(true);  // 克隆节点以移除所有旧事件
             downloadBtn.replaceWith(newDownloadBtn);  // 替换旧的节点
