@@ -104,7 +104,7 @@ function loadSection(sectionId) {
                     
                     <!-- 添加年份範圍選單 -->
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRange" onchange="updateDisplayedYears()">
+                    <select id="yearRange" onchange="fetchIncomeStatement()">
                         <option value="3">Last 3 Years</option>
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
