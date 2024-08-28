@@ -525,7 +525,7 @@ function loadSectionKR(sectionId) {
                     </select>
                     
                     <label for="yearRange">Select Year Range:</label>
-                    <select id="yearRangKR" onchange="fetchKRIncomeStatement()">
+                    <select id="yearRangeKR" onchange="fetchKRIncomeStatement()">
 <!--                        <option value="3">Last 3 Years</option>-->
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
