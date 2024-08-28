@@ -2350,7 +2350,12 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 绑定下载按钮的事件
     const downloadBtn = document.getElementById('downloadBtn');
     downloadBtn.replaceWith(downloadBtn.cloneNode(true));
-    document.getElementById('downloadBtn').onclick = () => downloadExcel(rows, data[0].symbol);
+    const newDownloadBtn = document.getElementById('downloadBtn');
+    newDownloadBtn.onclick = () => {
+        console.log("Button Clicked!");
+        downloadExcel(rows, data[0].symbol);
+    };
+
 }
 // 下载 Excel 文件的函数
 function downloadExcel(rows, symbol) {
