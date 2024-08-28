@@ -2147,10 +2147,8 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                 return;
             }
 
-            // 保存數據供年份範圍篩選使用
-            document.getElementById('yearRange').onchange = function() {
-                updateDisplayedYears(data, container, chartId, operatingChartId, period);
-            };
+            // 使用傳入的 yearRange 參數
+            updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange);
 
             // 初始顯示
             callback(data, container, chartId, operatingChartId, period, yearRange);
@@ -2371,13 +2369,12 @@ function downloadExcel(rows) {
     XLSX.writeFile(wb, "Income_Statement.xlsx");
 }
 
-function updateDisplayedYears(data, container, chartId, operatingChartId, period) {
+function updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange) {
     if (!data || !Array.isArray(data)) {
         console.error("Data is undefined or not an array");
         return;
     }
 
-    const yearRange = parseInt(document.getElementById('yearRange').value);
     const currentYear = new Date().getFullYear();
     const filteredData = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
