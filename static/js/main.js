@@ -2141,7 +2141,7 @@ function resetState(chartId, containerId) {
         delete incomeStatementChartInstances[chartId];
     }
 
-    // 清除容器的内容，防止残留状态
+    // 清除容器的內容，防止殘留狀態
     const container = document.getElementById(containerId);
     if (container) {
         container.innerHTML = '';
@@ -2179,10 +2179,10 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
 function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange) {
     const currentYear = new Date().getFullYear();
 
-    // 过滤数据以包含多两年的数据
+    // 過濾數據以包含多兩年的數據
     const filteredDataForTable = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 1)); // 表格显示多两年的数据
+        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 1)); // 表格顯示多兩年的數據
     });
 
     const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
@@ -2240,7 +2240,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         growthRate: [period === 'annual' ? 'YoY Growth' : 'YoY Growth']
     };
 
-    // 填充行数据并计算增长率
+    // 填充行數據並計算增長率
     filteredDataForTable.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -2278,7 +2278,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
 
-        // 计算增长率
+        // 計算增長率
         if (index > 0) {
             if (period === 'annual') {
                 let lastRevenue = filteredDataForTable[index - 1].revenue;
@@ -2313,7 +2313,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     });
 
-    // 构建 HTML 表格
+    // 構建 HTML 表格
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
@@ -2329,9 +2329,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     </div>
     `;
 
-    // 创建容器结构
+    // 創建容器結構，並綁定唯一的下載按鈕ID
+    const downloadButtonId = `downloadBtn_${chartId}`;
     container.innerHTML = `
-        <button id="downloadBtn">Download as Excel</button>
+        <button id="${downloadButtonId}">Download as Excel</button>
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div id="${chartId}Container">
                 ${tableHtml}
@@ -2345,7 +2346,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         </div>
     `;
 
-    // 设置scroll位置
+    // 設置scroll位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
@@ -2356,29 +2357,26 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     }, 100);
 
-    // 创建图表，仅使用筛选后的数据（删除多出来的那一年）
+    // 創建圖表，僅使用篩選後的數據（刪除多出來的那一年）
     createOperatingChart(filteredDataForChart, operatingChartId);
     createIncomeStatementChart(filteredDataForChart, chartId);
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline';
 
-    // 清除旧的事件并绑定新的下载按钮事件
-    bindDownloadButton(rows, data[0].symbol);
+    // 清除舊的事件並綁定新的下載按鈕事件
+    bindDownloadButton(rows, data[0].symbol, downloadButtonId);
 }
 
-function bindDownloadButton(rows, symbol) {
+function bindDownloadButton(rows, symbol, buttonId) {
     setTimeout(() => {
-        const downloadBtn = document.getElementById('downloadBtn');
+        const downloadBtn = document.getElementById(buttonId);
         if (downloadBtn) {
-            const newDownloadBtn = downloadBtn.cloneNode(true);  // 克隆节点以移除所有旧事件
-            downloadBtn.replaceWith(newDownloadBtn);  // 替换旧的节点
-            newDownloadBtn.addEventListener('click', () => {  // 重新绑定事件
-                console.log("Button Clicked!");
+            downloadBtn.addEventListener('click', () => {  // 重新綁定事件
                 downloadExcel(rows, symbol);
             });
         }
-    }, 100);  // 延迟执行确保DOM已经完全更新
+    }, 100);  // 延遲執行確保 DOM 已經完全更新
 }
 // 下载 Excel 文件的函数
 function downloadExcel(rows, symbol) {
