@@ -2159,6 +2159,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
         });
 }
 
+let rows = {};  // 提升 rows 為全局變數
 
 function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange) {
     const currentYear = new Date().getFullYear();
@@ -2185,7 +2186,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 按日期升序排序
     filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    let rows = {
+    rows = {
         date: ['Date'],
         symbol: ['Symbol'],
         reportedCurrency: ['Reported Currency'],
@@ -2355,20 +2356,27 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 }
 
 // 下载 Excel 文件的函数
-function downloadExcel(rows) {
-    // 将 rows 对象转换为数组格式
+function downloadExcel() {
+    // 確保 rows 變數已經包含當前國家的數據
+    if (!rows || Object.keys(rows).length === 0) {
+        alert('No data available for download.');
+        return;
+    }
+
+    // 將 rows 對象轉換為數組格式
     const data = Object.keys(rows).map(key => rows[key]);
 
-    // 创建工作簿和工作表
+    // 創建工作簿和工作表
     const wb = XLSX.utils.book_new();
     const ws = XLSX.utils.aoa_to_sheet(data);
 
-    // 将工作表添加到工作簿
+    // 將工作表添加到工作簿
     XLSX.utils.book_append_sheet(wb, ws, "Income Statement");
 
-    // 生成文件并触发下载
+    // 生成文件並觸發下載
     XLSX.writeFile(wb, "Income_Statement.xlsx");
 }
+
 
 function updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange) {
     if (!data || !Array.isArray(data)) {
