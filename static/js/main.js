@@ -2164,10 +2164,10 @@ let rows = {};  // 提升 rows 為全局變數
 function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange) {
     const currentYear = new Date().getFullYear();
 
-    // 过滤数据以包含多一年的数据
+    // 过滤数据以包含多两年的数据
     const filteredDataForTable = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= yearRange); // 表格显示多一年的数据
+        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 2)); // 表格显示多两年的数据
     });
 
     const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
