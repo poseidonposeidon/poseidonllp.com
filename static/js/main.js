@@ -2140,6 +2140,7 @@ function resetState(chartId) {
         incomeStatementChartInstances[chartId].destroy();
         delete incomeStatementChartInstances[chartId];
     }
+    // 可以在这里添加其他需要重置的全局状态
 }
 
 function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period, yearRange) {
@@ -2362,15 +2363,16 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 }
 
 function bindDownloadButton(rows, symbol) {
-    // 使用setTimeout来确保事件在DOM更新后才被绑定
     setTimeout(() => {
-        const downloadBtn = document.getElementById('downloadBtn');
-        downloadBtn.replaceWith(downloadBtn.cloneNode(true));  // 移除舊的事件綁定
-        const newDownloadBtn = document.getElementById('downloadBtn');
-        newDownloadBtn.onclick = () => {
-            console.log("Button Clicked!");
-            downloadExcel(rows, symbol);
-        };
+        const oldDownloadBtn = document.getElementById('downloadBtn');
+        if (oldDownloadBtn) {
+            const newDownloadBtn = oldDownloadBtn.cloneNode(true);
+            oldDownloadBtn.replaceWith(newDownloadBtn);
+            newDownloadBtn.addEventListener('click', () => {
+                console.log("Button Clicked!");
+                downloadExcel(rows, symbol);
+            });
+        }
     }, 0);
 }
 // 下载 Excel 文件的函数
