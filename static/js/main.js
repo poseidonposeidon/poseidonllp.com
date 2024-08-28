@@ -2093,7 +2093,7 @@ function fetchEUIncomeStatement() {
 function fetchKRIncomeStatement() {
     const stockSymbol = fetchKRStock();
     const period = document.getElementById('periodKR').value;
-    const yearRange = document.getElementById('yearRangeKR').value;  // 修改這行，正確獲取對應市場的年份選擇器
+    const yearRange = document.getElementById('yearRange').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
