@@ -2346,14 +2346,19 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline';
 
-    // 绑定下载按钮的事件
+    // 清除旧的事件并绑定新的下载按钮事件
+    bindDownloadButton(rows, data[0].symbol);
+}
+
+function bindDownloadButton(rows, symbol) {
+    // 使用setTimeout来确保事件在DOM更新后才被绑定
     setTimeout(() => {
         const downloadBtn = document.getElementById('downloadBtn');
-        downloadBtn.replaceWith(downloadBtn.cloneNode(true));  // 移除舊的事件並綁定新事件
+        downloadBtn.replaceWith(downloadBtn.cloneNode(true));  // 移除舊的事件綁定
         const newDownloadBtn = document.getElementById('downloadBtn');
         newDownloadBtn.onclick = () => {
             console.log("Button Clicked!");
-            downloadExcel(rows, data[0].symbol);
+            downloadExcel(rows, symbol);
         };
     }, 0);
 }
