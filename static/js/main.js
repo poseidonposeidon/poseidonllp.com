@@ -2372,11 +2372,18 @@ function bindDownloadButton(rows, symbol, buttonId) {
     setTimeout(() => {
         const downloadBtn = document.getElementById(buttonId);
         if (downloadBtn) {
-            downloadBtn.addEventListener('click', () => {  // 重新綁定事件
+            // 移除之前的所有事件綁定
+            downloadBtn.removeEventListener('click', downloadExcelEventHandler);
+
+            // 定義一個新的事件處理函數
+            const downloadExcelEventHandler = function() {
                 downloadExcel(rows, symbol);
-            });
+            };
+
+            // 為按鈕綁定新的事件
+            downloadBtn.addEventListener('click', downloadExcelEventHandler);
         }
-    }, 100);  // 延遲執行確保 DOM 已經完全更新
+    }, 100);  // 延遲執行以確保 DOM 已完全更新
 }
 // 下载 Excel 文件的函数
 function downloadExcel(rows, symbol) {
