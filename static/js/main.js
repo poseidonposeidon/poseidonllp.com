@@ -2135,8 +2135,19 @@ function fetchCNIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
 }
 
+function resetState(chartId) {
+    if (incomeStatementChartInstances[chartId]) {
+        incomeStatementChartInstances[chartId].destroy();
+        delete incomeStatementChartInstances[chartId];
+    }
+}
+
 function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period, yearRange) {
     const container = document.getElementById(containerId);
+
+    // 重置狀態
+    resetState(chartId);
+
     container.innerHTML = '<p>Loading...</p>';
 
     fetch(apiUrl)
