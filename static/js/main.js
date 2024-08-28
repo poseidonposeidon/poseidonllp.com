@@ -2372,16 +2372,13 @@ function bindDownloadButton(rows, symbol, buttonId) {
     setTimeout(() => {
         const downloadBtn = document.getElementById(buttonId);
         if (downloadBtn) {
-            // 移除之前的所有事件綁定
-            downloadBtn.removeEventListener('click', downloadExcelEventHandler);
+            // 先移除舊的事件綁定
+            downloadBtn.onclick = null;
 
-            // 定義一個新的事件處理函數
-            const downloadExcelEventHandler = function() {
+            // 直接使用新的事件處理函數綁定
+            downloadBtn.onclick = function() {
                 downloadExcel(rows, symbol);
             };
-
-            // 為按鈕綁定新的事件
-            downloadBtn.addEventListener('click', downloadExcelEventHandler);
         }
     }, 100);  // 延遲執行以確保 DOM 已完全更新
 }
