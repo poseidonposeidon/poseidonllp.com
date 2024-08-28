@@ -2147,10 +2147,10 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
                 return;
             }
 
-            // 使用傳入的 yearRange 參數
+            // 使用傳入的 yearRange 參數，並調用 updateDisplayedYears
             updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange);
 
-            // 初始顯示
+            // 調用 displayIncomeStatement 並傳入所有需要的參數
             callback(data, container, chartId, operatingChartId, period, yearRange);
         })
         .catch(error => {
