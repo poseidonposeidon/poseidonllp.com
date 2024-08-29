@@ -2842,10 +2842,10 @@ function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId, period, 
             console.log('Year Range:', yearRange);
 
             // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
-            updateDisplayedYears_BS(data, container, chartId, period, yearRange);
+            const filteredData = updateDisplayedYears_BS(data, container, chartId, period, yearRange);
 
             // 调用 displayBalanceSheet 并传入所有需要的参数
-            callback(data, container, chartId, period, yearRange);
+            callback(filteredData, container, chartId, period, yearRange);  // 传递过滤后的数据
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
@@ -2856,18 +2856,25 @@ function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId, period, 
 function updateDisplayedYears_BS(data, container, chartId, period, yearRange) {
     if (!data || !Array.isArray(data)) {
         console.error("Data is undefined or not an array");
-        return;
+        return [];
     }
 
     const currentYear = new Date().getFullYear();
-    const yearRangeInt = yearRange === 'all' ? Infinity : parseInt(yearRange, 10); // 处理年份范围
+    console.log("Original Data Length:", data.length);  // 确认初始数据数量
+    console.log("Year Range:", yearRange);  // 确认年份范围
 
     const filteredData = data.filter(entry => {
-        const entryYear = parseInt(entry.calendarYear, 10); // 确保年份是整数
-        return yearRangeInt === Infinity || (currentYear - entryYear <= yearRangeInt);
+        const entryYear = parseInt(entry.calendarYear);
+        if (yearRange === 'all') {
+            return true; // 返回所有年份的数据
+        } else {
+            const yearRangeInt = parseInt(yearRange);
+            return currentYear - entryYear <= yearRangeInt; // 根据年份范围过滤数据
+        }
     });
 
-    displayBalanceSheet(filteredData, container, chartId, period, yearRange);
+    console.log("Filtered Data Length:", filteredData.length);  // 确认过滤后的数据数量
+    return filteredData;  // 返回过滤后的数据
 }
 
 function displayBalanceSheet(data, container, chartId, period, yearRange) {
