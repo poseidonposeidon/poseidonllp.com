@@ -248,8 +248,8 @@ function loadSectionJP(sectionId) {
         <div class="section" id="balance-sheet">
             <h2>Balance Sheet Statements</h2>
             <div class="content scroll-container-x">
-                <label for="period_2">Select Period:</label>
-                <select id="period_2">
+                <label for="periodJP_2">Select Period:</label>
+                <select id="periodJP_2">
                     <option value="annual">Annual</option>
                     <option value="quarter">Quarter</option>
                 </select>
