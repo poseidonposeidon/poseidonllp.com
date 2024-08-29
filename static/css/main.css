@@ -74,110 +74,58 @@ div {
     padding: 10px;
     border-radius: 5px;
 }
-/*////////////////////////////////////////////////////////////////*/
+
 .navbar {
     display: flex;
-    justify-content: space-between; /* 讓內容左右對齊 */
-    align-items: center; /* 垂直居中對齊 */
+    justify-content: center;
+    align-items: center;
     background-color: #121212;
     padding: 5px 10px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     width: 100%;
     margin-bottom: 10px;
+    transition: background-color 0.3s ease;
     position: relative;
-    z-index: 1000;
+    top: -10px;
+    z-index: 1000; /* 提升導航欄的層級 */
 }
 
 .logo-container {
     display: flex;
     align-items: center;
+    margin-right: 20px; /* 確保 logo 和連結之間有一點空間 */
 }
 
 .logo {
     height: 40px;
     width: auto;
-    margin-right: 20px;
+    margin-right: 50px; /* 默認情況下的 margin */
 }
 
 .navbar-links {
     display: flex;
-    justify-content: flex-end; /* 將導航連結推到右側 */
-    align-items: center;
+    justify-content: center;
+    background-color: #121212;
 }
 
-.navbar-links a,
-.navbar .dropdown .dropbtn {
+.navbar-links a {
     display: flex;
     align-items: center;
     justify-content: center;
     text-decoration: none;
     color: white;
-    margin: 0 10px;
+    margin: 0 10px; /* 增加 margin 來讓連結之間有些空間 */
     padding: 5px 10px;
     border-radius: 5px;
     transition: all 0.3s ease;
     font-size: 16px;
 }
 
-.navbar-links a:hover,
-.navbar .dropdown .dropbtn:hover {
-    background-color: #2c2c2c;
+.navbar-links a:hover {
     color: #90caf9;
 }
 
-.navbar .dropdown {
-    position: relative;
-    display: inline-block;
-}
-
-.navbar .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #1e1e1e;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    border-radius: 5px;
-}
-
-.navbar .dropdown-content a {
-    color: #90caf9;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    transition: background-color 0.3s ease;
-}
-
-.navbar .dropdown-content a:hover {
-    background-color: #2c2c2c;
-    color: white;
-}
-
-.navbar .dropdown:hover .dropdown-content {
-    display: block;
-}
-
-.navbar .dropdown .dropbtn {
-    background-color: #121212;
-    border: none;
-    cursor: pointer;
-}
-
-@media (max-width: 768px) {
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .navbar-links {
-        justify-content: center;
-        width: 100%;
-    }
-}
-
-
-/*////////////////////////////////////////////////////////////*/
 .section {
     border: 1px solid #333;
     padding: 5px;
@@ -411,15 +359,6 @@ button:not(.info-input button):hover {
 
     .logo {
         margin-right: 30px; /* 平板設備上的 margin */
-    }
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .navbar-links {
-        justify-content: center;
-        width: 100%;
     }
 }
 
