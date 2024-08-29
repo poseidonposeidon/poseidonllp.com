@@ -3300,8 +3300,10 @@ function fetchCNCashflow() {
 function fetchData_Cashflow(apiUrl, callback, containerId, chartId, period, yearRange) {
     const container = document.getElementById(containerId);
 
-    // 重置状态和清理容器
-    resetState(chartId, containerId);
+    if (!container) {
+        console.error(`Container element with id ${containerId} not found.`);
+        return;
+    }
 
     container.innerHTML = '<p>Loading...</p>';
 
@@ -3312,15 +3314,8 @@ function fetchData_Cashflow(apiUrl, callback, containerId, chartId, period, year
                 container.innerHTML = '<p>No data found for this symbol.</p>';
                 return;
             }
-
-            console.log('Original Data Length:', data.length);
-            console.log('Year Range:', yearRange);
-
-            // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
             const filteredData = updateDisplayedYears_CF(data, container, chartId, period, yearRange);
-
-            // 调用 displayCashflow 并传入所有需要的参数
-            callback(filteredData, container, chartId, period, yearRange);  // 传递过滤后的数据
+            callback(filteredData, container, chartId, period, yearRange);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
