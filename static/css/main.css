@@ -74,10 +74,10 @@ div {
     padding: 10px;
     border-radius: 5px;
 }
-
+/*////////////////////////////////////////////////////////////////*/
 .navbar {
     display: flex;
-    justify-content: center;
+    justify-content: space-between; /* 确保 logo 和导航项之间的距离 */
     align-items: center;
     background-color: #121212;
     padding: 5px 10px;
@@ -88,24 +88,24 @@ div {
     transition: background-color 0.3s ease;
     position: relative;
     top: -10px;
-    z-index: 1000; /* 提升導航欄的層級 */
+    z-index: 1000; /* 提升导航栏的层级 */
 }
 
 .logo-container {
     display: flex;
     align-items: center;
-    margin-right: 20px; /* 確保 logo 和連結之間有一點空間 */
 }
 
 .logo {
     height: 40px;
     width: auto;
-    margin-right: 50px; /* 默認情況下的 margin */
+    margin-right: 20px; /* 确保 logo 和导航项之间有一点空间 */
 }
 
 .navbar-links {
     display: flex;
-    justify-content: center;
+    justify-content: flex-end; /* 将导航项推到右侧 */
+    align-items: center;
     background-color: #121212;
 }
 
@@ -115,7 +115,7 @@ div {
     justify-content: center;
     text-decoration: none;
     color: white;
-    margin: 0 10px; /* 增加 margin 來讓連結之間有些空間 */
+    margin: 0 10px; /* 增加 margin 让链接之间有些空间 */
     padding: 5px 10px;
     border-radius: 5px;
     transition: all 0.3s ease;
@@ -126,6 +126,55 @@ div {
     color: #90caf9;
 }
 
+/* Dropdown 样式 */
+.navbar .dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.navbar .dropbtn {
+    background-color: #121212;
+    color: white;
+    padding: 10px 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.navbar .dropbtn:hover,
+.navbar .dropbtn:focus {
+    background-color: #2c2c2c;
+    color: #90caf9;
+}
+
+.navbar .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #1e1e1e;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.navbar .dropdown-content a {
+    color: #90caf9;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+    transition: background-color 0.3s ease;
+}
+
+.navbar .dropdown-content a:hover {
+    background-color: #2c2c2c;
+    color: white;
+}
+
+.navbar .dropdown:hover .dropdown-content {
+    display: block;
+}
+/*////////////////////////////////////////////////////////////*/
 .section {
     border: 1px solid #333;
     padding: 5px;
@@ -359,6 +408,15 @@ button:not(.info-input button):hover {
 
     .logo {
         margin-right: 30px; /* 平板設備上的 margin */
+    }
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .navbar-links {
+        justify-content: center;
+        width: 100%;
     }
 }
 
