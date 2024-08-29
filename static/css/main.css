@@ -75,18 +75,6 @@ div {
     border-radius: 5px;
 }
 
-.logo-container {
-    display: flex;
-    align-items: center;
-    margin-right: 20px; /* 確保 logo 和連結之間有一點空間 */
-}
-
-.logo {
-    height: 40px;
-    width: auto;
-    margin-right: 50px; /* 默認情況下的 margin */
-}
-
 .navbar {
     display: flex;
     justify-content: center;
@@ -103,66 +91,22 @@ div {
     z-index: 1000; /* 提升導航欄的層級 */
 }
 
-/* 添加新的 dropdown 样式 */
-.navbar .dropdown {
-    position: relative;
-    display: inline-block;
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-right: 20px; /* 確保 logo 和連結之間有一點空間 */
 }
 
-.navbar .dropbtn {
-    background-color: #121212;
-    color: white;
-    padding: 10px 16px;
-    font-size: 16px;
-    border: none;
-    cursor: pointer;
-}
-
-.navbar .dropbtn:hover,
-
-.navbar .dropbtn:focus {
-    background-color: #2c2c2c;
-    color: #90caf9;
-}
-
-.navbar .dropdown-content a {
-    text-align: left;
-    padding: 10px 20px;
-}
-
-.navbar .dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #1e1e1e;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    border-radius: 5px;
-    overflow: hidden;
-}
-
-.navbar .dropdown-content a {
-    color: #90caf9;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-    transition: background-color 0.3s ease;
-}
-
-.navbar .dropdown-content a:hover {
-    background-color: #2c2c2c;
-    color: white;
-}
-
-.navbar .dropdown:hover .dropdown-content {
-    display: block;
+.logo {
+    height: 40px;
+    width: auto;
+    margin-right: 50px; /* 默認情況下的 margin */
 }
 
 .navbar-links {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 20px; /* 控制子项间距 */
+    justify-content: center;
+    background-color: #121212;
 }
 
 .navbar-links a {
@@ -415,16 +359,6 @@ button:not(.info-input button):hover {
 
     .logo {
         margin-right: 30px; /* 平板設備上的 margin */
-    }
-    .navbar {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .navbar .dropdown-content {
-        position: relative;
-        width: 100%;
-        box-shadow: none;
     }
 }
 
