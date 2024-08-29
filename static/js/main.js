@@ -3327,10 +3327,10 @@ function fetchData_Cashflow(apiUrl, callback, containerId, chartId, period, year
             }
 
             // 使用传入的 yearRange 参数，并调用 updateDisplayedYears_CF
-            const filteredData = updateDisplayedYears_CF(data, container, chartId, period, yearRange);
+            const filteredData = updateDisplayedYears_CF(data, containerId, chartId, period, yearRange);
 
             // 调用 displayCashflow 并传入所有需要的参数
-            callback(filteredData, container, chartId, period, yearRange);
+            callback(filteredData, containerId, chartId, period, yearRange); // 确保这里传递的是 containerId
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
