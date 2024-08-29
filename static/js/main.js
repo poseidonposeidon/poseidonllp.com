@@ -2878,12 +2878,24 @@ function updateDisplayedYears_BS(data, container, chartId, period, yearRange) {
 }
 
 function displayBalanceSheet(data, container, chartId, period, yearRange) {
-    if (!data || !Array.isArray(data) || data.length === 0) {
+    const currentYear = new Date().getFullYear();
+
+    // 過濾數據以包含多兩年的數據
+    const filteredDataForTable = data.filter(entry => {
+        const entryYear = parseInt(entry.calendarYear);
+        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 2)); // 表格顯示多兩年的數據
+    });
+
+    // 保持图表数据与表格数据一致
+    const filteredDataForChart = filteredDataForTable;
+
+    if (!filteredDataForTable || !Array.isArray(filteredDataForTable) || filteredDataForTable.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         return;
     }
 
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+    // 按日期升序排序
+    filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let rows = {
         date: ['Date'],
@@ -2941,7 +2953,7 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
         debtToAssetRate: ['Debt to Asset Rate']
     };
 
-    data.forEach((entry) => {
+    filteredDataForTable.forEach((entry) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
@@ -3043,8 +3055,8 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
         }
     }, 100);
 
-    // 創建圖表
-    createCombinedBalanceSheetChart(data, chartId);
+    // 創建圖表，僅使用篩選後的數據（刪除多出來的那一年）
+    createCombinedBalanceSheetChart(filteredDataForChart, chartId);
 
     // 清除舊的事件並綁定新的下載按鈕事件
     bindDownloadButton_BS(rows, data[0].symbol, downloadButtonId, "Balance Sheet");
