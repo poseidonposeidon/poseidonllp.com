@@ -248,8 +248,8 @@ function loadSectionJP(sectionId) {
         <div class="section" id="balance-sheet">
             <h2>Balance Sheet Statements</h2>
             <div class="content scroll-container-x">
-                <label for="period_2JP">Select Period:</label>
-                <select id="period_2JP">
+                <label for="periodJP_2">Select Period:</label>
+                <select id="periodJP_2">
                     <option value="annual">Annual</option>
                     <option value="quarter">Quarter</option>
                 </select>
@@ -264,7 +264,7 @@ function loadSectionJP(sectionId) {
                     
     
                 <button onclick="fetchJPBalanceSheet()">Load Statement</button>
-                <div id="balanceSheetContainer"></div>
+                <div id="balanceSheetContainerJP"></div>
             </div>
         </div>`,
         'cashflow-statement': `
@@ -2734,7 +2734,7 @@ function fetchBalanceSheet() {
 
 function fetchJPBalanceSheet() {
     const stockSymbol = fetchJPStock();
-    const period = document.getElementById('period_2JP').value;
+    const period = document.getElementById('periodJP_2').value;
     const yearRange = document.getElementById('yearRangeJP_2').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
