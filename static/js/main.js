@@ -264,7 +264,7 @@ function loadSectionJP(sectionId) {
                     
     
                 <button onclick="fetchJPBalanceSheet()">Load Statement</button>
-                <div id="balanceSheetContainerJP1"></div>
+                <div id="balanceSheetContainerJP"></div>
             </div>
         </div>`,
         'cashflow-statement': `
