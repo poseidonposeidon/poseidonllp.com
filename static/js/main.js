@@ -124,6 +124,14 @@ function loadSection(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRange_2">Select Year Range:</label>
+                    <select id="yearRange_2" onchange="fetchBalanceSheet()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
+                    
                     <button onclick="fetchBalanceSheet()">Load Statement</button>
                     <div id="balanceSheetContainer"></div>
                 </div>
@@ -136,6 +144,14 @@ function loadSection(sectionId) {
                     <select id="period_3">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
+                    </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRange_3">Select Year Range:</label>
+                    <select id="yearRange_3" onchange="fetchCashflow()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
                     </select>
                     <button onclick="fetchCashflow()">Load Statement</button>
                     <div id="cashflowContainer"></div>
@@ -229,18 +245,28 @@ function loadSectionJP(sectionId) {
                 </div>
             </div>`,
         'balance-sheet': `
-            <div class="section" id="balance-sheet-JP">
-                <h2>Balance Sheet Statements</h2>
-                <div class="content scroll-container-x">
-                    <label for="periodJP_2">Select Period:</label>
-                    <select id="periodJP_2">
-                        <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
-                    </select>
-                    <button onclick="fetchJPBalanceSheet()">Load Statement</button>
-                    <div id="balanceSheetContainerJP"></div>
-                </div>
-            </div>`,
+        <div class="section" id="balance-sheet">
+            <h2>Balance Sheet Statements</h2>
+            <div class="content scroll-container-x">
+                <label for="period_2">Select Period:</label>
+                <select id="period_2">
+                    <option value="annual">Annual</option>
+                    <option value="quarter">Quarter</option>
+                </select>
+                
+                <!-- 添加年份範圍選單 -->
+                <label for="yearRangeJP_2">Select Year Range:</label>
+                <select id="yearRangeJP_2" onchange="fetchJPBalanceSheet()">
+                    <option value="5">Last 5 Years</option>
+                    <option value="10">Last 10 Years</option>
+                    <option value="all">All Years</option>
+                </select>
+                    
+    
+                <button onclick="fetchBalanceSheet()">Load Statement</button>
+                <div id="balanceSheetContainer"></div>
+            </div>
+        </div>`,
         'cashflow-statement': `
             <div class="section" id="cashflow-statement-JP">
                 <h2>Cashflow Statement</h2>
@@ -249,6 +275,14 @@ function loadSectionJP(sectionId) {
                     <select id="periodJP_3">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
+                    </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRangeJP_3">Select Year Range:</label>
+                    <select id="yearRangeJP_3" onchange="fetchJPCashflow()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
                     </select>
                     <button onclick="fetchJPCashflow()">Load Statement</button>
                     <div id="cashflowContainerJP"></div>
@@ -351,6 +385,14 @@ function loadSectionTW(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRangeTW_2">Select Year Range:</label>
+                    <select id="yearRangeTW_2" onchange="fetchTWBalanceSheet()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
                     <button onclick="fetchTWBalanceSheet()">Load Statement</button>
                     <div id="balanceSheetContainerTW"></div>
                 </div>
@@ -363,6 +405,14 @@ function loadSectionTW(sectionId) {
                     <select id="periodTW_3">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
+                    </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRangeTW_3">Select Year Range:</label>
+                    <select id="yearRangeTW_3" onchange="fetchTWCashflow()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
                     </select>
                     <button onclick="fetchTWCashflow()">Load Statement</button>
                     <div id="cashflowContainerTW"></div>
@@ -431,6 +481,14 @@ function loadSectionEU(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRange_2EU">Select Year Range:</label>
+                    <select id="yearRange_2EU" onchange="fetchEUBalanceSheet()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
                     <button onclick="fetchEUBalanceSheet()">Load Statement</button>
                     <div id="balanceSheetContainerEU"></div>
                 </div>
@@ -444,6 +502,15 @@ function loadSectionEU(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRange_3EU">Select Year Range:</label>
+                    <select id="yearRange_3EU" onchange="fetchEUCashflow()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
+                    
                     <button onclick="fetchEUCashflow()">Load Statement</button>
                     <div id="cashflowContainerEU"></div>
                 </div>
@@ -544,6 +611,14 @@ function loadSectionKR(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRange_2KR">Select Year Range:</label>
+                    <select id="yearRange_2KR" onchange="fetchKRBalanceSheet()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
                     <button onclick="fetchKRBalanceSheet()">Load Statement</button>
                     <div id="balanceSheetContainerKR"></div>
                 </div>
@@ -556,6 +631,14 @@ function loadSectionKR(sectionId) {
                     <select id="period_3KR">
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
+                    </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRange_3KR">Select Year Range:</label>
+                    <select id="yearRange_3KR" onchange="fetchKRCashflow()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
                     </select>
                     <button onclick="fetchKRCashflow()">Load Statement</button>
                     <div id="cashflowContainerKR"></div>
@@ -657,6 +740,14 @@ function loadSectionHK(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRange_2HK">Select Year Range:</label>
+                    <select id="yearRange_2HK" onchange="fetchHKBalanceSheet()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
                     <button onclick="fetchHKBalanceSheet()">Load Statement</button>
                     <div id="balanceSheetContainerHK"></div>
                 </div>
@@ -670,6 +761,15 @@ function loadSectionHK(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRange_3HK">Select Year Range:</label>
+                    <select id="yearRange_3HK" onchange="fetchHKCashflow()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
+                    
                     <button onclick="fetchHKCashflow()">Load Statement</button>
                     <div id="cashflowContainerHK"></div>
                 </div>
@@ -770,6 +870,15 @@ function loadSectionCN(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRange_2CN">Select Year Range:</label>
+                    <select id="yearRange_2CN" onchange="fetchCNBalanceSheet()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
+                    
                     <button onclick="fetchCNBalanceSheet()">Load Statement</button>
                     <div id="balanceSheetContainerCN"></div>
                 </div>
@@ -783,6 +892,15 @@ function loadSectionCN(sectionId) {
                         <option value="annual">Annual</option>
                         <option value="quarter">Quarter</option>
                     </select>
+                    
+                    <!-- 添加年份範圍選單 -->
+                    <label for="yearRange_3CN">Select Year Range:</label>
+                    <select id="yearRange_3CN" onchange="fetchCNCashflow()">
+                        <option value="5">Last 5 Years</option>
+                        <option value="10">Last 10 Years</option>
+                        <option value="all">All Years</option>
+                    </select>
+                    
                     <button onclick="fetchCNCashflow()">Load Statement</button>
                     <div id="cashflowContainerCN"></div>
                 </div>
@@ -2602,6 +2720,7 @@ let balanceSheetChartInstances = {}; // 用於存儲不同國家的圖表實例
 function fetchBalanceSheet() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period_2').value;
+    const yearRange = document.getElementById('yearRange_2').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2610,12 +2729,13 @@ function fetchBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainer', 'balanceSheetChartUS');
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainer', 'balanceSheetChartUS', period, yearRange);
 }
 
 function fetchJPBalanceSheet() {
     const stockSymbol = fetchJPStock();
     const period = document.getElementById('periodJP_2').value;
+    const yearRange = document.getElementById('yearRange_2JP').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2624,12 +2744,13 @@ function fetchJPBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerJP', 'balanceSheetChartJP');
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerJP', 'balanceSheetChartJP', period, yearRange);
 }
 
 async function fetchTWBalanceSheet() {
     const stockSymbol = await fetchTWStock();
     const period = document.getElementById('periodTW_2').value;
+    const yearRange = document.getElementById('yearRange_2TW').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2638,12 +2759,13 @@ async function fetchTWBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW', 'balanceSheetChartTW');
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW', 'balanceSheetChartTW', period, yearRange);
 }
 
 function fetchEUBalanceSheet() {
     const stockSymbol = fetchEUStock();
     const period = document.getElementById('period_2EU').value;
+    const yearRange = document.getElementById('yearRange_2EU').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2652,12 +2774,13 @@ function fetchEUBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerEU', 'balanceSheetChartEU');
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerEU', 'balanceSheetChartEU', period, yearRange);
 }
 
 function fetchKRBalanceSheet() {
     const stockSymbol = fetchKRStock();
     const period = document.getElementById('period_2KR').value;
+    const yearRange = document.getElementById('yearRange_2KR').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2666,12 +2789,13 @@ function fetchKRBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerKR', 'balanceSheetChartKR');
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerKR', 'balanceSheetChartKR', period, yearRange);
 }
 
 function fetchHKBalanceSheet() {
     const stockSymbol = fetchHKStock();
     const period = document.getElementById('period_2HK').value;
+    const yearRange = document.getElementById('yearRange_2HK').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2680,12 +2804,13 @@ function fetchHKBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerHK', 'balanceSheetChartHK');
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerHK', 'balanceSheetChartHK', period, yearRange);
 }
 
 function fetchCNBalanceSheet() {
-    const stockSymbol = fetchCNStock();  // 获取中国股票代码
-    const period = document.getElementById('period_2CN').value;  // 获取选定的期间（年度或季度）
+    const stockSymbol = fetchCNStock();
+    const period = document.getElementById('period_2CN').value;
+    const yearRange = document.getElementById('yearRange_2CN').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2694,24 +2819,30 @@ function fetchCNBalanceSheet() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerCN', 'balanceSheetChartCN');
+    fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerCN', 'balanceSheetChartCN', period, yearRange);
 }
 
-function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId) {
+function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId, period, yearRange) {
     const container = document.getElementById(containerId);
+
+    // 重置状态和清理容器
+    resetState(chartId, containerId);
+
     container.innerHTML = '<p>Loading...</p>';
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            if (data === undefined || !Array.isArray(data)) {
-                container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
-            } else {
-                if (data.length > 0) {
-                    callback(data, container, chartId);
-                } else {
-                    container.innerHTML = '<p>No data found for this symbol.</p>';
-                }
+            if (!Array.isArray(data) || data.length === 0) {
+                container.innerHTML = '<p>No data found for this symbol.</p>';
+                return;
             }
+
+            // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
+            updateDisplayedYears_BS(data, container, chartId, period, yearRange);
+
+            // 调用 displayBalanceSheet 并传入所有需要的参数
+            callback(data, container, chartId, period, yearRange);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
@@ -2719,7 +2850,21 @@ function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId) {
         });
 }
 
-function displayBalanceSheet(data, container, chartId) {
+function updateDisplayedYears_BS(data, container, chartId, period, yearRange) {
+    if (!data || !Array.isArray(data)) {
+        console.error("Data is undefined or not an array");
+        return;
+    }
+
+    const currentYear = new Date().getFullYear();
+    const filteredData = data.filter(entry => {
+        const entryYear = parseInt(entry.calendarYear);
+        return yearRange === 'all' || (currentYear - entryYear <= yearRange);
+    });
+    displayBalanceSheet(filteredData, container, chartId, period, yearRange);
+}
+
+function displayBalanceSheet(data, container, chartId, period, yearRange) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         return;
@@ -2780,8 +2925,6 @@ function displayBalanceSheet(data, container, chartId) {
         totalInvestments: ['Total Investments'],
         totalDebt: ['Total Debt'],
         netDebt: ['Net Debt'],
-        // link: ['Report Link'],
-        // finalLink: ['Final Link'],
         debtToAssetRate: ['Debt to Asset Rate']
     };
 
@@ -2838,8 +2981,7 @@ function displayBalanceSheet(data, container, chartId) {
         rows.totalInvestments.push(formatNumber(entry.totalInvestments));
         rows.totalDebt.push(formatNumber(entry.totalDebt));
         rows.netDebt.push(formatNumber(entry.netDebt));
-        // rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
-        // rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
+
         let totalLiabilities = entry.totalLiabilities || 0;
         let totalAssets = entry.totalAssets || 0;
         let debtToAssetRate = totalAssets ? (totalLiabilities / totalAssets) : 0;
@@ -2863,8 +3005,10 @@ function displayBalanceSheet(data, container, chartId) {
     </div>
     `;
 
-    // 更新容器结构
+    // 創建容器結構，並綁定唯一的下載按鈕ID
+    const downloadButtonId = `downloadBtn_${chartId}`;
     container.innerHTML = `
+        <button id="${downloadButtonId}">Download as Excel</button>
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div id="${chartId}Container">
                 ${tableHtml}
@@ -2875,27 +3019,59 @@ function displayBalanceSheet(data, container, chartId) {
         </div>
     `;
 
+    // 設置scroll位置
     setTimeout(() => {
-        const canvas = document.getElementById(chartId);
-        if (canvas && canvas instanceof HTMLCanvasElement) {
-            createCombinedBalanceSheetChart(data, chartId);
-        } else {
-            console.error(`Canvas element with id ${chartId} not found or is not a canvas element.`);
-            // 嘗試重新創建 canvas 元素
-            const container = document.getElementById('chartContainer');
-            if (container) {
-                container.innerHTML = `<canvas id="${chartId}"></canvas>`;
-                const newCanvas = document.getElementById(chartId);
-                if (newCanvas && newCanvas instanceof HTMLCanvasElement) {
-                    createCombinedBalanceSheetChart(data, chartId);
-                } else {
-                    console.error(`Failed to create canvas element with id ${chartId}.`);
-                }
+        const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
+        if (scrollContainer) {
+            scrollContainer.scrollLeft = scrollContainer.scrollWidth;
+            if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
+                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
             }
         }
-    }, 500);
+    }, 100);
 
+    // 創建圖表
+    createCombinedBalanceSheetChart(data, chartId);
 
+    // 清除舊的事件並綁定新的下載按鈕事件
+    bindDownloadButton(rows, data[0].symbol, downloadButtonId, "Balance Sheet");
+}
+
+function bindDownloadButton(rows, symbol, buttonId, sheetName) {
+    setTimeout(() => {
+        const downloadBtn = document.getElementById(buttonId);
+        if (downloadBtn) {
+            // 先移除舊的事件綁定
+            downloadBtn.onclick = null;
+
+            // 直接使用新的事件處理函數綁定
+            downloadBtn.onclick = function() {
+                downloadExcel(rows, symbol, sheetName);
+            };
+        }
+    }, 100);  // 延遲執行以確保 DOM 已完全更新
+}
+
+// 下载 Excel 文件的函数
+function downloadExcel(rows, symbol, sheetName) {
+    // Check if rows is defined and not empty
+    if (!rows || Object.keys(rows).length === 0) {
+        alert('No data available for download.');
+        return;
+    }
+
+    // Convert the rows object to an array format
+    const data = Object.keys(rows).map(key => rows[key]);
+
+    // Create workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+    // Use the stock symbol to name the file
+    XLSX.writeFile(wb, `${symbol}_${sheetName.toLowerCase().replace(/ /g, '_')}.xlsx`);
 }
 
 function createCombinedBalanceSheetChart(data, chartId) {
