@@ -579,7 +579,7 @@ function loadSectionEU(sectionId) {
     sectionContainerEU.innerHTML = sectionsEU[sectionId] || '<p>Section not found</p>';
 }
 
-function loadSectionKR(sectionId) {
+function loadSectionKR(sectionId)   {
     const sectionsKR = {
         'income-statement': `
             <div class="section" id="income-statement-kr">
@@ -3046,14 +3046,14 @@ function bindDownloadButton(rows, symbol, buttonId, sheetName) {
 
             // 直接使用新的事件處理函數綁定
             downloadBtn.onclick = function() {
-                downloadExcel(rows, symbol, sheetName);
+                downloadExcel_BS(rows, symbol, sheetName);
             };
         }
     }, 100);  // 延遲執行以確保 DOM 已完全更新
 }
 
 // 下载 Excel 文件的函数
-function downloadExcel(rows, symbol, sheetName) {
+function downloadExcel_BS(rows, symbol, sheetName) {
     // Check if rows is defined and not empty
     if (!rows || Object.keys(rows).length === 0) {
         alert('No data available for download.');
