@@ -2735,7 +2735,7 @@ function fetchBalanceSheet() {
 function fetchJPBalanceSheet() {
     const stockSymbol = fetchJPStock();
     const period = document.getElementById('periodJP_2').value;
-    const yearRange = document.getElementById('yearRange_2JP').value;  // 新增年份選擇
+    const yearRange = document.getElementById('yearRangeJP_2').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2750,7 +2750,7 @@ function fetchJPBalanceSheet() {
 async function fetchTWBalanceSheet() {
     const stockSymbol = await fetchTWStock();
     const period = document.getElementById('periodTW_2').value;
-    const yearRange = document.getElementById('yearRange_2TW').value;  // 新增年份選擇
+    const yearRange = document.getElementById('yearRangeTW_2').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2765,7 +2765,7 @@ async function fetchTWBalanceSheet() {
 function fetchEUBalanceSheet() {
     const stockSymbol = fetchEUStock();
     const period = document.getElementById('period_2EU').value;
-    const yearRange = document.getElementById('yearRange_2EU').value;  // 新增年份選擇
+    const yearRange = document.getElementById('yearRangeEU_2').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2780,7 +2780,7 @@ function fetchEUBalanceSheet() {
 function fetchKRBalanceSheet() {
     const stockSymbol = fetchKRStock();
     const period = document.getElementById('period_2KR').value;
-    const yearRange = document.getElementById('yearRange_2KR').value;  // 新增年份選擇
+    const yearRange = document.getElementById('yearRangeKR_2').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2795,7 +2795,7 @@ function fetchKRBalanceSheet() {
 function fetchHKBalanceSheet() {
     const stockSymbol = fetchHKStock();
     const period = document.getElementById('period_2HK').value;
-    const yearRange = document.getElementById('yearRange_2HK').value;  // 新增年份選擇
+    const yearRange = document.getElementById('yearRangeHK_2').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -2810,7 +2810,7 @@ function fetchHKBalanceSheet() {
 function fetchCNBalanceSheet() {
     const stockSymbol = fetchCNStock();
     const period = document.getElementById('period_2CN').value;
-    const yearRange = document.getElementById('yearRange_2CN').value;  // 新增年份選擇
+    const yearRange = document.getElementById('yearRangeCN_2').value;  // 新增年份選擇
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
