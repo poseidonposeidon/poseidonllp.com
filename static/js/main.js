@@ -2859,8 +2859,14 @@ function updateDisplayedYears_BS(data, container, chartId, period, yearRange) {
     const currentYear = new Date().getFullYear();
     const filteredData = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= yearRange);
+        if (yearRange === 'all') {
+            return true; // 返回所有年份的数据
+        } else {
+            const yearRangeInt = parseInt(yearRange);
+            return currentYear - entryYear <= yearRangeInt; // 过滤数据，显示指定年份范围的数据
+        }
     });
+
     displayBalanceSheet(filteredData, container, chartId, period, yearRange);
 }
 
