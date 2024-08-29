@@ -77,8 +77,8 @@ div {
 /*////////////////////////////////////////////////////////////////*/
 .navbar {
     display: flex;
-    justify-content: space-between;
-    align-items: center; /* 確保內容在同一行並垂直居中對齊 */
+    justify-content: space-between; /* 讓內容左右對齊 */
+    align-items: center; /* 垂直居中對齊 */
     background-color: #121212;
     padding: 5px 10px;
     border-radius: 10px;
@@ -103,8 +103,7 @@ div {
 .navbar-links {
     display: flex;
     justify-content: flex-end; /* 將導航連結推到右側 */
-    align-items: center; /* 垂直居中 */
-    flex-grow: 1;
+    align-items: center;
 }
 
 .navbar-links a,
@@ -176,7 +175,6 @@ div {
         width: 100%;
     }
 }
-
 
 
 /*////////////////////////////////////////////////////////////*/
