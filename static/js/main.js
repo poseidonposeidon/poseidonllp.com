@@ -483,8 +483,8 @@ function loadSectionEU(sectionId) {
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
-                    <label for="yearRange_2EU">Select Year Range:</label>
-                    <select id="yearRange_2EU" onchange="fetchEUBalanceSheet()">
+                    <label for="yearRangeEU_2">Select Year Range:</label>
+                    <select id="yearRangeEU_2" onchange="fetchEUBalanceSheet()">
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -504,8 +504,8 @@ function loadSectionEU(sectionId) {
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
-                    <label for="yearRange_3EU">Select Year Range:</label>
-                    <select id="yearRange_3EU" onchange="fetchEUCashflow()">
+                    <label for="yearRangeEU_3">Select Year Range:</label>
+                    <select id="yearRangeEU_3" onchange="fetchEUCashflow()">
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -613,8 +613,8 @@ function loadSectionKR(sectionId) {
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
-                    <label for="yearRange_2KR">Select Year Range:</label>
-                    <select id="yearRange_2KR" onchange="fetchKRBalanceSheet()">
+                    <label for="yearRangeKR_2">Select Year Range:</label>
+                    <select id="yearRangeKR_2" onchange="fetchKRBalanceSheet()">
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -634,8 +634,8 @@ function loadSectionKR(sectionId) {
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
-                    <label for="yearRange_3KR">Select Year Range:</label>
-                    <select id="yearRange_3KR" onchange="fetchKRCashflow()">
+                    <label for="yearRangeKR_3">Select Year Range:</label>
+                    <select id="yearRangeKR_3" onchange="fetchKRCashflow()">
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -742,8 +742,8 @@ function loadSectionHK(sectionId) {
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
-                    <label for="yearRange_2HK">Select Year Range:</label>
-                    <select id="yearRange_2HK" onchange="fetchHKBalanceSheet()">
+                    <label for="yearRangeHK_2">Select Year Range:</label>
+                    <select id="yearRangeHK_2" onchange="fetchHKBalanceSheet()">
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -763,8 +763,8 @@ function loadSectionHK(sectionId) {
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
-                    <label for="yearRange_3HK">Select Year Range:</label>
-                    <select id="yearRange_3HK" onchange="fetchHKCashflow()">
+                    <label for="yearRangeHK_3">Select Year Range:</label>
+                    <select id="yearRangeHK_3" onchange="fetchHKCashflow()">
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -872,8 +872,8 @@ function loadSectionCN(sectionId) {
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
-                    <label for="yearRange_2CN">Select Year Range:</label>
-                    <select id="yearRange_2CN" onchange="fetchCNBalanceSheet()">
+                    <label for="yearRangeCN_2">Select Year Range:</label>
+                    <select id="yearRangeCN_2" onchange="fetchCNBalanceSheet()">
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
@@ -894,8 +894,8 @@ function loadSectionCN(sectionId) {
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
-                    <label for="yearRange_3CN">Select Year Range:</label>
-                    <select id="yearRange_3CN" onchange="fetchCNCashflow()">
+                    <label for="yearRangeCN_3">Select Year Range:</label>
+                    <select id="yearRangeCN_3" onchange="fetchCNCashflow()">
                         <option value="5">Last 5 Years</option>
                         <option value="10">Last 10 Years</option>
                         <option value="all">All Years</option>
