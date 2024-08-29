@@ -3034,10 +3034,10 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
     createCombinedBalanceSheetChart(data, chartId);
 
     // 清除舊的事件並綁定新的下載按鈕事件
-    bindDownloadButton(rows, data[0].symbol, downloadButtonId, "Balance Sheet");
+    bindDownloadButton_BS(rows, data[0].symbol, downloadButtonId, "Balance Sheet");
 }
 
-function bindDownloadButton(rows, symbol, buttonId, sheetName) {
+function bindDownloadButton_BS(rows, symbol, buttonId, sheetName) {
     setTimeout(() => {
         const downloadBtn = document.getElementById(buttonId);
         if (downloadBtn) {
