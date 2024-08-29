@@ -3204,7 +3204,7 @@ function fetchCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainer', 'cashflowChartUS', period, yearRange));
+    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainer', 'cashflowChartUS', period, yearRange);
 }
 
 function fetchJPCashflow() {
@@ -3219,7 +3219,7 @@ function fetchJPCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerJP', 'cashflowChartJP', period, yearRange));
+    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerJP', 'cashflowChartJP', period, yearRange);
 }
 
 async function fetchTWCashflow() {
@@ -3234,7 +3234,7 @@ async function fetchTWCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerTW', 'cashflowChartTW', period, yearRange));
+    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerTW', 'cashflowChartTW', period, yearRange);
 }
 
 function fetchEUCashflow() {
@@ -3249,7 +3249,7 @@ function fetchEUCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerEU', 'cashflowChartEU', period, yearRange));
+    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerEU', 'cashflowChartEU', period, yearRange);
 }
 
 function fetchKRCashflow() {
@@ -3264,7 +3264,7 @@ function fetchKRCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerKR', 'cashflowChartKR', period, yearRange));
+    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerKR', 'cashflowChartKR', period, yearRange);
 }
 
 function fetchHKCashflow() {
@@ -3279,7 +3279,7 @@ function fetchHKCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerHK', 'cashflowChartHK', period, yearRange));
+    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerHK', 'cashflowChartHK', period, yearRange);
 }
 
 function fetchCNCashflow() {
@@ -3294,18 +3294,14 @@ function fetchCNCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerCN', 'cashflowChartCN', period, yearRange));
+    fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerCN', 'cashflowChartCN', period, yearRange);
 }
 
 function fetchData_Cashflow(apiUrl, callback, containerId, chartId, period, yearRange) {
     const container = document.getElementById(containerId);
 
-    if (!container) {
-        console.error(`Container element with id ${containerId} not found.`);
-        return;
-    }
-
-    console.log(`Found container with id ${containerId}`);
+    // 重置状态和清理容器
+    resetState(chartId, containerId);
 
     container.innerHTML = '<p>Loading...</p>';
 
@@ -3316,8 +3312,15 @@ function fetchData_Cashflow(apiUrl, callback, containerId, chartId, period, year
                 container.innerHTML = '<p>No data found for this symbol.</p>';
                 return;
             }
+
+            console.log('Original Data Length:', data.length);
+            console.log('Year Range:', yearRange);
+
+            // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
             const filteredData = updateDisplayedYears_CF(data, container, chartId, period, yearRange);
-            callback(filteredData, container, chartId, period, yearRange);
+
+            // 调用 displayCashflow 并传入所有需要的参数
+            callback(filteredData, container, chartId, period, yearRange);  // 传递过滤后的数据
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
@@ -3637,6 +3640,7 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
+
 
 
 //////////////法說會逐字稿 Earnings Call Transcript/////////////////
