@@ -3305,6 +3305,8 @@ function fetchData_Cashflow(apiUrl, callback, containerId, chartId, period, year
         return;
     }
 
+    console.log(`Found container with id ${containerId}`);
+
     container.innerHTML = '<p>Loading...</p>';
 
     fetch(apiUrl)
