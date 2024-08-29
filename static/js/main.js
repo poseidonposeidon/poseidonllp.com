@@ -3297,11 +3297,24 @@ function fetchCNCashflow() {
     fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerCN', 'cashflowChartCN', period, yearRange);
 }
 
+function resetState_CF(chartId, containerId) {
+    if (cashflowChartInstances[chartId]) {
+        cashflowChartInstances[chartId].destroy();
+        delete cashflowChartInstances[chartId];
+    }
+
+    // 清除容器的內容，防止殘留狀態
+    const container = document.getElementById(containerId);
+    if (container) {
+        container.innerHTML = '';
+    }
+}
+
 function fetchData_Cashflow(apiUrl, callback, containerId, chartId, period, yearRange) {
     const container = document.getElementById(containerId);
 
     // 重置状态和清理容器
-    resetState(chartId, containerId);
+    resetState_CF(chartId, containerId);
 
     container.innerHTML = '<p>Loading...</p>';
 
@@ -3313,14 +3326,11 @@ function fetchData_Cashflow(apiUrl, callback, containerId, chartId, period, year
                 return;
             }
 
-            console.log('Original Data Length:', data.length);
-            console.log('Year Range:', yearRange);
-
-            // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
+            // 使用传入的 yearRange 参数，并调用 updateDisplayedYears_CF
             const filteredData = updateDisplayedYears_CF(data, container, chartId, period, yearRange);
 
             // 调用 displayCashflow 并传入所有需要的参数
-            callback(filteredData, container, chartId, period, yearRange);  // 传递过滤后的数据
+            callback(filteredData, container, chartId, period, yearRange);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
@@ -3640,7 +3650,6 @@ function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
-
 
 
 //////////////法說會逐字稿 Earnings Call Transcript/////////////////
