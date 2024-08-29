@@ -3195,6 +3195,7 @@ let cashflowChartInstances = {}; // 用於存儲不同國家的圖表實例
 function fetchCashflow() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period_3').value;
+    const yearRange = document.getElementById('yearRange_3').value;  // 获取年份范围
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -3203,12 +3204,13 @@ function fetchCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainer', 'cashflowChartUS'));
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainer', 'cashflowChartUS', period, yearRange));
 }
 
 function fetchJPCashflow() {
     const stockSymbol = fetchJPStock();
     const period = document.getElementById('periodJP_3').value;
+    const yearRange = document.getElementById('yearRangeJP_3').value;  // 获取年份范围
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -3217,12 +3219,13 @@ function fetchJPCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerJP', 'cashflowChartJP'));
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerJP', 'cashflowChartJP', period, yearRange));
 }
 
 async function fetchTWCashflow() {
     const stockSymbol = await fetchTWStock();
     const period = document.getElementById('periodTW_3').value;
+    const yearRange = document.getElementById('yearRangeTW_3').value;  // 获取年份范围
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -3231,12 +3234,13 @@ async function fetchTWCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerTW', 'cashflowChartTW'));
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerTW', 'cashflowChartTW', period, yearRange));
 }
 
 function fetchEUCashflow() {
     const stockSymbol = fetchEUStock();
     const period = document.getElementById('period_3EU').value;
+    const yearRange = document.getElementById('yearRangeEU_3').value;  // 获取年份范围
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -3245,12 +3249,13 @@ function fetchEUCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerEU', 'cashflowChartEU'));
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerEU', 'cashflowChartEU', period, yearRange));
 }
 
 function fetchKRCashflow() {
     const stockSymbol = fetchKRStock();
     const period = document.getElementById('period_3KR').value;
+    const yearRange = document.getElementById('yearRangeKR_3').value;  // 获取年份范围
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -3259,12 +3264,13 @@ function fetchKRCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerKR', 'cashflowChartKR'));
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerKR', 'cashflowChartKR', period, yearRange));
 }
 
 function fetchHKCashflow() {
     const stockSymbol = fetchHKStock();
     const period = document.getElementById('period_3HK').value;
+    const yearRange = document.getElementById('yearRangeHK_3').value;  // 获取年份范围
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -3273,12 +3279,13 @@ function fetchHKCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerHK', 'cashflowChartHK'));
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerHK', 'cashflowChartHK', period, yearRange));
 }
 
 function fetchCNCashflow() {
     const stockSymbol = fetchCNStock();  // 获取中国股票代码
     const period = document.getElementById('period_3CN').value;  // 获取选定的期间（年度或季度）
+    const yearRange = document.getElementById('yearRangeCN_3').value;  // 获取年份范围
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -3287,34 +3294,83 @@ function fetchCNCashflow() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/cash-flow-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerCN', 'cashflowChartCN'));
+    fetchData_Cashflow(apiUrl, data => displayCashflow(data, 'cashflowContainerCN', 'cashflowChartCN', period, yearRange));
 }
 
-function fetchData_Cashflow(apiUrl, callback) {
+function fetchData_Cashflow(apiUrl, callback, containerId, chartId, period, yearRange) {
+    const container = document.getElementById(containerId);
+
+    // 重置状态和清理容器
+    resetState(chartId, containerId);
+
+    container.innerHTML = '<p>Loading...</p>';
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            if (data === undefined || !Array.isArray(data)) {
-                console.error('Error loading data: Data is not an array or is undefined.');
-            } else if (data.length > 0) {
-                callback(data);
-            } else {
-                console.error('No data found for this symbol.');
+            if (!Array.isArray(data) || data.length === 0) {
+                container.innerHTML = '<p>No data found for this symbol.</p>';
+                return;
             }
+
+            console.log('Original Data Length:', data.length);
+            console.log('Year Range:', yearRange);
+
+            // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
+            const filteredData = updateDisplayedYears_CF(data, container, chartId, period, yearRange);
+
+            // 调用 displayCashflow 并传入所有需要的参数
+            callback(filteredData, container, chartId, period, yearRange);  // 传递过滤后的数据
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
+            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
         });
 }
 
-function displayCashflow(data, containerId, chartId) {
+function updateDisplayedYears_CF(data, container, chartId, period, yearRange) {
+    if (!data || !Array.isArray(data)) {
+        console.error("Data is undefined or not an array");
+        return [];
+    }
+
+    const currentYear = new Date().getFullYear();
+    console.log("Original Data Length:", data.length);  // 确认初始数据数量
+    console.log("Year Range:", yearRange);  // 确认年份范围
+
+    const filteredData = data.filter(entry => {
+        const entryYear = parseInt(entry.calendarYear);
+        if (yearRange === 'all') {
+            return true; // 返回所有年份的数据
+        } else {
+            const yearRangeInt = parseInt(yearRange);
+            return currentYear - entryYear <= yearRangeInt; // 根据年份范围过滤数据
+        }
+    });
+
+    console.log("Filtered Data Length:", filteredData.length);  // 确认过滤后的数据数量
+    return filteredData;  // 返回过滤后的数据
+}
+
+function displayCashflow(data, containerId, chartId, period, yearRange) {
+    const currentYear = new Date().getFullYear();
+
+    // 過濾數據以包含多兩年的數據
+    const filteredDataForTable = data.filter(entry => {
+        const entryYear = parseInt(entry.calendarYear);
+        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 2)); // 表格顯示多兩年的數據
+    });
+
+    // 保持图表数据与表格数据一致
+    const filteredDataForChart = filteredDataForTable;
+
     const container = document.getElementById(containerId);
     if (!container) {
         console.error(`Container element with id ${containerId} not found.`);
         return;
     }
 
-    if (!data || !Array.isArray(data) || data.length === 0) {
+    if (!filteredDataForTable || !Array.isArray(filteredDataForTable) || filteredDataForTable.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         return;
     }
@@ -3358,16 +3414,11 @@ function displayCashflow(data, containerId, chartId) {
         operatingCashFlow: ['Operating Cash Flow'],
         capitalExpenditure: ['Capital Expenditure'],
         freeCashFlow: ['Free Cash Flow'],
-        // link: ['Report Link'],
-        // finalLink: ['Final Link'],
         capexToOperatingCashFlow: ['Capex to Operating Cash Flow']
     };
 
-    // 按日期升序排序
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
-
     // 填充行數據
-    data.forEach(entry => {
+    filteredDataForTable.forEach(entry => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
@@ -3406,8 +3457,6 @@ function displayCashflow(data, containerId, chartId) {
         rows.operatingCashFlow.push(formatNumber(entry.operatingCashFlow));
         rows.capitalExpenditure.push(formatNumber(entry.capitalExpenditure));
         rows.freeCashFlow.push(formatNumber(entry.freeCashFlow));
-        // rows.link.push(`<a class="styled-link" href="${entry.link}" target="_blank">View Report</a>`);
-        // rows.finalLink.push(`<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Report</a>`);
 
         // 計算 Capex to Operating Cash Flow
         let capex = entry.capitalExpenditure || 0;
@@ -3417,7 +3466,6 @@ function displayCashflow(data, containerId, chartId) {
 
         // 保存數值版本以供圖表使用
         entry.capexToOperatingCashFlowValue = capexToOperatingCashFlow;
-
     });
 
     // 構建 HTML 表格
@@ -3436,8 +3484,10 @@ function displayCashflow(data, containerId, chartId) {
     </div>
     `;
 
-    // 創建容器結構
+    // 創建容器結構，並綁定唯一的下載按鈕ID
+    const downloadButtonId = `downloadBtn_${chartId}`;
     container.innerHTML = `
+        <button id="${downloadButtonId}">Download as Excel</button>
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div id="${chartId}Container">
                 ${tableHtml}
@@ -3453,8 +3503,6 @@ function displayCashflow(data, containerId, chartId) {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
             scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-
-            // 再次確認是否滾動到最右邊
             if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
                 scrollContainer.scrollLeft = scrollContainer.scrollWidth;
             }
@@ -3462,7 +3510,46 @@ function displayCashflow(data, containerId, chartId) {
     }, 100);
 
     // 繪製圖表
-    createCashflowChart(data, chartId);
+    createCashflowChart(filteredDataForChart, chartId);
+
+    // 清除舊的事件並綁定新的下載按鈕事件
+    bindDownloadButton_CF(rows, data[0].symbol, downloadButtonId, "Cash Flow");
+}
+
+function bindDownloadButton_CF(rows, symbol, buttonId, sheetName) {
+    setTimeout(() => {
+        const downloadBtn = document.getElementById(buttonId);
+        if (downloadBtn) {
+            // 先移除舊的事件綁定
+            downloadBtn.onclick = null;
+
+            // 直接使用新的事件處理函數綁定
+            downloadBtn.onclick = function() {
+                downloadExcel_CF(rows, symbol, sheetName);
+            };
+        }
+    }, 100);  // 延遲執行以確保 DOM 已完全更新
+}
+
+function downloadExcel_CF(rows, symbol, sheetName) {
+    // Check if rows is defined and not empty
+    if (!rows || Object.keys(rows).length === 0) {
+        alert('No data available for download.');
+        return;
+    }
+
+    // Convert the rows object to an array format
+    const data = Object.keys(rows).map(key => rows[key]);
+
+    // Create workbook and worksheet
+    const wb = XLSX.utils.book_new();
+    const ws = XLSX.utils.aoa_to_sheet(data);
+
+    // Add the worksheet to the workbook
+    XLSX.utils.book_append_sheet(wb, ws, sheetName);
+
+    // Use the stock symbol to name the file
+    XLSX.writeFile(wb, `${symbol}_${sheetName.toLowerCase().replace(/ /g, '_')}.xlsx`);
 }
 
 function createCashflowChart(data, chartId) {
