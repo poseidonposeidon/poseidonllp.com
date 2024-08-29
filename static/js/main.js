@@ -2838,6 +2838,9 @@ function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId, period, 
                 return;
             }
 
+            console.log('Original Data Length:', data.length);
+            console.log('Year Range:', yearRange);
+
             // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
             updateDisplayedYears_BS(data, container, chartId, period, yearRange);
 
@@ -2857,14 +2860,11 @@ function updateDisplayedYears_BS(data, container, chartId, period, yearRange) {
     }
 
     const currentYear = new Date().getFullYear();
+    const yearRangeInt = yearRange === 'all' ? Infinity : parseInt(yearRange, 10); // 处理年份范围
+
     const filteredData = data.filter(entry => {
-        const entryYear = parseInt(entry.calendarYear);
-        if (yearRange === 'all') {
-            return true; // 返回所有年份的数据
-        } else {
-            const yearRangeInt = parseInt(yearRange);
-            return currentYear - entryYear <= yearRangeInt; // 过滤数据，显示指定年份范围的数据
-        }
+        const entryYear = parseInt(entry.calendarYear, 10); // 确保年份是整数
+        return yearRangeInt === Infinity || (currentYear - entryYear <= yearRangeInt);
     });
 
     displayBalanceSheet(filteredData, container, chartId, period, yearRange);
