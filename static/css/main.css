@@ -140,27 +140,32 @@ div {
     display: inline-block;
 }
 
-/* 顯示下拉選單 */
+/* 控制下拉選單的顯示與隱藏 */
+.dropdown-content {
+    visibility: hidden; /* 默認為隱藏 */
+    opacity: 0; /* 默認透明度為 0 */
+    display: block; /* 默認設置為 block，讓 transition 工作 */
+    position: absolute;
+    background-color: #1e1e1e;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+    border-radius: 5px;
+    left: 0;
+    top: 100%;
+    transition: visibility 0s linear 0.3s, opacity 0.3s linear; /* 增加 transition */
+}
+
+/* 當 hover 時顯示下拉選單 */
 .dropdown:hover .dropdown-content {
-    display: block;
+    visibility: visible;
+    opacity: 1;
+    transition-delay: 0s, 0s; /* 移除延遲 */
 }
 
 /* Change the color of the dropdown link when hovered */
 .dropdown:hover > a {
     color: #90caf9;
-}
-
-/* Dropdown content */
-.dropdown-content {
-    display: none;
-    position: absolute;
-    background-color: #1e1e1e;
-    min-width: 160px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-    z-index: 1;
-    border-radius: 5px;
-    left: 0;
-    top: 100%;
 }
 
 /* Links inside the dropdown */
@@ -174,7 +179,6 @@ div {
 .dropdown-content a:hover {
     background-color: #575757;
 }
-
 
 
 /*//////////////////////////////////////////////////////////////////////////////////////*/
