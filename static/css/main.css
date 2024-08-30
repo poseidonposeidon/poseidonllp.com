@@ -74,7 +74,7 @@ div {
     padding: 10px;
     border-radius: 5px;
 }
-
+/*//////////////////////////////////////////////////////////////////////////////////////*/
 .navbar {
     display: flex;
     justify-content: center;
@@ -125,6 +125,49 @@ div {
 .navbar-links a:hover {
     color: #90caf9;
 }
+
+/* Dropdown container */
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #1e1e1e;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    border-radius: 5px;
+    margin-top: 5px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+    color: white;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {
+    background-color: #575757;
+}
+
+/* Show the dropdown content on hover */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Change the color of the dropdown link when hovered */
+.dropdown:hover a {
+    color: #90caf9;
+}
+
+/*//////////////////////////////////////////////////////////////////////////////////////*/
 
 .section {
     border: 1px solid #333;
