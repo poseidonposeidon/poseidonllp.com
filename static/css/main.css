@@ -130,20 +130,26 @@ div {
 }
 
 /* Dropdown container */
-
 .dropdown-container {
     position: relative;
 }
 
+/* Dropdown 內部結構 */
 .dropdown {
     position: relative;
     display: inline-block;
-    padding-bottom: 10px; /* 增加 padding 以確保滑鼠移動時不會離開 */
 }
 
-.dropdown:hover {
+/* 顯示下拉選單 */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Change the color of the dropdown link when hovered */
+.dropdown:hover > a {
     color: #90caf9;
 }
+
 /* Dropdown content */
 .dropdown-content {
     display: none;
@@ -156,6 +162,7 @@ div {
     left: 0;
     top: 100%;
 }
+
 /* Links inside the dropdown */
 .dropdown-content a {
     color: white;
@@ -168,15 +175,6 @@ div {
     background-color: #575757;
 }
 
-/* Show the dropdown content on hover */
-.dropdown:hover .dropdown-content {
-    display: block;
-}
-
-/* Change the color of the dropdown link when hovered */
-.dropdown:hover > a {
-    color: #90caf9;
-}
 
 
 /*//////////////////////////////////////////////////////////////////////////////////////*/
