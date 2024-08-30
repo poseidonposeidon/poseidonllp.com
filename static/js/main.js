@@ -13,8 +13,6 @@ let activeSection = null;
 //     }
 // }
 
-
-
 function collapseSection(element) {
     const content = element.querySelector('.content');
     if (!element.classList.contains('fixed')) {
@@ -24,7 +22,6 @@ function collapseSection(element) {
         content.style.paddingBottom = '0';
     }
 }
-
 // function toggleFixed(event, element) {
 //     if (event.target.tagName === 'SELECT' || event.target.tagName === 'BUTTON' || event.target.tagName === 'INPUT') {
 //         return;
@@ -85,12 +82,21 @@ function hideSection(section) {
     }, 500); // Match CSS transition duration
 }
 
+document.querySelector('.body-container').addEventListener('click', () => {
+    if (activeSection) {
+        hideSection(activeSection);
+        activeSection = null;
+        document.querySelector('.overlay').classList.remove('active');
+        document.body.classList.remove('modal-open');
+        document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)').forEach(el => el.classList.remove('blur-background'));
+    }
+});
+
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box,#jp-info-section,#tw-info-section,#eu-info-section,#kr-info-section,#hk-info-section,#cn-info-section').forEach(section => {
+    document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section').forEach(section => {
         section.style.display = 'none';
     });
 });
-
 ////////////////////////////////////////////////////////////////////////////
 
 function loadSection(sectionId) {
