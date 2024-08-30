@@ -120,6 +120,7 @@ div {
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 16px;
+    background-color: #1e1e1e; /* 確保背景顏色一致 */
     transition: all 0.3s ease;
 }
 
@@ -129,17 +130,18 @@ div {
 
 .dropdown-container {
     position: relative;
-    background-color: #1e1e1e;
+    background-color: #000000; /* 設置背景顏色為全黑 */
     padding: 0;
     margin: 0;
-    border-radius: 5px;
+    border-radius: 5px; /* 確保邊角圓滑一致 */
+    box-shadow: none; /* 移除陰影確保顏色一致 */
 }
 
 /* Dropdown */
 .dropdown {
     position: relative;
     display: inline-block;
-    background-color: #1e1e1e;
+    background-color: #000000; /* 確保背景顏色為全黑 */
     padding: 0;
     margin: 0;
     border-radius: 5px; /* 確保邊角圓滑一致 */
@@ -152,7 +154,7 @@ div {
     opacity: 0;
     display: block;
     position: absolute;
-    background-color: #1e1e1e; /* 確保下拉選單也是全黑 */
+    background-color: #000000; /* 確保下拉選單也是全黑 */
     min-width: 160px;
     z-index: 1;
     border-radius: 5px;
