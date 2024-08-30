@@ -107,7 +107,7 @@ div {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #1e1e1e;
+    background-color: #121212;
 }
 
 .navbar-links a {
@@ -120,7 +120,7 @@ div {
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 16px;
-    background-color: #1e1e1e; /* 確保背景顏色一致 */
+    background-color: #121212; /* 確保背景顏色一致 */
     transition: all 0.3s ease;
 }
 
@@ -141,7 +141,7 @@ div {
 .dropdown {
     position: relative;
     display: inline-block;
-    background-color: #1e1e1e; /* 確保背景顏色為全黑 */
+    background-color: #121212; /* 確保背景顏色為全黑 */
     padding: 0;
     margin: 0;
     border-radius: 5px; /* 確保邊角圓滑一致 */
