@@ -13,7 +13,7 @@ function collapseSection(element) {
 
 function toggleSection(event, sectionId) {
     event.preventDefault();
-    event.stopPropagation();  // 防止事件冒泡影響其他點擊事件
+    event.stopPropagation(); // 防止事件冒泡影響其他點擊事件
     const section = document.querySelector(sectionId);
     if (!section) {
         console.error('Section not found:', sectionId);
@@ -56,12 +56,12 @@ function hideSection(section) {
         if (!section.classList.contains('active')) {
             section.style.display = 'none';
         }
-    }, 500); // Match CSS transition duration
+    }, 500); // 與 CSS 轉場時間匹配
 }
 
-// 點擊 body-container 區域時收起已展開的 section
-document.querySelector('.body-container').addEventListener('click', (event) => {
-    if (activeSection) {
+// 當點擊 body 時，若點擊位置不在 activeSection 內，則收起 section
+document.addEventListener('click', (event) => {
+    if (activeSection && !activeSection.contains(event.target)) {
         hideSection(activeSection);
         activeSection = null;
         document.querySelector('.overlay').classList.remove('active');
@@ -75,6 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
         section.style.display = 'none';
     });
 });
+
 ////////////////////////////////////////////////////////////////////////////
 
 function loadSection(sectionId) {
