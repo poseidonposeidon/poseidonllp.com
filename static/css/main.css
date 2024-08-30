@@ -79,7 +79,7 @@ div {
 .navbar {
     display: flex;
     justify-content: center;
-    align-items: center;
+    align-items: center; /* 確保所有項目都垂直居中對齊 */
     background-color: #121212;
     padding: 5px 10px;
     border-radius: 10px;
@@ -110,6 +110,7 @@ div {
     display: flex;
     justify-content: center;
     background-color: #121212;
+    align-items: center; /* 保證所有連結垂直居中 */
 }
 
 .navbar-links a {
@@ -123,6 +124,7 @@ div {
     border-radius: 5px;
     transition: all 0.3s ease;
     font-size: 16px;
+    line-height: normal; /* 確保行高一致 */
 }
 
 .navbar-links a:hover {
@@ -134,10 +136,11 @@ div {
     position: relative;
 }
 
-/* Dropdown 內部結構 */
+/* Dropdown */
 .dropdown {
     position: relative;
     display: inline-block;
+    background-color: #000000; /* 設置背景顏色為全黑 */
 }
 
 /* 控制下拉選單的顯示與隱藏 */
@@ -156,11 +159,11 @@ div {
     transition: visibility 0s linear 0.3s, opacity 0.3s linear; /* 增加 transition */
 }
 
-/* 當 hover 時顯示下拉選單 */
+/* 顯示下拉選單 */
 .dropdown:hover .dropdown-content {
     visibility: visible;
     opacity: 1;
-    transition-delay: 0s, 0s; /* 移除延遲 */
+    transition-delay: 0s, 0s;
 }
 
 /* Change the color of the dropdown link when hovered */
@@ -179,7 +182,6 @@ div {
 .dropdown-content a:hover {
     background-color: #575757;
 }
-
 
 /*//////////////////////////////////////////////////////////////////////////////////////*/
 
