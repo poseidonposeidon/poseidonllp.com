@@ -37,13 +37,11 @@
                 <a href="#">AI Research</a> <!-- 下拉按鈕 -->
                 <div class="dropdown-content">
                     <a href="https://chatgpt.com/" target="_blank">Chat GPT</a>
-                    <a href="#" onclick="loadAIBoxSection('audio-transcription')">Audio Transcription</a>
-                </div>
-                <div id="aiBoxSectionContainer" class="section-container">
-                    <!-- Dynamic content loading -->
+                    <a href="#" onclick="loadAIBoxSection('audio-transcription'); toggleSection(event, '#ai_box');">Audio Transcription</a>
                 </div>
             </div>
         </div>
+
     </div>
 </div>
 
@@ -291,9 +289,9 @@
             <a href="#" onclick="loadAIBoxSection('audio-transcription')">Audio Transcription</a>
         </div>
     </div>
-<!--    <div id="aiBoxSectionContainer" class="section-container">-->
-<!--        &lt;!&ndash; Dynamic content loading &ndash;&gt;-->
-<!--    </div>-->
+    <div id="aiBoxSectionContainer" class="section-container">
+        <!-- Dynamic content loading -->
+    </div>
 </div>
 <!--/////////////////////////////////body資料/////////////////////////////////-->
 <div class="body-container">
