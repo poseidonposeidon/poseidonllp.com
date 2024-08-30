@@ -153,7 +153,7 @@ div {
     visibility: hidden;
     opacity: 0;
     display: block;
-    position: absolute1e1e1e
+    position: absolute
     background-color: #000000; /* 確保下拉選單也是全黑 */
     min-width: 160px;
     z-index: 1;
