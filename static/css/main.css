@@ -154,7 +154,7 @@ div {
     opacity: 0;
     display: block;
     position: absolute;
-    background-color: #1e1e1e; /* 確保下拉選單也是全黑 */
+    background-color: #121212; /* 確保下拉選單也是全黑 */
     min-width: 160px;
     z-index: 1;
     border-radius: 5px;
