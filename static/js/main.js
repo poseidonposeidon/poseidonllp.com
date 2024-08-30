@@ -13,21 +13,21 @@ let activeSection = null;
 //     }
 // }
 
-document.addEventListener('DOMContentLoaded', function() {
-    const dropdown = document.querySelector('.dropdown');
-    dropdown.addEventListener('click', function(event) {
-        event.preventDefault();  // 防止連結的默認行為
-        const dropdownContent = this.nextElementSibling;
-        dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
-    });
-
-    // Optional: Close dropdown if clicking outside of it
-    window.addEventListener('click', function(event) {
-        if (!dropdown.contains(event.target)) {
-            dropdown.nextElementSibling.style.display = 'none';
-        }
-    });
-});
+// document.addEventListener('DOMContentLoaded', function() {
+//     const dropdown = document.querySelector('.dropdown');
+//     dropdown.addEventListener('click', function(event) {
+//         event.preventDefault();  // 防止連結的默認行為
+//         const dropdownContent = this.nextElementSibling;
+//         dropdownContent.style.display = dropdownContent.style.display === 'block' ? 'none' : 'block';
+//     });
+//
+//     // Optional: Close dropdown if clicking outside of it
+//     window.addEventListener('click', function(event) {
+//         if (!dropdown.contains(event.target)) {
+//             dropdown.nextElementSibling.style.display = 'none';
+//         }
+//     });
+// });
 
 function collapseSection(element) {
     const content = element.querySelector('.content');
