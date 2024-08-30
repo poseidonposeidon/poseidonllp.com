@@ -134,6 +134,7 @@ div {
     position: relative;
     display: inline-block;
     cursor: pointer; /* 確保 hover 時有手型指標 */
+    background-color: #1e1e1e;
 }
 
 /* Dropdown content */
