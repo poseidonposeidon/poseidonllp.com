@@ -32,10 +32,18 @@
                 </div>
             </div>
         </div>
-        <a href="#ai_box" onclick="toggleSection(event, '#ai_box')">AI Research</a>
-        <a href="../index.html">Home</a>
+        <div class="dropdown-container"> <!-- 新增的 AI Research dropdown-container -->
+            <div class="dropdown"> <!-- 將 AI Research dropdown 放在一個 div 內 -->
+                <a href="#">AI Research</a> <!-- 下拉按鈕 -->
+                <div class="dropdown-content">
+                    <a href="https://chatgpt.com/" target="_blank">Chat GPT</a>
+                    <a href="#" onclick="loadAIBoxSection('audio-transcription')">Audio Transcription</a>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
+
 
 
 
