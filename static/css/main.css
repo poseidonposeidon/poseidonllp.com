@@ -130,13 +130,20 @@ div {
 }
 
 /* Dropdown container */
+
+.dropdown-container {
+    position: relative;
+}
+
 .dropdown {
     position: relative;
     display: inline-block;
-    cursor: pointer; /* 確保 hover 時有手型指標 */
-    background-color: #1e1e1e;
+    padding-bottom: 10px; /* 增加 padding 以確保滑鼠移動時不會離開 */
 }
 
+.dropdown:hover {
+    color: #90caf9;
+}
 /* Dropdown content */
 .dropdown-content {
     display: none;
@@ -146,11 +153,9 @@ div {
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
     border-radius: 5px;
-    margin-top: 5px;
-    left: 0; /* 確保下拉選單的左邊緣與 Stock 連結對齊 */
-    top: 100%; /* 確保下拉選單出現在 Stock 連結的正下方 */
+    left: 0;
+    top: 100%;
 }
-
 /* Links inside the dropdown */
 .dropdown-content a {
     color: white;
