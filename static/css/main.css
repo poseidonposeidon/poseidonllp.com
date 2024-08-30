@@ -133,6 +133,7 @@ div {
 .dropdown {
     position: relative;
     display: inline-block;
+    cursor: pointer; /* 確保 hover 時有手型指標 */
 }
 
 /* Dropdown content */
@@ -145,8 +146,8 @@ div {
     z-index: 1;
     border-radius: 5px;
     margin-top: 5px;
-    left: 0;
-    top: 100%;
+    left: 0; /* 確保下拉選單的左邊緣與 Stock 連結對齊 */
+    top: 100%; /* 確保下拉選單出現在 Stock 連結的正下方 */
 }
 
 /* Links inside the dropdown */
@@ -166,8 +167,8 @@ div {
     display: block;
 }
 
-/* 改變 dropdown 連結的顏色 */
-.dropdown:hover a {
+/* Change the color of the dropdown link when hovered */
+.dropdown:hover > a {
     color: #90caf9;
 }
 
