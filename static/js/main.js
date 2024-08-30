@@ -1,42 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
-    // Three.js 代碼
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('globe-container').appendChild(renderer.domElement);
 
-    // 創建地球儀
-    const geometry = new THREE.SphereGeometry(5, 32, 32);
-    const textureLoader = new THREE.TextureLoader();
-    const material = new THREE.MeshBasicMaterial({
-        map: textureLoader.load('https://example.com/earth-texture.jpg') // 替換成地球表面的圖像
-    });
-    const globe = new THREE.Mesh(geometry, material);
-    scene.add(globe);
-
-    // 設置攝像機位置
-    camera.position.z = 10;
-
-    // 添加動畫效果讓地球儀自轉
-    function animate() {
-        requestAnimationFrame(animate);
-        globe.rotation.y += 0.005; // 控制自轉速度
-        renderer.render(scene, camera);
-    }
-    animate();
-
-    // 添加 OrbitControls 來進行互動
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableZoom = true;
-
-    // 窗口大小變化時，更新渲染器尺寸
-    window.addEventListener('resize', () => {
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        camera.aspect = window.innerWidth / window.innerHeight;
-        camera.updateProjectionMatrix();
-    });
-});
 
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
