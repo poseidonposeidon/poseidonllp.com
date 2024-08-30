@@ -133,6 +133,7 @@ div {
 }
 
 /* Dropdown content (hidden by default) */
+/* 調整下拉選單的位置 */
 .dropdown-content {
     display: none;
     position: absolute;
@@ -142,6 +143,8 @@ div {
     z-index: 1;
     border-radius: 5px;
     margin-top: 5px;
+    left: 0; /* 新增這一行，將左邊距設為0 */
+    top: 100%; /* 確保下拉選單從正下方開始顯示 */
 }
 
 /* Links inside the dropdown */
