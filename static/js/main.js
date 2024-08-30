@@ -1,21 +1,9 @@
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
 
-
-/////////////////////////////////////////////
-// function expandSection(element) {
-//     const content = element.querySelector('.content');
-//     if (!element.classList.contains('fixed')) {
-//         content.style.maxHeight = '1000px';
-//         content.style.opacity = '1';
-//         content.style.paddingTop = '20px';
-//         content.style.paddingBottom = '20px';
-//     }
-// }
-
 function collapseSection(element) {
     const content = element.querySelector('.content');
-    if (!element.classList.contains('fixed')) {
+    if (content && !element.classList.contains('fixed')) {
         content.style.maxHeight = '0px';
         content.style.opacity = '0';
         content.style.paddingTop = '0';
