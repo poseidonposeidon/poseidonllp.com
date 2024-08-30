@@ -10,21 +10,10 @@ function collapseSection(element) {
         content.style.paddingBottom = '0';
     }
 }
-// function toggleFixed(event, element) {
-//     if (event.target.tagName === 'SELECT' || event.target.tagName === 'BUTTON' || event.target.tagName === 'INPUT') {
-//         return;
-//     }
-//     const content = element.querySelector('.content');
-//     if (content.style.maxHeight !== '0px' && !element.classList.contains('fixed')) {
-//         element.classList.add('fixed');
-//     } else {
-//         element.classList.remove('fixed');
-//         collapseSection(element);
-//     }
-// }
 
 function toggleSection(event, sectionId) {
     event.preventDefault();
+    event.stopPropagation();  // 防止事件冒泡影響其他點擊事件
     const section = document.querySelector(sectionId);
     if (!section) {
         console.error('Section not found:', sectionId);
@@ -70,7 +59,8 @@ function hideSection(section) {
     }, 500); // Match CSS transition duration
 }
 
-document.querySelector('.body-container').addEventListener('click', () => {
+// 點擊 body-container 區域時收起已展開的 section
+document.querySelector('.body-container').addEventListener('click', (event) => {
     if (activeSection) {
         hideSection(activeSection);
         activeSection = null;
