@@ -141,7 +141,7 @@ div {
 .dropdown {
     position: relative;
     display: inline-block;
-    background-color: #121212; /* 確保背景顏色為全黑 */
+    background-color: #1e1e1e; /* 確保背景顏色為全黑 */
     padding: 0;
     margin: 0;
     border-radius: 5px; /* 確保邊角圓滑一致 */
