@@ -89,6 +89,19 @@ div {
     z-index: 1000;
 }
 
+/* Logo 样式 */
+.logo-container {
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
+}
+
+.logo {
+    height: 30px; /* 調整高度來縮小 logo */
+    width: auto;
+    margin-right: 50px;
+}
+
 /* Navbar links */
 .navbar-links {
     display: flex;
@@ -123,9 +136,11 @@ div {
 .dropdown {
     position: relative;
     display: inline-block;
-    background-color: #000000; /* 設置背景顏色為全黑 */
-    padding: 0; /* 移除padding */
-    margin: 0; /* 移除margin */
+    background-color: #000000; /* 確保背景顏色為全黑 */
+    padding: 0;
+    margin: 0;
+    border-radius: 5px; /* 確保邊角圓滑一致 */
+    box-shadow: none; /* 移除陰影確保顏色一致 */
 }
 
 /* 控制下拉選單的顯示與隱藏 */
