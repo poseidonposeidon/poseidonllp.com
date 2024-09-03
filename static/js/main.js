@@ -1511,6 +1511,7 @@ function displaySuggestions(suggestions) {
             const suggestionDiv = document.createElement('div');
             suggestionDiv.textContent = symbol;
             suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
                 document.getElementById('stockSymbol').value = symbol;
                 clearSuggestions(); // 选择后清空并隐藏建议列表
                 suggestionsContainer.classList.remove('active');
