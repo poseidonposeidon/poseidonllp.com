@@ -125,7 +125,7 @@ div {
 }
 
 .navbar-links a:hover {
-    color: #90caf9;
+    color: #d0b381;
 }
 
 .dropdown-container {
@@ -186,7 +186,7 @@ div {
 }
 
 .dropdown-content a:hover {
-    background-color: #575757;
+    /*background-color: #575757;*/
 }
 
 
