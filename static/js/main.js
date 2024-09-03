@@ -1064,7 +1064,7 @@ function fetchStock() {
         ]).then(() => {
             setTimeout(() => {
                 clearSuggestions();
-            }, 1000); // 延迟1秒后清除建议框
+            }, 1500); // 延迟1秒后清除建议框
         });
     }
 
@@ -1121,7 +1121,7 @@ function fetchJPStock() {
         ]).then(() => {
             setTimeout(() => {
                 clearSuggestionsJP();
-            }, 1000); // 延迟1秒后清除建议框
+            }, 1500); // 延迟1秒后清除建议框
         });
     }
 
@@ -1215,7 +1215,7 @@ async function fetchTWStock() {
         ]).then(() => {
             setTimeout(() => {
                 clearSuggestionsTW();
-            }, 1000); // 延迟1秒后清除建议框
+            }, 1500); // 延迟1秒后清除建议框
         });
     }
 
@@ -1272,7 +1272,7 @@ function fetchEUStock() {
         ]).then(() => {
             setTimeout(() => {
                 clearSuggestionsEU();
-            }, 1000); // 延迟1秒后清除建议框
+            }, 1500); // 延迟1秒后清除建议框
         });
     }
 
@@ -1329,7 +1329,7 @@ function fetchKRStock() {
         ]).then(() => {
             setTimeout(() => {
                 clearSuggestionsKR();
-            }, 1000); // 延迟1秒后清除建议框
+            }, 1500); // 延迟1秒后清除建议框
         });
     }
 
@@ -1386,7 +1386,7 @@ function fetchHKStock() {
         ]).then(() => {
             setTimeout(() => {
                 clearSuggestionsHK();
-            }, 1000); // 延迟1秒后清除建议框
+            }, 1500); // 延迟1秒后清除建议框
         });
     }
 
@@ -1443,7 +1443,7 @@ function fetchCNStock() {
         ]).then(() => {
             setTimeout(() => {
                 clearSuggestionsCN();
-            }, 1000); // 延迟1秒后清除建议框
+            }, 1500); // 延迟1秒后清除建议框
         });
     }
 
