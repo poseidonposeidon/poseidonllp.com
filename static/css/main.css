@@ -161,6 +161,7 @@ div {
     left: 0;
     top: 100%;
     transition: visibility 0s linear 0.3s, opacity 0.3s linear;
+    white-space: nowrap;
 }
 
 /* 顯示下拉選單 */
@@ -180,7 +181,8 @@ div {
     color: white;
     padding: 12px 16px;
     text-decoration: none;
-    display: block;
+    white-space: nowrap; /* 確保文本不會換行 */
+    display: inline-block; /* 保持內聯區塊元素的性質 */
 }
 
 .dropdown-content a:hover {
