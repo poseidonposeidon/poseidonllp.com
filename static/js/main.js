@@ -1058,23 +1058,11 @@ function fetchStock() {
         });
 
         // Fetch and display company profile and price information
-        fetchCompanyProfile(stockSymbol)
-            .then(() => {
-                setTimeout(() => {
-                    clearSuggestions(); // 延遲 0.5 秒清除建議框
-                }, 500);
-            });
+        fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
+        fetchCompanyPrice(stockSymbol);    // Fetch and display stock price information
 
-        fetchCompanyPrice(stockSymbol)
-            .then(() => {
-                setTimeout(() => {
-                    clearSuggestions(); // 延遲 0.5 秒清除建議框
-                }, 500);
-            });
-    } else {
-        clearSuggestions(); // 如果股票代码未更改，直接清除建議框
     }
-
+    clearSuggestions();
     return stockSymbol;
 }
 
@@ -1922,7 +1910,7 @@ function clearSuggestionsCN() {
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-    clearSuggestions();
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainer')))
@@ -1932,7 +1920,7 @@ function fetchCompanyProfile(stockSymbol) {
 function fetchJPCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 這裡填入你的API密鑰
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-    clearSuggestionsJP();
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerJP')))
@@ -1942,7 +1930,7 @@ function fetchJPCompanyProfile(stockSymbol) {
 function fetchTWCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-    clearSuggestionsTW();
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerTW')))
@@ -1952,7 +1940,7 @@ function fetchTWCompanyProfile(stockSymbol) {
 function fetchEUCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-    clearSuggestionsEU();
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerEU')))
@@ -1962,7 +1950,7 @@ function fetchEUCompanyProfile(stockSymbol) {
 function fetchKRCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-    clearSuggestionsKR();
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerKR')))
@@ -1972,7 +1960,7 @@ function fetchKRCompanyProfile(stockSymbol) {
 function fetchHKCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-    clearSuggestionsHK();
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerHK')))
@@ -1982,7 +1970,7 @@ function fetchHKCompanyProfile(stockSymbol) {
 function fetchCNCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-    clearSuggestionsCN();
+
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerCN')))
@@ -1990,7 +1978,6 @@ function fetchCNCompanyProfile(stockSymbol) {
 }
 
 function displayCompanyProfile(data, container) {
-    clearSuggestions();
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         return;
