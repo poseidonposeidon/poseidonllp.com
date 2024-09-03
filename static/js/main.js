@@ -1910,7 +1910,7 @@ function clearSuggestionsCN() {
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-
+    clearSuggestions();
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainer')))
@@ -1920,7 +1920,7 @@ function fetchCompanyProfile(stockSymbol) {
 function fetchJPCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 這裡填入你的API密鑰
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-
+    clearSuggestionsJP();
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerJP')))
@@ -1930,7 +1930,7 @@ function fetchJPCompanyProfile(stockSymbol) {
 function fetchTWCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-
+    clearSuggestionsTW();
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerTW')))
@@ -1940,7 +1940,7 @@ function fetchTWCompanyProfile(stockSymbol) {
 function fetchEUCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-
+    clearSuggestionsEU();
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerEU')))
@@ -1950,7 +1950,7 @@ function fetchEUCompanyProfile(stockSymbol) {
 function fetchKRCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-
+    clearSuggestionsKR();
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerKR')))
@@ -1960,7 +1960,7 @@ function fetchKRCompanyProfile(stockSymbol) {
 function fetchHKCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-
+    clearSuggestionsHK();
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerHK')))
@@ -1970,7 +1970,7 @@ function fetchHKCompanyProfile(stockSymbol) {
 function fetchCNCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
-
+    clearSuggestionsCN();
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainerCN')))
