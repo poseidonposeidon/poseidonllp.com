@@ -1058,12 +1058,11 @@ function fetchStock() {
         });
 
         // Fetch and display company profile and price information
-        clearSuggestions();
         fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
         fetchCompanyPrice(stockSymbol);    // Fetch and display stock price information
 
     }
-
+    clearSuggestions();
     return stockSymbol;
 }
 
@@ -1113,9 +1112,8 @@ function fetchJPStock() {
         // Fetch and display company profile and price information
         fetchJPCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchJPCompanyProfile
         fetchJPCompanyPrice(stockSymbol);    // Fetch and display stock price information
-        clearSuggestionsJP();
     }
-
+    clearSuggestionsJP();
     return stockSymbol;
 }
 
@@ -1202,9 +1200,9 @@ async function fetchTWStock() {
         // Fetch and display company profile and price information
         fetchTWCompanyProfile(fullStockSymbol);  // 传递 fullStockSymbol 给 fetchTWCompanyProfile
         fetchTWCompanyPrice(fullStockSymbol);    // 获取并显示股票价格信息
-        clearSuggestionsTW();
-    }
 
+    }
+    clearSuggestionsTW();
     return fullStockSymbol;
 }
 
@@ -1254,9 +1252,8 @@ function fetchEUStock() {
         // Fetch and display company profile and price information
         fetchEUCompanyProfile(stockSymbol);  // 获取并显示公司简介
         fetchEUCompanyPrice(stockSymbol);    // 获取并显示股票价格信息
-        clearSuggestionsEU();
     }
-
+    clearSuggestionsEU();
     return stockSymbol;
 }
 
@@ -1306,9 +1303,8 @@ function fetchKRStock() {
         // Fetch and display company profile and price information
         fetchKRCompanyProfile(stockSymbol);  // 获取并显示公司简介
         fetchKRCompanyPrice(stockSymbol);    // 获取并显示股票价格信息
-        clearSuggestionsKR();
     }
-
+    clearSuggestionsKR();
     return stockSymbol;
 }
 
@@ -1358,9 +1354,8 @@ function fetchHKStock() {
         // Fetch and display company profile and price information
         fetchHKCompanyProfile(stockSymbol);  // 获取并显示公司简介
         fetchHKCompanyPrice(stockSymbol);    // 获取并显示股票价格信息
-        clearSuggestionsHK();
     }
-
+    clearSuggestionsHK();
     return stockSymbol;
 }
 
@@ -1410,9 +1405,8 @@ function fetchCNStock() {
         // 获取并显示公司简介和价格信息
         fetchCNCompanyProfile(stockSymbol);  // 获取并显示公司简介
         fetchCNCompanyPrice(stockSymbol);    // 获取并显示股票价格信息
-        clearSuggestionsCN();
     }
-
+    clearSuggestionsCN();
     return stockSymbol;
 }
 
