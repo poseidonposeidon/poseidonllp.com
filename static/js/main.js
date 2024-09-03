@@ -3375,6 +3375,8 @@ function displayCashflow(data, containerId, chartId, period, yearRange) {
         return;
     }
 
+    filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     let rows = {
         date: ['Date'],
         symbol: ['Symbol'],
