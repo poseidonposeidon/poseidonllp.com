@@ -1978,6 +1978,7 @@ function fetchCNCompanyProfile(stockSymbol) {
 }
 
 function displayCompanyProfile(data, container) {
+    clearSuggestions();
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         return;
