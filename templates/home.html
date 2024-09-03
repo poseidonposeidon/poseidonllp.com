@@ -68,7 +68,7 @@
     <div class="info-input">
         <input type="text" id="stockSymbol" placeholder="Input U.S Stock" pattern="[A-Z]*" autocomplete="off">
 
-        <button id="usStockButton" onclick="fetchStock()">
+        <button id="usStockButton" onclick="fetchStock() ; clearSuggestions();">
             <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
         </button>
     </div>
