@@ -1058,11 +1058,19 @@ function fetchStock() {
         });
 
         // Fetch and display company profile and price information
-        fetchCompanyProfile(stockSymbol);  // Pass stockSymbol to fetchCompanyProfile
-        fetchCompanyPrice(stockSymbol);    // Fetch and display stock price information
+        fetchCompanyProfile(stockSymbol).then(() => {
+            setTimeout(() => {
+                clearSuggestions(); // 延遲 0.5 秒清除建議框
+            }, 500);
+        });
 
+        fetchCompanyPrice(stockSymbol).then(() => {
+            setTimeout(() => {
+                clearSuggestions(); // 延遲 0.5 秒清除建議框
+            }, 500);
+        });
     }
-    clearSuggestions();
+
     return stockSymbol;
 }
 
