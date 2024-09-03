@@ -152,6 +152,7 @@ div {
 .dropdown-content {
     visibility: hidden;
     opacity: 0;
+    display: block;
     position: absolute;
     background-color: #121212; /* 確保下拉選單也是全黑 */
     min-width: 160px;
@@ -160,9 +161,6 @@ div {
     left: 0;
     top: 100%;
     transition: visibility 0s linear 0.3s, opacity 0.3s linear;
-    display: flex;
-    flex-direction: column;
-    white-space: nowrap;
 }
 
 /* 顯示下拉選單 */
@@ -182,8 +180,7 @@ div {
     color: white;
     padding: 12px 16px;
     text-decoration: none;
-    white-space: nowrap; /* 確保文字不換行 */
-    display: block; /* 保持塊狀元素性質，使其佔據整行寬度 */
+    display: block;
 }
 
 .dropdown-content a:hover {
