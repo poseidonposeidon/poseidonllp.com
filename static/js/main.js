@@ -1058,17 +1058,21 @@ function fetchStock() {
         });
 
         // Fetch and display company profile and price information
-        fetchCompanyProfile(stockSymbol).then(() => {
-            setTimeout(() => {
-                clearSuggestions(); // 延遲 0.5 秒清除建議框
-            }, 1000);
-        });
+        fetchCompanyProfile(stockSymbol)
+            .then(() => {
+                setTimeout(() => {
+                    clearSuggestions(); // 延遲 0.5 秒清除建議框
+                }, 500);
+            });
 
-        fetchCompanyPrice(stockSymbol).then(() => {
-            setTimeout(() => {
-                clearSuggestions(); // 延遲 0.5 秒清除建議框
-            }, 1000);
-        });
+        fetchCompanyPrice(stockSymbol)
+            .then(() => {
+                setTimeout(() => {
+                    clearSuggestions(); // 延遲 0.5 秒清除建議框
+                }, 500);
+            });
+    } else {
+        clearSuggestions(); // 如果股票代码未更改，直接清除建議框
     }
 
     return stockSymbol;
