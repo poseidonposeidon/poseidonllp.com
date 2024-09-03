@@ -106,7 +106,7 @@
 <div id="jp-info-section" class="info-section" style="display: none;">
     <div class="info-input">
         <input type="text" id="jpStockSymbol" placeholder="Input JP Stock" pattern="[0-9]*">
-        <button id="jpStockButton" onclick="fetchJPStock()">
+        <button id="jpStockButton" onclick="fetchJPStock() ; clearSuggestionsJP();">
             <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
         </button>
     </div>
@@ -141,7 +141,7 @@
 <div id="tw-info-section" class="info-section">
     <div class="info-input">
         <input type="text" id="twStockSymbol" placeholder="Input TW Stock" pattern="[0-9]*">
-        <button id="twStockButton" onclick="fetchTWStock()">
+        <button id="twStockButton" onclick="fetchTWStock() ; clearSuggestionsTW();">
             <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
         </button>
     </div>
@@ -172,7 +172,7 @@
 <div id="eu-info-section" class="info-section" style="display: none;">
     <div class="info-input">
         <input type="text" id="euStockSymbol" placeholder="Input EU Stock" pattern="[A-Z0-9\.\-]*">
-        <button id="euStockButton" onclick="fetchEUStock()">
+        <button id="euStockButton" onclick="fetchEUStock() ; clearSuggestionsEU();">
             <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
         </button>
     </div>
@@ -207,7 +207,7 @@
 <div id="kr-info-section" class="info-section" style="display: none;">
     <div class="info-input">
         <input type="text" id="krStockSymbol" placeholder="Input KR Stock" pattern="[A-Z0-9]{1,6}">
-        <button id="krStockButton" onclick="fetchKRStock()">
+        <button id="krStockButton" onclick="fetchKRStock() ; clearSuggestionsKR();">
             <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
         </button>
     </div>
@@ -237,7 +237,7 @@
 <div id="hk-info-section" class="info-section" style="display: none;">
     <div class="info-input">
         <input type="text" id="hkStockSymbol" placeholder="Input HK Stock" pattern="[0-9]{5}">
-        <button id="hkStockButton" onclick="fetchHKStock()">
+        <button id="hkStockButton" onclick="fetchHKStock() ; clearSuggestionsHK();">
             <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
         </button>
     </div>
@@ -267,7 +267,7 @@
 <div id="cn-info-section" class="info-section" style="display: none;">
     <div class="info-input">
         <input type="text" id="cnStockSymbol" placeholder="Input CN Stock" pattern="^(60[0-9]{4}|(00|30)[0-9]{4}|002[0-9]{3})$" title="请输入有效的上海或深圳交易所股票代码">
-        <button id="cnStockButton" onclick="fetchCNStock()">
+        <button id="cnStockButton" onclick="fetchCNStock() ; clearSuggestionsCN();">
             <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
         </button>
     </div>
