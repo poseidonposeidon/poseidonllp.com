@@ -1572,6 +1572,7 @@ function displaySuggestionsEU(suggestions) {
             const suggestionDiv = document.createElement('div');
             suggestionDiv.textContent = symbol;
             suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
                 document.getElementById('euStockSymbol').value = symbol;
                 clearSuggestionsEU(); // 选择后清空并隐藏建议列表
                 suggestionsContainerEU.classList.remove('active');
@@ -1632,6 +1633,7 @@ function displaySuggestionsJP(suggestions) {
             const suggestionDiv = document.createElement('div');
             suggestionDiv.textContent = symbol.replace('.T', ''); // 移除顯示中的 ".T"
             suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
                 document.getElementById('jpStockSymbol').value = symbol.replace('.T', ''); // 移除輸入框中的 ".T"
                 clearSuggestionsJP(); // 選擇後清空並隱藏建議列表
                 suggestionsContainerJP.classList.remove('active');
@@ -1699,6 +1701,7 @@ function displaySuggestionsTW(suggestions) {
             const suggestionDiv = document.createElement('div');
             suggestionDiv.textContent = symbol; // 显示去除 ".TW" 和 ".TWO" 的股票符号
             suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
                 document.getElementById('twStockSymbol').value = symbol; // 选中后也不包含 ".TW" 或 ".TWO"
                 clearSuggestionsTW(); // 选择后清空并隐藏建议列表
                 suggestionsContainerTW.classList.remove('active');
@@ -1759,6 +1762,7 @@ function displaySuggestionsKR(suggestions) {
             const suggestionDiv = document.createElement('div');
             suggestionDiv.textContent = symbol;
             suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
                 document.getElementById('krStockSymbol').value = symbol;
                 clearSuggestionsKR(); // 选择后清空并隐藏建议列表
                 suggestionsContainerKR.classList.remove('active');
@@ -1820,6 +1824,7 @@ function displaySuggestionsHK(suggestions) {
             const suggestionDiv = document.createElement('div');
             suggestionDiv.textContent = cleanSymbol;
             suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
                 document.getElementById('hkStockSymbol').value = cleanSymbol; // 移除輸入框中的 ".HK"
                 clearSuggestionsHK(); // 選擇後清空並隱藏建議列表
                 suggestionsContainerHK.classList.remove('active');
@@ -1880,6 +1885,7 @@ function displaySuggestionsCN(suggestions) {
             const suggestionDiv = document.createElement('div');
             suggestionDiv.textContent = symbol;
             suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
                 document.getElementById('cnStockSymbol').value = symbol;
                 clearSuggestionsCN(); // 选择后清空并隐藏建议列表
                 suggestionsContainerCN.classList.remove('active');
