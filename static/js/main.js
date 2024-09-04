@@ -3728,8 +3728,10 @@ async function fetchEarningsCallTranscript() {
 
 async function fetchJPEarningsCallTranscript() {
     var stockSymbol = fetchJPStock();
-    var year = document.getElementById('yearInputJP').value;
-    var quarter = document.getElementById('quarterInputJP').value;
+    var yearInput = document.getElementById('yearInputJP');
+    var quarterInput = document.getElementById('quarterInputJP');
+    var year = yearInput.value;
+    var quarter = quarterInput.value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (stockSymbol.length === 0) {
@@ -3745,6 +3747,10 @@ async function fetchJPEarningsCallTranscript() {
             if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
+
+                // 填入自動取得的年份和季度
+                yearInput.value = year;
+                quarterInput.value = quarter;
             } else {
                 alert('未找到最新的法說會逐字稿。');
                 return;
@@ -3762,8 +3768,10 @@ async function fetchJPEarningsCallTranscript() {
 
 async function fetchTWEarningsCallTranscript() {
     const stockSymbol = await fetchTWStock();
-    var year = document.getElementById('yearInputTW').value;
-    var quarter = document.getElementById('quarterInputTW').value;
+    var yearInput = document.getElementById('yearInputTW');
+    var quarterInput = document.getElementById('quarterInputTW');
+    var year = yearInput.value;
+    var quarter = quarterInput.value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (stockSymbol.length === 0) {
@@ -3779,6 +3787,10 @@ async function fetchTWEarningsCallTranscript() {
             if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
+
+                // 填入自動取得的年份和季度
+                yearInput.value = year;
+                quarterInput.value = quarter;
             } else {
                 alert('未找到最新的法說會逐字稿。');
                 return;
@@ -3796,8 +3808,10 @@ async function fetchTWEarningsCallTranscript() {
 
 async function fetchEUEarningsCallTranscript() {
     const stockSymbol = fetchEUStock();
-    var year = document.getElementById('yearInputEU').value;
-    var quarter = document.getElementById('quarterInputEU').value;
+    var yearInput = document.getElementById('yearInputEU');
+    var quarterInput = document.getElementById('quarterInputEU');
+    var year = yearInput.value;
+    var quarter = quarterInput.value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (stockSymbol.length === 0) {
@@ -3813,6 +3827,10 @@ async function fetchEUEarningsCallTranscript() {
             if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
+
+                // 填入自動取得的年份和季度
+                yearInput.value = year;
+                quarterInput.value = quarter;
             } else {
                 alert('未找到最新的法說會逐字稿。');
                 return;
@@ -3830,8 +3848,10 @@ async function fetchEUEarningsCallTranscript() {
 
 async function fetchKREarningsCallTranscript() {
     const stockSymbol = fetchKRStock();
-    var year = document.getElementById('yearInputKR').value;
-    var quarter = document.getElementById('quarterInputKR').value;
+    var yearInput = document.getElementById('yearInputKR');
+    var quarterInput = document.getElementById('quarterInputKR');
+    var year = yearInput.value;
+    var quarter = quarterInput.value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (stockSymbol.length === 0) {
@@ -3847,6 +3867,10 @@ async function fetchKREarningsCallTranscript() {
             if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
+
+                // 填入自動取得的年份和季度
+                yearInput.value = year;
+                quarterInput.value = quarter;
             } else {
                 alert('未找到最新的法說會逐字稿。');
                 return;
@@ -3864,8 +3888,10 @@ async function fetchKREarningsCallTranscript() {
 
 async function fetchHKEarningsCallTranscript() {
     const stockSymbol = fetchHKStock();
-    var year = document.getElementById('yearInputHK').value;
-    var quarter = document.getElementById('quarterInputHK').value;
+    var yearInput = document.getElementById('yearInputHK');
+    var quarterInput = document.getElementById('quarterInputHK');
+    var year = yearInput.value;
+    var quarter = quarterInput.value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (stockSymbol.length === 0) {
@@ -3881,6 +3907,10 @@ async function fetchHKEarningsCallTranscript() {
             if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
+
+                // 填入自動取得的年份和季度
+                yearInput.value = year;
+                quarterInput.value = quarter;
             } else {
                 alert('未找到最新的法說會逐字稿。');
                 return;
@@ -3898,8 +3928,10 @@ async function fetchHKEarningsCallTranscript() {
 
 async function fetchCNEarningsCallTranscript() {
     const stockSymbol = fetchCNStock();
-    var year = document.getElementById('yearInputCN').value;
-    var quarter = document.getElementById('quarterInputCN').value;
+    var yearInput = document.getElementById('yearInputCN');
+    var quarterInput = document.getElementById('quarterInputCN');
+    var year = yearInput.value;
+    var quarter = quarterInput.value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (stockSymbol.length === 0) {
@@ -3915,6 +3947,10 @@ async function fetchCNEarningsCallTranscript() {
             if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
+
+                // 填入自動取得的年份和季度
+                yearInput.value = year;
+                quarterInput.value = quarter;
             } else {
                 alert('未找到最新的法說會逐字稿。');
                 return;
