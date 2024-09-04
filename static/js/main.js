@@ -4049,15 +4049,38 @@ function fetchData_Transcript(apiUrl, callback, containerId) {
 
 //////////////法說會日曆 Earnings Call Calendar/////////////////
 
-function fetchEarningsCallCalendar() {
-    const fromDate = document.getElementById('fromDate').value;
-    const toDate = document.getElementById('toDate').value;
-    stockSymbol = fetchStock();
+async function fetchEarningsCallCalendar() {
+    const fromDateInput = document.getElementById('fromDate');
+    const toDateInput = document.getElementById('toDate');
+    var fromDate = fromDateInput.value;
+    var toDate = toDateInput.value;
+    const stockSymbol = fetchStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    // 如果使用者沒有輸入日期，則自動抓取最近兩場法說會日期
     if (!fromDate || !toDate) {
-        alert('Please enter both from and to dates.');
-        return;
+        const latestApiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?limit=2&apikey=${apiKey}`;
+        try {
+            const response = await fetch(latestApiUrl);
+            const data = await response.json();
+            if (data && data.length > 0) {
+                // 自動填入最近兩場法說會的日期
+                fromDate = data[1].date;  // 最早的日期
+                toDate = data[0].date;    // 最近的日期
+
+                fromDateInput.value = fromDate;
+                toDateInput.value = toDate;
+            } else {
+                alert('未找到最近的法說會日期。');
+                return;
+            }
+        } catch (error) {
+            console.error('Error fetching latest earnings call dates:', error);
+            alert('無法獲取最近的法說會日期。');
+            return;
+        }
     }
+
     const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
     fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainer', stockSymbol), 'earningsCallCalendarContainer');
 }
