@@ -3685,15 +3685,35 @@ function formatNumber(value) {
 
 
 //////////////法說會逐字稿 Earnings Call Transcript/////////////////
-function fetchEarningsCallTranscript() {
+async function fetchEarningsCallTranscript() {
     var stockSymbol = fetchStock();
-    const year = document.getElementById('yearInput').value;
-    const quarter = document.getElementById('quarterInput').value;
+    var year = document.getElementById('yearInput').value;
+    var quarter = document.getElementById('quarterInput').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    if (stockSymbol.length === 0 || year.length === 0 || quarter.length === 0) {
-        alert('請輸入股票代碼、年份及季度。');
+    if (stockSymbol.length === 0) {
+        alert('請輸入股票代碼。');
         return;
+    }
+
+    // 如果年和季度未填寫，則自動抓取最新的逐字稿
+    if (year.length === 0 || quarter.length === 0) {
+        const latestApiUrl = `https://financialmodelingprep.com/api/v3/earning_call_transcript/${stockSymbol}?limit=1&apikey=${apiKey}`;
+        try {
+            const response = await fetch(latestApiUrl);
+            const data = await response.json();
+            if (data && data.length > 0) {
+                year = data[0].year;
+                quarter = data[0].quarter;
+            } else {
+                alert('未找到最新的法說會逐字稿。');
+                return;
+            }
+        } catch (error) {
+            console.error('Error fetching latest transcript:', error);
+            alert('無法獲取最新的法說會逐字稿。');
+            return;
+        }
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/earning_call_transcript/${stockSymbol}?year=${year}&quarter=${quarter}&apikey=${apiKey}`;
