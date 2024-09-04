@@ -3687,8 +3687,10 @@ function formatNumber(value) {
 //////////////法說會逐字稿 Earnings Call Transcript/////////////////
 async function fetchEarningsCallTranscript() {
     var stockSymbol = fetchStock();
-    var year = document.getElementById('yearInput').value;
-    var quarter = document.getElementById('quarterInput').value;
+    var yearInput = document.getElementById('yearInput');
+    var quarterInput = document.getElementById('quarterInput');
+    var year = yearInput.value;
+    var quarter = quarterInput.value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (stockSymbol.length === 0) {
@@ -3696,7 +3698,7 @@ async function fetchEarningsCallTranscript() {
         return;
     }
 
-    // 如果年和季度未填寫，則自動抓取最新的逐字稿
+    // 如果使用者沒有輸入年份或季度，則自動抓取最新的逐字稿資料
     if (year.length === 0 || quarter.length === 0) {
         const latestApiUrl = `https://financialmodelingprep.com/api/v3/earning_call_transcript/${stockSymbol}?limit=1&apikey=${apiKey}`;
         try {
@@ -3705,6 +3707,10 @@ async function fetchEarningsCallTranscript() {
             if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
+
+                // 自動填入最新的年份和季度到表單中
+                yearInput.value = year;
+                quarterInput.value = quarter;
             } else {
                 alert('未找到最新的法說會逐字稿。');
                 return;
