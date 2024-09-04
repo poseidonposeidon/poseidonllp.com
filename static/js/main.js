@@ -4054,35 +4054,38 @@ async function fetchEarningsCallCalendar() {
     const toDateInput = document.getElementById('toDate');
     var fromDate = fromDateInput.value;
     var toDate = toDateInput.value;
-    const stockSymbol = fetchStock();
+    const stockSymbol = fetchStock();  // 獲取股票代碼
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     // 如果使用者未輸入日期，則自動查詢今天及未來的法說會
     if (!fromDate || !toDate) {
         const today = new Date().toISOString().split('T')[0]; // 取得今天的日期（格式：YYYY-MM-DD）
-        const latestApiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${today}&limit=2&apikey=${apiKey}`;
+        const latestApiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?symbol=${stockSymbol}&from=${today}&limit=2&apikey=${apiKey}`;
+
         try {
             const response = await fetch(latestApiUrl);
             const data = await response.json();
+
             if (data && data.length > 0) {
-                // 將 API 回傳的最近兩場法說會的日期自動填入輸入框
+                // 自動填入最近兩場法說會的日期
                 fromDate = data[data.length - 1].date;  // 最早的日期
                 toDate = data[0].date;  // 最近的日期
 
                 fromDateInput.value = fromDate;
                 toDateInput.value = toDate;
             } else {
-                alert(`No earnings calendar data found for ${stockSymbol}.`);
+                alert(`No earnings calendar data found for ${stockSymbol}. It may not have upcoming earnings calls.`);
                 return;
             }
         } catch (error) {
             console.error('Error fetching latest earnings call dates:', error);
-            alert('Unable to fetch the latest earnings call dates.');
+            alert('Unable to fetch the latest earnings call dates. Please try again later.');
             return;
         }
     }
 
-    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
+    // 再次發送請求，查詢從 fromDate 到 toDate 的法說會
+    const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?symbol=${stockSymbol}&from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
     fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainer', stockSymbol), 'earningsCallCalendarContainer');
 }
 
