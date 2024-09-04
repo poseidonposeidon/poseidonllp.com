@@ -4392,7 +4392,6 @@ async function fetchCNEarningsCallCalendar() {
     }
 }
 
-
 function displayEarningsCallCalendar(data, containerId, stockSymbol) {
     const container = document.getElementById(containerId);
     if (!container) {
@@ -4461,8 +4460,12 @@ function displayEarningsCallCalendar_JP(data, containerId, stockSymbol) {
 
 function fetchData_2(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
-    console.log(container); // Add this line
-    container.innerHTML = '<p>Loading...</p>';
+
+    // 顯示 "Loading..." 提示
+    if (container) {
+        container.innerHTML = '<p>Loading...</p>';
+    }
+
     fetch(apiUrl)
         .then(response => {
             if (!response.ok) throw new Error('Network response was not ok');
@@ -4473,7 +4476,7 @@ function fetchData_2(apiUrl, callback, containerId) {
             // 確保 data 是一個陣列
             if (Array.isArray(data)) {
                 if (data.length > 0) {
-                    callback(data, container);
+                    callback(data, containerId);
                 } else {
                     container.innerHTML = '<p>No data found for this symbol.</p>';
                 }
@@ -4490,6 +4493,7 @@ function fetchData_2(apiUrl, callback, containerId) {
             container.innerHTML = `<p>Error loading data: ${error.message}. Please check the console for more details.</p>`;
         });
 }
+
 
 //////////////歷史獲利和未來獲利 Historical and Future Earnings/////////////////
 
