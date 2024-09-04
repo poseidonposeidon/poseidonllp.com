@@ -4057,26 +4057,27 @@ async function fetchEarningsCallCalendar() {
     const stockSymbol = fetchStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    // 如果使用者沒有輸入日期，則自動抓取最近兩場法說會日期
+    // 如果使用者未輸入日期，則自動查詢今天及未來的法說會
     if (!fromDate || !toDate) {
-        const latestApiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?limit=2&apikey=${apiKey}`;
+        const today = new Date().toISOString().split('T')[0]; // 取得今天的日期（格式：YYYY-MM-DD）
+        const latestApiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${today}&limit=2&apikey=${apiKey}`;
         try {
             const response = await fetch(latestApiUrl);
             const data = await response.json();
             if (data && data.length > 0) {
-                // 自動填入最近兩場法說會的日期
-                fromDate = data[1].date;  // 最早的日期
-                toDate = data[0].date;    // 最近的日期
+                // 將 API 回傳的最近兩場法說會的日期自動填入輸入框
+                fromDate = data[data.length - 1].date;  // 最早的日期
+                toDate = data[0].date;  // 最近的日期
 
                 fromDateInput.value = fromDate;
                 toDateInput.value = toDate;
             } else {
-                alert('未找到最近的法說會日期。');
+                alert(`No earnings calendar data found for ${stockSymbol}.`);
                 return;
             }
         } catch (error) {
             console.error('Error fetching latest earnings call dates:', error);
-            alert('無法獲取最近的法說會日期。');
+            alert('Unable to fetch the latest earnings call dates.');
             return;
         }
     }
@@ -4084,6 +4085,7 @@ async function fetchEarningsCallCalendar() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
     fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainer', stockSymbol), 'earningsCallCalendarContainer');
 }
+
 
 function fetchJPEarningsCallCalendar() {
     const fromDate = document.getElementById('fromDateJP').value;
