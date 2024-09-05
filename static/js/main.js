@@ -165,9 +165,9 @@ function loadSection(sectionId) {
                     <input type="date" id="fromDate" placeholder="From Date">
                     <input type="date" id="toDate" placeholder="To Date">
                     <button onclick="fetchEarningsCallCalendar()">Load Calendar</button>
-                    <div class="scroll-container">
-                        <div id="earningsCallCalendarContainer"></div>
-                    </div>
+                    
+                       <div id="earningsCallCalendarContainer"></div>
+                    
                 </div>
             </div>`,
         'historical-earnings': `
@@ -177,7 +177,7 @@ function loadSection(sectionId) {
 <!--                    <input type="date" id="fromDate_1" placeholder="From Date">-->
 <!--                    <input type="date" id="toDate_1" placeholder="To Date">-->
                     <button onclick="fetch_historical_earning_calendar()">Load Calendar</button>
-                    <div class="scroll-container" id="historicalEarningsContainer">
+                    <div id="historicalEarningsContainer">
                         <!-- Data table will be displayed here -->
                     </div>
                 </div>
@@ -189,7 +189,7 @@ function loadSection(sectionId) {
                     <input type="date" id="fromDate_2" placeholder="From Date">
                     <input type="date" id="toDate_2" placeholder="To Date">
                     <button onclick="fetch_stock_dividend_calendar()">Load Calendar</button>
-                    <div class="scroll-container" id="stockDividendCalendarContainer">
+                    <div id="stockDividendCalendarContainer">
                         <!-- Data table will be displayed here -->
                     </div>
                 </div>
@@ -199,7 +199,7 @@ function loadSection(sectionId) {
                 <h2>Insider Trades</h2>
                 <div class="content">
                     <button onclick="fetchInsiderTrades()">Load Table</button>
-                    <div class="scroll-container-x" id="insiderTradesContainer">
+                    <div  id="insiderTradesContainer">
                         <!-- Data table will be displayed here -->
                     </div>
                 </div>
