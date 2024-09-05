@@ -174,8 +174,8 @@ function loadSection(sectionId) {
             <div class="section" id="historical-earnings">
                 <h2>Historical and Future Earnings</h2>
                 <div class="content">
-                    <input type="date" id="fromDate_1" placeholder="From Date">
-                    <input type="date" id="toDate_1" placeholder="To Date">
+<!--                    <input type="date" id="fromDate_1" placeholder="From Date">-->
+<!--                    <input type="date" id="toDate_1" placeholder="To Date">-->
                     <button onclick="fetch_historical_earning_calendar()">Load Calendar</button>
                     <div class="scroll-container" id="historicalEarningsContainer">
                         <!-- Data table will be displayed here -->
