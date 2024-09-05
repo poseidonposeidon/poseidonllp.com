@@ -4870,6 +4870,9 @@ function displayInsiderTrades(data, container) {
         return;
     }
 
+    // 按日期升序排序（最早的在左，最新的在右）
+    data.sort((a, b) => new Date(a.transactionDate) - new Date(b.transactionDate));
+
     let rows = {
         symbol: ['Symbol'],
         filingDate: ['Filing Date'],
@@ -4884,7 +4887,7 @@ function displayInsiderTrades(data, container) {
         link: ['Link']
     };
 
-    // 填充行数据
+    // 填充行數據
     data.forEach(item => {
         rows.symbol.push(item.symbol || 'N/A');
         rows.filingDate.push(item.filingDate || 'N/A');
@@ -4896,10 +4899,10 @@ function displayInsiderTrades(data, container) {
         rows.securityName.push(item.securityName || 'N/A');
         rows.price.push(item.price ? `$${item.price.toFixed(2)}` : 'N/A');
         rows.formType.push(item.formType || 'N/A');
-        rows.link.push(item.link ? `<a  class="styled-link" href="${item.link}" target="_blank">View Form</a>` : 'N/A');
+        rows.link.push(item.link ? `<a class="styled-link" href="${item.link}" target="_blank">View Form</a>` : 'N/A');
     });
 
-    // 构建 HTML 表格
+    // 構建 HTML 表格
     let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
         htmlContent += `<tr><th>${rows[key][0]}</th>`;
@@ -4919,6 +4922,9 @@ function displayInsiderTrades_JP(data, container) {
         return;
     }
 
+    // 按日期升序排序（最早的在左，最新的在右）
+    data.sort((a, b) => new Date(a.transactionDate) - new Date(b.transactionDate));
+
     let rows = {
         symbol: ['Symbol'],
         filingDate: ['Filing Date'],
@@ -4933,7 +4939,7 @@ function displayInsiderTrades_JP(data, container) {
         link: ['Link']
     };
 
-    // 填充行数据
+    // 填充行數據
     data.forEach(item => {
         rows.symbol.push(item.symbol || 'N/A');
         rows.filingDate.push(item.filingDate || 'N/A');
@@ -4942,25 +4948,7 @@ function displayInsiderTrades_JP(data, container) {
         rows.transactionType.push(item.transactionType || 'N/A');
         rows.securitiesOwned.push(item.securitiesOwned ? item.securitiesOwned.toLocaleString() : 'N/A');
         rows.securitiesTransacted.push(item.securitiesTransacted ? item.securitiesTransacted.toLocaleString() : 'N/A');
-        rows.securityName.push(item.securityName || 'N/A');
-        rows.price.push(item.price ? `$${item.price.toFixed(2)}` : 'N/A');
-        rows.formType.push(item.formType || 'N/A');
-        rows.link.push(item.link ? `<a class="styled-link" href="${item.link}" target="_blank">View Form</a>` : 'N/A');
-    });
-
-    // 构建 HTML 表格
-    let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
-    Object.keys(rows).forEach(key => {
-        htmlContent += `<tr><th>${rows[key][0]}</th>`;
-        rows[key].slice(1).forEach(value => {
-            htmlContent += `<td>${value}</td>`;
-        });
-        htmlContent += '</tr>';
-    });
-    htmlContent += '</table>';
-
-    container.innerHTML = htmlContent;
-}
+        rows.securityName.push
 
 
 ////////////////////////////錄音檔轉文字/////////////////////////////
