@@ -4600,6 +4600,9 @@ function display_historical_earning_calendar(data, container) {
         return;
     }
 
+    // 按照日期對資料進行排序（由舊到新）
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     // 建立表格結構
     let rows = {
         date: ['Date'],
