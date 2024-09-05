@@ -4647,16 +4647,18 @@ function display_historical_earning_calendar(data, container) {
         rows.fiscalDateEnding.push(item.fiscalDateEnding || 'N/A');
     });
 
-    // 構建 HTML 表格，移除 Y 滾動條，並統一背景顏色
+    // 構建 HTML 表格，使用與 `income statement` 相同的樣式
     let tableHtml = `
-    <div style="display: flex; overflow-x: auto; height: auto;">
+    <div style="display: flex; overflow-x: auto;">
+        <!-- 左側標題欄 -->
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
             <table border="1" style="border-collapse: collapse;">
                 ${Object.keys(rows).map(key => `<tr><th style="padding: 10px; background-color: #2c2c2c; border: 1px solid black;">${rows[key][0]}</th></tr>`).join('')}
             </table>
         </div>
+        <!-- 可滾動的數據欄 -->
         <div class="scroll-right" style="overflow-x: auto;">
-            <table border="1" style="border-collapse: collapse; width: 100%;">
+            <table border="1" style="width: 100%; border-collapse: collapse;">
                 ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="padding: 10px; background-color: #1e1e1e; border: 1px solid black;">${value}</td>`).join('')}</tr>`).join('')}
             </table>
         </div>
