@@ -4056,8 +4056,6 @@ function fetchData_Transcript(apiUrl, callback, containerId) {
 //////////////法說會日曆 Earnings Call Calendar/////////////////
 
 async function fetchEarningsCallCalendar() {
-    const fromDateInput = document.getElementById('fromDate');
-    const toDateInput = document.getElementById('toDate');
     const stockSymbol = fetchStock();  // 獲取股票代碼
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const container = document.getElementById('earningsCallCalendarContainer');
@@ -4066,58 +4064,59 @@ async function fetchEarningsCallCalendar() {
     if (container) {
         container.innerHTML = '<p>Loading...</p>';
     }
-    // 如果使用者未輸入日期，則自動查詢最近六個月內的法說會
-    if (!fromDateInput.value || !toDateInput.value) {
-        // 取得今天的日期
-        const today = new Date();
 
-        // 取得三個月前的日期
-        const threeMonthsAgo = new Date();
-        threeMonthsAgo.setMonth(today.getMonth() - 3);
+    // 取得今天的日期
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
 
-        // 取得六個月前的日期
-        const sixMonthsAgo = new Date();
-        sixMonthsAgo.setMonth(today.getMonth() - 6);
+    // 計算未來三個月與六個月的日期
+    const threeMonthsFuture = new Date();
+    threeMonthsFuture.setMonth(today.getMonth() + 3);
+    const sixMonthsFuture = new Date();
+    sixMonthsFuture.setMonth(today.getMonth() + 6);
 
-        // 將日期轉換為 YYYY-MM-DD 格式
-        const todayStr = today.toISOString().split('T')[0];
-        const threeMonthsAgoStr = threeMonthsAgo.toISOString().split('T')[0];
-        const sixMonthsAgoStr = sixMonthsAgo.toISOString().split('T')[0];
+    const threeMonthsFutureStr = threeMonthsFuture.toISOString().split('T')[0];
+    const sixMonthsFutureStr = sixMonthsFuture.toISOString().split('T')[0];
 
-        try {
-            // 第一次查詢：今天到三個月前
-            const firstApiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?symbol=${stockSymbol}&from=${threeMonthsAgoStr}&to=${todayStr}&apikey=${apiKey}`;
-            const firstResponse = await fetch(firstApiUrl);
-            const firstData = await firstResponse.json();
+    // 計算過去三個月與六個月的日期
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
 
-            // 第二次查詢：三到六個月前
-            const secondApiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?symbol=${stockSymbol}&from=${sixMonthsAgoStr}&to=${threeMonthsAgoStr}&apikey=${apiKey}`;
-            const secondResponse = await fetch(secondApiUrl);
-            const secondData = await secondResponse.json();
+    const threeMonthsAgoStr = threeMonthsAgo.toISOString().split('T')[0];
+    const sixMonthsAgoStr = sixMonthsAgo.toISOString().split('T')[0];
 
-            // 合併結果
-            const allData = [...firstData, ...secondData];
+    try {
+        // 查詢未來三個月與六個月
+        const futureApiUrl1 = `https://financialmodelingprep.com/api/v3/earning_calendar?symbol=${stockSymbol}&from=${todayStr}&to=${threeMonthsFutureStr}&apikey=${apiKey}`;
+        const futureApiUrl2 = `https://financialmodelingprep.com/api/v3/earning_calendar?symbol=${stockSymbol}&from=${threeMonthsFutureStr}&to=${sixMonthsFutureStr}&apikey=${apiKey}`;
 
-            if (allData.length > 0) {
-                // 填入日期範圍到輸入框
-                fromDateInput.value = sixMonthsAgoStr;  // 六個月前
-                toDateInput.value = todayStr;  // 今天
+        const [futureResponse1, futureResponse2] = await Promise.all([
+            fetch(futureApiUrl1).then(res => res.json()),
+            fetch(futureApiUrl2).then(res => res.json())
+        ]);
 
-                // 顯示查詢結果
-                displayEarningsCallCalendar(allData, 'earningsCallCalendarContainer', stockSymbol);
-            } else {
-                alert(`No earnings calendar data found for ${stockSymbol}.`);
-            }
-        } catch (error) {
-            console.error('Error fetching earnings call calendar data:', error);
-            alert('Unable to fetch earnings call data. Please try again later.');
+        // 查詢過去三個月與六個月
+        const pastApiUrl1 = `https://financialmodelingprep.com/api/v3/earning_calendar?symbol=${stockSymbol}&from=${threeMonthsAgoStr}&to=${todayStr}&apikey=${apiKey}`;
+        const pastApiUrl2 = `https://financialmodelingprep.com/api/v3/earning_calendar?symbol=${stockSymbol}&from=${sixMonthsAgoStr}&to=${threeMonthsAgoStr}&apikey=${apiKey}`;
+
+        const [pastResponse1, pastResponse2] = await Promise.all([
+            fetch(pastApiUrl1).then(res => res.json()),
+            fetch(pastApiUrl2).then(res => res.json())
+        ]);
+
+        // 合併結果
+        const allData = [...futureResponse1, ...futureResponse2, ...pastResponse1, ...pastResponse2];
+
+        if (allData.length > 0) {
+            displayEarningsCallCalendar(allData, 'earningsCallCalendarContainer', stockSymbol);
+        } else {
+            alert(`No earnings calendar data found for ${stockSymbol}.`);
         }
-    } else {
-        // 如果使用者輸入了日期，根據輸入的日期範圍查詢
-        const fromDate = fromDateInput.value;
-        const toDate = toDateInput.value;
-        const apiUrl = `https://financialmodelingprep.com/api/v3/earning_calendar?symbol=${stockSymbol}&from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
-        fetchData_2(apiUrl, (data) => displayEarningsCallCalendar(data, 'earningsCallCalendarContainer', stockSymbol), 'earningsCallCalendarContainer');
+    } catch (error) {
+        console.error('Error fetching earnings call calendar data:', error);
+        alert('Unable to fetch earnings call data. Please try again later.');
     }
 }
 
