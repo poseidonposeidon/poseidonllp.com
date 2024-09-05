@@ -4822,30 +4822,76 @@ async function fetchData_historical_earning_calendar(apiUrl, callback, container
 
 
 //////////////股利發放日期/////////////////
-function fetch_stock_dividend_calendar() {
-    const fromDate = document.getElementById('fromDate_2').value;
-    const toDate = document.getElementById('toDate_2').value;
+async function fetch_stock_dividend_calendar() {
+    const fromDateInput = document.getElementById('fromDate_2').value;
+    const toDateInput = document.getElementById('toDate_2').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 请替换成您的 API 密钥
+    const container = document.getElementById('stockDividendCalendarContainer');
 
-    if (!fromDate || !toDate) {
-        alert('Please enter both a start and an end date.');
-        return;
+    // 顯示 "Loading..." 提示
+    if (container) {
+        container.innerHTML = '<p>Loading...</p>';
     }
 
-    const apiUrl = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
-    fetchData(apiUrl, display_stock_dividend_calendar, 'stockDividendCalendarContainer');
-}
+    // 取得今天的日期
+    const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
 
-function fetchJPStockDividendCalendar() {
-    const fromDate = document.getElementById('fromDate_2-JP').value;
-    const toDate = document.getElementById('toDate_2-JP').value;
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 替換為你的實際 API 密鑰
-    if (!fromDate || !toDate) {
-        alert('請輸入起始日期和結束日期。');
-        return;
+    // 計算過去三個月、六個月、九個月的日期
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
+    const nineMonthsAgo = new Date();
+    nineMonthsAgo.setMonth(today.getMonth() - 9);
+
+    const threeMonthsAgoStr = threeMonthsAgo.toISOString().split('T')[0];
+    const sixMonthsAgoStr = sixMonthsAgo.toISOString().split('T')[0];
+    const nineMonthsAgoStr = nineMonthsAgo.toISOString().split('T')[0];
+
+    // 計算未來三個月、六個月的日期
+    const threeMonthsFuture = new Date();
+    threeMonthsFuture.setMonth(today.getMonth() + 3);
+    const sixMonthsFuture = new Date();
+    sixMonthsFuture.setMonth(today.getMonth() + 6);
+
+    const threeMonthsFutureStr = threeMonthsFuture.toISOString().split('T')[0];
+    const sixMonthsFutureStr = sixMonthsFuture.toISOString().split('T')[0];
+
+    // 如果使用者沒有填寫日期，自動設置日期範圍
+    const fromDate = fromDateInput || nineMonthsAgoStr;
+    const toDate = toDateInput || sixMonthsFutureStr;
+
+    try {
+        // 查詢過去三次 (9個月)，每次 3 個月
+        const pastApiUrl1 = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${nineMonthsAgoStr}&to=${sixMonthsAgoStr}&apikey=${apiKey}`;
+        const pastApiUrl2 = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${sixMonthsAgoStr}&to=${threeMonthsAgoStr}&apikey=${apiKey}`;
+        const pastApiUrl3 = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${threeMonthsAgoStr}&to=${todayStr}&apikey=${apiKey}`;
+
+        // 查詢未來兩次 (6個月)，每次 3 個月
+        const futureApiUrl1 = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${todayStr}&to=${threeMonthsFutureStr}&apikey=${apiKey}`;
+        const futureApiUrl2 = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${threeMonthsFutureStr}&to=${sixMonthsFutureStr}&apikey=${apiKey}`;
+
+        const [pastResponse1, pastResponse2, pastResponse3, futureResponse1, futureResponse2] = await Promise.all([
+            fetch(pastApiUrl1).then(res => res.json()),
+            fetch(pastApiUrl2).then(res => res.json()),
+            fetch(pastApiUrl3).then(res => res.json()),
+            fetch(futureApiUrl1).then(res => res.json()),
+            fetch(futureApiUrl2).then(res => res.json())
+        ]);
+
+        // 合併結果
+        const allData = [...pastResponse1, ...pastResponse2, ...pastResponse3, ...futureResponse1, ...futureResponse2];
+
+        if (allData.length > 0) {
+            display_stock_dividend_calendar(allData, container);
+        } else {
+            container.innerHTML = `<p>No dividend calendar data found for the selected dates.</p>`;
+        }
+    } catch (error) {
+        console.error('Error fetching stock dividend calendar data:', error);
+        alert('Unable to fetch stock dividend data. Please try again later.');
     }
-    const apiUrl = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
-    fetchData_2(apiUrl, display_stock_dividend_calendar_JP, 'stockDividendCalendarContainerJP');
 }
 
 function display_stock_dividend_calendar(data, container) {
@@ -4855,91 +4901,54 @@ function display_stock_dividend_calendar(data, container) {
         return;
     }
 
-    let htmlContent = '<table border="1">';
-    htmlContent += `
-            <tr>
-                <th>Date</th>
-                <th>Label</th>
-                <th>Symbol</th>
-                <th>Dividend</th>
-                <th>Adjusted Dividend</th>
-                <th>Declaration Date</th>
-                <th>Record Date</th>
-                <th>Payment Date</th>
-            </tr>
-        `;
+    let rows = {
+        date: ['Date'],
+        label: ['Label'],
+        symbol: ['Symbol'],
+        dividend: ['Dividend'],
+        adjDividend: ['Adjusted Dividend'],
+        declarationDate: ['Declaration Date'],
+        recordDate: ['Record Date'],
+        paymentDate: ['Payment Date']
+    };
 
-    // 过滤并只显示匹配的股票代码
+    // 填充行數據，並只添加符合輸入的股票代碼的行
     data.forEach(item => {
-        if (item.symbol.toUpperCase() === stockSymbol.toUpperCase()) { // 只添加符合输入的股票代码的行
-            htmlContent += `
-                    <tr>
-                        <td>${item.date || 'N/A'}</td>
-                        <td>${item.label || 'N/A'}</td>
-                        <td>${item.symbol || 'N/A'}</td>
-                        <td>${item.dividend != null ? item.dividend : 'N/A'}</td>
-                        <td>${item.adjDividend != null ? item.adjDividend : 'N/A'}</td>
-                        <td>${item.declarationDate || 'N/A'}</td>
-                        <td>${item.recordDate || 'N/A'}</td>
-                        <td>${item.paymentDate || 'N/A'}</td>
-                    </tr>
-                `;
+        if (item.symbol.toUpperCase() === stockSymbol.toUpperCase()) {
+            rows.date.push(item.date || 'N/A');
+            rows.label.push(item.label || 'N/A');
+            rows.symbol.push(item.symbol || 'N/A');
+            rows.dividend.push(item.dividend != null ? item.dividend : 'N/A');
+            rows.adjDividend.push(item.adjDividend != null ? item.adjDividend : 'N/A');
+            rows.declarationDate.push(item.declarationDate || 'N/A');
+            rows.recordDate.push(item.recordDate || 'N/A');
+            rows.paymentDate.push(item.paymentDate || 'N/A');
         }
     });
 
-    htmlContent += '</table>';
-    container.innerHTML = htmlContent;
-
-    if (htmlContent.indexOf('<tr>') === -1) { // 如果没有匹配的数据，显示消息
+    // 如果没有匹配的数据，顯示消息
+    if (rows.date.length === 1) { // 沒有任何數據添加
         container.innerHTML = '<p>No data available for the selected stock symbol.</p>';
-    }
-}
-
-function display_stock_dividend_calendar_JP(data, container) {
-    stockSymbol = fetchJPStock();
-    if (!data || data.length === 0) {
-        container.innerHTML = '<p>No data available for the selected dates.</p>';
         return;
     }
 
-    let htmlContent = '<table border="1">';
-    htmlContent += `
-            <tr>
-                <th>Date</th>
-                <th>Label</th>
-                <th>Symbol</th>
-                <th>Dividend</th>
-                <th>Adjusted Dividend</th>
-                <th>Declaration Date</th>
-                <th>Record Date</th>
-                <th>Payment Date</th>
-            </tr>
-        `;
+    // 構建 HTML 表格，使用 white-space: nowrap; 防止內容換行
+    let tableHtml = `
+    <div style="display: flex; overflow-x: auto;">
+        <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
+            <table border="1" style="border-collapse: collapse; white-space: nowrap;">
+                ${Object.keys(rows).map(key => `<tr><th style="white-space: nowrap;">${rows[key][0]}</th></tr>`).join('')}
+            </table>
+        </div>
+        <div class="scroll-right" style="overflow-x: auto;">
+            <table border="1" style="width: 100%; border-collapse: collapse; white-space: nowrap;">
+                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="white-space: nowrap;">${value}</td>`).join('')}</tr>`).join('')}
+            </table>
+        </div>
+    </div>
+    `;
 
-    // 过滤并只显示匹配的股票代码
-    data.forEach(item => {
-        if (item.symbol.toUpperCase() === stockSymbol.toUpperCase()) { // 只添加符合输入的股票代码的行
-            htmlContent += `
-                    <tr>
-                        <td>${item.date || 'N/A'}</td>
-                        <td>${item.label || 'N/A'}</td>
-                        <td>${item.symbol || 'N/A'}</td>
-                        <td>${item.dividend != null ? item.dividend : 'N/A'}</td>
-                        <td>${item.adjDividend != null ? item.adjDividend : 'N/A'}</td>
-                        <td>${item.declarationDate || 'N/A'}</td>
-                        <td>${item.recordDate || 'N/A'}</td>
-                        <td>${item.paymentDate || 'N/A'}</td>
-                    </tr>
-                `;
-        }
-    });
-
-    htmlContent += '</table>';
-    container.innerHTML = htmlContent;
-
-    if (htmlContent.indexOf('<tr>') === -1) { // 如果没有匹配的数据，显示消息
-        container.innerHTML = '<p>No data available for the selected stock symbol.</p>';
-    }
+    container.innerHTML = tableHtml;
 }
 
 function fetchData(apiUrl, callback, containerId) {
