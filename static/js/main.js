@@ -4532,8 +4532,8 @@ function fetchData_2(apiUrl, callback, containerId) {
 
 //////////////歷史獲利和未來獲利 Historical and Future Earnings/////////////////
 
-function fetch_historical_earning_calendar() {
-    stockSymbol = fetchStock();
+async function fetch_historical_earning_calendar() {
+    const stockSymbol = fetchStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 你的 API 密鑰
     const container = document.getElementById('historicalEarningsContainer');
 
@@ -4543,9 +4543,7 @@ function fetch_historical_earning_calendar() {
     }
 
     // 顯示 "Loading..." 提示
-    if (container) {
-        container.innerHTML = '<p>Loading...</p>';
-    }
+    container.innerHTML = '<p>Loading...</p>';
 
     // 取得今天的日期
     const today = new Date();
@@ -4563,93 +4561,90 @@ function fetch_historical_earning_calendar() {
     const threeMonthsAgoStr = threeMonthsAgo.toISOString().split('T')[0];
     const sixMonthsAgoStr = sixMonthsAgo.toISOString().split('T')[0];
 
+    // 自動填入日期到 input 欄位
+    document.getElementById('fromDate_1').value = sixMonthsAgoStr;
+    document.getElementById('toDate_1').value = todayStr;
+
     // 進行第一次查詢（今天到三個月前）
     const firstApiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?from=${threeMonthsAgoStr}&to=${todayStr}&apikey=${apiKey}`;
 
     // 進行第二次查詢（三個月前到六個月前）
     const secondApiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?from=${sixMonthsAgoStr}&to=${threeMonthsAgoStr}&apikey=${apiKey}`;
 
-    // 串行請求兩個 API 並合併結果
-    Promise.all([fetch(firstApiUrl).then(res => res.json()), fetch(secondApiUrl).then(res => res.json())])
-        .then(results => {
-            const allData = [...results[0], ...results[1]];
+    try {
+        // 等待兩次 API 請求結果
+        const [firstData, secondData] = await Promise.all([
+            fetch(firstApiUrl).then(res => res.json()),
+            fetch(secondApiUrl).then(res => res.json())
+        ]);
 
-            if (allData.length > 0) {
-                display_historical_earning_calendar(allData, container);
-            } else {
-                container.innerHTML = `<p>No historical earnings data found for ${stockSymbol}.</p>`;
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching historical earnings data: ', error);
-            container.innerHTML = `<p>Error loading data: ${error.message}. Please try again later.</p>`;
-        });
-}
+        // 合併結果
+        const allData = [...firstData, ...secondData];
 
-function fetchJPHistoricalEarnings() {
-    stockSymbol = fetchJPStock();
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 替換為你的實際 API 密鑰
-    if (!stockSymbol) {
-        alert('請輸入股票代碼。');
-        return;
+        // 檢查是否有資料並顯示
+        if (allData.length > 0) {
+            display_historical_earning_calendar(allData, container);
+        } else {
+            container.innerHTML = `<p>No historical earnings data found for ${stockSymbol}.</p>`;
+        }
+    } catch (error) {
+        console.error('Error fetching historical earnings data: ', error);
+        container.innerHTML = `<p>Error loading data: ${error.message}. Please try again later.</p>`;
     }
-
-    const apiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?apikey=${apiKey}`;
-    fetchData_historical_earning_calendar(apiUrl, display_historical_earning_calendar_JP, 'historicalEarningsContainerJP');
 }
 
 function display_historical_earning_calendar(data, container) {
-    const fromDate = document.getElementById('fromDate_1').value;
-    const toDate = document.getElementById('toDate_1').value;
-    const startDate = new Date(fromDate);
-    const endDate = new Date(toDate);
-
+    // 檢查是否有資料
     if (!data || data.length === 0) {
         container.innerHTML = '<p>No data available.</p>';
         return;
     }
 
+    // 建立表格結構
     let rows = {
         date: ['Date'],
         symbol: ['Symbol'],
         eps: ['EPS'],
         estimatedEPS: ['Estimated EPS'],
-        epsDifference: ['EPS預期差異'], // 新增列标题
+        epsDifference: ['EPS 預期差異'],
         time: ['Time'],
         revenue: ['Revenue'],
         estimatedRevenue: ['Estimated Revenue'],
-        revenueDifference: ['營收預期差異'], // 新增列标题
+        revenueDifference: ['營收預期差異'],
         fiscalDateEnding: ['Fiscal Date Ending']
     };
 
+    // 填入資料
     data.forEach(item => {
-        const itemDate = new Date(item.date);
-        if (itemDate >= startDate && itemDate <= endDate) {
-            rows.date.push(item.date || 'N/A');
-            rows.symbol.push(item.symbol || 'N/A');
-            rows.eps.push(item.eps != null ? item.eps : 'N/A');
-            rows.estimatedEPS.push(item.epsEstimated != null ? item.epsEstimated : 'N/A');
-            // 计算 EPS 预期差异百分比
-            if (item.eps != null && item.epsEstimated != null && item.epsEstimated !== 0) {
-                const epsDifference = ((item.eps - item.epsEstimated) / item.epsEstimated * 100).toFixed(2) + '%';
-                rows.epsDifference.push(epsDifference);
-            } else {
-                rows.epsDifference.push('N/A');
-            }
-            rows.time.push(item.time || 'N/A');
-            rows.revenue.push(item.revenue != null ? item.revenue.toLocaleString() : 'N/A');
-            rows.estimatedRevenue.push(item.revenueEstimated != null ? item.revenueEstimated.toLocaleString() : 'N/A');
-            // 计算营收预期差异百分比
-            if (item.revenue != null && item.revenueEstimated != null && item.revenueEstimated !== 0) {
-                const revenueDifference = ((item.revenue - item.revenueEstimated) / item.revenueEstimated * 100).toFixed(2) + '%';
-                rows.revenueDifference.push(revenueDifference);
-            } else {
-                rows.revenueDifference.push('N/A');
-            }
-            rows.fiscalDateEnding.push(item.fiscalDateEnding || 'N/A');
+        rows.date.push(item.date || 'N/A');
+        rows.symbol.push(item.symbol || 'N/A');
+        rows.eps.push(item.eps != null ? item.eps : 'N/A');
+        rows.estimatedEPS.push(item.epsEstimated != null ? item.epsEstimated : 'N/A');
+
+        // 計算 EPS 差異
+        if (item.eps != null && item.epsEstimated != null && item.epsEstimated !== 0) {
+            const epsDifference = ((item.eps - item.epsEstimated) / item.epsEstimated * 100).toFixed(2) + '%';
+            rows.epsDifference.push(epsDifference);
+        } else {
+            rows.epsDifference.push('N/A');
         }
+
+        rows.time.push(item.time || 'N/A');
+        rows.revenue.push(item.revenue != null ? item.revenue.toLocaleString() : 'N/A');
+        rows.estimatedRevenue.push(item.revenueEstimated != null ? item.revenueEstimated.toLocaleString() : 'N/A');
+
+        // 計算營收差異
+        if (item.revenue != null && item.revenueEstimated != null && item.revenueEstimated !== 0) {
+            const revenueDifference = ((item.revenue - item.revenueEstimated) / item.revenueEstimated * 100).toFixed(2) + '%';
+            rows.revenueDifference.push(revenueDifference);
+        } else {
+            rows.revenueDifference.push('N/A');
+        }
+
+        rows.fiscalDateEnding.push(item.fiscalDateEnding || 'N/A');
     });
 
+    // 建立 HTML 表格
     let htmlContent = '<table border="1">';
     Object.keys(rows).forEach(key => {
         htmlContent += `<tr><th>${rows[key][0]}</th>`;
@@ -4662,23 +4657,25 @@ function display_historical_earning_calendar(data, container) {
     container.innerHTML = htmlContent;
 }
 
-function fetchData_historical_earning_calendar(apiUrl, callback, containerId) {
+async function fetchData_historical_earning_calendar(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = '<p>Loading...</p>';
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data.error) {
-                container.innerHTML = '<p>Error loading data: ' + data.error + '</p>';
-                return;
-            }
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        if (data.error) {
+            container.innerHTML = `<p>Error loading data: ${data.error}</p>`;
+        } else {
             callback(data, container);
-        })
-        .catch(error => {
-            console.error('Error fetching data: ', error);
-            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
-        });
+        }
+    } catch (error) {
+        console.error('Error fetching data: ', error);
+        container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
+    }
 }
+
 
 //////////////股利發放日期/////////////////
 function fetch_stock_dividend_calendar() {
