@@ -4444,12 +4444,15 @@ function displayEarningsCallCalendar(data, containerId, stockSymbol) {
         return;
     }
 
-    const earningsData = stockSymbol ? data.filter(item => item.symbol.toUpperCase() === stockSymbol) : data;
+    // 過濾股票代碼並按日期排序 (由舊到新)
+    const earningsData = stockSymbol ? data.filter(item => item.symbol.toUpperCase() === stockSymbol).sort((a, b) => new Date(a.date) - new Date(b.date)) : data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     if (earningsData.length === 0) {
         container.innerHTML = `<p>No earnings calendar data found for ${stockSymbol}.</p>`;
         return;
     }
 
+    // 建立表格結構
     let rows = {
         date: ['Date'],
         symbol: ['Symbol'],
@@ -4459,6 +4462,7 @@ function displayEarningsCallCalendar(data, containerId, stockSymbol) {
         estimatedRevenue: ['Estimated Revenue']
     };
 
+    // 填充資料
     earningsData.forEach(item => {
         rows.date.push(item.date || 'N/A');
         rows.symbol.push(item.symbol || 'N/A');
@@ -4468,9 +4472,9 @@ function displayEarningsCallCalendar(data, containerId, stockSymbol) {
         rows.estimatedRevenue.push(item.revenueEstimated !== null ? item.revenueEstimated.toLocaleString() : 'N/A');
     });
 
-    // 構建表格
+    // 建立 HTML 表格，並讓表格自動適應頁面
     let tableHtml = `
-    <div style="display: flex; overflow-x: auto;">
+    <div style="display: flex; overflow-x: auto; overflow-y: visible;">
         <!-- 左側標題欄 -->
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
             <table border="1" style="border-collapse: collapse;">
@@ -4478,7 +4482,7 @@ function displayEarningsCallCalendar(data, containerId, stockSymbol) {
             </table>
         </div>
         <!-- 右側可滾動的數據欄 -->
-        <div class="scroll-right" style="overflow-x: auto;">
+        <div class="scroll-right" style="overflow-x: auto; height: auto; white-space: nowrap;">
             <table border="1" style="width: 100%; border-collapse: collapse;">
                 ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="padding: 10px; background-color: #1e1e1e; border: 1px solid black;">${value}</td>`).join('')}</tr>`).join('')}
             </table>
