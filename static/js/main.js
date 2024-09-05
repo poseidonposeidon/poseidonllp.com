@@ -2385,8 +2385,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         epsdiluted: ['EPS Diluted'],
         weightedAverageShsOut: ['Weighted Average Shares Outstanding'],
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
-        link: ['Link'],
-        finalLink: ['Final Link'],
+        link: ['SEC Link'],
+        finalLink: ['10K Link'],
         growthRate: [period === 'annual' ? 'YoY Growth' : 'YoY Growth']
     };
 
