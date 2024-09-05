@@ -4561,9 +4561,9 @@ async function fetch_historical_earning_calendar() {
     const threeMonthsAgoStr = threeMonthsAgo.toISOString().split('T')[0];
     const sixMonthsAgoStr = sixMonthsAgo.toISOString().split('T')[0];
 
-    // 自動填入日期到 input 欄位
-    document.getElementById('fromDate_1').value = sixMonthsAgoStr;
-    document.getElementById('toDate_1').value = todayStr;
+    // // 自動填入日期到 input 欄位
+    // document.getElementById('fromDate_1').value = sixMonthsAgoStr;
+    // document.getElementById('toDate_1').value = todayStr;
 
     // 進行第一次查詢（今天到三個月前）
     const firstApiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?from=${threeMonthsAgoStr}&to=${todayStr}&apikey=${apiKey}`;
