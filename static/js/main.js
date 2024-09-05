@@ -4122,7 +4122,12 @@ async function fetchJPEarningsCallCalendar() {
     var toDate = toDateInput.value;
     const stockSymbol = fetchJPStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const container = document.getElementById('earningsCallCalendarContainerJP');
 
+    // 顯示 "Loading..." 提示
+    if (container) {
+        container.innerHTML = '<p>Loading...</p>';
+    }
     if (!fromDate || !toDate) {
         const today = new Date();
         const threeMonthsAgo = new Date();
@@ -4169,7 +4174,12 @@ async function fetchTWEarningsCallCalendar() {
     var toDate = toDateInput.value;
     const stockSymbol = await fetchTWStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const container = document.getElementById('earningsCallCalendarContainerTW');
 
+    // 顯示 "Loading..." 提示
+    if (container) {
+        container.innerHTML = '<p>Loading...</p>';
+    }
     if (!fromDate || !toDate) {
         const today = new Date();
         const threeMonthsAgo = new Date();
@@ -4216,7 +4226,12 @@ async function fetchEUEarningsCallCalendar() {
     var toDate = toDateInput.value;
     const stockSymbol = fetchEUStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const container = document.getElementById('earningsCallCalendarContainerEU');
 
+    // 顯示 "Loading..." 提示
+    if (container) {
+        container.innerHTML = '<p>Loading...</p>';
+    }
     if (!fromDate || !toDate) {
         const today = new Date();
         const threeMonthsAgo = new Date();
@@ -4263,7 +4278,12 @@ async function fetchKREarningsCallCalendar() {
     var toDate = toDateInput.value;
     const stockSymbol = fetchKRStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const container = document.getElementById('earningsCallCalendarContainerKR');
 
+    // 顯示 "Loading..." 提示
+    if (container) {
+        container.innerHTML = '<p>Loading...</p>';
+    }
     if (!fromDate || !toDate) {
         const today = new Date();
         const threeMonthsAgo = new Date();
@@ -4310,7 +4330,12 @@ async function fetchHKEarningsCallCalendar() {
     var toDate = toDateInput.value;
     const stockSymbol = fetchHKStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const container = document.getElementById('earningsCallCalendarContainerHK');
 
+    // 顯示 "Loading..." 提示
+    if (container) {
+        container.innerHTML = '<p>Loading...</p>';
+    }
     if (!fromDate || !toDate) {
         const today = new Date();
         const threeMonthsAgo = new Date();
@@ -4357,7 +4382,12 @@ async function fetchCNEarningsCallCalendar() {
     var toDate = toDateInput.value;
     const stockSymbol = fetchCNStock();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const container = document.getElementById('earningsCallCalendarContainerCN');
 
+    // 顯示 "Loading..." 提示
+    if (container) {
+        container.innerHTML = '<p>Loading...</p>';
+    }
     if (!fromDate || !toDate) {
         const today = new Date();
         const threeMonthsAgo = new Date();
