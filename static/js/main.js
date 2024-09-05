@@ -4647,7 +4647,7 @@ function display_historical_earning_calendar(data, container) {
         rows.fiscalDateEnding.push(item.fiscalDateEnding || 'N/A');
     });
 
-    // 構建 HTML 表格，使用與 `income statement` 相同的樣式
+    // 構建 HTML 表格，確保右邊的數據不會換行
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
         <!-- 左側標題欄 -->
@@ -4658,8 +4658,8 @@ function display_historical_earning_calendar(data, container) {
         </div>
         <!-- 可滾動的數據欄 -->
         <div class="scroll-right" style="overflow-x: auto;">
-            <table border="1" style="width: 100%; border-collapse: collapse;">
-                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="padding: 10px; background-color: #1e1e1e; border: 1px solid black;">${value}</td>`).join('')}</tr>`).join('')}
+            <table border="1" style="width: 100%; border-collapse: collapse; white-space: nowrap;">
+                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="padding: 10px; background-color: #1e1e1e; border: 1px solid black; white-space: nowrap;">${value}</td>`).join('')}</tr>`).join('')}
             </table>
         </div>
     </div>
