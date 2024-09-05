@@ -4647,7 +4647,7 @@ function display_historical_earning_calendar(data, container) {
         rows.fiscalDateEnding.push(item.fiscalDateEnding || 'N/A');
     });
 
-    // 構建 HTML 表格，移除內側滾動
+    // 構建 HTML 表格，確保表格顯示完整
     let tableHtml = `
     <div style="display: flex; overflow-x: auto; overflow-y: visible;">
         <!-- 左側標題欄 -->
@@ -4656,10 +4656,10 @@ function display_historical_earning_calendar(data, container) {
                 ${Object.keys(rows).map(key => `<tr><th style="padding: 10px; background-color: #2c2c2c; border: 1px solid black;">${rows[key][0]}</th></tr>`).join('')}
             </table>
         </div>
-        <!-- 可滾動的數據欄 -->
-        <div class="scroll-right" style="overflow-x: auto; overflow-y: hidden;"> <!-- 移除 overflow-y -->
-            <table border="1" style="width: 100%; border-collapse: collapse; white-space: nowrap;">
-                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="padding: 10px; background-color: #1e1e1e; border: 1px solid black; white-space: nowrap;">${value}</td>`).join('')}</tr>`).join('')}
+        <!-- 右側可滾動的數據欄 -->
+        <div class="scroll-right" style="overflow-x: auto; height: auto; white-space: nowrap;"> <!-- 移除overflow-y -->
+            <table border="1" style="width: 100%; border-collapse: collapse;">
+                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="padding: 10px; background-color: #1e1e1e; border: 1px solid black;">${value}</td>`).join('')}</tr>`).join('')}
             </table>
         </div>
     </div>
