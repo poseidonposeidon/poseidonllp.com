@@ -2428,7 +2428,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
         rows.link.push(item.link ? `<a class="styled-link" href="${item.link}" target="_blank">link</a>` : 'N/A');
-        rows.finalLink.push(item.link ? `<a class="styled-link" href="${item.link}" target="_blank">finalLink</a>` : 'N/A');
+        rows.finalLink.push(item.finalLink ? `<a class="styled-link" href="${item.finalLink}" target="_blank">finalLink</a>` : 'N/A');
 
         // 計算增長率
         if (index > 0) {
