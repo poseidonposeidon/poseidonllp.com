@@ -4054,7 +4054,12 @@ async function fetchEarningsCallCalendar() {
     const toDateInput = document.getElementById('toDate');
     const stockSymbol = fetchStock();  // 獲取股票代碼
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const container = document.getElementById('earningsCallCalendarContainer');
 
+    // 顯示 "Loading..." 提示
+    if (container) {
+        container.innerHTML = '<p>Loading...</p>';
+    }
     // 如果使用者未輸入日期，則自動查詢最近六個月內的法說會
     if (!fromDateInput.value || !toDateInput.value) {
         // 取得今天的日期
