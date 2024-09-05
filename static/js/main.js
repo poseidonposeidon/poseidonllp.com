@@ -4834,19 +4834,64 @@ async function fetch_stock_dividend_calendar() {
         container.innerHTML = '<p>Loading...</p>';
     }
 
-    // 如果使用者沒有填寫日期，自動設置日期範圍
+    // 取得今天的日期
     const today = new Date();
+    const todayStr = today.toISOString().split('T')[0];
+
+    // 計算過去三個月、六個月、九個月的日期
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(today.getMonth() - 3);
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
     const nineMonthsAgo = new Date();
     nineMonthsAgo.setMonth(today.getMonth() - 9);
 
-    const fromDate = fromDateInput || nineMonthsAgo.toISOString().split('T')[0];
-    const toDate = toDateInput || today.toISOString().split('T')[0];
+    const threeMonthsAgoStr = threeMonthsAgo.toISOString().split('T')[0];
+    const sixMonthsAgoStr = sixMonthsAgo.toISOString().split('T')[0];
+    const nineMonthsAgoStr = nineMonthsAgo.toISOString().split('T')[0];
+
+    // 計算未來三個月、六個月的日期
+    const threeMonthsFuture = new Date();
+    threeMonthsFuture.setMonth(today.getMonth() + 3);
+    const sixMonthsFuture = new Date();
+    sixMonthsFuture.setMonth(today.getMonth() + 6);
+
+    const threeMonthsFutureStr = threeMonthsFuture.toISOString().split('T')[0];
+    const sixMonthsFutureStr = sixMonthsFuture.toISOString().split('T')[0];
+
+    // 如果使用者沒有填寫日期，自動設置日期範圍
+    const fromDate = fromDateInput || nineMonthsAgoStr;
+    const toDate = toDateInput || sixMonthsFutureStr;
 
     try {
-        // 查詢選定範圍的股息數據
-        const apiUrl = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
-        const response = await fetch(apiUrl);
-        const allData = await response.json();
+        let allData = [];
+
+        if (!fromDateInput && !toDateInput) {
+            // 自動查詢過去9個月和未來6個月，每3個月查詢一次
+            const pastApiUrl1 = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${nineMonthsAgoStr}&to=${sixMonthsAgoStr}&apikey=${apiKey}`;
+            const pastApiUrl2 = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${sixMonthsAgoStr}&to=${threeMonthsAgoStr}&apikey=${apiKey}`;
+            const pastApiUrl3 = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${threeMonthsAgoStr}&to=${todayStr}&apikey=${apiKey}`;
+
+            const futureApiUrl1 = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${todayStr}&to=${threeMonthsFutureStr}&apikey=${apiKey}`;
+            const futureApiUrl2 = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${threeMonthsFutureStr}&to=${sixMonthsFutureStr}&apikey=${apiKey}`;
+
+            // 並行請求多個時間段的數據
+            const [pastResponse1, pastResponse2, pastResponse3, futureResponse1, futureResponse2] = await Promise.all([
+                fetch(pastApiUrl1).then(res => res.json()),
+                fetch(pastApiUrl2).then(res => res.json()),
+                fetch(pastApiUrl3).then(res => res.json()),
+                fetch(futureApiUrl1).then(res => res.json()),
+                fetch(futureApiUrl2).then(res => res.json())
+            ]);
+
+            // 合併所有數據
+            allData = [...pastResponse1, ...pastResponse2, ...pastResponse3, ...futureResponse1, ...futureResponse2];
+        } else {
+            // 查詢選定範圍的股息數據
+            const apiUrl = `https://financialmodelingprep.com/api/v3/stock_dividend_calendar?from=${fromDate}&to=${toDate}&apikey=${apiKey}`;
+            const response = await fetch(apiUrl);
+            allData = await response.json();
+        }
 
         // 過濾符合當前股票代碼的數據
         const filteredData = allData.filter(item => item.symbol.toUpperCase() === stockSymbol.toUpperCase());
@@ -4868,6 +4913,9 @@ function display_stock_dividend_calendar(data, container) {
         container.innerHTML = '<p>No data available for the selected dates.</p>';
         return;
     }
+
+    // 根據日期進行排序，從早到晚
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let rows = {
         date: ['Date'],
