@@ -4399,9 +4399,6 @@ function displayEarningsCallCalendar(data, containerId, stockSymbol) {
         return;
     }
 
-    // 顯示 "Loading..." 提示
-    container.innerHTML = '<p>Loading...</p>';
-
     if (!data || !Array.isArray(data)) {
         container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
         return;
@@ -4434,9 +4431,6 @@ function displayEarningsCallCalendar_JP(data, containerId, stockSymbol) {
         console.error('Container element not found');
         return;
     }
-
-    // 顯示 "Loading..." 提示
-    container.innerHTML = '<p>Loading...</p>';
 
     if (!data || !Array.isArray(data)) {
         container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
@@ -4870,9 +4864,6 @@ function displayInsiderTrades(data, container) {
         return;
     }
 
-    // 按日期升序排序（從舊到新）
-    data.sort((a, b) => new Date(a.transactionDate) - new Date(b.transactionDate));
-
     let rows = {
         symbol: ['Symbol'],
         filingDate: ['Filing Date'],
@@ -4887,7 +4878,7 @@ function displayInsiderTrades(data, container) {
         link: ['Link']
     };
 
-    // 填充行數據
+    // 填充行数据
     data.forEach(item => {
         rows.symbol.push(item.symbol || 'N/A');
         rows.filingDate.push(item.filingDate || 'N/A');
@@ -4899,10 +4890,10 @@ function displayInsiderTrades(data, container) {
         rows.securityName.push(item.securityName || 'N/A');
         rows.price.push(item.price ? `$${item.price.toFixed(2)}` : 'N/A');
         rows.formType.push(item.formType || 'N/A');
-        rows.link.push(item.link ? `<a class="styled-link" href="${item.link}" target="_blank">View Form</a>` : 'N/A');
+        rows.link.push(item.link ? `<a  class="styled-link" href="${item.link}" target="_blank">View Form</a>` : 'N/A');
     });
 
-    // 構建 HTML 表格
+    // 构建 HTML 表格
     let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
         htmlContent += `<tr><th>${rows[key][0]}</th>`;
@@ -4922,9 +4913,6 @@ function displayInsiderTrades_JP(data, container) {
         return;
     }
 
-    // 按日期升序排序（從舊到新）
-    data.sort((a, b) => new Date(a.transactionDate) - new Date(b.transactionDate));
-
     let rows = {
         symbol: ['Symbol'],
         filingDate: ['Filing Date'],
@@ -4939,7 +4927,7 @@ function displayInsiderTrades_JP(data, container) {
         link: ['Link']
     };
 
-    // 填充行數據
+    // 填充行数据
     data.forEach(item => {
         rows.symbol.push(item.symbol || 'N/A');
         rows.filingDate.push(item.filingDate || 'N/A');
@@ -4954,7 +4942,7 @@ function displayInsiderTrades_JP(data, container) {
         rows.link.push(item.link ? `<a class="styled-link" href="${item.link}" target="_blank">View Form</a>` : 'N/A');
     });
 
-    // 構建 HTML 表格
+    // 构建 HTML 表格
     let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
     Object.keys(rows).forEach(key => {
         htmlContent += `<tr><th>${rows[key][0]}</th>`;
@@ -4967,6 +4955,7 @@ function displayInsiderTrades_JP(data, container) {
 
     container.innerHTML = htmlContent;
 }
+
 
 ////////////////////////////錄音檔轉文字/////////////////////////////
 let originalFileNames = {};
