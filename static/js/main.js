@@ -296,9 +296,9 @@ function loadSectionJP(sectionId) {
                     <input type="date" id="fromDateJP" placeholder="From Date">
                     <input type="date" id="toDateJP" placeholder="To Date">
                     <button onclick="fetchJPEarningsCallCalendar()">Load Calendar</button>
-                    <div class="scroll-container">
-                        <div id="earningsCallCalendarContainerJP"></div>
-                    </div>
+                    
+                      <div id="earningsCallCalendarContainerJP"></div>
+                    
                 </div>
             </div>`,
         'historical-earnings': `
@@ -426,9 +426,9 @@ function loadSectionTW(sectionId) {
                     <input type="date" id="fromDateTW" placeholder="From Date">
                     <input type="date" id="toDateTW" placeholder="To Date">
                     <button onclick="fetchTWEarningsCallCalendar()">Load Calendar</button>
-                    <div class="scroll-container">
+                    
                         <div id="earningsCallCalendarContainerTW"></div>
-                    </div>
+                    
                 </div>
             </div>`
     };
@@ -523,9 +523,9 @@ function loadSectionEU(sectionId) {
                     <input type="date" id="fromDateEU" placeholder="From Date">
                     <input type="date" id="toDateEU" placeholder="To Date">
                     <button onclick="fetchEUEarningsCallCalendar()">Load Calendar</button>
-                    <div class="scroll-container">
+                    
                         <div id="earningsCallCalendarContainerEU"></div>
-                    </div>
+                    
                 </div>
             </div>`,
         'historical-earnings': `
@@ -535,7 +535,7 @@ function loadSectionEU(sectionId) {
                     <input type="date" id="fromDate_1EU" placeholder="From Date">
                     <input type="date" id="toDate_1EU" placeholder="To Date">
                     <button onclick="fetchEUHistoricalEarnings()">Load Calendar</button>
-                    <div class="scroll-container" id="historicalEarningsContainerEU">
+                    <div  id="historicalEarningsContainerEU">
                         <!-- Data table will be displayed here -->
                     </div>
                 </div>
@@ -652,9 +652,9 @@ function loadSectionKR(sectionId)   {
                     <input type="date" id="fromDateKR" placeholder="From Date">
                     <input type="date" id="toDateKR" placeholder="To Date">
                     <button onclick="fetchKREarningsCallCalendar()">Load Calendar</button>
-                    <div class="scroll-container">
+                    
                         <div id="earningsCallCalendarContainerKR"></div>
-                    </div>
+                    
                 </div>
             </div>`,
         'historical-earnings': `
@@ -782,9 +782,9 @@ function loadSectionHK(sectionId) {
                     <input type="date" id="fromDateHK" placeholder="From Date">
                     <input type="date" id="toDateHK" placeholder="To Date">
                     <button onclick="fetchHKEarningsCallCalendar()">Load Calendar</button>
-                    <div class="scroll-container">
+                    
                         <div id="earningsCallCalendarContainerHK"></div>
-                    </div>
+                    
                 </div>
             </div>`,
         'historical-earnings': `
@@ -913,9 +913,9 @@ function loadSectionCN(sectionId) {
                     <input type="date" id="fromDateCN" placeholder="From Date">
                     <input type="date" id="toDateCN" placeholder="To Date">
                     <button onclick="fetchCNEarningsCallCalendar()">Load Calendar</button>
-                    <div class="scroll-container">
+                    
                         <div id="earningsCallCalendarContainerCN"></div>
-                    </div>
+                    
                 </div>
             </div>`,
         'historical-earnings': `
@@ -4451,19 +4451,43 @@ function displayEarningsCallCalendar(data, containerId, stockSymbol) {
         return;
     }
 
-    let htmlContent = '<ul>';
+    let rows = {
+        date: ['Date'],
+        symbol: ['Symbol'],
+        eps: ['EPS'],
+        estimatedEPS: ['Estimated EPS'],
+        revenue: ['Revenue'],
+        estimatedRevenue: ['Estimated Revenue']
+    };
+
     earningsData.forEach(item => {
-        htmlContent += `<li>
-            Date: ${item.date || 'N/A'} <br>
-            Symbol: ${item.symbol || 'N/A'} <br>
-            EPS: ${item.eps !== null ? item.eps.toFixed(4) : 'N/A'} <br>
-            EPS Estimated: ${item.epsEstimated !== null ? item.epsEstimated.toFixed(4) : 'N/A'} <br>
-            Revenue: ${item.revenue !== null ? item.revenue.toLocaleString() : 'N/A'} <br>
-            Revenue Estimated: ${item.revenueEstimated !== null ? item.revenueEstimated.toLocaleString() : 'N/A'}
-        </li>`;
+        rows.date.push(item.date || 'N/A');
+        rows.symbol.push(item.symbol || 'N/A');
+        rows.eps.push(item.eps !== null ? item.eps.toFixed(4) : 'N/A');
+        rows.estimatedEPS.push(item.epsEstimated !== null ? item.epsEstimated.toFixed(4) : 'N/A');
+        rows.revenue.push(item.revenue !== null ? item.revenue.toLocaleString() : 'N/A');
+        rows.estimatedRevenue.push(item.revenueEstimated !== null ? item.revenueEstimated.toLocaleString() : 'N/A');
     });
-    htmlContent += '</ul>';
-    container.innerHTML = htmlContent;
+
+    // 構建表格
+    let tableHtml = `
+    <div style="display: flex; overflow-x: auto;">
+        <!-- 左側標題欄 -->
+        <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
+            <table border="1" style="border-collapse: collapse;">
+                ${Object.keys(rows).map(key => `<tr><th style="padding: 10px; background-color: #2c2c2c; border: 1px solid black;">${rows[key][0]}</th></tr>`).join('')}
+            </table>
+        </div>
+        <!-- 右側可滾動的數據欄 -->
+        <div class="scroll-right" style="overflow-x: auto;">
+            <table border="1" style="width: 100%; border-collapse: collapse;">
+                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="padding: 10px; background-color: #1e1e1e; border: 1px solid black;">${value}</td>`).join('')}</tr>`).join('')}
+            </table>
+        </div>
+    </div>
+    `;
+
+    container.innerHTML = tableHtml;
 }
 
 function displayEarningsCallCalendar_JP(data, containerId, stockSymbol) {
@@ -4484,19 +4508,43 @@ function displayEarningsCallCalendar_JP(data, containerId, stockSymbol) {
         return;
     }
 
-    let htmlContent = '<ul>';
+    let rows = {
+        date: ['Date'],
+        symbol: ['Symbol'],
+        eps: ['EPS'],
+        estimatedEPS: ['Estimated EPS'],
+        revenue: ['Revenue'],
+        estimatedRevenue: ['Estimated Revenue']
+    };
+
     earningsData.forEach(item => {
-        htmlContent += `<li>
-            Date: ${item.date || 'N/A'} <br>
-            Symbol: ${item.symbol || 'N/A'} <br>
-            EPS: ${item.eps !== null ? item.eps.toFixed(4) : 'N/A'} <br>
-            EPS Estimated: ${item.epsEstimated !== null ? item.epsEstimated.toFixed(4) : 'N/A'} <br>
-            Revenue: ${item.revenue !== null ? item.revenue.toLocaleString() : 'N/A'} <br>
-            Revenue Estimated: ${item.revenueEstimated !== null ? item.revenueEstimated.toLocaleString() : 'N/A'}
-        </li>`;
+        rows.date.push(item.date || 'N/A');
+        rows.symbol.push(item.symbol || 'N/A');
+        rows.eps.push(item.eps !== null ? item.eps.toFixed(4) : 'N/A');
+        rows.estimatedEPS.push(item.epsEstimated !== null ? item.epsEstimated.toFixed(4) : 'N/A');
+        rows.revenue.push(item.revenue !== null ? item.revenue.toLocaleString() : 'N/A');
+        rows.estimatedRevenue.push(item.revenueEstimated !== null ? item.revenueEstimated.toLocaleString() : 'N/A');
     });
-    htmlContent += '</ul>';
-    container.innerHTML = htmlContent;
+
+    // 構建表格
+    let tableHtml = `
+    <div style="display: flex; overflow-x: auto;">
+        <!-- 左側標題欄 -->
+        <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
+            <table border="1" style="border-collapse: collapse;">
+                ${Object.keys(rows).map(key => `<tr><th style="padding: 10px; background-color: #2c2c2c; border: 1px solid black;">${rows[key][0]}</th></tr>`).join('')}
+            </table>
+        </div>
+        <!-- 右側可滾動的數據欄 -->
+        <div class="scroll-right" style="overflow-x: auto;">
+            <table border="1" style="width: 100%; border-collapse: collapse;">
+                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="padding: 10px; background-color: #1e1e1e; border: 1px solid black;">${value}</td>`).join('')}</tr>`).join('')}
+            </table>
+        </div>
+    </div>
+    `;
+
+    container.innerHTML = tableHtml;
 }
 
 function fetchData_2(apiUrl, callback, containerId) {
