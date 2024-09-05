@@ -4399,6 +4399,9 @@ function displayEarningsCallCalendar(data, containerId, stockSymbol) {
         return;
     }
 
+    // 顯示 "Loading..." 提示
+    container.innerHTML = '<p>Loading...</p>';
+
     if (!data || !Array.isArray(data)) {
         container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
         return;
@@ -4431,6 +4434,9 @@ function displayEarningsCallCalendar_JP(data, containerId, stockSymbol) {
         console.error('Container element not found');
         return;
     }
+
+    // 顯示 "Loading..." 提示
+    container.innerHTML = '<p>Loading...</p>';
 
     if (!data || !Array.isArray(data)) {
         container.innerHTML = '<p>Error loading data: Data is not an array or is undefined.</p>';
