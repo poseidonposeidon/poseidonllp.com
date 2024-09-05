@@ -4647,9 +4647,9 @@ function display_historical_earning_calendar(data, container) {
         rows.fiscalDateEnding.push(item.fiscalDateEnding || 'N/A');
     });
 
-    // 構建 HTML 表格，確保右邊的數據不會換行
+    // 構建 HTML 表格，移除 y 滾動並確保右邊的數據不會換行
     let tableHtml = `
-    <div style="display: flex; overflow-x: auto;">
+    <div style="display: flex; overflow-x: auto; overflow-y: visible;">
         <!-- 左側標題欄 -->
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
             <table border="1" style="border-collapse: collapse;">
@@ -4657,7 +4657,7 @@ function display_historical_earning_calendar(data, container) {
             </table>
         </div>
         <!-- 可滾動的數據欄 -->
-        <div class="scroll-right" style="overflow-x: auto;">
+        <div class="scroll-right" style="overflow-x: auto; overflow-y: visible;">
             <table border="1" style="width: 100%; border-collapse: collapse; white-space: nowrap;">
                 ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="padding: 10px; background-color: #1e1e1e; border: 1px solid black; white-space: nowrap;">${value}</td>`).join('')}</tr>`).join('')}
             </table>
