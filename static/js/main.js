@@ -4647,16 +4647,43 @@ function display_historical_earning_calendar(data, container) {
         rows.fiscalDateEnding.push(item.fiscalDateEnding || 'N/A');
     });
 
-    // 建立 HTML 表格
-    let htmlContent = '<table border="1">';
-    Object.keys(rows).forEach(key => {
-        htmlContent += `<tr><th>${rows[key][0]}</th>`;
-        rows[key].slice(1).forEach(value => {
-            htmlContent += `<td>${value}</td>`;
-        });
-        htmlContent += '</tr>';
+    // 建立 HTML 表格，並讓表格自動適應頁面高度，移除Y滾動條
+    let htmlContent = `
+    <table border="1" style="width: 100%; border-collapse: collapse; table-layout: auto;">
+        <thead>
+            <tr>
+                <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid black;">${rows.date[0]}</th>
+                <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid black;">${rows.symbol[0]}</th>
+                <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid black;">${rows.eps[0]}</th>
+                <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid black;">${rows.estimatedEPS[0]}</th>
+                <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid black;">${rows.epsDifference[0]}</th>
+                <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid black;">${rows.time[0]}</th>
+                <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid black;">${rows.revenue[0]}</th>
+                <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid black;">${rows.estimatedRevenue[0]}</th>
+                <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid black;">${rows.revenueDifference[0]}</th>
+                <th style="padding: 10px; background-color: #f2f2f2; border: 1px solid black;">${rows.fiscalDateEnding[0]}</th>
+            </tr>
+        </thead>
+        <tbody>`;
+
+    Object.keys(rows).forEach((key, idx) => {
+        if (idx > 0) {
+            htmlContent += `<tr>`;
+            htmlContent += `<td style="padding: 10px; border: 1px solid black;">${rows.date[idx]}</td>`;
+            htmlContent += `<td style="padding: 10px; border: 1px solid black;">${rows.symbol[idx]}</td>`;
+            htmlContent += `<td style="padding: 10px; border: 1px solid black;">${rows.eps[idx]}</td>`;
+            htmlContent += `<td style="padding: 10px; border: 1px solid black;">${rows.estimatedEPS[idx]}</td>`;
+            htmlContent += `<td style="padding: 10px; border: 1px solid black;">${rows.epsDifference[idx]}</td>`;
+            htmlContent += `<td style="padding: 10px; border: 1px solid black;">${rows.time[idx]}</td>`;
+            htmlContent += `<td style="padding: 10px; border: 1px solid black;">${rows.revenue[idx]}</td>`;
+            htmlContent += `<td style="padding: 10px; border: 1px solid black;">${rows.estimatedRevenue[idx]}</td>`;
+            htmlContent += `<td style="padding: 10px; border: 1px solid black;">${rows.revenueDifference[idx]}</td>`;
+            htmlContent += `<td style="padding: 10px; border: 1px solid black;">${rows.fiscalDateEnding[idx]}</td>`;
+            htmlContent += `</tr>`;
+        }
     });
-    htmlContent += '</table>';
+
+    htmlContent += '</tbody></table>';
     container.innerHTML = htmlContent;
 }
 
