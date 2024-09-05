@@ -4989,83 +4989,14 @@ function fetchInsiderTrades() {
         });
 }
 
-function fetchJPInsiderTrades() {
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 替換為你的 API 密鑰
-    stockSymbol = fetchJPStock();
-    const apiUrl = `https://financialmodelingprep.com/api/v4/insider-trading?symbol=${stockSymbol}&page=0&apikey=${apiKey}`;
-
-    fetch(apiUrl)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            const container = document.getElementById('insiderTradesContainerJP');
-            displayInsiderTrades_JP(data, container);
-        })
-        .catch(error => {
-            console.error('Error fetching data: ', error);
-            const container = document.getElementById('insiderTradesContainerJP');
-            container.innerHTML = '<tr><td colspan="11">Error loading data. Please check the console for more details.</td></tr>';
-        });
-}
-
 function displayInsiderTrades(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>No data available.</p>';
         return;
     }
 
-    let rows = {
-        symbol: ['Symbol'],
-        filingDate: ['Filing Date'],
-        transactionDate: ['Transaction Date'],
-        reportingName: ['Reporting Name'],
-        transactionType: ['Transaction Type'],
-        securitiesOwned: ['Securities Owned'],
-        securitiesTransacted: ['Securities Transacted'],
-        securityName: ['Security Name'],
-        price: ['Price'],
-        formType: ['Form Type'],
-        link: ['Link']
-    };
-
-    // 填充行数据
-    data.forEach(item => {
-        rows.symbol.push(item.symbol || 'N/A');
-        rows.filingDate.push(item.filingDate || 'N/A');
-        rows.transactionDate.push(item.transactionDate || 'N/A');
-        rows.reportingName.push(item.reportingName || 'N/A');
-        rows.transactionType.push(item.transactionType || 'N/A');
-        rows.securitiesOwned.push(item.securitiesOwned ? item.securitiesOwned.toLocaleString() : 'N/A');
-        rows.securitiesTransacted.push(item.securitiesTransacted ? item.securitiesTransacted.toLocaleString() : 'N/A');
-        rows.securityName.push(item.securityName || 'N/A');
-        rows.price.push(item.price ? `$${item.price.toFixed(2)}` : 'N/A');
-        rows.formType.push(item.formType || 'N/A');
-        rows.link.push(item.link ? `<a  class="styled-link" href="${item.link}" target="_blank">View Form</a>` : 'N/A');
-    });
-
-    // 构建 HTML 表格
-    let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
-    Object.keys(rows).forEach(key => {
-        htmlContent += `<tr><th>${rows[key][0]}</th>`;
-        rows[key].slice(1).forEach(value => {
-            htmlContent += `<td>${value}</td>`;
-        });
-        htmlContent += '</tr>';
-    });
-    htmlContent += '</table>';
-
-    container.innerHTML = htmlContent;
-}
-
-function displayInsiderTrades_JP(data, container) {
-    if (!data || !Array.isArray(data) || data.length === 0) {
-        container.innerHTML = '<p>No data available.</p>';
-        return;
-    }
+    // 將資料根據 filingDate 由舊到新排序
+    data.sort((a, b) => new Date(a.filingDate) - new Date(b.filingDate));
 
     let rows = {
         symbol: ['Symbol'],
@@ -5081,7 +5012,7 @@ function displayInsiderTrades_JP(data, container) {
         link: ['Link']
     };
 
-    // 填充行数据
+    // 填充行數據
     data.forEach(item => {
         rows.symbol.push(item.symbol || 'N/A');
         rows.filingDate.push(item.filingDate || 'N/A');
@@ -5096,18 +5027,23 @@ function displayInsiderTrades_JP(data, container) {
         rows.link.push(item.link ? `<a class="styled-link" href="${item.link}" target="_blank">View Form</a>` : 'N/A');
     });
 
-    // 构建 HTML 表格
-    let htmlContent = '<table border="1" style="width: 100%; border-collapse: collapse;">';
-    Object.keys(rows).forEach(key => {
-        htmlContent += `<tr><th>${rows[key][0]}</th>`;
-        rows[key].slice(1).forEach(value => {
-            htmlContent += `<td>${value}</td>`;
-        });
-        htmlContent += '</tr>';
-    });
-    htmlContent += '</table>';
+    // 構建 HTML 表格
+    let tableHtml = `
+    <div style="display: flex; overflow-x: auto;">
+        <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
+            <table border="1" style="border-collapse: collapse;">
+                ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
+            </table>
+        </div>
+        <div class="scroll-right" style="overflow-x: auto;">
+            <table border="1" style="width: 100%; border-collapse: collapse;">
+                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
+            </table>
+        </div>
+    </div>
+    `;
 
-    container.innerHTML = htmlContent;
+    container.innerHTML = tableHtml;
 }
 
 
