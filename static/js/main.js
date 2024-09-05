@@ -2427,8 +2427,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.epsdiluted.push(entry.epsdiluted || 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
-        rows.link.push(item.link ? `<a class="styled-link" href="${item.link}" target="_blank">link</a>` : 'N/A');
-        rows.finalLink.push(item.finalLink ? `<a class="styled-link" href="${item.finalLink}" target="_blank">finalLink</a>` : 'N/A');
+
+        // 新增 link 和 finalLink
+        rows.link.push(entry.link ? `<a class="styled-link" href="${entry.link}" target="_blank">Link</a>` : 'N/A');
+        rows.finalLink.push(entry.finalLink ? `<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Link</a>` : 'N/A');
 
         // 計算增長率
         if (index > 0) {
