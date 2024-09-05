@@ -4600,7 +4600,7 @@ function display_historical_earning_calendar(data, container) {
         return;
     }
 
-    // 按日期升序排序（由舊到新）
+    // 按日期對資料進行排序（由舊到新）
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     // 建立表格結構
@@ -4647,17 +4647,17 @@ function display_historical_earning_calendar(data, container) {
         rows.fiscalDateEnding.push(item.fiscalDateEnding || 'N/A');
     });
 
-    // 構建 HTML 表格，模仿 income statement 樣式
+    // 構建 HTML 表格，移除 Y 滾動條，並統一背景顏色
     let tableHtml = `
-    <div style="display: flex; overflow-x: auto;">
+    <div style="display: flex; overflow-x: auto; height: auto;">
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
             <table border="1" style="border-collapse: collapse;">
-                ${Object.keys(rows).map(key => `<tr><th style="padding: 10px; background-color: #f2f2f2; border: 1px solid black;">${rows[key][0]}</th></tr>`).join('')}
+                ${Object.keys(rows).map(key => `<tr><th style="padding: 10px; background-color: #2c2c2c; border: 1px solid black;">${rows[key][0]}</th></tr>`).join('')}
             </table>
         </div>
         <div class="scroll-right" style="overflow-x: auto;">
             <table border="1" style="border-collapse: collapse; width: 100%;">
-                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="padding: 10px; border: 1px solid black;">${value}</td>`).join('')}</tr>`).join('')}
+                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td style="padding: 10px; background-color: #1e1e1e; border: 1px solid black;">${value}</td>`).join('')}</tr>`).join('')}
             </table>
         </div>
     </div>
