@@ -1510,19 +1510,31 @@ addEnterKeyListener("cnStockSymbol", "#cnStockButton");
 
 //////////////////建議/////////////////
 //美股
-document.getElementById('stockSymbol').addEventListener('input', async function() {
+function debounce(func, delay) {
+    let timer;
+    return function (...args) {
+        clearTimeout(timer);
+        timer = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+// 在input事件中加入debounce
+document.getElementById('stockSymbol').addEventListener('input', debounce(async function() {
     const stockSymbol = this.value.trim().toUpperCase();
     const suggestionsContainer = document.getElementById('suggestions');
 
     if (stockSymbol.length > 0) {
         const stockData = await fetchStockSuggestions(stockSymbol);
-        displaySuggestions(stockData);
-        suggestionsContainer.classList.add('active'); // 显示建议框
+        // 確保結果依照當前輸入顯示
+        if (this.value.trim().toUpperCase() === stockSymbol) {
+            displaySuggestions(stockData);
+            suggestionsContainer.classList.add('active'); // 显示建议框
+        }
     } else {
         clearSuggestions(); // 清空并隐藏建议列表
         suggestionsContainer.classList.remove('active');
     }
-});
+}, 300)); // 300ms 的延遲
 
 async function fetchStockSuggestions(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
