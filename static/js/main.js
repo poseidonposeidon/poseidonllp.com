@@ -1510,6 +1510,8 @@ addEnterKeyListener("cnStockSymbol", "#cnStockButton");
 
 //////////////////建議/////////////////
 // debounce 函數，延遲觸發事件
+// debounce 函數，延遲觸發事件
+// debounce 函數，延遲觸發事件
 function debounce(func, delay) {
     let timer;
     return function (...args) {
@@ -1555,107 +1557,6 @@ function handleStockInput(inputId, suggestionsContainerId, fetchSuggestionsFn, d
     }, 100));  // 將 debounce 延遲時間設置為 100 毫秒
 }
 
-// 美國股票 API 函數
-async function fetchStockSuggestions(stockSymbol) {
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const filteredData = data.filter(stock => stock.currency === 'USD');
-        return filteredData.map(stock => stock.symbol);
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-        return [];
-    }
-}
-
-// 歐洲股票 API 函數
-async function fetchStockSuggestionsEU(stockSymbol) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`;
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const filteredData = data.filter(stock => stock.currency === 'EUR' || stock.currency === 'GBp');
-        return filteredData.map(stock => stock.symbol);
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-        return [];
-    }
-}
-
-// 日本股票 API 函數
-async function fetchStockSuggestionsJP(stockSymbol) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`;
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const filteredData = data.filter(stock => stock.currency === 'JPY');
-        return filteredData.map(stock => stock.symbol.replace('.T', ''));
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-        return [];
-    }
-}
-
-// 台灣股票 API 函數
-async function fetchStockSuggestionsTW(stockSymbol) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`;
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const filteredData = data.filter(stock => stock.currency === 'TWD');
-        let symbols = filteredData.map(stock => stock.symbol.replace('.TW', ''));
-        symbols = symbols.map(symbol => symbol.replace('O', ''));
-        return symbols;
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-        return [];
-    }
-}
-
-// 韓國股票 API 函數
-async function fetchStockSuggestionsKR(stockSymbol) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`;
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const filteredData = data.filter(stock => stock.currency === 'KRW');
-        return filteredData.map(stock => stock.symbol);
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-        return [];
-    }
-}
-
-// 香港股票 API 函數
-async function fetchStockSuggestionsHK(stockSymbol) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`;
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const filteredData = data.filter(stock => stock.currency === 'HKD');
-        return filteredData.map(stock => stock.symbol.replace('.HK', ''));
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-        return [];
-    }
-}
-
-// 中國股票 API 函數
-async function fetchStockSuggestionsCN(stockSymbol) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`;
-    try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
-        const filteredData = data.filter(stock => stock.currency === 'CNY');
-        return filteredData.map(stock => stock.symbol);
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-        return [];
-    }
-}
-
 // 顯示建議和清除建議的函數 (美股)
 function displaySuggestions(suggestions) {
     const suggestionsContainer = document.getElementById('suggestions');
@@ -1663,7 +1564,8 @@ function displaySuggestions(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
-        suggestionDiv.addEventListener('click', () => {
+        suggestionDiv.addEventListener('click', (event) => {
+            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('stockSymbol').value = symbol;
             clearSuggestions();
         });
@@ -1685,7 +1587,8 @@ function displaySuggestionsEU(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
-        suggestionDiv.addEventListener('click', () => {
+        suggestionDiv.addEventListener('click', (event) => {
+            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('euStockSymbol').value = symbol;
             clearSuggestionsEU();
         });
@@ -1707,7 +1610,8 @@ function displaySuggestionsJP(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
-        suggestionDiv.addEventListener('click', () => {
+        suggestionDiv.addEventListener('click', (event) => {
+            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('jpStockSymbol').value = symbol;
             clearSuggestionsJP();
         });
@@ -1729,7 +1633,8 @@ function displaySuggestionsTW(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
-        suggestionDiv.addEventListener('click', () => {
+        suggestionDiv.addEventListener('click', (event) => {
+            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('twStockSymbol').value = symbol;
             clearSuggestionsTW();
         });
@@ -1751,7 +1656,8 @@ function displaySuggestionsKR(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
-        suggestionDiv.addEventListener('click', () => {
+        suggestionDiv.addEventListener('click', (event) => {
+            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('krStockSymbol').value = symbol;
             clearSuggestionsKR();
         });
@@ -1773,7 +1679,8 @@ function displaySuggestionsHK(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
-        suggestionDiv.addEventListener('click', () => {
+        suggestionDiv.addEventListener('click', (event) => {
+            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('hkStockSymbol').value = symbol;
             clearSuggestionsHK();
         });
@@ -1795,7 +1702,8 @@ function displaySuggestionsCN(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
-        suggestionDiv.addEventListener('click', () => {
+        suggestionDiv.addEventListener('click', (event) => {
+            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('cnStockSymbol').value = symbol;
             clearSuggestionsCN();
         });
@@ -1818,7 +1726,6 @@ handleStockInput('twStockSymbol', 'suggestionsTW', fetchStockSuggestionsTW, disp
 handleStockInput('krStockSymbol', 'suggestionsKR', fetchStockSuggestionsKR, displaySuggestionsKR, clearSuggestionsKR);
 handleStockInput('hkStockSymbol', 'suggestionsHK', fetchStockSuggestionsHK, displaySuggestionsHK, clearSuggestionsHK);
 handleStockInput('cnStockSymbol', 'suggestionsCN', fetchStockSuggestionsCN, displaySuggestionsCN, clearSuggestionsCN);
-
 
 
 //////////////////////////////Profile//////////////////////////////////////////////
