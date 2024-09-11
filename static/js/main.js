@@ -1513,6 +1513,7 @@ addEnterKeyListener("cnStockSymbol", "#cnStockButton");
 // debounce 函數，延遲觸發事件
 // debounce 函數，延遲觸發事件
 // debounce 函數，延遲觸發事件
+// debounce 函數，延遲觸發事件
 function debounce(func, delay) {
     let timer;
     return function (...args) {
@@ -1535,9 +1536,15 @@ function showNoSuggestions(container) {
 
 // 通用的輸入事件處理函數
 function handleStockInput(inputId, suggestionsContainerId, fetchSuggestionsFn, displayFn, clearFn) {
-    document.getElementById(inputId).addEventListener('input', debounce(async function() {
+    const inputElement = document.getElementById(inputId);
+    const suggestionsContainer = document.getElementById(suggestionsContainerId);
+    if (!inputElement || !suggestionsContainer) {
+        console.error('Input element or suggestions container not found:', inputId, suggestionsContainerId);
+        return;
+    }
+
+    inputElement.addEventListener('input', debounce(async function() {
         const stockSymbol = this.value.trim().toUpperCase();
-        const suggestionsContainer = document.getElementById(suggestionsContainerId);
 
         if (stockSymbol.length > 0) {
             showLoadingSuggestions(suggestionsContainer);  // 顯示載入中狀態
@@ -1745,6 +1752,7 @@ document.addEventListener('click', (event) => {
         document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)').forEach(el => el.classList.remove('blur-background'));
     }
 });
+
 
 
 //////////////////////////////Profile//////////////////////////////////////////////
