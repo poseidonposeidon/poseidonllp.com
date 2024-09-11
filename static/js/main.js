@@ -3838,11 +3838,16 @@ function displayEarningsCallTranscript(transcript, container) {
         return;
     }
 
+    // 將日期時間顯示在逐字稿內容之前
+    let transcriptDate = new Date(transcript.date).toLocaleString(); // 格式化日期時間
+    let dateContent = `<p><strong>Date ：</strong> ${transcriptDate}</p>`;
+
     // 將逐字稿內容分段
     let paragraphs = splitTranscriptIntoParagraphs(transcript.content);
 
     // 組裝HTML內容
-    let htmlContent = `<div id="transcriptPreview">${paragraphs.slice(0, 3).join('')}...</div>`;
+    let htmlContent = dateContent;  // 加上日期內容
+    htmlContent += `<div id="transcriptPreview">${paragraphs.slice(0, 3).join('')}...</div>`;
     htmlContent += `<div id="fullTranscript" style="display:none; white-space: normal;">${paragraphs.join('')}</div>`;
     htmlContent += '<button id="expandButton" class="transcript-button" onclick="expandTranscript(event)">Read More</button>';
     htmlContent += '<button id="collapseButton" class="transcript-button" style="display: none;" onclick="collapseTranscript(event)">Read Less</button>';
