@@ -1512,6 +1512,7 @@ addEnterKeyListener("cnStockSymbol", "#cnStockButton");
 // debounce 函數，延遲觸發事件
 // debounce 函數，延遲觸發事件
 // debounce 函數，延遲觸發事件
+// debounce 函數，延遲觸發事件
 function debounce(func, delay) {
     let timer;
     return function (...args) {
@@ -1564,6 +1565,7 @@ function displaySuggestions(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
+        suggestionDiv.classList.add('suggestion-item'); // 添加class
         suggestionDiv.addEventListener('click', (event) => {
             event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('stockSymbol').value = symbol;
@@ -1587,6 +1589,7 @@ function displaySuggestionsEU(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
+        suggestionDiv.classList.add('suggestion-item'); // 添加class
         suggestionDiv.addEventListener('click', (event) => {
             event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('euStockSymbol').value = symbol;
@@ -1610,6 +1613,7 @@ function displaySuggestionsJP(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
+        suggestionDiv.classList.add('suggestion-item'); // 添加class
         suggestionDiv.addEventListener('click', (event) => {
             event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('jpStockSymbol').value = symbol;
@@ -1633,6 +1637,7 @@ function displaySuggestionsTW(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
+        suggestionDiv.classList.add('suggestion-item'); // 添加class
         suggestionDiv.addEventListener('click', (event) => {
             event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('twStockSymbol').value = symbol;
@@ -1656,6 +1661,7 @@ function displaySuggestionsKR(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
+        suggestionDiv.classList.add('suggestion-item'); // 添加class
         suggestionDiv.addEventListener('click', (event) => {
             event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('krStockSymbol').value = symbol;
@@ -1679,6 +1685,7 @@ function displaySuggestionsHK(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
+        suggestionDiv.classList.add('suggestion-item'); // 添加class
         suggestionDiv.addEventListener('click', (event) => {
             event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('hkStockSymbol').value = symbol;
@@ -1702,6 +1709,7 @@ function displaySuggestionsCN(suggestions) {
     suggestions.forEach(symbol => {
         const suggestionDiv = document.createElement('div');
         suggestionDiv.textContent = symbol;
+        suggestionDiv.classList.add('suggestion-item'); // 添加class
         suggestionDiv.addEventListener('click', (event) => {
             event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
             document.getElementById('cnStockSymbol').value = symbol;
@@ -1726,6 +1734,17 @@ handleStockInput('twStockSymbol', 'suggestionsTW', fetchStockSuggestionsTW, disp
 handleStockInput('krStockSymbol', 'suggestionsKR', fetchStockSuggestionsKR, displaySuggestionsKR, clearSuggestionsKR);
 handleStockInput('hkStockSymbol', 'suggestionsHK', fetchStockSuggestionsHK, displaySuggestionsHK, clearSuggestionsHK);
 handleStockInput('cnStockSymbol', 'suggestionsCN', fetchStockSuggestionsCN, displaySuggestionsCN, clearSuggestionsCN);
+
+// 防止推薦框點擊時觸發全局 section 收起行為
+document.addEventListener('click', (event) => {
+    if (activeSection && !activeSection.contains(event.target) && !event.target.closest('.suggestion-item')) {
+        hideSection(activeSection);
+        activeSection = null;
+        document.querySelector('.overlay').classList.remove('active');
+        document.body.classList.remove('modal-open');
+        document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)').forEach(el => el.classList.remove('blur-background'));
+    }
+});
 
 
 //////////////////////////////Profile//////////////////////////////////////////////
