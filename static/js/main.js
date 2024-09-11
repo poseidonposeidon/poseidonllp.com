@@ -1510,6 +1510,7 @@ addEnterKeyListener("cnStockSymbol", "#cnStockButton");
 
 //////////////////建議/////////////////
 //美股
+// debounce 函数，延迟触发事件
 function debounce(func, delay) {
     let timer;
     return function (...args) {
@@ -1518,23 +1519,32 @@ function debounce(func, delay) {
     };
 }
 
-// 在input事件中加入debounce
+// 预先显示建议框，添加 "载入中..." 状态
+function showLoadingSuggestions() {
+    const suggestionsContainer = document.getElementById('suggestions');
+    suggestionsContainer.innerHTML = '<div>Loading...</div>';
+    suggestionsContainer.classList.add('active'); // 显示建议框
+}
+
 document.getElementById('stockSymbol').addEventListener('input', debounce(async function() {
     const stockSymbol = this.value.trim().toUpperCase();
     const suggestionsContainer = document.getElementById('suggestions');
 
+    // 当用户输入时马上显示推荐框
     if (stockSymbol.length > 0) {
+        showLoadingSuggestions();  // 显示“加载中”
+
         const stockData = await fetchStockSuggestions(stockSymbol);
-        // 確保結果依照當前輸入顯示
+
+        // 确保结果依照当前输入显示
         if (this.value.trim().toUpperCase() === stockSymbol) {
-            displaySuggestions(stockData);
-            suggestionsContainer.classList.add('active'); // 显示建议框
+            displaySuggestions(stockData);  // 更新推荐列表
         }
     } else {
         clearSuggestions(); // 清空并隐藏建议列表
         suggestionsContainer.classList.remove('active');
     }
-}, 300)); // 300ms 的延遲
+}, 100)); // 将延迟设置为 100 毫秒
 
 async function fetchStockSuggestions(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
@@ -1572,7 +1582,7 @@ function displaySuggestions(suggestions) {
         });
         suggestionsContainer.classList.add('active'); // 显示建议框
     } else {
-        suggestionsContainer.classList.remove('active'); // 如果没有建议，隐藏建议框
+        suggestionsContainer.innerHTML = '<div>No suggestions available</div>'; // 如果没有建议，显示提示
     }
 }
 
@@ -1581,6 +1591,7 @@ function clearSuggestions() {
     suggestionsContainer.innerHTML = '';
     suggestionsContainer.classList.remove('active'); // 隐藏建议框
 }
+
 
 //歐股
 document.getElementById('euStockSymbol').addEventListener('input', async function() {
