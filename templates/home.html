@@ -68,7 +68,7 @@
     <div class="info-input">
         <input type="text" id="stockSymbol" placeholder="Input U.S Stock" pattern="[A-Z]*" autocomplete="off">
 
-        <button id="usStockButton" onclick="fetchStock() ; clearSuggestions();">
+        <button id="usStockButton" onclick="fetchStock() ; ">
             <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
         </button>
     </div>
@@ -106,7 +106,7 @@
 <div id="jp-info-section" class="info-section" style="display: none;">
     <div class="info-input">
         <input type="text" id="jpStockSymbol" placeholder="Input JP Stock" pattern="[0-9]*">
-        <button id="jpStockButton" onclick="fetchJPStock() ; clearSuggestionsJP();">
+        <button id="jpStockButton" onclick="fetchJPStock() ; clearSuggestions();">
             <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
         </button>
     </div>

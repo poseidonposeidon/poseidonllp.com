@@ -1487,16 +1487,11 @@ document.getElementById('stockSymbol').addEventListener('input', function(e) {
 function addEnterKeyListener(inputId, buttonSelector) {
     document.getElementById(inputId).addEventListener("keypress", function(event) {
         if (event.key === "Enter") {
-            event.preventDefault(); // Prevent form submission
-            document.querySelector(buttonSelector).click(); // Trigger button click event
+            event.preventDefault(); // 防止表單提交
+            document.querySelector(buttonSelector).click(); // 觸發按鈕點擊事件
 
-            // 隐藏建议框
+            // 隱藏對應的建議框
             clearSuggestions();
-            // clearSuggestionsEU();
-            // clearSuggestionsJP();
-            // clearSuggestionsTW();
-            // clearSuggestionsKR();
-            // clearSuggestionsHK();
         }
     });
 }
@@ -1532,7 +1527,39 @@ function showNoSuggestions(container) {
 }
 
 // 清空建議列表
-function clearSuggestions(container) {
+function clearSuggestions(container = null) {
+    if (!container) {
+        // 根據不同的 input id 對應不同的建議框容器
+        const inputId = document.activeElement.id;
+        switch (inputId) {
+            case 'stockSymbol':
+                container = document.getElementById('suggestions');
+                break;
+            case 'jpStockSymbol':
+                container = document.getElementById('suggestionsJP');
+                break;
+            case 'twStockSymbol':
+                container = document.getElementById('suggestionsTW');
+                break;
+            case 'euStockSymbol':
+                container = document.getElementById('suggestionsEU');
+                break;
+            case 'krStockSymbol':
+                container = document.getElementById('suggestionsKR');
+                break;
+            case 'hkStockSymbol':
+                container = document.getElementById('suggestionsHK');
+                break;
+            case 'cnStockSymbol':
+                container = document.getElementById('suggestionsCN');
+                break;
+            default:
+                console.error('未知的輸入框 id');
+                return;
+        }
+    }
+
+    // 清空內容並隱藏建議框
     container.innerHTML = '';
     container.classList.remove('active');
 }
@@ -1580,7 +1607,7 @@ function displaySuggestions(suggestions, suggestionsContainer, inputId) {
             suggestionDiv.addEventListener('click', () => {
                 event.stopPropagation();
                 document.getElementById(inputId).value = symbol;
-                clearSuggestions(suggestionsContainer);
+                clearSuggestions(suggestionsContainer); // 清除當前的建議框
             });
             suggestionsContainer.appendChild(suggestionDiv);
         });
