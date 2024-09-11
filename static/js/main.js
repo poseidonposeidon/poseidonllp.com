@@ -1491,7 +1491,7 @@ function addEnterKeyListener(inputId, buttonSelector) {
             document.querySelector(buttonSelector).click(); // Trigger button click event
 
             // 隐藏建议框
-            // clearSuggestions();
+            clearSuggestions();
             // clearSuggestionsEU();
             // clearSuggestionsJP();
             // clearSuggestionsTW();
@@ -1510,7 +1510,6 @@ addEnterKeyListener("cnStockSymbol", "#cnStockButton");
 
 //////////////////建議/////////////////
 //美股
-// debounce 函数，延迟触发事件
 // debounce 函數，延遲觸發事件
 function debounce(func, delay) {
     let timer;
