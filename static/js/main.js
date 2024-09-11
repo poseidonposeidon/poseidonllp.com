@@ -1509,11 +1509,8 @@ addEnterKeyListener("hkStockSymbol", "#hkStockButton");
 addEnterKeyListener("cnStockSymbol", "#cnStockButton");
 
 //////////////////建議/////////////////
-// debounce 函數，延遲觸發事件
-// debounce 函數，延遲觸發事件
-// debounce 函數，延遲觸發事件
-// debounce 函數，延遲觸發事件
-// debounce 函數，延遲觸發事件
+//美股
+// debounce 函数，延迟触发事件
 function debounce(func, delay) {
     let timer;
     return function (...args) {
@@ -1522,237 +1519,453 @@ function debounce(func, delay) {
     };
 }
 
-// 顯示"載入中"狀態
-function showLoadingSuggestions(container) {
-    container.innerHTML = '<div>Loading...</div>';
-    container.classList.add('active');
+// 预先显示建议框，添加 "载入中..." 状态
+function showLoadingSuggestions() {
+    const suggestionsContainer = document.getElementById('suggestions');
+    suggestionsContainer.innerHTML = '<div>Loading...</div>';
+    suggestionsContainer.classList.add('active'); // 显示建议框
 }
 
-// 顯示"無建議"狀態
-function showNoSuggestions(container) {
-    container.innerHTML = '<div>No suggestions available</div>';
-    container.classList.add('active');
-}
+document.getElementById('stockSymbol').addEventListener('input', debounce(async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainer = document.getElementById('suggestions');
 
-// 通用的輸入事件處理函數
-function handleStockInput(inputId, suggestionsContainerId, fetchSuggestionsFn, displayFn, clearFn) {
-    const inputElement = document.getElementById(inputId);
-    const suggestionsContainer = document.getElementById(suggestionsContainerId);
-    if (!inputElement || !suggestionsContainer) {
-        console.error('Input element or suggestions container not found:', inputId, suggestionsContainerId);
-        return;
-    }
+    // 当用户输入时马上显示推荐框
+    if (stockSymbol.length > 0) {
+        showLoadingSuggestions();  // 显示“加载中”
 
-    inputElement.addEventListener('input', debounce(async function() {
-        const stockSymbol = this.value.trim().toUpperCase();
+        const stockData = await fetchStockSuggestions(stockSymbol);
 
-        if (stockSymbol.length > 0) {
-            showLoadingSuggestions(suggestionsContainer);  // 顯示載入中狀態
-            const stockData = await fetchSuggestionsFn(stockSymbol);
-
-            // 確保結果與當前輸入匹配
-            if (this.value.trim().toUpperCase() === stockSymbol) {
-                if (stockData.length > 0) {
-                    displayFn(stockData);  // 更新推薦列表
-                } else {
-                    showNoSuggestions(suggestionsContainer);  // 顯示無建議
-                }
-            }
-        } else {
-            clearFn();  // 清空並隱藏建議列表
-            suggestionsContainer.classList.remove('active');
+        // 确保结果依照当前输入显示
+        if (this.value.trim().toUpperCase() === stockSymbol) {
+            displaySuggestions(stockData);  // 更新推荐列表
         }
-    }, 100));  // 將 debounce 延遲時間設置為 100 毫秒
+    } else {
+        clearSuggestions(); // 清空并隐藏建议列表
+        suggestionsContainer.classList.remove('active');
+    }
+}, 100)); // 将延迟设置为 100 毫秒
+
+async function fetchStockSuggestions(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 过滤条件：只返回 currency 为 USD 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'USD');
+        return filteredData.map(stock => stock.symbol); // 仅返回股票符号
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
 }
 
-// 顯示建議和清除建議的函數 (美股)
 function displaySuggestions(suggestions) {
     const suggestionsContainer = document.getElementById('suggestions');
-    suggestionsContainer.innerHTML = '';
-    suggestions.forEach(symbol => {
-        const suggestionDiv = document.createElement('div');
-        suggestionDiv.textContent = symbol;
-        suggestionDiv.classList.add('suggestion-item'); // 添加class
-        suggestionDiv.addEventListener('click', (event) => {
-            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
-            document.getElementById('stockSymbol').value = symbol;
-            clearSuggestions();
+    suggestionsContainer.innerHTML = ''; // 清空之前的建议列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol;
+            suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
+                document.getElementById('stockSymbol').value = symbol;
+                clearSuggestions(); // 选择后清空并隐藏建议列表
+                suggestionsContainer.classList.remove('active');
+            });
+            suggestionsContainer.appendChild(suggestionDiv);
         });
-        suggestionsContainer.appendChild(suggestionDiv);
-    });
-    suggestionsContainer.classList.add('active');
+        suggestionsContainer.classList.add('active'); // 显示建议框
+    } else {
+        suggestionsContainer.innerHTML = '<div>No suggestions available</div>'; // 如果没有建议，显示提示
+    }
 }
 
 function clearSuggestions() {
     const suggestionsContainer = document.getElementById('suggestions');
     suggestionsContainer.innerHTML = '';
-    suggestionsContainer.classList.remove('active');
+    suggestionsContainer.classList.remove('active'); // 隐藏建议框
 }
 
-// 顯示建議和清除建議的函數 (歐股)
+
+//歐股
+document.getElementById('euStockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainerEU = document.getElementById('suggestionsEU');
+
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestionsEU(stockSymbol);
+        displaySuggestionsEU(stockData);
+        suggestionsContainerEU.classList.add('active'); // 显示建议框
+    } else {
+        clearSuggestionsEU(); // 清空并隐藏建议列表
+        suggestionsContainerEU.classList.remove('active');
+    }
+});
+
+async function fetchStockSuggestionsEU(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 过滤条件：只返回 currency 为 EUR 或 GBp 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'EUR' || stock.currency === 'GBp');
+        return filteredData.map(stock => stock.symbol); // 仅返回股票符号
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
 function displaySuggestionsEU(suggestions) {
     const suggestionsContainerEU = document.getElementById('suggestionsEU');
-    suggestionsContainerEU.innerHTML = '';
-    suggestions.forEach(symbol => {
-        const suggestionDiv = document.createElement('div');
-        suggestionDiv.textContent = symbol;
-        suggestionDiv.classList.add('suggestion-item'); // 添加class
-        suggestionDiv.addEventListener('click', (event) => {
-            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
-            document.getElementById('euStockSymbol').value = symbol;
-            clearSuggestionsEU();
+    suggestionsContainerEU.innerHTML = ''; // 清空之前的建议列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol;
+            suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
+                document.getElementById('euStockSymbol').value = symbol;
+                clearSuggestionsEU(); // 选择后清空并隐藏建议列表
+                suggestionsContainerEU.classList.remove('active');
+            });
+            suggestionsContainerEU.appendChild(suggestionDiv);
         });
-        suggestionsContainerEU.appendChild(suggestionDiv);
-    });
-    suggestionsContainerEU.classList.add('active');
+        suggestionsContainerEU.classList.add('active'); // 显示建议框
+    } else {
+        suggestionsContainerEU.classList.remove('active'); // 如果没有建议，隐藏建议框
+    }
 }
 
 function clearSuggestionsEU() {
     const suggestionsContainerEU = document.getElementById('suggestionsEU');
     suggestionsContainerEU.innerHTML = '';
-    suggestionsContainerEU.classList.remove('active');
+    suggestionsContainerEU.classList.remove('active'); // 隐藏建议框
 }
 
-// 顯示建議和清除建議的函數 (日股)
+//日股
+document.getElementById('jpStockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainerJP = document.getElementById('suggestionsJP');
+
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestionsJP(stockSymbol);
+        displaySuggestionsJP(stockData);
+        suggestionsContainerJP.classList.add('active'); // 顯示建議框
+    } else {
+        clearSuggestionsJP(); // 清空並隱藏建議列表
+        suggestionsContainerJP.classList.remove('active');
+    }
+});
+
+async function fetchStockSuggestionsJP(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 過濾條件：只返回 currency 為 JPY 的股票符號
+        const filteredData = data.filter(stock => stock.currency === 'JPY');
+        return filteredData.map(stock => stock.symbol); // 僅返回股票符號
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
 function displaySuggestionsJP(suggestions) {
     const suggestionsContainerJP = document.getElementById('suggestionsJP');
-    suggestionsContainerJP.innerHTML = '';
-    suggestions.forEach(symbol => {
-        const suggestionDiv = document.createElement('div');
-        suggestionDiv.textContent = symbol;
-        suggestionDiv.classList.add('suggestion-item'); // 添加class
-        suggestionDiv.addEventListener('click', (event) => {
-            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
-            document.getElementById('jpStockSymbol').value = symbol;
-            clearSuggestionsJP();
+    suggestionsContainerJP.innerHTML = ''; // 清空之前的建議列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol.replace('.T', ''); // 移除顯示中的 ".T"
+            suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
+                document.getElementById('jpStockSymbol').value = symbol.replace('.T', ''); // 移除輸入框中的 ".T"
+                clearSuggestionsJP(); // 選擇後清空並隱藏建議列表
+                suggestionsContainerJP.classList.remove('active');
+            });
+            suggestionsContainerJP.appendChild(suggestionDiv);
         });
-        suggestionsContainerJP.appendChild(suggestionDiv);
-    });
-    suggestionsContainerJP.classList.add('active');
+        suggestionsContainerJP.classList.add('active'); // 顯示建議框
+    } else {
+        suggestionsContainerJP.classList.remove('active'); // 如果沒有建議，隱藏建議框
+    }
 }
 
 function clearSuggestionsJP() {
     const suggestionsContainerJP = document.getElementById('suggestionsJP');
     suggestionsContainerJP.innerHTML = '';
-    suggestionsContainerJP.classList.remove('active');
+    suggestionsContainerJP.classList.remove('active'); // 隱藏建議框
 }
 
-// 顯示建議和清除建議的函數 (台股)
+//台股
+document.getElementById('twStockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainerTW = document.getElementById('suggestionsTW');
+
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestionsTW(stockSymbol);
+        displaySuggestionsTW(stockData);
+        suggestionsContainerTW.classList.add('active'); // 显示建议框
+    } else {
+        clearSuggestionsTW(); // 清空并隐藏建议列表
+        suggestionsContainerTW.classList.remove('active');
+    }
+});
+
+async function fetchStockSuggestionsTW(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 过滤条件：只返回 currency 为 TWD 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'TWD');
+
+        // 先去除 ".TW"
+        let symbols = filteredData.map(stock => stock.symbol.replace('.TW', ''));
+        // 再处理 ".TWO" 的 "O"
+        symbols = symbols.map(symbol => symbol.replace('O', ''));
+
+        return symbols;
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
+
 function displaySuggestionsTW(suggestions) {
     const suggestionsContainerTW = document.getElementById('suggestionsTW');
-    suggestionsContainerTW.innerHTML = '';
-    suggestions.forEach(symbol => {
-        const suggestionDiv = document.createElement('div');
-        suggestionDiv.textContent = symbol;
-        suggestionDiv.classList.add('suggestion-item'); // 添加class
-        suggestionDiv.addEventListener('click', (event) => {
-            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
-            document.getElementById('twStockSymbol').value = symbol;
-            clearSuggestionsTW();
+    suggestionsContainerTW.innerHTML = ''; // 清空之前的建议列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol; // 显示去除 ".TW" 和 ".TWO" 的股票符号
+            suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
+                document.getElementById('twStockSymbol').value = symbol; // 选中后也不包含 ".TW" 或 ".TWO"
+                clearSuggestionsTW(); // 选择后清空并隐藏建议列表
+                suggestionsContainerTW.classList.remove('active');
+            });
+            suggestionsContainerTW.appendChild(suggestionDiv);
         });
-        suggestionsContainerTW.appendChild(suggestionDiv);
-    });
-    suggestionsContainerTW.classList.add('active');
+        suggestionsContainerTW.classList.add('active'); // 显示建议框
+    } else {
+        suggestionsContainerTW.classList.remove('active'); // 如果没有建议，隐藏建议框
+    }
 }
 
 function clearSuggestionsTW() {
     const suggestionsContainerTW = document.getElementById('suggestionsTW');
     suggestionsContainerTW.innerHTML = '';
-    suggestionsContainerTW.classList.remove('active');
+    suggestionsContainerTW.classList.remove('active'); // 隐藏建议框
 }
 
-// 顯示建議和清除建議的函數 (韓股)
+// 韓股
+document.getElementById('krStockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainerKR = document.getElementById('suggestionsKR');
+
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestionsKR(stockSymbol);
+        displaySuggestionsKR(stockData);
+        suggestionsContainerKR.classList.add('active'); // 显示建议框
+    } else {
+        clearSuggestionsKR(); // 清空并隐藏建议列表
+        suggestionsContainerKR.classList.remove('active');
+    }
+});
+
+async function fetchStockSuggestionsKR(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 过滤条件：只返回 currency 为 KRW 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'KRW');
+        return filteredData.map(stock => stock.symbol); // 仅返回股票符号
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
 function displaySuggestionsKR(suggestions) {
     const suggestionsContainerKR = document.getElementById('suggestionsKR');
-    suggestionsContainerKR.innerHTML = '';
-    suggestions.forEach(symbol => {
-        const suggestionDiv = document.createElement('div');
-        suggestionDiv.textContent = symbol;
-        suggestionDiv.classList.add('suggestion-item'); // 添加class
-        suggestionDiv.addEventListener('click', (event) => {
-            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
-            document.getElementById('krStockSymbol').value = symbol;
-            clearSuggestionsKR();
+    suggestionsContainerKR.innerHTML = ''; // 清空之前的建议列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol;
+            suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
+                document.getElementById('krStockSymbol').value = symbol;
+                clearSuggestionsKR(); // 选择后清空并隐藏建议列表
+                suggestionsContainerKR.classList.remove('active');
+            });
+            suggestionsContainerKR.appendChild(suggestionDiv);
         });
-        suggestionsContainerKR.appendChild(suggestionDiv);
-    });
-    suggestionsContainerKR.classList.add('active');
+        suggestionsContainerKR.classList.add('active'); // 显示建议框
+    } else {
+        suggestionsContainerKR.classList.remove('active'); // 如果没有建议，隐藏建议框
+    }
 }
 
 function clearSuggestionsKR() {
     const suggestionsContainerKR = document.getElementById('suggestionsKR');
     suggestionsContainerKR.innerHTML = '';
-    suggestionsContainerKR.classList.remove('active');
+    suggestionsContainerKR.classList.remove('active'); // 隐藏建议框
 }
 
-// 顯示建議和清除建議的函數 (港股)
+// 港股
+document.getElementById('hkStockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainerHK = document.getElementById('suggestionsHK');
+
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestionsHK(stockSymbol);
+        displaySuggestionsHK(stockData);
+        suggestionsContainerHK.classList.add('active'); // 顯示建議框
+    } else {
+        clearSuggestionsHK(); // 清空並隱藏建議列表
+        suggestionsContainerHK.classList.remove('active');
+    }
+});
+
+async function fetchStockSuggestionsHK(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 過濾條件：只返回 currency 為 HKD 的股票符號
+        const filteredData = data.filter(stock => stock.currency === 'HKD');
+        return filteredData.map(stock => stock.symbol); // 僅返回股票符號
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
 function displaySuggestionsHK(suggestions) {
     const suggestionsContainerHK = document.getElementById('suggestionsHK');
-    suggestionsContainerHK.innerHTML = '';
-    suggestions.forEach(symbol => {
-        const suggestionDiv = document.createElement('div');
-        suggestionDiv.textContent = symbol;
-        suggestionDiv.classList.add('suggestion-item'); // 添加class
-        suggestionDiv.addEventListener('click', (event) => {
-            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
-            document.getElementById('hkStockSymbol').value = symbol;
-            clearSuggestionsHK();
+    suggestionsContainerHK.innerHTML = ''; // 清空之前的建議列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const cleanSymbol = symbol.replace('.HK', ''); // 移除顯示中的 ".HK"
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = cleanSymbol;
+            suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
+                document.getElementById('hkStockSymbol').value = cleanSymbol; // 移除輸入框中的 ".HK"
+                clearSuggestionsHK(); // 選擇後清空並隱藏建議列表
+                suggestionsContainerHK.classList.remove('active');
+            });
+            suggestionsContainerHK.appendChild(suggestionDiv);
         });
-        suggestionsContainerHK.appendChild(suggestionDiv);
-    });
-    suggestionsContainerHK.classList.add('active');
+        suggestionsContainerHK.classList.add('active'); // 顯示建議框
+    } else {
+        suggestionsContainerHK.classList.remove('active'); // 如果沒有建議，隱藏建議框
+    }
 }
 
 function clearSuggestionsHK() {
     const suggestionsContainerHK = document.getElementById('suggestionsHK');
     suggestionsContainerHK.innerHTML = '';
-    suggestionsContainerHK.classList.remove('active');
+    suggestionsContainerHK.classList.remove('active'); // 隱藏建議框
 }
 
-// 顯示建議和清除建議的函數 (中國股)
+// 中國股
+document.getElementById('cnStockSymbol').addEventListener('input', async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainerCN = document.getElementById('suggestionsCN');
+
+    if (stockSymbol.length > 0) {
+        const stockData = await fetchStockSuggestionsCN(stockSymbol);
+        displaySuggestionsCN(stockData);
+        suggestionsContainerCN.classList.add('active'); // 显示建议框
+    } else {
+        clearSuggestionsCN(); // 清空并隐藏建议列表
+        suggestionsContainerCN.classList.remove('active');
+    }
+});
+
+async function fetchStockSuggestionsCN(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        // 过滤条件：只返回 currency 为 CNY 的股票符号
+        const filteredData = data.filter(stock => stock.currency === 'CNY');
+        return filteredData.map(stock => stock.symbol); // 仅返回股票符号
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
 function displaySuggestionsCN(suggestions) {
     const suggestionsContainerCN = document.getElementById('suggestionsCN');
-    suggestionsContainerCN.innerHTML = '';
-    suggestions.forEach(symbol => {
-        const suggestionDiv = document.createElement('div');
-        suggestionDiv.textContent = symbol;
-        suggestionDiv.classList.add('suggestion-item'); // 添加class
-        suggestionDiv.addEventListener('click', (event) => {
-            event.stopPropagation();  // 阻止事件冒泡，防止關閉 section
-            document.getElementById('cnStockSymbol').value = symbol;
-            clearSuggestionsCN();
+    suggestionsContainerCN.innerHTML = ''; // 清空之前的建议列表
+
+    if (suggestions.length > 0) {
+        suggestions.forEach(symbol => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = symbol;
+            suggestionDiv.addEventListener('click', () => {
+                event.stopPropagation();
+                document.getElementById('cnStockSymbol').value = symbol;
+                clearSuggestionsCN(); // 选择后清空并隐藏建议列表
+                suggestionsContainerCN.classList.remove('active');
+            });
+            suggestionsContainerCN.appendChild(suggestionDiv);
         });
-        suggestionsContainerCN.appendChild(suggestionDiv);
-    });
-    suggestionsContainerCN.classList.add('active');
+        suggestionsContainerCN.classList.add('active'); // 显示建议框
+    } else {
+        suggestionsContainerCN.classList.remove('active'); // 如果没有建议，隐藏建议框
+    }
 }
 
 function clearSuggestionsCN() {
     const suggestionsContainerCN = document.getElementById('suggestionsCN');
     suggestionsContainerCN.innerHTML = '';
-    suggestionsContainerCN.classList.remove('active');
+    suggestionsContainerCN.classList.remove('active'); // 隐藏建议框
 }
-
-// 設置每個國家的輸入框事件
-handleStockInput('stockSymbol', 'suggestions', fetchStockSuggestions, displaySuggestions, clearSuggestions);
-handleStockInput('euStockSymbol', 'suggestionsEU', fetchStockSuggestionsEU, displaySuggestionsEU, clearSuggestionsEU);
-handleStockInput('jpStockSymbol', 'suggestionsJP', fetchStockSuggestionsJP, displaySuggestionsJP, clearSuggestionsJP);
-handleStockInput('twStockSymbol', 'suggestionsTW', fetchStockSuggestionsTW, displaySuggestionsTW, clearSuggestionsTW);
-handleStockInput('krStockSymbol', 'suggestionsKR', fetchStockSuggestionsKR, displaySuggestionsKR, clearSuggestionsKR);
-handleStockInput('hkStockSymbol', 'suggestionsHK', fetchStockSuggestionsHK, displaySuggestionsHK, clearSuggestionsHK);
-handleStockInput('cnStockSymbol', 'suggestionsCN', fetchStockSuggestionsCN, displaySuggestionsCN, clearSuggestionsCN);
-
-// 防止推薦框點擊時觸發全局 section 收起行為
-document.addEventListener('click', (event) => {
-    if (activeSection && !activeSection.contains(event.target) && !event.target.closest('.suggestion-item')) {
-        hideSection(activeSection);
-        activeSection = null;
-        document.querySelector('.overlay').classList.remove('active');
-        document.body.classList.remove('modal-open');
-        document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)').forEach(el => el.classList.remove('blur-background'));
-    }
-});
-
 
 
 //////////////////////////////Profile//////////////////////////////////////////////
