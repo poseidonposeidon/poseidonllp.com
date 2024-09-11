@@ -1511,6 +1511,7 @@ addEnterKeyListener("cnStockSymbol", "#cnStockButton");
 //////////////////建議/////////////////
 //美股
 // debounce 函数，延迟触发事件
+//test
 function debounce(func, delay) {
     let timer;
     return function (...args) {
