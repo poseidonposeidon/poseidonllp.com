@@ -1496,7 +1496,7 @@ function addEnterKeyListener(inputId, buttonSelector) {
             // 延遲 0.3 秒再次清除建議框，確保不會再次顯示
             setTimeout(() => {
                 clearSuggestions();
-            }, 300); // 300 毫秒
+            }, 500); // 300 毫秒
         }
     });
 }
