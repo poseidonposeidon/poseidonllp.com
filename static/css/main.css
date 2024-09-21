@@ -643,14 +643,24 @@ button:not(.info-input button):hover {
     padding: 10px;
     margin: 5px 0;
     border-radius: 5px;
+    max-width: 70%; /* 限制訊息寬度，根據內容自動調整 */
+    word-wrap: break-word; /* 確保長訊息換行 */
 }
 
 .chat-message {
-    align-self: flex-end;
+    align-self: flex-start; /* 使用者訊息靠左 */
+    background-color: #444; /* 修改使用者訊息背景顏色 */
+    border-top-left-radius: 5px;
+    border-top-right-radius: 20px;
+    border-bottom-right-radius: 20px;
 }
 
 .chat-response {
-    align-self: flex-start;
+    align-self: flex-end; /* 系統訊息靠右 */
+    background-color: #666; /* 修改系統回應訊息背景顏色 */
+    border-top-right-radius: 5px;
+    border-top-left-radius: 20px;
+    border-bottom-left-radius: 20px;
 }
 
 /* Loader 樣式 */
