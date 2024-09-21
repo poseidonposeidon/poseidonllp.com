@@ -1046,16 +1046,18 @@ function sendMessage() {
         // 發送請求到 Flask 後端
         fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
+            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ message: message })
         })
             .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (response.status >= 200 && response.status < 300) {
+                    console.log("Request successful, but no response body due to no-cors mode.");
+                } else {
+                    console.error(`Request failed with status: ${response.status}`);
                 }
-                return response.json();
             })
             .then(data => {
                 if (data.reply) {
