@@ -1034,42 +1034,32 @@ function sendMessage() {
     const message = inputField.value.trim();
 
     if (message !== "") {
-        // 顯示使用者的訊息
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('chat-message');
         messageDiv.textContent = message;
         chatBox.appendChild(messageDiv);
 
-        // 清空輸入框
-        inputField.value = '';
+        inputField.value = '';  // Clear input field
 
-        // 發送請求到 Flask 後端
         fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
-            mode: 'cors',  // 改為 'cors'
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ message: message })
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                // 顯示系統的回覆訊息
                 const responseDiv = document.createElement('div');
                 responseDiv.classList.add('chat-response');
-                responseDiv.textContent = data.reply;
+                responseDiv.textContent = data.reply || 'No response from API';
                 chatBox.appendChild(responseDiv);
             })
             .catch(error => {
                 console.error('Error fetching OpenAI response:', error);
                 const errorBox = document.getElementById('error-message');
                 if (errorBox) {
-                    errorBox.innerText = 'Error: Could not retrieve a response from the server.\n' + error;
+                    errorBox.innerText = 'Error: ' + error.message;
                 }
             });
     }
