@@ -1043,6 +1043,7 @@ function sendMessage() {
 
         fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
+            mode: 'cors',
             headers: {
                 'Content-Type': 'application/json'
             },
