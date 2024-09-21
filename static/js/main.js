@@ -1043,13 +1043,17 @@ function sendMessage() {
 
         fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
-            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ message: message })
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 const responseDiv = document.createElement('div');
                 responseDiv.classList.add('chat-response');
@@ -1065,7 +1069,6 @@ function sendMessage() {
             });
     }
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
