@@ -1047,15 +1047,14 @@ function sendMessage() {
         messageDiv.textContent = message;
         chatBox.appendChild(messageDiv);
 
-        inputField.value = '';  // Clear input field
+        inputField.value = '';  // 清除輸入欄位
 
         fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            credentials: 'include', // 確保 Cookies 或其他憑證被包含
-            body: JSON.stringify({ message: message })
+            body: JSON.stringify({ message: message })  // 傳遞使用者輸入
         })
             .then(response => {
                 if (!response.ok) {
@@ -1066,7 +1065,7 @@ function sendMessage() {
             .then(data => {
                 const responseDiv = document.createElement('div');
                 responseDiv.classList.add('chat-response');
-                responseDiv.textContent = data.reply || 'No response from API';
+                responseDiv.textContent = data.reply || '此功能測試中';  // 當回應為空時顯示 "此功能測試中"
                 chatBox.appendChild(responseDiv);
             })
             .catch(error => {
@@ -1075,8 +1074,13 @@ function sendMessage() {
                 if (errorBox) {
                     errorBox.innerText = 'Error: ' + error.message;
                 }
-            });
 
+                // 顯示 "此功能測試中" 當 API 回應錯誤
+                const responseDiv = document.createElement('div');
+                responseDiv.classList.add('chat-response');
+                responseDiv.textContent = '此功能測試中';
+                chatBox.appendChild(responseDiv);
+            });
     }
 }
 
