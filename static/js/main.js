@@ -1,6 +1,8 @@
 
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
+const baseUrl = 'https://api.poseidonllp.com';
+
 
 function collapseSection(element) {
     const content = element.querySelector('.content');
@@ -1076,7 +1078,7 @@ function sendMessage() {
             });
     }
 }
-v
+
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
@@ -5018,7 +5020,6 @@ function displayInsiderTrades(data, container) {
 let originalFileNames = {};
 let currentOriginalFileName = '';
 let pollingInterval;
-const baseUrl = 'https://api.poseidonllp.com';
 
 document.addEventListener("DOMContentLoaded", () => {
     fetchFileList();
