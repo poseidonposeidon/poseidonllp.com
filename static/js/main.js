@@ -77,6 +77,8 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section,#chat-gpt-section').forEach(section => {
         section.style.display = 'none';
     });
+    const dynamicSections = document.querySelectorAll('#chat-gpt-section, #audio-transcription-section');
+    dynamicSections.forEach(section => section.style.display = 'none');
 });
 
 ////////////////////////////////////////////////////////////////////////////
