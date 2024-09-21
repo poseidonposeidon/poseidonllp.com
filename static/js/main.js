@@ -1043,7 +1043,7 @@ function sendMessage() {
 
         fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
-            // mode: 'no-cors',  // 仍然會限制回應數據
+            mode: 'no-cors',  // 仍然會限制回應數據
             headers: {
                 'Content-Type': 'application/json'
             },
