@@ -1046,7 +1046,7 @@ function sendMessage() {
         // 發送請求到 Flask 後端
         fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
-            mode: 'no-cors',
+            mode: 'cors',  // 改為 'cors'
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -1074,6 +1074,7 @@ function sendMessage() {
             });
     }
 }
+
 
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
