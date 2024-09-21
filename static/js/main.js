@@ -1000,6 +1000,19 @@ function loadAIBoxSection(sectionId) {
                         <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
                     </div>
                 </div>
+            </div>`,
+        'chat-gpt': `
+            <div class="section" id="chat-gpt">
+                <h2>Chat GPT</h2>
+                <div class="chat-container">
+                    <div id="chat-box" class="chat-box">
+                        <!-- 聊天訊息將顯示在這裡 -->
+                    </div>
+                    <div class="chat-input-container">
+                        <textarea id="chat-input" rows="2" placeholder="Type your message here..."></textarea>
+                        <button onclick="sendMessage()">Send</button>
+                    </div>
+                </div>
             </div>`
     };
 
@@ -1010,6 +1023,35 @@ function loadAIBoxSection(sectionId) {
         fetchTextFileList();
         updateQueueLength();
         setInterval(updateQueueLength, 5000); // 每5秒更新一次排程長度
+    }
+}
+
+function sendMessage() {
+    const inputField = document.getElementById('chat-input');
+    const chatBox = document.getElementById('chat-box');
+    const message = inputField.value.trim();
+
+    if (message !== "") {
+        // 將訊息顯示到聊天框中
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('chat-message');
+        messageDiv.textContent = message;
+        chatBox.appendChild(messageDiv);
+
+        // 清空輸入框
+        inputField.value = '';
+
+        // 自動捲動到底部
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // 模擬回應 (這裡可以替換為實際的聊天回應邏輯)
+        setTimeout(function() {
+            const responseDiv = document.createElement('div');
+            responseDiv.classList.add('chat-response');
+            responseDiv.textContent = "This is a simulated response.";
+            chatBox.appendChild(responseDiv);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }, 1000);
     }
 }
 
