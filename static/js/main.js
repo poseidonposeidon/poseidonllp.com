@@ -1010,7 +1010,7 @@ function loadAIBoxSection(sectionId) {
                     </div>
                     <div class="chat-input-container">
                         <textarea id="chat-input" rows="2" placeholder="Type your message here..."></textarea>
-                        <button onclick="sendMessage()">Send</button>
+                        <button id="send-btn" onclick="sendMessage()">Send</button>
                     </div>
                 </div>
             </div>`
@@ -1026,13 +1026,15 @@ function loadAIBoxSection(sectionId) {
     }
 }
 
+const baseUrl = 'https://api.poseidonllp.com';
+
 function sendMessage() {
     const inputField = document.getElementById('chat-input');
     const chatBox = document.getElementById('chat-box');
     const message = inputField.value.trim();
 
     if (message !== "") {
-        // 將訊息顯示到聊天框中
+        // 顯示使用者的訊息
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('chat-message');
         messageDiv.textContent = message;
@@ -1041,18 +1043,73 @@ function sendMessage() {
         // 清空輸入框
         inputField.value = '';
 
-        // 自動捲動到底部
-        chatBox.scrollTop = chatBox.scrollHeight;
-
-        // 模擬回應 (這裡可以替換為實際的聊天回應邏輯)
-        setTimeout(function() {
-            const responseDiv = document.createElement('div');
-            responseDiv.classList.add('chat-response');
-            responseDiv.textContent = "This is a simulated response.";
-            chatBox.appendChild(responseDiv);
-            chatBox.scrollTop = chatBox.scrollHeight;
-        }, 1000);
+        // 發送請求到 Flask 後端
+        fetch(`${baseUrl}/chat_openai`, {  // 更新為使用 baseUrl
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ message: message })  // 傳送使用者輸入到後端
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.reply) {
+                    // 顯示系統的回覆訊息
+                    const responseDiv = document.createElement('div');
+                    responseDiv.classList.add('chat-response');
+                    responseDiv.textContent = data.reply;
+                    chatBox.appendChild(responseDiv);
+                    chatBox.scrollTop = chatBox.scrollHeight;  // 自動捲動到最新訊息
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching OpenAI response:', error);
+                const errorBox = document.getElementById('error-message');
+                if (errorBox) {
+                    errorBox.innerText = 'Error: Could not retrieve a response from the server.\n' + error;
+                }
+            });
     }
+}
+
+function fetchOpenAIResponse(userInput) {
+    console.log("Sending user input to OpenAI...");
+
+    fetch(`${baseUrl}/chat_openai`, {
+        method: 'POST',
+        mode: 'cors',
+        credentials: 'include',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            message: userInput  // 將使用者輸入的內容發送到後端
+        })
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log("Response from OpenAI obtained:", data);
+            const chatBox = document.getElementById('chat-box');
+            if (chatBox) {
+                const responseDiv = document.createElement('div');
+                responseDiv.classList.add('chat-response');
+                responseDiv.textContent = data.reply || "No response from OpenAI";
+                chatBox.appendChild(responseDiv);
+                chatBox.scrollTop = chatBox.scrollHeight;  // 自動捲動到最新訊息
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching OpenAI response:', error);
+            const errorBox = document.getElementById('error-message');
+            if (errorBox) {
+                errorBox.innerText = 'Error: Could not retrieve a response from the server.\n' + error;
+            }
+        });
 }
 
 //////////////////////////////////////////////////////////////////////////////
