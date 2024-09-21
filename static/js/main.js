@@ -74,7 +74,7 @@ document.addEventListener('click', (event) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box,#chat-gpt-section, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section').forEach(section => {
+    document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section,#chat-gpt-section').forEach(section => {
         section.style.display = 'none';
     });
 });
@@ -1004,7 +1004,7 @@ function loadAIBoxSection(sectionId) {
                 </div>
             </div>`,
         'chat-gpt': `
-            <div class="section" id="chat-gpt">
+            <div class="section" id="chat-gpt-section">
                 <h2>Chat GPT</h2>
                 <div class="chat-container">
                     <div id="chat-box" class="chat-box">
