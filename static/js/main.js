@@ -1046,15 +1046,23 @@ function sendMessage() {
         // 發送請求到 Flask 後端
         fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
-            mode: 'no-cors',  // 使用 no-cors 模式
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ message: message })
         })
             .then(response => {
-                // 无法从响应中读取实际内容
-                console.log("Request sent, but cannot read response in no-cors mode");
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 顯示系統的回覆訊息
+                const responseDiv = document.createElement('div');
+                responseDiv.classList.add('chat-response');
+                responseDiv.textContent = data.reply;
+                chatBox.appendChild(responseDiv);
             })
             .catch(error => {
                 console.error('Error fetching OpenAI response:', error);
