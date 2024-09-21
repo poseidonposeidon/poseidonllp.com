@@ -72,7 +72,7 @@ document.addEventListener('click', (event) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section').forEach(section => {
+    document.querySelectorAll('#info-section, #ai_box,#chat_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section').forEach(section => {
         section.style.display = 'none';
     });
 });
@@ -1026,8 +1026,6 @@ function loadAIBoxSection(sectionId) {
     }
 }
 
-const baseUrl = 'https://api.poseidonllp.com';  // 使用你的 API Base URL
-
 function sendMessage() {
     const inputField = document.getElementById('chat-input');
     const chatBox = document.getElementById('chat-box');
@@ -1073,7 +1071,6 @@ function sendMessage() {
             });
     }
 }
-
 
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
