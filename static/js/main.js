@@ -1044,24 +1044,21 @@ function sendMessage() {
         inputField.value = '';
 
         // 發送請求到 Flask 後端
-        fetch(`${baseUrl}/chat_openai`, {
+        ffetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
-            mode: 'no-cors',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',  // 確保這裡是正確的
             },
             body: JSON.stringify({ message: message })
         })
             .then(response => {
-                if (response.status >= 200 && response.status < 300) {
-                    console.log("Request successful, but no response body due to no-cors mode.");
-                } else {
-                    console.error(`Request failed with status: ${response.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                return response.json();
             })
             .then(data => {
                 if (data.reply) {
-                    // 顯示系統的回覆訊息
                     const responseDiv = document.createElement('div');
                     responseDiv.classList.add('chat-response');
                     responseDiv.textContent = data.reply;
@@ -1073,11 +1070,8 @@ function sendMessage() {
             })
             .catch(error => {
                 console.error('Error fetching OpenAI response:', error);
-                const errorBox = document.getElementById('error-message');
-                if (errorBox) {
-                    errorBox.innerText = 'Error: Could not retrieve a response from the server.\n' + error;
-                }
             });
+
     }
 }
 
