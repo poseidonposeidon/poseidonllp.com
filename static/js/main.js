@@ -1043,16 +1043,22 @@ function sendMessage() {
 
         fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
-            mode: 'no-cors',  // 仍然會限制回應數據
+            // mode: 'no-cors',  // 仍然會限制回應數據
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ message: message })
         })
-            .then(() => {
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json(); // 解析回應為 JSON
+            })
+            .then(data => {
                 const responseDiv = document.createElement('div');
                 responseDiv.classList.add('chat-response');
-                responseDiv.textContent = 'Request sent, but no response due to no-cors mode';
+                responseDiv.textContent = data.reply || 'No response from API';
                 chatBox.appendChild(responseDiv);
             })
             .catch(error => {
