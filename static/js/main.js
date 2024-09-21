@@ -1042,15 +1042,19 @@ function sendMessage() {
         inputField.value = '';
 
         // 發送請求到 Flask 後端
-        fetch(`${baseUrl}/chat_openai`, {  // 確保使用 baseUrl
+        fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
-            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ message: message })  // 傳送使用者輸入到後端
+            body: JSON.stringify({ message: message })
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.reply) {
                     // 顯示系統的回覆訊息
@@ -1058,7 +1062,7 @@ function sendMessage() {
                     responseDiv.classList.add('chat-response');
                     responseDiv.textContent = data.reply;
                     chatBox.appendChild(responseDiv);
-                    chatBox.scrollTop = chatBox.scrollHeight;  // 自動捲動到最新訊息
+                    chatBox.scrollTop = chatBox.scrollHeight;
                 } else {
                     console.error('No reply from OpenAI.');
                 }
@@ -1072,7 +1076,7 @@ function sendMessage() {
             });
     }
 }
-
+v
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
