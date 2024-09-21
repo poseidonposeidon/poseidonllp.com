@@ -1046,6 +1046,7 @@ function sendMessage() {
         // 發送請求到 Flask 後端
         fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
+            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json'
             },
