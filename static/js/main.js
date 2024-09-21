@@ -17,10 +17,16 @@ function collapseSection(element) {
 function toggleSection(event, sectionId) {
     event.preventDefault();
     event.stopPropagation(); // 防止事件冒泡影響其他點擊事件
+
     const section = document.querySelector(sectionId);
     if (!section) {
         console.error('Section not found:', sectionId);
         return;
+    }
+
+    // 如果當前點擊的區塊已經是 activeSection，且是 ai_box，則直接返回，不做任何操作
+    if (activeSection === section && sectionId === '#ai_box') {
+        return; // 不做任何操作，因為已經是同一個區塊
     }
 
     const overlay = document.querySelector('.overlay');
