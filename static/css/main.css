@@ -621,6 +621,8 @@ button:not(.info-input button):hover {
     padding: 10px;
     overflow-y: auto;
     border-bottom: 1px solid #616161;
+    display: flex;
+    flex-direction: column;
 }
 
 .chat-input-container {
@@ -639,28 +641,34 @@ button:not(.info-input button):hover {
 }
 
 .chat-message, .chat-response {
-    background-color: #333;
     padding: 10px;
     margin: 5px 0;
-    border-radius: 5px;
-    max-width: 70%; /* 限制訊息寬度，根據內容自動調整 */
-    word-wrap: break-word; /* 確保長訊息換行 */
+    border-radius: 10px;
+    max-width: 60%; /* 根據訊息長度自動調整 */
+    word-wrap: break-word; /* 確保訊息過長時換行 */
+    display: inline-block; /* 讓訊息不佔滿整行 */
 }
 
 .chat-message {
-    align-self: flex-start; /* 使用者訊息靠左 */
-    background-color: #444; /* 修改使用者訊息背景顏色 */
-    border-top-left-radius: 5px;
-    border-top-right-radius: 20px;
-    border-bottom-right-radius: 20px;
+    align-self: flex-end; /* 使用者訊息靠右 */
+    background-color: #444; /* 使用者訊息背景顏色 */
+    border-radius: 20px 20px 0 20px; /* 自定義圓角樣式 */
 }
 
 .chat-response {
-    align-self: flex-end; /* 系統訊息靠右 */
-    background-color: #666; /* 修改系統回應訊息背景顏色 */
-    border-top-right-radius: 5px;
-    border-top-left-radius: 20px;
-    border-bottom-left-radius: 20px;
+    align-self: flex-start; /* 系統訊息靠左 */
+    background-color: #666; /* 系統回復訊息背景顏色 */
+    border-radius: 20px 20px 20px 0; /* 自定義圓角樣式 */
+}
+
+#chat-input {
+    flex: 1;
+    margin-right: 10px;
+    padding: 5px;
+    background-color: #121212;
+    border: 1px solid #616161;
+    border-radius: 5px;
+    color: #e0e0e0;
 }
 
 /* Loader 樣式 */
