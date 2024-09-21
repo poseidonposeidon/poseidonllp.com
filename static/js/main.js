@@ -1044,7 +1044,7 @@ function sendMessage() {
         inputField.value = '';
 
         // 發送請求到 Flask 後端
-        ffetch(`${baseUrl}/chat_openai`, {
+        fetch(`${baseUrl}/chat_openai`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',  // 確保這裡是正確的
