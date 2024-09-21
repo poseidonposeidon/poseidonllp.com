@@ -74,7 +74,7 @@ document.addEventListener('click', (event) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box,#chat_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section').forEach(section => {
+    document.querySelectorAll('#info-section, #ai_box,#chat-gpt-section, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section').forEach(section => {
         section.style.display = 'none';
     });
 });
