@@ -1026,7 +1026,7 @@ function loadAIBoxSection(sectionId) {
     }
 }
 
-const baseUrl = 'https://api.poseidonllp.com';
+const baseUrl = 'https://api.poseidonllp.com';  // 使用你的 API Base URL
 
 function sendMessage() {
     const inputField = document.getElementById('chat-input');
@@ -1044,7 +1044,7 @@ function sendMessage() {
         inputField.value = '';
 
         // 發送請求到 Flask 後端
-        fetch(`${baseUrl}/chat_openai`, {  // 更新為使用 baseUrl
+        fetch(`${baseUrl}/chat_openai`, {  // 確保使用 baseUrl
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1060,6 +1060,8 @@ function sendMessage() {
                     responseDiv.textContent = data.reply;
                     chatBox.appendChild(responseDiv);
                     chatBox.scrollTop = chatBox.scrollHeight;  // 自動捲動到最新訊息
+                } else {
+                    console.error('No reply from OpenAI.');
                 }
             })
             .catch(error => {
@@ -1072,45 +1074,6 @@ function sendMessage() {
     }
 }
 
-function fetchOpenAIResponse(userInput) {
-    console.log("Sending user input to OpenAI...");
-
-    fetch(`${baseUrl}/chat_openai`, {
-        method: 'POST',
-        mode: 'cors',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            message: userInput  // 將使用者輸入的內容發送到後端
-        })
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("Response from OpenAI obtained:", data);
-            const chatBox = document.getElementById('chat-box');
-            if (chatBox) {
-                const responseDiv = document.createElement('div');
-                responseDiv.classList.add('chat-response');
-                responseDiv.textContent = data.reply || "No response from OpenAI";
-                chatBox.appendChild(responseDiv);
-                chatBox.scrollTop = chatBox.scrollHeight;  // 自動捲動到最新訊息
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching OpenAI response:', error);
-            const errorBox = document.getElementById('error-message');
-            if (errorBox) {
-                errorBox.innerText = 'Error: Could not retrieve a response from the server.\n' + error;
-            }
-        });
-}
 
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
