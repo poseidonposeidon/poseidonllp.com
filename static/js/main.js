@@ -1039,22 +1039,16 @@ function sendMessage() {
         messageDiv.textContent = message;
         chatBox.appendChild(messageDiv);
 
-        inputField.value = '';  // Clear input field
+        inputField.value = '';  // 清空輸入框
 
-        fetch(`${baseUrl}/chat_openai`, {
+        fetch('http://localhost:3000/chat_openai', {  // 指向你的代理伺服器
             method: 'POST',
-            mode: 'no-cors',  // 仍然會限制回應數據
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({ message: message })
         })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json(); // 解析回應為 JSON
-            })
+            .then(response => response.json())
             .then(data => {
                 const responseDiv = document.createElement('div');
                 responseDiv.classList.add('chat-response');
@@ -1068,9 +1062,9 @@ function sendMessage() {
                     errorBox.innerText = 'Error: ' + error.message;
                 }
             });
-
     }
 }
+
 
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
