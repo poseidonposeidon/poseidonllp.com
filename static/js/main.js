@@ -1046,6 +1046,7 @@ function sendMessage() {
             headers: {
                 'Content-Type': 'application/json'
             },
+            credentials: 'include', // 確保 Cookies 或其他憑證被包含
             body: JSON.stringify({ message: message })
         })
             .then(response => {
