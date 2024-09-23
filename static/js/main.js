@@ -1,7 +1,6 @@
 
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
-const baseUrl = 'https://api.poseidonllp.com';
 
 
 function collapseSection(element) {
@@ -1035,6 +1034,8 @@ function loadAIBoxSection(sectionId) {
         setInterval(updateQueueLength, 5000); // 每5秒更新一次排程長度
     }
 }
+
+const baseUrl = 'https://api.poseidonllp.com';
 
 function sendMessage() {
     const inputField = document.getElementById('chat-input');
