@@ -1037,6 +1037,13 @@ function loadAIBoxSection(sectionId) {
 
 const baseUrl = 'https://api.poseidonllp.com';
 
+document.getElementById('chat-input').addEventListener('keypress', function(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault();  // 防止換行
+        sendMessage();  // 呼叫發送訊息的函數
+    }
+});
+
 function sendMessage() {
     const inputField = document.getElementById('chat-input');
     const chatBox = document.getElementById('chat-box');
@@ -1049,6 +1056,15 @@ function sendMessage() {
         chatBox.appendChild(messageDiv);
 
         inputField.value = '';  // 清除輸入欄位
+
+        // 創建 "Loading..." 提示
+        const loadingDiv = document.createElement('div');
+        loadingDiv.classList.add('chat-loading');
+        loadingDiv.textContent = 'Loading...';
+        chatBox.appendChild(loadingDiv);
+
+        // 滾動到最新的聊天內容
+        chatBox.scrollTop = chatBox.scrollHeight;
 
         fetch(`${baseUrl}/chat_llm`, {  // 修改成新的路徑
             method: 'POST',
@@ -1064,6 +1080,10 @@ function sendMessage() {
                 return response.json(); // 解析回應為 JSON
             })
             .then(data => {
+                // 刪除 "Loading..." 提示
+                chatBox.removeChild(loadingDiv);
+
+                // 顯示 AI 回覆
                 const responseDiv = document.createElement('div');
                 responseDiv.classList.add('chat-response');
                 responseDiv.textContent = data.reply || '此功能測試中';  // 當回應為空時顯示 "此功能測試中"
@@ -1071,12 +1091,11 @@ function sendMessage() {
             })
             .catch(error => {
                 console.error('Error fetching LLM response:', error);
-                const errorBox = document.getElementById('error-message');
-                if (errorBox) {
-                    errorBox.innerText = 'Error: ' + error.message;
-                }
 
-                // 顯示 "此功能測試中" 當 API 回應錯誤
+                // 刪除 "Loading..." 提示
+                chatBox.removeChild(loadingDiv);
+
+                // 顯示錯誤訊息或 "此功能測試中"
                 const responseDiv = document.createElement('div');
                 responseDiv.classList.add('chat-response');
                 responseDiv.textContent = '此功能測試中';
