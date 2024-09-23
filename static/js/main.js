@@ -1037,12 +1037,12 @@ function loadAIBoxSection(sectionId) {
 
 const baseUrl = 'https://api.poseidonllp.com';
 
-document.getElementById('chat-input').addEventListener('keypress', function(event) {
-    if (event.key === 'Enter') {
-        event.preventDefault();  // 防止換行
-        sendMessage();  // 呼叫發送訊息的函數
-    }
-});
+// document.getElementById('chat-input').addEventListener('keypress', function(event) {
+//     if (event.key === 'Enter') {
+//         event.preventDefault();  // 防止換行
+//         sendMessage();  // 呼叫發送訊息的函數
+//     }
+// });
 
 function sendMessage() {
     const inputField = document.getElementById('chat-input');
