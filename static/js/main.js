@@ -1050,7 +1050,7 @@ function sendMessage() {
 
         inputField.value = '';  // 清除輸入欄位
 
-        fetch(`${baseUrl}/chat_openai`, {
+        fetch(`${baseUrl}/chat_llm`, {  // 修改成新的路徑
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -1070,7 +1070,7 @@ function sendMessage() {
                 chatBox.appendChild(responseDiv);
             })
             .catch(error => {
-                console.error('Error fetching OpenAI response:', error);
+                console.error('Error fetching LLM response:', error);
                 const errorBox = document.getElementById('error-message');
                 if (errorBox) {
                     errorBox.innerText = 'Error: ' + error.message;
