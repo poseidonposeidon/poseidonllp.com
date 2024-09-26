@@ -2162,6 +2162,13 @@ function fetchIncomeStatement() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
+
+    // 新增：本益比河流圖的 API 請求
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+
+    // 獲取本益比河流圖的數據
+    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart);
 }
 
 function fetchJPIncomeStatement() {
@@ -2252,6 +2259,46 @@ function fetchCNIncomeStatement() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
+}
+
+function fetchPEBandData(priceApiUrl, epsApiUrl, callback) {
+    // 並行請求股價和 EPS 數據
+    Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
+        .then(responses => Promise.all(responses.map(response => response.json())))
+        .then(([priceData, epsData]) => {
+            if (priceData.historical && Array.isArray(epsData)) {
+                const peData = calculatePEData(priceData.historical, epsData);
+                callback(peData, 'peBandChart'); // 顯示圖表
+            } else {
+                console.error("Invalid data from price or EPS API");
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching PE Band data:', error);
+        });
+}
+
+function calculatePEData(priceData, epsData) {
+    const peData = priceData.map(priceEntry => {
+        const date = priceEntry.date;
+        // 尋找最接近的 EPS 日期
+        const matchingEpsEntry = epsData.find(epsEntry => {
+            // 假設日期格式一致，你可以調整這個條件來適應不同的日期格式
+            return new Date(epsEntry.date) <= new Date(date);
+        });
+
+        // 確保有對應的 EPS 數據，並計算本益比
+        if (matchingEpsEntry && matchingEpsEntry.eps) {
+            const peRatio = priceEntry.close / matchingEpsEntry.eps;
+            return {
+                date: date,
+                peRatio: peRatio,
+            };
+        }
+        return null;
+    }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 的數據
+
+    return peData;
 }
 
 function resetState(chartId, containerId) {
@@ -2469,6 +2516,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         <div id="chartContainer" style="margin-top: 20px;">
             <canvas id="${chartId}"></canvas>
         </div>
+        <!-- 新增本益比河流圖的canvas -->
+        <div id="peBandContainer" style="margin-top: 20px;">
+            <canvas id="peBandChart"></canvas>
+        </div>
     `;
 
     // 設置scroll位置
@@ -2485,6 +2536,11 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 創建圖表，僅使用篩選後的數據（刪除多出來的那一年）
     createOperatingChart(filteredDataForChart, operatingChartId);
     createIncomeStatementChart(filteredDataForChart, chartId);
+
+    // 新增：創建本益比河流圖
+    fetchPEBandData(`https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?apikey=YOUR_API_KEY`,
+        `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=120&apikey=YOUR_API_KEY`,
+        displayPEBandChart);
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline';
@@ -2713,6 +2769,46 @@ function createIncomeStatementChart(data, chartId) {
                 }
             }
         }
+    });
+}
+
+function displayPEBandChart(peData, chartId) {
+    const ctx = document.getElementById(chartId).getContext('2d');
+    const dates = peData.map(entry => entry.date);
+    const peRatios = peData.map(entry => entry.peRatio);
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'P/E Ratio',
+                data: peRatios,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                fill: false,
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'year',
+                        tooltipFormat: 'YYYY-MM-DD',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Date',
+                    },
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'P/E Ratio',
+                    },
+                },
+            },
+        },
     });
 }
 
