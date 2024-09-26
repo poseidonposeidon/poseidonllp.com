@@ -2538,8 +2538,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     createIncomeStatementChart(filteredDataForChart, chartId);
 
     // 新增：創建本益比河流圖
-    fetchPEBandData(`https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?apikey=YOUR_API_KEY`,
-        `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=120&apikey=YOUR_API_KEY`,
+    fetchPEBandData(`https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
+        `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=120&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
         displayPEBandChart);
 
     const expandButton = document.getElementById('expandButton_Income');
