@@ -2802,7 +2802,7 @@ function displayPEBandChart(peData, chartId) {
                     type: 'time',
                     time: {
                         unit: 'year',
-                        tooltipFormat: 'YYYY-MM-DD',
+                        tooltipFormat: 'yyyy-MM-dd', // 正確的日期格式
                     },
                     title: {
                         display: true,
