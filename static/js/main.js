@@ -2146,7 +2146,6 @@ function displayCompanyPrice(data, container) {
 
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-
 let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
 let peBandChartInstance = null; // 儲存 P/E Band 圖表實例
@@ -2154,8 +2153,8 @@ let peBandChartInstance = null; // 儲存 P/E Band 圖表實例
 function fetchIncomeStatement() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
-    const yearRange = document.getElementById('yearRange').value;
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的實際 API 密鑰
+    const yearRange = document.getElementById('yearRange').value; // 取得年份範圍
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -2163,14 +2162,16 @@ function fetchIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+
+    // 傳入年份範圍
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
 
     // 新增：本益比河流圖的 API 請求
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
     const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
 
-    // 獲取本益比河流圖的數據
-    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart);
+    // 獲取本益比河流圖的數據，傳入年份範圍參數
+    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart, yearRange);
 }
 
 function fetchJPIncomeStatement() {
@@ -2263,13 +2264,19 @@ function fetchCNIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
 }
 
-function fetchPEBandData(priceApiUrl, epsApiUrl, callback) {
+function fetchPEBandData(priceApiUrl, epsApiUrl, callback, yearRange) {
     // 並行請求股價和 EPS 數據
     Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
             if (priceData.historical && Array.isArray(epsData)) {
-                const peData = calculatePEData(priceData.historical, epsData);
+                // 計算本益比，並應用年份範圍
+                const peData = calculatePEData(priceData.historical, epsData).filter(entry => {
+                    const entryYear = new Date(entry.date).getFullYear();
+                    const currentYear = new Date().getFullYear();
+                    return yearRange === 'all' || (currentYear - entryYear <= parseInt(yearRange));
+                });
+
                 callback(peData, 'peBandChart'); // 顯示圖表
             } else {
                 console.error("Invalid data from price or EPS API");
@@ -2588,16 +2595,16 @@ function downloadExcel(rows, symbol) {
 }
 
 function updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange) {
-    if (!data || !Array.isArray(data)) {
-        console.error("Data is undefined or not an array");
-        return;
-    }
-
     const currentYear = new Date().getFullYear();
+
+    // 根據年份範圍篩選資料
     const filteredData = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= yearRange);
+        // 篩選年份範圍，若選擇"all"，則不限制年份
+        return yearRange === 'all' || (currentYear - entryYear <= parseInt(yearRange));
     });
+
+    // 繪製圖表，並顯示資料
     displayIncomeStatement(filteredData, container, chartId, operatingChartId, period, yearRange);
 }
 
