@@ -2321,6 +2321,9 @@ function calculatePEData(priceData, epsData, yearRange) {
         startYear = currentYear - 10;
     } else if (yearRange === 'all') {
         startYear = 0; // 表示不限制年份
+    } else {
+        console.error('Invalid year range provided.');
+        return [];
     }
 
     const peData = priceData.map(priceEntry => {
@@ -2332,7 +2335,7 @@ function calculatePEData(priceData, epsData, yearRange) {
                 return new Date(epsEntry.date) <= new Date(priceEntry.date);
             });
 
-            if (matchingEpsEntry && matchingEpsEntry.eps) {
+            if (matchingEpsEntry && matchingEpsEntry.eps && matchingEpsEntry.eps > 0) {
                 const peRatio = priceEntry.close / matchingEpsEntry.eps;
                 return {
                     date: priceEntry.date,
@@ -2342,6 +2345,11 @@ function calculatePEData(priceData, epsData, yearRange) {
         }
         return null;
     }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 或不符合年份範圍的數據
+
+    // 檢查是否存在篩選後的資料
+    if (peData.length === 0) {
+        console.warn('No P/E data available after filtering by year range.');
+    }
 
     return peData;
 }
@@ -2825,6 +2833,12 @@ function displayPEBandChart(peData, chartId) {
     // 檢查舊的圖表實例，並銷毀它
     if (peBandChartInstance) {
         peBandChartInstance.destroy();
+        peBandChartInstance = null;
+    }
+
+    if (dates.length === 0 || peRatios.length === 0) {
+        console.error('No data available for P/E ratio chart.');
+        return;
     }
 
     // 創建新的圖表實例
@@ -2857,6 +2871,7 @@ function displayPEBandChart(peData, chartId) {
                         display: true,
                         text: 'P/E Ratio',
                     },
+                    beginAtZero: true // 確保 y 軸從 0 開始
                 },
             },
         },
