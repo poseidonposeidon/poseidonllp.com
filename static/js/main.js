@@ -2169,8 +2169,8 @@ function fetchIncomeStatement() {
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
     const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
 
-    // 獲取本益比河流圖的數據
-    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart);
+    // 將 period 和 yearRange 作為參數傳遞，並依據範圍進行篩選和繪圖
+    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart, period, yearRange);
 }
 
 function fetchJPIncomeStatement() {
@@ -2185,7 +2185,12 @@ function fetchJPIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period , yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period, yearRange);
+
+    // 新增：本益比河流圖 API 請求
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart, period, yearRange);
 }
 
 async function fetchTWIncomeStatement() {
@@ -2200,7 +2205,12 @@ async function fetchTWIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period ,yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period, yearRange);
+
+    // 新增：本益比河流圖 API 請求
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart, period, yearRange);
 }
 
 function fetchEUIncomeStatement() {
@@ -2215,7 +2225,12 @@ function fetchEUIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period ,yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period, yearRange);
+
+    // 新增：本益比河流圖 API 請求
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart, period, yearRange);
 }
 
 function fetchKRIncomeStatement() {
@@ -2230,7 +2245,12 @@ function fetchKRIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period ,yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period, yearRange);
+
+    // 新增：本益比河流圖 API 請求
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart, period, yearRange);
 }
 
 function fetchHKIncomeStatement() {
@@ -2245,7 +2265,12 @@ function fetchHKIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period ,yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period, yearRange);
+
+    // 新增：本益比河流圖 API 請求
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart, period, yearRange);
 }
 
 function fetchCNIncomeStatement() {
@@ -2260,16 +2285,21 @@ function fetchCNIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period, yearRange);
+
+    // 新增：本益比河流圖 API 請求
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart, period, yearRange);
 }
 
-function fetchPEBandData(priceApiUrl, epsApiUrl, callback) {
+function fetchPEBandData(priceApiUrl, epsApiUrl, callback, period, yearRange) {
     // 並行請求股價和 EPS 數據
     Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
             if (priceData.historical && Array.isArray(epsData)) {
-                const peData = calculatePEData(priceData.historical, epsData);
+                const peData = calculatePEData(priceData.historical, epsData, yearRange); // 傳遞 yearRange 進行數據篩選
                 callback(peData, 'peBandChart'); // 顯示圖表
             } else {
                 console.error("Invalid data from price or EPS API");
@@ -2280,25 +2310,38 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, callback) {
         });
 }
 
-function calculatePEData(priceData, epsData) {
-    const peData = priceData.map(priceEntry => {
-        const date = priceEntry.date;
-        // 尋找最接近的 EPS 日期
-        const matchingEpsEntry = epsData.find(epsEntry => {
-            // 假設日期格式一致，你可以調整這個條件來適應不同的日期格式
-            return new Date(epsEntry.date) <= new Date(date);
-        });
+function calculatePEData(priceData, epsData, yearRange) {
+    const currentYear = new Date().getFullYear();
+    let startYear;
 
-        // 確保有對應的 EPS 數據，並計算本益比
-        if (matchingEpsEntry && matchingEpsEntry.eps) {
-            const peRatio = priceEntry.close / matchingEpsEntry.eps;
-            return {
-                date: date,
-                peRatio: peRatio,
-            };
+    // 根據 yearRange 計算起始年份
+    if (yearRange === '5') {
+        startYear = currentYear - 5;
+    } else if (yearRange === '10') {
+        startYear = currentYear - 10;
+    } else if (yearRange === 'all') {
+        startYear = 0; // 表示不限制年份
+    }
+
+    const peData = priceData.map(priceEntry => {
+        const entryYear = new Date(priceEntry.date).getFullYear();
+
+        // 根據年份篩選數據
+        if (entryYear >= startYear) {
+            const matchingEpsEntry = epsData.find(epsEntry => {
+                return new Date(epsEntry.date) <= new Date(priceEntry.date);
+            });
+
+            if (matchingEpsEntry && matchingEpsEntry.eps) {
+                const peRatio = priceEntry.close / matchingEpsEntry.eps;
+                return {
+                    date: priceEntry.date,
+                    peRatio: peRatio,
+                };
+            }
         }
         return null;
-    }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 的數據
+    }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 或不符合年份範圍的數據
 
     return peData;
 }
