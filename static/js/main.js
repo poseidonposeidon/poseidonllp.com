@@ -2298,6 +2298,9 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, callback, period, yearRange) {
     Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
+            console.log('Price Data:', priceData);
+            console.log('EPS Data:', epsData);
+
             if (priceData.historical && Array.isArray(epsData)) {
                 const peData = calculatePEData(priceData.historical, epsData, yearRange); // 傳遞 yearRange 進行數據篩選
                 callback(peData, 'peBandChart'); // 顯示圖表
@@ -2323,7 +2326,7 @@ function calculatePEData(priceData, epsData, yearRange) {
         startYear = 0; // 表示不限制年份
     } else {
         console.error('Invalid year range provided.');
-        return [];
+        return []; // 返回空陣列，避免後續的計算錯誤
     }
 
     const peData = priceData.map(priceEntry => {
@@ -2346,7 +2349,6 @@ function calculatePEData(priceData, epsData, yearRange) {
         return null;
     }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 或不符合年份範圍的數據
 
-    // 檢查是否存在篩選後的資料
     if (peData.length === 0) {
         console.warn('No P/E data available after filtering by year range.');
     }
