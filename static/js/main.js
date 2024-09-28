@@ -2154,8 +2154,8 @@ let peBandChartInstance = null; // 儲存 P/E Band 圖表實例
 function fetchIncomeStatement() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
-    const yearRange = document.getElementById('yearRange').value;
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的實際 API 密鑰
+    const yearRange = document.getElementById('yearRange').value; // 確保讀取正確
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -2163,13 +2163,14 @@ function fetchIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
 
     // 新增：本益比河流圖的 API 請求
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
     const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
 
-    // 獲取本益比河流圖的數據，並傳遞 yearRange
+    // 確保 yearRange 被正確傳遞
     fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, displayPEBandChart);
 }
 
@@ -2283,9 +2284,10 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, displayPEBandChart) 
 function calculatePEData(priceData, epsData, yearRange) {
     const currentYear = new Date().getFullYear();
 
+    // 確保 yearRange 是數字，並過濾 priceData 只保留符合 yearRange 的數據
     const filteredPriceData = priceData.filter(priceEntry => {
         const entryYear = new Date(priceEntry.date).getFullYear();
-        return yearRange === 'all' || (currentYear - entryYear <= yearRange);
+        return yearRange === 'all' || (currentYear - entryYear <= parseInt(yearRange, 10));
     });
 
     // 計算 P/E Ratio
@@ -2783,10 +2785,12 @@ function displayPEBandChart(peData, chartId) {
     const dates = peData.map(entry => entry.date);
     const peRatios = peData.map(entry => entry.peRatio);
 
+    // 檢查舊的圖表實例，並銷毀它
     if (peBandChartInstance) {
         peBandChartInstance.destroy();
     }
 
+    // 創建新的圖表實例
     peBandChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -2821,9 +2825,6 @@ function displayPEBandChart(peData, chartId) {
         },
     });
 }
-
-// 確保在 fetchPEBandData 中正確傳遞了 callback
-
 
 function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
