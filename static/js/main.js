@@ -2148,7 +2148,7 @@ function displayCompanyPrice(data, container) {
 
 let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
-let peBandChartInstance = {}; // 儲存 P/E Band 圖表實例
+let peBandChartInstances = {};
 
 function fetchIncomeStatement() {
     const stockSymbol = fetchStock();
@@ -2819,6 +2819,7 @@ function displayPEBandChart(peData, chartId) {
         peBandChartInstances[chartId].destroy();
     }
 
+    // 創建新的圖表實例
     peBandChartInstances[chartId] = new Chart(ctx, {
         type: 'line',
         data: {
