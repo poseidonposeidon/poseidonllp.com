@@ -2838,6 +2838,8 @@ function displayPEBandChart(peData, chartId) {
     });
 }
 
+fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, displayPEBandChart);
+
 function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
