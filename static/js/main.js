@@ -2151,6 +2151,59 @@ let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的�
 
 let peBandChartInstance = null; // 儲存 P/E Band 圖表實例
 
+function displayPEBandChart(peData, chartId) {
+    const ctx = document.getElementById(chartId).getContext('2d');
+
+    // 檢查是否有足夠的數據來繪製圖表
+    if (!peData || peData.length === 0) {
+        console.error('No data available for P/E Band chart');
+        return;
+    }
+
+    const dates = peData.map(entry => entry.date);
+    const peRatios = peData.map(entry => entry.peRatio);
+
+    // 檢查舊的圖表實例，並銷毀它
+    if (peBandChartInstance) {
+        peBandChartInstance.destroy();
+    }
+
+    // 創建新的圖表實例
+    peBandChartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates,
+            datasets: [{
+                label: 'P/E Ratio',
+                data: peRatios,
+                borderColor: 'rgba(75, 192, 192, 1)',
+                fill: false,
+            }]
+        },
+        options: {
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'year',
+                        tooltipFormat: 'yyyy-MM-dd',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Date',
+                    },
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'P/E Ratio',
+                    },
+                },
+            },
+        },
+    });
+}
+
 function fetchIncomeStatement() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
@@ -2262,59 +2315,6 @@ function fetchCNIncomeStatement() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
-}
-
-function displayPEBandChart(peData, chartId) {
-    const ctx = document.getElementById(chartId).getContext('2d');
-
-    // 檢查是否有足夠的數據來繪製圖表
-    if (!peData || peData.length === 0) {
-        console.error('No data available for P/E Band chart');
-        return;
-    }
-
-    const dates = peData.map(entry => entry.date);
-    const peRatios = peData.map(entry => entry.peRatio);
-
-    // 檢查舊的圖表實例，並銷毀它
-    if (peBandChartInstance) {
-        peBandChartInstance.destroy();
-    }
-
-    // 創建新的圖表實例
-    peBandChartInstance = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: dates,
-            datasets: [{
-                label: 'P/E Ratio',
-                data: peRatios,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                fill: false,
-            }]
-        },
-        options: {
-            scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'year',
-                        tooltipFormat: 'yyyy-MM-dd',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Date',
-                    },
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'P/E Ratio',
-                    },
-                },
-            },
-        },
-    });
 }
 
 function fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, displayPEBandChart) {
@@ -2837,7 +2837,6 @@ function createIncomeStatementChart(data, chartId) {
         }
     });
 }
-
 
 function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
