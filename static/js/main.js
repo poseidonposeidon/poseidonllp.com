@@ -2263,14 +2263,14 @@ function fetchCNIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
 }
 
-function fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, callback) {
+function fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, displayPEBandChart) {
     // 並行請求股價和 EPS 數據
     Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
             if (priceData.historical && Array.isArray(epsData)) {
                 const peData = calculatePEData(priceData.historical, epsData, yearRange);
-                callback(peData, 'peBandChart'); // 顯示圖表
+                displayPEBandChart(peData, 'peBandChart'); // 顯示圖表
             } else {
                 console.error("Invalid data from price or EPS API");
             }
@@ -2283,12 +2283,12 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, callback) {
 function calculatePEData(priceData, epsData, yearRange) {
     const currentYear = new Date().getFullYear();
 
-    // 過濾priceData以符合選取的年份範圍
     const filteredPriceData = priceData.filter(priceEntry => {
         const entryYear = new Date(priceEntry.date).getFullYear();
         return yearRange === 'all' || (currentYear - entryYear <= yearRange);
     });
 
+    // 計算 P/E Ratio
     const peData = filteredPriceData.map(priceEntry => {
         const date = priceEntry.date;
         const matchingEpsEntry = epsData.find(epsEntry => new Date(epsEntry.date) <= new Date(date));
