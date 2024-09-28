@@ -2154,7 +2154,6 @@ let peBandChartInstance = null; // 儲存 P/E Band 圖表實例
 function displayPEBandChart(peData, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 檢查是否有足夠的數據來繪製圖表
     if (!peData || peData.length === 0) {
         console.error('No data available for P/E Band chart');
         return;
@@ -2318,7 +2317,6 @@ function fetchCNIncomeStatement() {
 }
 
 function fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, displayPEBandChart) {
-    // 確認 displayPEBandChart 是一個函數
     if (typeof displayPEBandChart !== 'function') {
         console.error('displayPEBandChart is not a function');
         return;
@@ -2329,6 +2327,7 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, displayPEBandChart) 
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
             if (priceData.historical && Array.isArray(epsData)) {
+                // 確保 yearRange 被正確應用
                 const peData = calculatePEData(priceData.historical, epsData, yearRange);
                 displayPEBandChart(peData, 'peBandChart'); // 顯示圖表
             } else {
@@ -2343,13 +2342,12 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, displayPEBandChart) 
 function calculatePEData(priceData, epsData, yearRange) {
     const currentYear = new Date().getFullYear();
 
-    // 確保 yearRange 是數字，並過濾 priceData 只保留符合 yearRange 的數據
+    // 將 yearRange 轉換為數字並應用篩選
     const filteredPriceData = priceData.filter(priceEntry => {
         const entryYear = new Date(priceEntry.date).getFullYear();
         return yearRange === 'all' || (currentYear - entryYear <= parseInt(yearRange, 10));
     });
 
-    // 計算 P/E Ratio
     const peData = filteredPriceData.map(priceEntry => {
         const date = priceEntry.date;
         const matchingEpsEntry = epsData.find(epsEntry => new Date(epsEntry.date) <= new Date(date));
