@@ -2292,20 +2292,20 @@ function calculatePEData(priceData, epsData) {
         const date = priceEntry.date;
         // 尋找最接近的 EPS 日期
         const matchingEpsEntry = epsData.find(epsEntry => {
-            // 假設日期格式一致，你可以調整這個條件來適應不同的日期格式
             return new Date(epsEntry.date) <= new Date(date);
         });
 
-        // 確保有對應的 EPS 數據，並計算本益比
-        if (matchingEpsEntry && matchingEpsEntry.eps) {
+        // 確保EPS數據存在且不為0，避免計算錯誤
+        if (matchingEpsEntry && matchingEpsEntry.eps && matchingEpsEntry.eps !== 0) {
             const peRatio = priceEntry.close / matchingEpsEntry.eps;
             return {
                 date: date,
                 peRatio: peRatio,
             };
         }
+        // 當EPS為0或沒有找到匹配數據時，返回null
         return null;
-    }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 的數據
+    }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 或EPS為0的數據
 
     return peData;
 }
@@ -2809,7 +2809,7 @@ function displayPEBandChart(peData, chartId) {
                     type: 'time',
                     time: {
                         unit: 'year',
-                        tooltipFormat: 'yyyy-MM-dd', // 正確的日期格式
+                        tooltipFormat: 'yyyy-MM-dd',
                     },
                     title: {
                         display: true,
@@ -2817,10 +2817,14 @@ function displayPEBandChart(peData, chartId) {
                     },
                 },
                 y: {
+                    beginAtZero: false, // 允許Y軸動態調整
                     title: {
                         display: true,
                         text: 'P/E Ratio',
                     },
+                    // 動態設置Y軸的範圍
+                    suggestedMin: Math.min(...peRatios) * 0.9,
+                    suggestedMax: Math.max(...peRatios) * 1.1,
                 },
             },
         },
