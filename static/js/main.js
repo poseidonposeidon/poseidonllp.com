@@ -2265,6 +2265,12 @@ function fetchCNIncomeStatement() {
 }
 
 function fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, displayPEBandChart) {
+    // 確認 displayPEBandChart 是一個函數
+    if (typeof displayPEBandChart !== 'function') {
+        console.error('displayPEBandChart is not a function');
+        return;
+    }
+
     // 並行請求股價和 EPS 數據
     Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
         .then(responses => Promise.all(responses.map(response => response.json())))
@@ -2779,9 +2785,15 @@ function createIncomeStatementChart(data, chartId) {
     });
 }
 
-// 確保函數定義
 function displayPEBandChart(peData, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
+
+    // 檢查是否有足夠的數據來繪製圖表
+    if (!peData || peData.length === 0) {
+        console.error('No data available for P/E Band chart');
+        return;
+    }
+
     const dates = peData.map(entry => entry.date);
     const peRatios = peData.map(entry => entry.peRatio);
 
