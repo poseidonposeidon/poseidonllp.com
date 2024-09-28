@@ -2169,8 +2169,8 @@ function fetchIncomeStatement() {
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
     const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
 
-    // 獲取本益比河流圖的數據
-    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart);
+    // 獲取本益比河流圖的數據，並傳遞 yearRange
+    fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, displayPEBandChart);
 }
 
 function fetchJPIncomeStatement() {
@@ -2263,13 +2263,13 @@ function fetchCNIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
 }
 
-function fetchPEBandData(priceApiUrl, epsApiUrl, callback) {
+function fetchPEBandData(priceApiUrl, epsApiUrl, yearRange, callback) {
     // 並行請求股價和 EPS 數據
     Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
             if (priceData.historical && Array.isArray(epsData)) {
-                const peData = calculatePEData(priceData.historical, epsData);
+                const peData = calculatePEData(priceData.historical, epsData, yearRange);
                 callback(peData, 'peBandChart'); // 顯示圖表
             } else {
                 console.error("Invalid data from price or EPS API");
@@ -2280,16 +2280,19 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, callback) {
         });
 }
 
-function calculatePEData(priceData, epsData) {
-    const peData = priceData.map(priceEntry => {
-        const date = priceEntry.date;
-        // 尋找最接近的 EPS 日期
-        const matchingEpsEntry = epsData.find(epsEntry => {
-            // 假設日期格式一致，你可以調整這個條件來適應不同的日期格式
-            return new Date(epsEntry.date) <= new Date(date);
-        });
+function calculatePEData(priceData, epsData, yearRange) {
+    const currentYear = new Date().getFullYear();
 
-        // 確保有對應的 EPS 數據，並計算本益比
+    // 過濾priceData以符合選取的年份範圍
+    const filteredPriceData = priceData.filter(priceEntry => {
+        const entryYear = new Date(priceEntry.date).getFullYear();
+        return yearRange === 'all' || (currentYear - entryYear <= yearRange);
+    });
+
+    const peData = filteredPriceData.map(priceEntry => {
+        const date = priceEntry.date;
+        const matchingEpsEntry = epsData.find(epsEntry => new Date(epsEntry.date) <= new Date(date));
+
         if (matchingEpsEntry && matchingEpsEntry.eps) {
             const peRatio = priceEntry.close / matchingEpsEntry.eps;
             return {
@@ -2298,7 +2301,7 @@ function calculatePEData(priceData, epsData) {
             };
         }
         return null;
-    }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 的數據
+    }).filter(entry => entry !== null);
 
     return peData;
 }
