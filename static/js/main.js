@@ -2375,7 +2375,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 過濾數據以包含多兩年的數據
     const filteredDataForTable = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 1)); // 表格顯示多兩年的數據
+        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 1));
     });
 
     const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
@@ -2545,7 +2545,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         </div>
         <!-- 新增本益比河流圖的canvas -->
         <div id="peBandContainer" style="margin-top: 20px;">
-            <canvas id="peBandChart"></canvas>
+            <canvas id="peBandChart_${chartId}"></canvas>
         </div>
     `;
 
@@ -2565,9 +2565,11 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     createIncomeStatementChart(filteredDataForChart, chartId);
 
     // 新增：創建本益比河流圖
-    fetchPEBandData(`https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
+    fetchPEBandData(
+        `https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
         `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=120&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
-        displayPEBandChart);
+        `peBandChart_${chartId}`
+    );
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline';
@@ -2800,16 +2802,23 @@ function createIncomeStatementChart(data, chartId) {
 }
 
 function displayPEBandChart(peData, chartId) {
-    const ctx = document.getElementById(chartId).getContext('2d');
+    const canvas = document.getElementById(chartId);
+
+    // 檢查 canvas 是否已正確生成
+    if (!canvas) {
+        console.error(`Canvas with ID ${chartId} not found.`);
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
     const dates = peData.map(entry => entry.date);
     const peRatios = peData.map(entry => entry.peRatio);
 
-    // 如果存在舊的 P/E Band 圖表，銷毀它
+    // 檢查是否已有先前的圖表實例
     if (peBandChartInstances[chartId]) {
         peBandChartInstances[chartId].destroy();
     }
 
-    // 創建新的 P/E Band 圖表
     peBandChartInstances[chartId] = new Chart(ctx, {
         type: 'line',
         data: {
