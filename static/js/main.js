@@ -2777,17 +2777,16 @@ function createIncomeStatementChart(data, chartId) {
     });
 }
 
+// 確保函數定義
 function displayPEBandChart(peData, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
     const dates = peData.map(entry => entry.date);
     const peRatios = peData.map(entry => entry.peRatio);
 
-    // 檢查舊的圖表實例，並銷毀它
     if (peBandChartInstance) {
         peBandChartInstance.destroy();
     }
 
-    // 創建新的圖表實例
     peBandChartInstance = new Chart(ctx, {
         type: 'line',
         data: {
@@ -2805,7 +2804,7 @@ function displayPEBandChart(peData, chartId) {
                     type: 'time',
                     time: {
                         unit: 'year',
-                        tooltipFormat: 'yyyy-MM-dd', // 正確的日期格式
+                        tooltipFormat: 'yyyy-MM-dd',
                     },
                     title: {
                         display: true,
@@ -2822,6 +2821,9 @@ function displayPEBandChart(peData, chartId) {
         },
     });
 }
+
+// 確保在 fetchPEBandData 中正確傳遞了 callback
+
 
 function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
