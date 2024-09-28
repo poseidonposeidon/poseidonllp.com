@@ -2782,11 +2782,23 @@ function createIncomeStatementChart(data, chartId) {
 }
 
 function displayPEBandChart(peData, chartId) {
-    const ctx = document.getElementById(chartId).getContext('2d');
+    // 檢查 canvas 元素是否存在
+    const canvasElement = document.getElementById(chartId);
+    if (!canvasElement) {
+        console.error(`Canvas element with id ${chartId} not found.`);
+        return;
+    }
+
+    const ctx = canvasElement.getContext('2d');
+    if (!ctx) {
+        console.error(`Failed to get context for canvas element with id ${chartId}`);
+        return;
+    }
+
     const dates = peData.map(entry => entry.date);
     const peRatios = peData.map(entry => entry.peRatio);
 
-    // 檢查舊的圖表實例，並銷毀它
+    // 如果之前有圖表實例，銷毀它
     if (peBandChartInstance) {
         peBandChartInstance.destroy();
     }
@@ -2817,14 +2829,10 @@ function displayPEBandChart(peData, chartId) {
                     },
                 },
                 y: {
-                    beginAtZero: false, // 允許Y軸動態調整
                     title: {
                         display: true,
                         text: 'P/E Ratio',
                     },
-                    // 動態設置Y軸的範圍
-                    suggestedMin: Math.min(...peRatios) * 0.9,
-                    suggestedMax: Math.max(...peRatios) * 1.1,
                 },
             },
         },
