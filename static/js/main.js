@@ -1035,12 +1035,11 @@ function loadAIBoxSection(sectionId) {
 }
 
 function loadCompareSection(sectionId) {
-    console.log("Loading section: " + sectionId);
     const sections = {
         'compare-tw': `
             <div class="section" id="compare-tw">
                 <h2>Compare Taiwan Stocks</h2>
-                <div class="content">
+                <div class="info-input">
                     <label for="stock1-tw">Enter Stock 1 (Taiwan):</label>
                     <input type="text" id="stock1-tw" placeholder="e.g., 2330">
                     
@@ -1048,15 +1047,15 @@ function loadCompareSection(sectionId) {
                     <input type="text" id="stock2-tw" placeholder="e.g., 2317">
                     
                     <button onclick="compareTaiwanStocks()">Compare</button>
-                    
-                    <div class="scroll-container-x" id="comparisonResultContainer-tw">
-                        <!-- Comparison results will be displayed here -->
-                    </div>
+                </div>
+                
+                <div id="comparisonResultContainer-tw">
+                    <!-- Comparison results will be displayed here -->
                 </div>
             </div>`
     };
 
-    const sectionContainer = document.getElementById('section-container');
+    const sectionContainer = document.getElementById('section-container-compare-tw');
     if (sectionContainer) {
         sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
         document.getElementById('compare-tw').style.display = 'block'; // 確保顯示
