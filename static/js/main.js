@@ -50,6 +50,13 @@ function toggleSection(event, sectionId) {
 
 function showSection(section) {
     section.style.display = 'block';
+    const content = section.querySelector('.content');
+    if (content) {
+        content.style.maxHeight = content.scrollHeight + 'px'; // 設置最大高度為內容高度
+        content.style.opacity = '1';
+        content.style.paddingTop = '';
+        content.style.paddingBottom = '';
+    }
     setTimeout(() => {
         section.classList.add('active');
         section.style.overflowY = 'auto'; // 確保展開後支援滾動
@@ -57,6 +64,13 @@ function showSection(section) {
 }
 
 function hideSection(section) {
+    const content = section.querySelector('.content');
+    if (content) {
+        content.style.maxHeight = '0px'; // 設置最大高度為0，動畫隱藏
+        content.style.opacity = '0';
+        content.style.paddingTop = '0';
+        content.style.paddingBottom = '0';
+    }
     section.classList.remove('active');
     section.style.overflowY = 'hidden'; // 隱藏時移除滾動條
     setTimeout(() => {
@@ -1056,10 +1070,10 @@ function loadCompareSection(sectionId) {
         `
     };
 
-    const compareSection = document.getElementById('compare');
+    const compareSection = document.getElementById('section-container-compare-tw'); // 修正 ID 為 section-container-compare-tw
     if (compareSection) {
         compareSection.innerHTML = sections[sectionId] || '<p>Section not found</p>';
-        compareSection.style.display = 'block';
+        document.getElementById('compare').style.display = 'block'; // 顯示 #compare 區域
     } else {
         console.error("Compare section not found");
     }
