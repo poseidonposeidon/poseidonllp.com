@@ -185,7 +185,7 @@ div {
     /*background-color: #575757;*/
 }
 
-/* 固定所有section, 包括compare-section的樣式 */
+/* 固定所有section, 包括compare的樣式 */
 .section, .compare {
     border: 1px solid #333;
     padding: 5px;
@@ -200,17 +200,17 @@ div {
     transform: scale(1.009);
 }
 
-.section-content, .compare-section-content {
+.section-content, .compare-content {
     transition: none;
     opacity: 1;
     display: block;
 }
 
-.section-content[style*="display: block"], .compare-section-content[style*="display: block"] {
+.section-content[style*="display: block"], .compare-content[style*="display: block"] {
     opacity: 1;
 }
 
-/* 修改 ai-box-section 和 compare-section 的設置以適應較小屏幕 */
+/* 修改 ai-box-section 和 compare 的設置以適應較小屏幕 */
 .ai-box-section {
     max-height: 0;
     overflow: hidden;
@@ -702,6 +702,10 @@ button:not(.info-input button):hover {
     }
 }
 
+.hidden {
+    display: none;
+}
+
 .alert {
     padding: 20px;
     background-color: #f44336;
@@ -723,23 +727,3 @@ button:not(.info-input button):hover {
 .closebtn:hover {
     color: black;
 }
-
-/*#compare {*/
-/*    background-color: rgba(255, 0, 0, 0.5); !* 半透明紅色背景確認 *!*/
-/*    position: fixed; !* 固定在頁面中央 *!*/
-/*    top: 50%;*/
-/*    left: 50%;*/
-/*    transform: translate(-50%, -50%); !* 保證區塊水平垂直居中 *!*/
-/*    width: 80%; !* 設定寬度 *!*/
-/*    max-height: 80vh; !* 限制高度，避免超出視窗 *!*/
-/*    z-index: 1000; !* 確保在最上層顯示 *!*/
-/*    overflow-y: auto; !* 啟用垂直滾動 *!*/
-/*    padding: 20px;*/
-/*    border-radius: 10px;*/
-/*    opacity: 1;*/
-/*    display: block; !* 確保區塊可見 *!*/
-/*}*/
-/*#compare:hover {*/
-/*    transform: none; !* 避免 hover 時移動位置 *!*/
-/*    background-color: rgba(255, 0, 0, 0.6); !* 可以調整 hover 背景顏色進行測試 *!*/
-/*}*/
