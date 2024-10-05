@@ -210,6 +210,42 @@ div {
     opacity: 1;
 }
 
+/* 修改 ai-box-section 和 compare-section 的設置以適應較小屏幕 */
+.ai-box-section {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
+    padding: 0 20px;
+}
+
+.ai-box-section.active {
+    max-height: 80%;
+    opacity: 1;
+    padding: 20px;
+}
+
+.compare-section {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
+    padding: 0 20px;
+}
+
+.compare-section.active {
+    max-height: 80%;
+    opacity: 1;
+    padding: 20px;
+}
+
+.inline-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
 .info-input {
     display: flex;
     justify-content: center;
@@ -427,42 +463,6 @@ button:not(.info-input button):hover {
     .logo {
         margin-right: 500px;
     }
-}
-
-/* 修改 ai-box-section 和 compare-section 的設置以適應較小屏幕 */
-.ai-box-section {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
-    padding: 0 20px;
-}
-
-.ai-box-section.active {
-    max-height: 80%;
-    opacity: 1;
-    padding: 20px;
-}
-
-.compare-section {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
-    padding: 0 20px;
-}
-
-.compare-section.active {
-    max-height: 80%;
-    opacity: 1;
-    padding: 20px;
-}
-
-.inline-container {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
 }
 
 /* 新增的樣式 */
