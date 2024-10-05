@@ -1058,7 +1058,8 @@ function loadCompareSection(sectionId) {
     const sectionContainer = document.getElementById('section-container');
     if (sectionContainer) {
         sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
-        console.log("Section loaded: ", sectionId); // 確認區塊是否正確載入
+        document.getElementById('compare-tw').style.display = 'block'; // 確保顯示
+        console.log("Section loaded and displayed: ", sectionId); // Debug 確認
     } else {
         console.error("Section container not found");
     }
