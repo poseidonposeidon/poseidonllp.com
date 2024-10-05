@@ -23,19 +23,14 @@ function toggleSection(event, sectionId) {
     }
 
     const overlay = document.querySelector('.overlay');
-    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)');
-
-    // 檢查點擊是否在內部
-    if (activeSection && activeSection.contains(event.target)) {
-        return; // 如果點擊在內部，則不做任何處理
-    }
+    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.compare)'); // 修改選擇器，排除 .compare
 
     if (activeSection && activeSection === section) {
         hideSection(section);
         activeSection = null;
-        overlay.classList.remove('active'); // 確保隱藏 .overlay
+        overlay.classList.remove('active');
         document.body.classList.remove('modal-open');
-        blurElements.forEach(el => el.classList.remove('blur-background'));
+        blurElements.forEach(el => el.classList.remove('blur-background')); // 移除模糊
     } else {
         if (activeSection) {
             hideSection(activeSection);
@@ -44,10 +39,9 @@ function toggleSection(event, sectionId) {
         activeSection = section;
         overlay.classList.add('active');
         document.body.classList.add('modal-open');
-        blurElements.forEach(el => el.classList.add('blur-background'));
+        blurElements.forEach(el => el.classList.add('blur-background')); // 添加模糊
     }
 
-    // 檢查是否需要 .overlay，僅在有 activeSection 時顯示
     if (!activeSection) {
         overlay.classList.remove('active');
     }
@@ -73,7 +67,6 @@ function showSection(section) {
         section.style.overflowY = 'auto'; // 確保展開後支援滾動
     }, 10);
 }
-
 
 function hideSection(section) {
     const content = section.querySelector('.content');

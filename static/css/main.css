@@ -61,7 +61,9 @@ h1, h2 {
 }
 
 .blur-background {
-    filter: blur(5px);
+    filter: blur(5px); /* 添加模糊效果 */
+    pointer-events: none; /* 禁止與模糊區域的互動 */
+    transition: filter 0.3s ease;
 }
 
 input, button {
@@ -236,28 +238,27 @@ div {
 
 /* Compare section 修正 */
 .compare {
-    position: fixed; /* 保持固定位置 */
+    position: fixed;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%); /* 確保區塊在頁面中心 */
-    background-color: #1e1e1e; /* 背景色保持一致 */
+    transform: translate(-50%, -50%);
+    background-color: #1e1e1e;
     padding: 20px;
     z-index: 99999; /* 提高 z-index，確保它在最上層 */
-    max-height: 80vh; /* 限制高度，避免超出視窗 */
+    max-height: 80vh;
     width: 80%;
-    overflow-y: auto; /* 如果內容超過區域，允許垂直滾動 */
-    opacity: 1; /* 顯示區塊 */
-    display: block; /* 確保區塊顯示 */
-    border-radius: 10px; /* 增加圓角 */
-    pointer-events: auto; /* 確保可以與區塊內部互動 */
-    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
+    overflow-y: auto;
+    opacity: 1;
+    display: block;
+    border-radius: 10px;
+    pointer-events: auto; /* 確保可以互動 */
 }
 
 .compare.active {
-    display: block; /* 顯示區塊 */
-    opacity: 1; /* 完全顯示 */
-    max-height: 80vh; /* 保持最大高度 */
-    pointer-events: auto; /* 允許互動 */
+    display: block;
+    opacity: 1;
+    max-height: 80vh;
+    pointer-events: auto;
 }
 
 .compare-content {
