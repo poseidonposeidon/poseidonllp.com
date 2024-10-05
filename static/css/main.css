@@ -723,3 +723,7 @@ button:not(.info-input button):hover {
 .closebtn:hover {
     color: black;
 }
+
+#compare {
+    background-color: rgba(255, 0, 0, 0.5); /* 加入半透明紅色背景進行確認 */
+}
