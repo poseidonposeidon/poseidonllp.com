@@ -22,18 +22,13 @@ function toggleSection(event, sectionId) {
         return;
     }
 
-    // 如果當前點擊的區塊已經是 activeSection，且是 ai_box，則直接返回，不做任何操作
-    if (activeSection === section && sectionId === '#ai_box') {
-        return; // 不做任何操作，因為已經是同一個區塊
-    }
-
     const overlay = document.querySelector('.overlay');
     const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)');
 
     if (activeSection && activeSection === section) {
         hideSection(section);
         activeSection = null;
-        overlay.classList.remove('active');
+        overlay.classList.remove('active'); // 確保隱藏 .overlay
         document.body.classList.remove('modal-open');
         blurElements.forEach(el => el.classList.remove('blur-background'));
     } else {
@@ -45,6 +40,11 @@ function toggleSection(event, sectionId) {
         overlay.classList.add('active');
         document.body.classList.add('modal-open');
         blurElements.forEach(el => el.classList.add('blur-background'));
+    }
+
+    // 檢查是否需要 .overlay，僅在有 activeSection 時顯示
+    if (!activeSection) {
+        overlay.classList.remove('active');
     }
 }
 
