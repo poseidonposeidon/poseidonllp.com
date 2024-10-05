@@ -17,7 +17,7 @@ body.modal-open {
     display: block;
 }
 
-.info-section, .ai-box-section {
+.info-section, .ai-box-section, .compare-section {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -32,7 +32,7 @@ body.modal-open {
     transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
 }
 
-.info-section.active, .ai-box-section.active {
+.info-section.active, .ai-box-section.active, .compare-section.active {
     opacity: 1;
     max-height: 80%;
 }
@@ -74,7 +74,7 @@ div {
     padding: 10px;
     border-radius: 5px;
 }
-/*//////////////////////////////////////////////////////////////////////////////////////*/
+
 /* Navbar 基本樣式 */
 .navbar {
     display: flex;
@@ -97,7 +97,7 @@ div {
 }
 
 .logo {
-    height: 30px; /* 調整高度來縮小 logo */
+    height: 30px;
     width: auto;
     margin-right: 50px;
 }
@@ -120,7 +120,7 @@ div {
     padding: 5px 10px;
     border-radius: 5px;
     font-size: 16px;
-    background-color: #121212; /* 確保背景顏色一致 */
+    background-color: #121212;
     transition: all 0.3s ease;
 }
 
@@ -130,22 +130,22 @@ div {
 
 .dropdown-container {
     position: relative;
-    background-color: #1e1e1e; /* 設置背景顏色為全黑 */
+    background-color: #1e1e1e;
     padding: 0;
     margin: 0;
-    border-radius: 5px; /* 確保邊角圓滑一致 */
-    box-shadow: none; /* 移除陰影確保顏色一致 */
+    border-radius: 5px;
+    box-shadow: none;
 }
 
 /* Dropdown */
 .dropdown {
     position: relative;
     display: inline-block;
-    background-color: #121212; /* 確保背景顏色為全黑 */
+    background-color: #121212;
     padding: 0;
     margin: 0;
-    border-radius: 5px; /* 確保邊角圓滑一致 */
-    box-shadow: none; /* 移除陰影確保顏色一致 */
+    border-radius: 5px;
+    box-shadow: none;
 }
 
 /* 控制下拉選單的顯示與隱藏 */
@@ -154,7 +154,7 @@ div {
     opacity: 0;
     display: block;
     position: absolute;
-    background-color: #121212; /* 確保下拉選單也是全黑 */
+    background-color: #121212;
     min-width: 160px;
     z-index: 1;
     border-radius: 5px;
@@ -163,20 +163,16 @@ div {
     transition: visibility 0s linear 0.3s, opacity 0.3s linear;
 }
 
-/* 顯示下拉選單 */
 .dropdown:hover .dropdown-content {
     visibility: visible;
     opacity: 1;
     transition-delay: 0s, 0s;
 }
 
-/* Change the color of the dropdown link when hovered */
 .dropdown:hover > a {
     color: #90caf9;
-
 }
 
-/* Links inside the dropdown */
 .dropdown-content a {
     color: white;
     padding: 12px 16px;
@@ -189,10 +185,8 @@ div {
     /*background-color: #575757;*/
 }
 
-
-/*//////////////////////////////////////////////////////////////////////////////////////*/
-
-.section {
+/* 固定所有section, 包括compare-section的樣式 */
+.section, .compare-section {
     border: 1px solid #333;
     padding: 5px;
     margin-bottom: 5px;
@@ -201,18 +195,18 @@ div {
     transition: background-color 0.6s ease, transform 0.6s ease;
 }
 
-.section:hover {
+.section:hover, .compare-section:hover {
     background-color: #2c2c2c;
     transform: scale(1.009);
 }
 
-.section-content {
+.section-content, .compare-section-content {
     transition: opacity 0.3s ease-in-out;
     opacity: 0;
     display: none;
 }
 
-.section-content[style*="display: block"] {
+.section-content[style*="display: block"], .compare-section-content[style*="display: block"] {
     opacity: 1;
 }
 
@@ -228,7 +222,6 @@ div {
     box-sizing: border-box;
 }
 
-/* 特定 button 樣式修改 */
 .info-input button {
     background-color: transparent;
     border: none;
@@ -242,7 +235,6 @@ div {
     cursor: pointer;
 }
 
-/* 其他 button 樣式保持不變 */
 button:not(.info-input button) {
     background-color: #616161;
     color: white;
@@ -258,11 +250,11 @@ button:not(.info-input button):hover {
 
 #outputSymbol,
 #outputSymbolJP,
-#outputSymbolTW ,
+#outputSymbolTW,
 #outputSymbolEU,
 #outputSymbolKR,
 #outputSymbolHK,
-#outputSymbolCN{
+#outputSymbolCN {
     text-align: center;
     margin: 10px 0;
 }
@@ -280,13 +272,13 @@ button:not(.info-input button):hover {
 #PriceContainerEU,
 #PriceContainerKR,
 #PriceContainerHK,
-#PriceContainerCN{
+#PriceContainerCN {
     text-align: center;
     margin: 10px auto;
     padding: 20px;
     background-color: #1e1e1e;
     border-radius: 5px;
-    max-width: 100%; /* 控制寬度 */
+    max-width: 100%;
 }
 
 .info-content {
@@ -324,26 +316,24 @@ button:not(.info-input button):hover {
     color: white;
 }
 
-/* 設置連結的默認顏色 */
 #companyProfileContainer a,
 #companyProfileContainerJP a,
 #companyProfileContainerTW a,
 #companyProfileContainerEU a,
 #companyProfileContainerKR a,
 #companyProfileContainerHK a,
-#companyProfileContainerCN a{
+#companyProfileContainerCN a {
     color: #90caf9;
     transition: all 0.3s ease;
 }
 
-/* 設置連結在懸停時的顏色 */
 #companyProfileContainer a:hover,
 #companyProfileContainerJP a:hover,
 #companyProfileContainerTW a:hover,
 #companyProfileContainerEU a:hover,
 #companyProfileContainerKR a:hover,
 #companyProfileContainerHK a:hover,
-#companyProfileContainerCN a:hover{
+#companyProfileContainerCN a:hover {
     color: #ffffff;
 }
 
@@ -374,6 +364,7 @@ button:not(.info-input button):hover {
     overflow-x: auto;
 }
 
+/* 載入器樣式 */
 .loader {
     border: 4px solid #f3f3f3;
     border-top: 4px solid #3498db;
@@ -424,7 +415,7 @@ button:not(.info-input button):hover {
     }
 
     .logo {
-        margin-right: 30px; /* 平板設備上的 margin */
+        margin-right: 30px;
     }
 }
 
@@ -432,12 +423,13 @@ button:not(.info-input button):hover {
     .navbar {
         flex-wrap: nowrap;
     }
+
     .logo {
-        margin-right: 500px; /* 桌面設備上的 margin */
+        margin-right: 500px;
     }
 }
 
-/* 修改 ai-box-section 的設置以適應較小屏幕 */
+/* 修改 ai-box-section 和 compare-section 的設置以適應較小屏幕 */
 .ai-box-section {
     max-height: 0;
     overflow: hidden;
@@ -446,8 +438,16 @@ button:not(.info-input button):hover {
     padding: 0 20px;
 }
 
-.ai-box-section.active {
-    max-height: 80%; /* 修改為80% */
+.compare-section {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
+    padding: 0 20px;
+}
+
+.ai-box-section.active, .compare-section.active {
+    max-height: 80%;
     opacity: 1;
     padding: 20px;
 }
@@ -456,7 +456,7 @@ button:not(.info-input button):hover {
     display: flex;
     align-items: center;
     gap: 10px;
-    flex-wrap: wrap; /* 確保在較小屏幕上能自適應 */
+    flex-wrap: wrap;
 }
 
 /* 新增的樣式 */
@@ -469,9 +469,9 @@ button:not(.info-input button):hover {
     padding: 10px;
     border-radius: 5px;
     position: relative;
-    max-width: 800px; /* 限制容器的最大寬度 */
-    margin-left: auto; /* 中心對齊 */
-    margin-right: auto; /* 中心對齊 */
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .text-block {
@@ -480,8 +480,8 @@ button:not(.info-input button):hover {
     padding: 20px;
     z-index: 1;
     width: 70%;
-    max-width: 500px; /* 限制文字區塊的最大寬度 */
-    margin: auto; /* 中心對齊 */
+    max-width: 500px;
+    margin: auto;
 }
 
 .image-block {
@@ -504,31 +504,29 @@ button:not(.info-input button):hover {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap;
-    gap: 0px; /* 確保 gap 為 0px，去除間距 */
-    padding: 0; /* 移除容器內邊距 */
-    margin: 0 auto; /* 確保容器本身居中 */
-    max-width: 100%; /* 確保容器寬度不超過屏幕 */
+    gap: 0px;
+    padding: 0;
+    margin: 0 auto;
+    max-width: 100%;
     background-color: #121212;
-
 }
 
 .logo-container-new a {
-    flex: 1 0 auto; /* 自適應寬度 */
-    max-width: 20%; /* 視需要調整 */
+    flex: 1 0 auto;
+    max-width: 20%;
     box-sizing: border-box;
     text-align: center;
-    margin: 0; /* 確保沒有外邊距 */
-    padding: 0; /* 確保沒有內邊距 */
+    margin: 0;
+    padding: 0;
 }
 
-
 .logo-container-new img {
-    max-height: 120px; /* 确保高度适当 */
+    max-height: 120px;
     width: auto;
-    margin: 0; /* 确保没有 margin */
+    margin: 0;
     display: block;
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    object-fit: contain; /* 确保图片适应其容器 */
+    object-fit: contain;
 }
 
 .logo-container-new img:hover {
@@ -542,8 +540,8 @@ button:not(.info-input button):hover {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 100vh; /* 使容器佔滿整個視窗高度 */
-    gap: 50px; /* 調整兩個區塊之間的間距 */
+    height: 100vh;
+    gap: 50px;
 }
 
 #trend_notification_app {
@@ -551,16 +549,16 @@ button:not(.info-input button):hover {
 }
 
 .transcript-button {
-    margin-right: 10px; /* 每個按鈕之間增加間距 */
+    margin-right: 10px;
 }
 
 .transcript-button:last-child {
-    margin-right: 0; /* 最後一個按鈕不需要右側間距 */
+    margin-right: 0;
 }
 
 #chartContainer, #operatingChartContainer #balanceSheetContainer {
-    width: 100%; /* 確保容器寬度為 100% */
-    height: auto; /* 高度自適應內容 */
+    width: 100%;
+    height: auto;
 }
 
 .scroll-right {
@@ -572,20 +570,20 @@ button:not(.info-input button):hover {
 }
 
 .suggestions-list {
-    display: none; /* 默认隐藏 */
+    display: none;
     position: absolute;
     border: 1px solid #ccc;
-    background-color: #1c1c1c; /* 符合黑色主题 */
+    background-color: #1c1c1c;
     max-height: 200px;
     overflow-y: auto;
-    width: calc(100% - 20px); /* 使宽度比输入框小20px */
-    left: 10px; /* 左侧距离10px */
-    right: 10px; /* 右侧距离10px */
+    width: calc(100% - 20px);
+    left: 10px;
+    right: 10px;
     z-index: 1000;
 }
 
 .suggestions-list.active {
-    display: block; /* 激活时显示 */
+    display: block;
 }
 
 .suggestions-list div {
@@ -601,10 +599,9 @@ button:not(.info-input button):hover {
     display: flex;
     gap: 10px;
     align-items: center;
-    display: none; /* 初始状态下隐藏 */
+    display: none;
 }
 
-/*聊天室*/
 /* 聊天框樣式 */
 .chat-container {
     display: flex;
@@ -644,21 +641,21 @@ button:not(.info-input button):hover {
     padding: 10px;
     margin: 5px 0;
     border-radius: 10px;
-    max-width: 60%; /* 根據訊息長度自動調整 */
-    word-wrap: break-word; /* 確保訊息過長時換行 */
-    display: inline-block; /* 讓訊息不佔滿整行 */
+    max-width: 60%;
+    word-wrap: break-word;
+    display: inline-block;
 }
 
 .chat-message {
-    align-self: flex-end; /* 使用者訊息靠右 */
-    background-color: #444; /* 使用者訊息背景顏色 */
-    border-radius: 20px 20px 0 20px; /* 自定義圓角樣式 */
+    align-self: flex-end;
+    background-color: #444;
+    border-radius: 20px 20px 0 20px;
 }
 
 .chat-response {
-    align-self: flex-start; /* 系統訊息靠左 */
-    background-color: #666; /* 系統回復訊息背景顏色 */
-    border-radius: 20px 20px 20px 0; /* 自定義圓角樣式 */
+    align-self: flex-start;
+    background-color: #666;
+    border-radius: 20px 20px 20px 0;
 }
 
 #chat-input {
@@ -671,7 +668,6 @@ button:not(.info-input button):hover {
     color: #e0e0e0;
 }
 
-/* Loader 樣式 */
 .loader {
     border: 4px solid #f3f3f3;
     border-top: 4px solid #3498db;
@@ -690,7 +686,6 @@ button:not(.info-input button):hover {
     }
 }
 
-/* Alert 框 */
 .alert {
     padding: 20px;
     background-color: #f44336;
@@ -706,6 +701,7 @@ button:not(.info-input button):hover {
     font-size: 22px;
     line-height: 20px;
     cursor: pointer;
+    transition: 0.3s;
 }
 
 .closebtn:hover {
