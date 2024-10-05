@@ -42,10 +42,6 @@ body.modal-open {
     max-height: 80%;
 }
 
-.blur-background {
-    /*filter: blur(5px);*/
-}
-
 body {
     background-color: #121212;
     color: #e0e0e0;
@@ -62,8 +58,8 @@ h1, h2 {
 
 .blur-background {
     filter: blur(5px); /* 添加模糊效果 */
-    pointer-events: none; /* 禁止與模糊區域的互動 */
-    transition: filter 0.3s ease;
+    /*pointer-events: none; !* 禁止與模糊區域的互動 *!*/
+    /*transition: filter 0.3s ease;*/
 }
 
 input, button {

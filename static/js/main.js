@@ -23,7 +23,7 @@ function toggleSection(event, sectionId) {
     }
 
     const overlay = document.querySelector('.overlay');
-    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)');
+    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(.compare)');
 
     // 檢查點擊是否在內部
     if (activeSection && activeSection.contains(event.target)) {
