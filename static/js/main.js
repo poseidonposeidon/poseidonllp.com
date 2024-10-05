@@ -25,6 +25,11 @@ function toggleSection(event, sectionId) {
     const overlay = document.querySelector('.overlay');
     const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)');
 
+    // 檢查點擊是否在內部
+    if (activeSection && activeSection.contains(event.target)) {
+        return; // 如果點擊在內部，則不做任何處理
+    }
+
     if (activeSection && activeSection === section) {
         hideSection(section);
         activeSection = null;
@@ -92,7 +97,7 @@ document.addEventListener('click', (event) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section, #chat-gpt-section, #compare-tw, #compare').forEach(section => {
+    document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section, #chat-gpt-section,  #compare').forEach(section => {
         section.style.display = 'none';
     });
     const dynamicSections = document.querySelectorAll('#chat-gpt-section, #audio-transcription-section');

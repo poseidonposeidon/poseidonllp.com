@@ -240,12 +240,14 @@ div {
     opacity: 1; /* 將初始不透明度設為 1 */
     transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
     display: none; /* 初始時隱藏 */
+    pointer-events: auto;
 }
 
 .compare.active {
     display: block; /* 顯示元素 */
     opacity: 1;
     max-height: 80vh;
+    pointer-events: auto;
 }
 
 .inline-container {
