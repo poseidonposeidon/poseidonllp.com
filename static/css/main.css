@@ -201,9 +201,9 @@ div {
 }
 
 .section-content, .compare-section-content {
-    transition: opacity 0.3s ease-in-out;
-    opacity: 0;
-    display: none;
+    transition: none;
+    opacity: 1;
+    display: block;
 }
 
 .section-content[style*="display: block"], .compare-section-content[style*="display: block"] {
@@ -226,17 +226,25 @@ div {
 }
 
 .compare-section {
-    max-height: 0;
-    overflow: hidden;
-    opacity: 0;
-    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
-    padding: 0 20px;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1e1e1e;
+    padding: 20px;
+    z-index: 1000; /* 確保它在最上層 */
+    max-height: 80vh; /* 使用視窗高度的百分比 */
+    width: 80%;
+    overflow-y: auto;
+    opacity: 1; /* 將初始不透明度設為 1 */
+    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
+    display: none; /* 初始時隱藏 */
 }
 
 .compare-section.active {
-    max-height: 80%;
+    display: block; /* 顯示元素 */
     opacity: 1;
-    padding: 20px;
+    max-height: 80vh;
 }
 
 .inline-container {
