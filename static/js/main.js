@@ -78,7 +78,7 @@ document.addEventListener('click', (event) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section,#chat-gpt-section').forEach(section => {
+    document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section,#chat-gpt-section,#compare-tw').forEach(section => {
         section.style.display = 'none';
     });
     const dynamicSections = document.querySelectorAll('#chat-gpt-section, #audio-transcription-section');
@@ -1034,14 +1034,33 @@ function loadAIBoxSection(sectionId) {
     }
 }
 
+function loadCompareSection(sectionId) {
+    const sections = {
+        'compare-tw': `
+            <div class="section" id="compare-tw">
+                <h2>Compare Taiwan Stocks</h2>
+                <div class="content">
+                    <label for="stock1-tw">Enter Stock 1 (Taiwan):</label>
+                    <input type="text" id="stock1-tw" placeholder="e.g., 2330">
+                    
+                    <label for="stock2-tw">Enter Stock 2 (Taiwan):</label>
+                    <input type="text" id="stock2-tw" placeholder="e.g., 2317">
+                    
+                    <button onclick="compareTaiwanStocks()">Compare</button>
+                    
+                    <div class="scroll-container-x" id="comparisonResultContainer-tw">
+                        <!-- Comparison results will be displayed here -->
+                    </div>
+                </div>
+            </div>`
+    };
+
+    const sectionContainer = document.getElementById('section-container');
+    sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+}
+
 const baseUrl = 'https://api.poseidonllp.com';
 
-// document.getElementById('send-btn').addEventListener('keypress', function(event) {
-//     if (event.key === 'Enter') {
-//         event.preventDefault();  // 防止換行
-//         sendMessage();  // 呼叫發送訊息的函數
-//     }
-// });
 
 function sendMessage() {
     const inputField = document.getElementById('chat-input');
