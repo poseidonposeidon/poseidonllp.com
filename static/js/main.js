@@ -1056,8 +1056,14 @@ function loadCompareSection(sectionId) {
     };
 
     const sectionContainer = document.getElementById('section-container');
-    sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+    if (sectionContainer) {
+        sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+        console.log("Section loaded: ", sectionId); // 確認區塊是否正確載入
+    } else {
+        console.error("Section container not found");
+    }
 }
+
 
 const baseUrl = 'https://api.poseidonllp.com';
 
