@@ -78,7 +78,7 @@ document.addEventListener('click', (event) => {
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section,#chat-gpt-section,#compare-tw').forEach(section => {
+    document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section, #chat-gpt-section, #compare-tw, #compare').forEach(section => {
         section.style.display = 'none';
     });
     const dynamicSections = document.querySelectorAll('#chat-gpt-section, #audio-transcription-section');
@@ -1052,15 +1052,16 @@ function loadCompareSection(sectionId) {
                 <div id="comparisonResultContainer-tw">
                     <!-- Comparison results will be displayed here -->
                 </div>
-            </div>`
+            </div>
+        `
     };
 
-    const sectionContainer = document.getElementById('section-container-compare-tw');
-    if (sectionContainer) {
-        sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
-        document.getElementById('compare-tw').style.display = 'block'; // 顯示比對區塊
+    const compareSection = document.getElementById('compare');
+    if (compareSection) {
+        compareSection.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+        compareSection.style.display = 'block';
     } else {
-        console.error("Section container not found");
+        console.error("Compare section not found");
     }
 }
 
