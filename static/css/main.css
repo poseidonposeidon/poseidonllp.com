@@ -17,7 +17,7 @@ body.modal-open {
     display: block;
 }
 
-.info-section, .ai-box-section, .compare-section {
+.info-section, .ai-box-section, .compare {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -32,7 +32,7 @@ body.modal-open {
     transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
 }
 
-.info-section.active, .ai-box-section.active, .compare-section.active {
+.info-section.active, .ai-box-section.active, .compare.active {
     opacity: 1;
     max-height: 80%;
 }
@@ -186,7 +186,7 @@ div {
 }
 
 /* 固定所有section, 包括compare-section的樣式 */
-.section, .compare-section {
+.section, .compare {
     border: 1px solid #333;
     padding: 5px;
     margin-bottom: 5px;
@@ -195,7 +195,7 @@ div {
     transition: background-color 0.6s ease, transform 0.6s ease;
 }
 
-.section:hover, .compare-section:hover {
+.section:hover, .compare:hover {
     background-color: #2c2c2c;
     transform: scale(1.009);
 }
@@ -226,7 +226,7 @@ div {
 }
 
 /* Compare section 修正 */
-.compare-section {
+.compare {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -242,7 +242,7 @@ div {
     display: none; /* 初始時隱藏 */
 }
 
-.compare-section.active {
+.compare.active {
     display: block; /* 顯示元素 */
     opacity: 1;
     max-height: 80vh;
@@ -724,22 +724,22 @@ button:not(.info-input button):hover {
     color: black;
 }
 
-#compare {
-    background-color: rgba(255, 0, 0, 0.5); /* 半透明紅色背景確認 */
-    position: fixed; /* 固定在頁面中央 */
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* 保證區塊水平垂直居中 */
-    width: 80%; /* 設定寬度 */
-    max-height: 80vh; /* 限制高度，避免超出視窗 */
-    z-index: 1000; /* 確保在最上層顯示 */
-    overflow-y: auto; /* 啟用垂直滾動 */
-    padding: 20px;
-    border-radius: 10px;
-    opacity: 1;
-    display: block; /* 確保區塊可見 */
-}
-#compare:hover {
-    transform: none; /* 避免 hover 時移動位置 */
-    background-color: rgba(255, 0, 0, 0.6); /* 可以調整 hover 背景顏色進行測試 */
-}
+/*#compare {*/
+/*    background-color: rgba(255, 0, 0, 0.5); !* 半透明紅色背景確認 *!*/
+/*    position: fixed; !* 固定在頁面中央 *!*/
+/*    top: 50%;*/
+/*    left: 50%;*/
+/*    transform: translate(-50%, -50%); !* 保證區塊水平垂直居中 *!*/
+/*    width: 80%; !* 設定寬度 *!*/
+/*    max-height: 80vh; !* 限制高度，避免超出視窗 *!*/
+/*    z-index: 1000; !* 確保在最上層顯示 *!*/
+/*    overflow-y: auto; !* 啟用垂直滾動 *!*/
+/*    padding: 20px;*/
+/*    border-radius: 10px;*/
+/*    opacity: 1;*/
+/*    display: block; !* 確保區塊可見 *!*/
+/*}*/
+/*#compare:hover {*/
+/*    transform: none; !* 避免 hover 時移動位置 *!*/
+/*    background-color: rgba(255, 0, 0, 0.6); !* 可以調整 hover 背景顏色進行測試 *!*/
+/*}*/
