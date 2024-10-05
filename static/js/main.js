@@ -1058,13 +1058,11 @@ function loadCompareSection(sectionId) {
     const sectionContainer = document.getElementById('section-container-compare-tw');
     if (sectionContainer) {
         sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
-        document.getElementById('compare-tw').style.display = 'block'; // 確保顯示
         console.log("Section loaded and displayed: ", sectionId);
     } else {
         console.error("Section container not found");
     }
 }
-
 
 const baseUrl = 'https://api.poseidonllp.com';
 
