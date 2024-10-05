@@ -1035,6 +1035,7 @@ function loadAIBoxSection(sectionId) {
 }
 
 function loadCompareSection(sectionId) {
+    console.log("Loading section: " + sectionId);
     const sections = {
         'compare-tw': `
             <div class="section" id="compare-tw">
@@ -1059,7 +1060,7 @@ function loadCompareSection(sectionId) {
     if (sectionContainer) {
         sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
         document.getElementById('compare-tw').style.display = 'block'; // 確保顯示
-        console.log("Section loaded and displayed: ", sectionId); // Debug 確認
+        console.log("Section loaded and displayed: ", sectionId);
     } else {
         console.error("Section container not found");
     }
