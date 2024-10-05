@@ -444,6 +444,20 @@ button:not(.info-input button):hover {
     padding: 20px;
 }
 
+.compare-section {
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
+    padding: 0 20px;
+}
+
+.compare-section.active {
+    max-height: 80%;
+    opacity: 1;
+    padding: 20px;
+}
+
 .inline-container {
     display: flex;
     align-items: center;
