@@ -1037,7 +1037,7 @@ function loadAIBoxSection(sectionId) {
 function loadCompareSection(sectionId) {
     const sections = {
         'compare-tw': `
-            <div class="section" id="compare-tw">
+            <div class="compare-section" id="compare-tw">
                 <h2>Compare Taiwan Stocks</h2>
                 <div class="info-input">
                     <label for="stock1-tw">Enter Stock 1 (Taiwan):</label>
@@ -1058,7 +1058,7 @@ function loadCompareSection(sectionId) {
     const sectionContainer = document.getElementById('section-container-compare-tw');
     if (sectionContainer) {
         sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
-        console.log("Section loaded and displayed: ", sectionId);
+        document.getElementById('compare-tw').style.display = 'block'; // 確保顯示
     } else {
         console.error("Section container not found");
     }
