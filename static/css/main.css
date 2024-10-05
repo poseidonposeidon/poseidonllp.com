@@ -58,10 +58,9 @@ h1, h2 {
 
 .blur-background {
     filter: blur(5px); /* 添加模糊效果 */
-    /*pointer-events: none; !* 禁止與模糊區域的互動 *!*/
-    /*transition: filter 0.3s ease;*/
+    pointer-events: none; /* 禁止與模糊區域的互動 */
+    transition: filter 0.3s ease;
 }
-
 input, button {
     background-color: #1e1e1e;
     border: 2px solid #616161;
@@ -240,7 +239,7 @@ div {
     transform: translate(-50%, -50%);
     background-color: #1e1e1e;
     padding: 20px;
-    z-index: 99999; /* 提高 z-index，確保它在最上層 */
+    z-index: 99999; /* 確保它在最上層 */
     max-height: 80vh;
     width: 80%;
     overflow-y: auto;

@@ -23,7 +23,7 @@ function toggleSection(event, sectionId) {
     }
 
     const overlay = document.querySelector('.overlay');
-    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(.compare)');
+    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(.compare)'); // 不對 .compare 應用模糊
 
     // 檢查點擊是否在內部
     if (activeSection && activeSection.contains(event.target)) {
@@ -35,7 +35,7 @@ function toggleSection(event, sectionId) {
         activeSection = null;
         overlay.classList.remove('active'); // 確保隱藏 .overlay
         document.body.classList.remove('modal-open');
-        blurElements.forEach(el => el.classList.remove('blur-background'));
+        blurElements.forEach(el => el.classList.remove('blur-background')); // 移除模糊
     } else {
         if (activeSection) {
             hideSection(activeSection);
@@ -44,7 +44,7 @@ function toggleSection(event, sectionId) {
         activeSection = section;
         overlay.classList.add('active');
         document.body.classList.add('modal-open');
-        blurElements.forEach(el => el.classList.add('blur-background'));
+        blurElements.forEach(el => el.classList.add('blur-background')); // 添加模糊
     }
 
     // 檢查是否需要 .overlay，僅在有 activeSection 時顯示
@@ -58,7 +58,7 @@ function showSection(section) {
 
     // 避免點擊 section 內部時觸發關閉行為
     section.addEventListener('click', (event) => {
-        event.stopPropagation();
+        event.stopPropagation(); // 防止點擊時事件冒泡到 document
     });
 
     const content = section.querySelector('.content');
@@ -73,7 +73,6 @@ function showSection(section) {
         section.style.overflowY = 'auto'; // 確保展開後支援滾動
     }, 10);
 }
-
 
 function hideSection(section) {
     const content = section.querySelector('.content');
@@ -108,7 +107,6 @@ document.addEventListener('click', (event) => {
         document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)').forEach(el => el.classList.remove('blur-background'));
     }
 });
-
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section, #chat-gpt-section,  #compare').forEach(section => {
