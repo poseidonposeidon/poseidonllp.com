@@ -1063,6 +1063,7 @@ function loadCompareSection(sectionId) {
     } else {
         console.error("Compare section not found");
     }
+    console.log(compareSection.innerHTML); // 確認內容是否已經正確載入
 }
 
 const baseUrl = 'https://api.poseidonllp.com';
