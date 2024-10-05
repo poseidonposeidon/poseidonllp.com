@@ -1088,7 +1088,7 @@ function loadCompareSection(sectionId) {
         document.getElementById('compare').style.display = 'block'; // 顯示 #compare 區域
 
         // 確保所有其他部分被模糊
-        const blurElements = document.querySelectorAll('body > *:not(#compare):not(.navbar)'); // 排除 #compare 和導航欄
+        const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)'); // 排除 #compare 和導航欄
         blurElements.forEach(el => el.classList.add('blur-background'));
 
         // 移除展開部分的模糊效果
