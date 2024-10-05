@@ -55,6 +55,12 @@ function toggleSection(event, sectionId) {
 
 function showSection(section) {
     section.style.display = 'block';
+
+    // 避免點擊 section 內部時觸發關閉行為
+    section.addEventListener('click', (event) => {
+        event.stopPropagation();
+    });
+
     const content = section.querySelector('.content');
     if (content) {
         content.style.maxHeight = content.scrollHeight + 'px'; // 設置最大高度為內容高度
@@ -67,6 +73,7 @@ function showSection(section) {
         section.style.overflowY = 'auto'; // 確保展開後支援滾動
     }, 10);
 }
+
 
 function hideSection(section) {
     const content = section.querySelector('.content');
@@ -87,6 +94,12 @@ function hideSection(section) {
 
 // 當點擊 body 時，若點擊位置不在 activeSection 內，則收起 section
 document.addEventListener('click', (event) => {
+    // 如果點擊事件發生在 activeSection 內部，則不處理
+    if (activeSection && activeSection.contains(event.target)) {
+        return;
+    }
+
+    // 如果點擊不在 activeSection 內部，則隱藏 activeSection
     if (activeSection && !activeSection.contains(event.target)) {
         hideSection(activeSection);
         activeSection = null;
@@ -95,6 +108,7 @@ document.addEventListener('click', (event) => {
         document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)').forEach(el => el.classList.remove('blur-background'));
     }
 });
+
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section, #chat-gpt-section,  #compare').forEach(section => {
