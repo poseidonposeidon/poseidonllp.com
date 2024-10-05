@@ -23,7 +23,7 @@ function toggleSection(event, sectionId) {
     }
 
     const overlay = document.querySelector('.overlay');
-    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(.compare)'); // 不對 .compare 應用模糊
+    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(.compare)');
 
     // 檢查點擊是否在內部
     if (activeSection && activeSection.contains(event.target)) {
@@ -1094,7 +1094,6 @@ function loadCompareSection(sectionId) {
     } else {
         console.error("Compare section not found");
     }
-    console.log(compareSection.innerHTML); // 確認內容是否已經正確載入
 }
 
 const baseUrl = 'https://api.poseidonllp.com';

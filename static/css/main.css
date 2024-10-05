@@ -57,10 +57,11 @@ h1, h2 {
 }
 
 .blur-background {
-    filter: blur(5px); /* 添加模糊效果 */
-    pointer-events: none; /* 禁止與模糊區域的互動 */
+    filter: blur(5px);
+    pointer-events: none;
     transition: filter 0.3s ease;
 }
+
 input, button {
     background-color: #1e1e1e;
     border: 2px solid #616161;
@@ -239,14 +240,14 @@ div {
     transform: translate(-50%, -50%);
     background-color: #1e1e1e;
     padding: 20px;
-    z-index: 99999; /* 確保它在最上層 */
+    z-index: 99999;
     max-height: 80vh;
     width: 80%;
     overflow-y: auto;
     opacity: 1;
     display: block;
     border-radius: 10px;
-    pointer-events: auto; /* 確保可以互動 */
+    pointer-events: auto;
 }
 
 .compare.active {
@@ -257,9 +258,9 @@ div {
 }
 
 .compare-content {
-    opacity: 1; /* 顯示內容 */
-    display: block; /* 確保內容顯示 */
-    transition: none; /* 移除內容的過渡效果 */
+    opacity: 1;
+    display: block;
+    transition: none;
 }
 
 .compare:hover {
