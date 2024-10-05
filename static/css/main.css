@@ -225,6 +225,7 @@ div {
     padding: 20px;
 }
 
+/* Compare section 修正 */
 .compare-section {
     position: fixed;
     top: 50%;
@@ -435,6 +436,7 @@ button:not(.info-input button):hover {
     padding: 20px;
     background-color: #f44336;
     color: white;
+    border-radius: 5px;
 }
 
 .closebtn {
