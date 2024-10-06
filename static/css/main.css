@@ -22,7 +22,7 @@ body.modal-open {
     background: rgba(0, 0, 0, 0.5);
     z-index: 9998; /* 比 compare 低，遮蔽其他部分 */}
 
-.info-section, .ai-box-section, .compare , .compare-tw{
+.info-section, .ai-box-section, .compare , #compare-tw{
     position: fixed;
     top: 50%;
     left: 50%;
@@ -37,7 +37,7 @@ body.modal-open {
     transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
 }
 
-.info-section.active, .ai-box-section.active, .compare.active,.compare-tw.active {
+.info-section.active, .ai-box-section.active, .compare.active,#compare-tw.active {
     opacity: 1;
     max-height: 80%;
 }
