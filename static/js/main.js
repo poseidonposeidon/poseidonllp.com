@@ -28,17 +28,17 @@ function toggleSection(event, sectionId) {
     if (activeSection && activeSection === section) {
         // 如果當前 activeSection 是被點擊的 section，那麼應該隱藏它
         hideSection(section);
-        activeSection = null;
+        activeSection = null; // 將 activeSection 設置為 null
         overlay.classList.remove('active');
         document.body.classList.remove('modal-open');
         blurElements.forEach(el => el.classList.remove('blur-background'));
     } else {
         // 否則，關閉當前 activeSection 並顯示點擊的 section
         if (activeSection) {
-            hideSection(activeSection);
+            hideSection(activeSection); // 關閉當前的 activeSection
         }
-        showSection(section);
-        activeSection = section;
+        showSection(section); // 展開新的 section
+        activeSection = section; // 將新展開的 section 設為 activeSection
         overlay.classList.add('active');
         document.body.classList.add('modal-open');
         blurElements.forEach(el => el.classList.add('blur-background'));
@@ -46,7 +46,7 @@ function toggleSection(event, sectionId) {
 }
 
 function showSection(section) {
-    section.style.display = 'block';
+    section.style.display = 'block'; // 確保 section 顯示
 
     // 避免點擊 section 內部時觸發關閉行為
     section.addEventListener('click', (event) => {
@@ -55,8 +55,7 @@ function showSection(section) {
 
     const content = section.querySelector('.content');
     if (content) {
-        // 使用 transition 配合 scrollHeight 確保高度過渡流暢
-        content.style.maxHeight = content.scrollHeight + 'px';
+        content.style.maxHeight = content.scrollHeight + 'px'; // 使用 scrollHeight 確保高度過渡
         content.style.opacity = '1';
         content.style.paddingTop = '';
         content.style.paddingBottom = '';
@@ -82,9 +81,7 @@ function hideSection(section) {
 
     // 使用 setTimeout 延遲隱藏，等待動畫結束
     setTimeout(() => {
-        if (!section.classList.contains('active')) {
-            section.style.display = 'none';
-        }
+        section.style.display = 'none'; // 動畫完成後隱藏 section
     }, 500); // 與 CSS 轉場時間匹配
 }
 
