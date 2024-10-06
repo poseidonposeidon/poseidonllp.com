@@ -1091,20 +1091,37 @@ function loadCompareSection(sectionId) {
         compareSection.innerHTML = sections[sectionId] || '<p>Section not found</p>';
         const compareDiv = document.getElementById('compare');
 
-        // 先顯示 #compare 區域
-        compareDiv.style.display = 'block';
+        // 如果 compareDiv 有 active class，則表示需要收起
+        if (compareDiv.classList.contains('active')) {
+            // 過渡動畫：收起
+            compareDiv.style.maxHeight = '0'; // 使其高度漸漸變小
+            compareDiv.style.opacity = '0'; // 透明度漸漸消失
 
-        // 延遲一點點時間觸發 active 過渡效果
-        setTimeout(() => {
-            compareDiv.classList.add('active'); // 添加 active class 以展開 compare 區域
-        }, 100);
+            // 移除 active class，等待動畫結束後隱藏
+            setTimeout(() => {
+                compareDiv.classList.remove('active');
+                compareDiv.style.display = 'none'; // 完全隱藏
+            }, 500); // 延遲500ms配合過渡動畫
+        } else {
+            // 展開區域
+            compareDiv.style.display = 'block'; // 顯示區域
+            compareDiv.style.maxHeight = '0'; // 預設為 0 高度
+            compareDiv.style.opacity = '0'; // 預設透明度 0
 
-        // 確保其他部分被模糊
-        const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)');
-        blurElements.forEach(el => el.classList.add('blur-background'));
+            // 確保過渡效果正常啟動
+            setTimeout(() => {
+                compareDiv.style.maxHeight = compareDiv.scrollHeight + 'px'; // 展開至內部高度
+                compareDiv.style.opacity = '1'; // 透明度完全顯現
+                compareDiv.classList.add('active'); // 添加 active class 來標示已展開
+            }, 10);
 
-        // 移除 compare 自己的模糊效果
-        compareDiv.classList.remove('blur-background');
+            // 確保其他部分被模糊
+            const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)');
+            blurElements.forEach(el => el.classList.add('blur-background'));
+
+            // 移除 compare 自己的模糊效果
+            compareDiv.classList.remove('blur-background');
+        }
     } else {
         console.error("Compare section not found");
     }

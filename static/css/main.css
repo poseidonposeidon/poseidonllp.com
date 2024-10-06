@@ -239,7 +239,7 @@ div {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #1e1e1e;
-    padding: 0 20px; /* 初始padding為0 */
+    padding: 0 20px; /* 初始 padding 為 0 */
     z-index: 99999;
     max-height: 0; /* 預設隱藏 */
     width: 80%;
@@ -251,8 +251,8 @@ div {
 }
 
 .compare.active {
-    max-height: 80vh; /* 展開後的最大高度 */
-    opacity: 1; /* 展開後變得完全不透明 */
+    max-height: 1000px; /* 設置為一個大值以容納多樣的內容高度 */
+    opacity: 1; /* 展開後完全顯現 */
     padding: 20px; /* 展開時增加 padding */
     pointer-events: auto; /* 展開後允許互動 */
 }
@@ -266,11 +266,15 @@ div {
 /* Compare content 過渡設置 */
 .compare-content {
     opacity: 0;
-    transition: opacity 0.3s ease-in-out; /* 添加透明度過渡效果 */
+    padding-top: 0;
+    padding-bottom: 0;
+    transition: opacity 0.3s ease-in-out, padding 0.3s ease-in-out; /* 添加 padding 過渡效果 */
 }
 
 .compare.active .compare-content {
     opacity: 1;
+    padding-top: 10px; /* 展開時增加內邊距 */
+    padding-bottom: 10px;
 }
 
 
