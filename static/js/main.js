@@ -23,15 +23,17 @@ function toggleSection(event, sectionId) {
     }
 
     const overlay = document.querySelector('.overlay');
-    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)'); // 確保不對 #compare 應用模糊效果
+    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)');
 
     if (activeSection && activeSection === section) {
+        // 如果當前 activeSection 是被點擊的 section，那麼應該隱藏它
         hideSection(section);
         activeSection = null;
         overlay.classList.remove('active');
         document.body.classList.remove('modal-open');
         blurElements.forEach(el => el.classList.remove('blur-background'));
     } else {
+        // 否則，關閉當前 activeSection 並顯示點擊的 section
         if (activeSection) {
             hideSection(activeSection);
         }
@@ -40,10 +42,6 @@ function toggleSection(event, sectionId) {
         overlay.classList.add('active');
         document.body.classList.add('modal-open');
         blurElements.forEach(el => el.classList.add('blur-background'));
-    }
-
-    if (!activeSection) {
-        overlay.classList.remove('active');
     }
 }
 
@@ -57,8 +55,8 @@ function showSection(section) {
 
     const content = section.querySelector('.content');
     if (content) {
-        const scrollHeight = content.scrollHeight + 'px'; // 動態獲取內容的高度
-        content.style.maxHeight = scrollHeight;
+        // 使用 transition 配合 scrollHeight 確保高度過渡流暢
+        content.style.maxHeight = content.scrollHeight + 'px';
         content.style.opacity = '1';
         content.style.paddingTop = '';
         content.style.paddingBottom = '';
@@ -92,19 +90,20 @@ function hideSection(section) {
 
 // 當點擊 body 時，若點擊位置不在 activeSection 內，則收起 section
 document.addEventListener('click', (event) => {
-    // 如果點擊事件發生在 activeSection 或它的子元素內，則不處理
-    if (activeSection && activeSection.contains(event.target)) {
+    // 如果沒有 activeSection，則不處理
+    if (!activeSection) return;
+
+    // 如果點擊事件發生在 activeSection 內部，則不處理
+    if (activeSection.contains(event.target)) {
         return;
     }
 
     // 如果點擊不在 activeSection 內，則隱藏 activeSection
-    if (activeSection) {
-        hideSection(activeSection);
-        activeSection = null;
-        document.querySelector('.overlay').classList.remove('active');
-        document.body.classList.remove('modal-open');
-        document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)').forEach(el => el.classList.remove('blur-background'));
-    }
+    hideSection(activeSection);
+    activeSection = null;
+    document.querySelector('.overlay').classList.remove('active');
+    document.body.classList.remove('modal-open');
+    document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)').forEach(el => el.classList.remove('blur-background'));
 });
 
 document.addEventListener('DOMContentLoaded', () => {

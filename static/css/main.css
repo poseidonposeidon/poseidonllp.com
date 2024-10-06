@@ -245,7 +245,7 @@ div {
     width: 80%;
     overflow-y: hidden;
     opacity: 0; /* 預設透明 */
-    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out, padding 0.5s ease-in-out; /* 添加過渡效果 */
+    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
     border-radius: 10px;
     pointer-events: none; /* 隱藏時不讓互動 */
 }
