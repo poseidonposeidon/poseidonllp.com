@@ -1094,19 +1094,25 @@ function loadCompareSection(sectionId) {
         // 如果 compareDiv 有 active class，則表示需要收起
         if (compareDiv.classList.contains('active')) {
             // 過渡動畫：收起
-            compareDiv.style.maxHeight = '0'; // 使其高度漸漸變小
-            compareDiv.style.opacity = '0'; // 透明度漸漸消失
+            compareDiv.style.maxHeight = compareDiv.scrollHeight + 'px'; // 先設置當前高度
+            compareDiv.style.opacity = '1'; // 透明度初始為1
+
+            // 需要等到瀏覽器將樣式應用後，再設置為0以啟動動畫
+            setTimeout(() => {
+                compareDiv.style.maxHeight = '0'; // 使其高度漸漸變小
+                compareDiv.style.opacity = '0'; // 透明度漸漸消失
+            }, 10);
 
             // 移除 active class，等待動畫結束後隱藏
             setTimeout(() => {
                 compareDiv.classList.remove('active');
                 compareDiv.style.display = 'none'; // 完全隱藏
-            }, 500); // 延遲500ms配合過渡動畫
+            }, 510); // 延遲500ms配合過渡動畫
         } else {
             // 展開區域
             compareDiv.style.display = 'block'; // 顯示區域
-            compareDiv.style.maxHeight = '0'; // 預設為 0 高度
-            compareDiv.style.opacity = '0'; // 預設透明度 0
+            compareDiv.style.maxHeight = '0'; // 初始為 0 高度
+            compareDiv.style.opacity = '0'; // 初始透明度 0
 
             // 確保過渡效果正常啟動
             setTimeout(() => {
