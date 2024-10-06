@@ -57,11 +57,13 @@ function showSection(section) {
 
     const content = section.querySelector('.content');
     if (content) {
-        content.style.maxHeight = content.scrollHeight + 'px'; // 設置最大高度為內容高度
+        const scrollHeight = content.scrollHeight + 'px'; // 動態獲取內容的高度
+        content.style.maxHeight = scrollHeight;
         content.style.opacity = '1';
         content.style.paddingTop = '';
         content.style.paddingBottom = '';
     }
+
     setTimeout(() => {
         section.classList.add('active');
         section.style.overflowY = 'auto'; // 確保展開後支援滾動
@@ -76,8 +78,11 @@ function hideSection(section) {
         content.style.paddingTop = '0';
         content.style.paddingBottom = '0';
     }
+
     section.classList.remove('active');
     section.style.overflowY = 'hidden'; // 隱藏時移除滾動條
+
+    // 使用 setTimeout 延遲隱藏，等待動畫結束
     setTimeout(() => {
         if (!section.classList.contains('active')) {
             section.style.display = 'none';
@@ -87,25 +92,28 @@ function hideSection(section) {
 
 // 當點擊 body 時，若點擊位置不在 activeSection 內，則收起 section
 document.addEventListener('click', (event) => {
-    // 如果點擊事件發生在 activeSection 內部，則不處理
+    // 如果點擊事件發生在 activeSection 或它的子元素內，則不處理
     if (activeSection && activeSection.contains(event.target)) {
         return;
     }
 
-    // 如果點擊不在 activeSection 內部，則隱藏 activeSection
-    if (activeSection && !activeSection.contains(event.target)) {
+    // 如果點擊不在 activeSection 內，則隱藏 activeSection
+    if (activeSection) {
         hideSection(activeSection);
         activeSection = null;
         document.querySelector('.overlay').classList.remove('active');
         document.body.classList.remove('modal-open');
-        document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section)').forEach(el => el.classList.remove('blur-background'));
+        document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)').forEach(el => el.classList.remove('blur-background'));
     }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section, #chat-gpt-section,  #compare').forEach(section => {
+    // 只隱藏那些需要展開或動態載入的 sections
+    document.querySelectorAll('#info-section, #ai_box, #jp-info-section, #tw-info-section, #eu-info-section, #kr-info-section, #hk-info-section, #cn-info-section, #compare').forEach(section => {
         section.style.display = 'none';
     });
+
+    // 對於動態載入的 section，也進行預設隱藏
     const dynamicSections = document.querySelectorAll('#chat-gpt-section, #audio-transcription-section');
     dynamicSections.forEach(section => section.style.display = 'none');
 });
@@ -1086,18 +1094,20 @@ function loadCompareSection(sectionId) {
         // 設置動態內容
         compareSection.innerHTML = sections[sectionId] || '<p>Section not found</p>';
         const compareDiv = document.getElementById('compare');
-        compareDiv.style.display = 'block'; // 顯示 #compare 區域
 
-        // 激活 compare 的過渡效果
+        // 先顯示 #compare 區域
+        compareDiv.style.display = 'block';
+
+        // 延遲一點點時間觸發 active 過渡效果
         setTimeout(() => {
-            compareDiv.classList.add('active'); // 添加 active class，觸發展開動畫
+            compareDiv.classList.add('active'); // 添加 active class 以展開 compare 區域
         }, 100);
 
         // 確保其他部分被模糊
         const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)');
         blurElements.forEach(el => el.classList.add('blur-background'));
 
-        // 移除 compare 的模糊效果
+        // 移除 compare 自己的模糊效果
         compareDiv.classList.remove('blur-background');
     } else {
         console.error("Compare section not found");

@@ -239,13 +239,13 @@ div {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #1e1e1e;
-    padding: 20px;
+    padding: 0 20px; /* 初始padding為0 */
     z-index: 99999;
     max-height: 0; /* 預設隱藏 */
     width: 80%;
-    overflow-y: auto;
+    overflow-y: hidden;
     opacity: 0; /* 預設透明 */
-    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out; /* 添加過渡效果 */
+    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out, padding 0.5s ease-in-out; /* 添加過渡效果 */
     border-radius: 10px;
     pointer-events: none; /* 隱藏時不讓互動 */
 }
@@ -253,14 +253,17 @@ div {
 .compare.active {
     max-height: 80vh; /* 展開後的最大高度 */
     opacity: 1; /* 展開後變得完全不透明 */
+    padding: 20px; /* 展開時增加 padding */
     pointer-events: auto; /* 展開後允許互動 */
 }
 
+/* Hover 效果 */
 .compare:hover {
     transform: scale(1.009); /* 當鼠標懸停時略微放大 */
     background-color: #2c2c2c; /* 懸停時改變背景色 */
 }
 
+/* Compare content 過渡設置 */
 .compare-content {
     opacity: 0;
     transition: opacity 0.3s ease-in-out; /* 添加透明度過渡效果 */
@@ -269,6 +272,7 @@ div {
 .compare.active .compare-content {
     opacity: 1;
 }
+
 
 /*/////////////////////////////////////////////////////*/
 .inline-container {
