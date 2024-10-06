@@ -22,7 +22,7 @@ body.modal-open {
     background: rgba(0, 0, 0, 0.5);
     z-index: 9998; /* 比 compare 低，遮蔽其他部分 */}
 
-.info-section, .ai-box-section, .compare , #compare-tw{
+.info-section, .ai-box-section, .compare {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -37,7 +37,7 @@ body.modal-open {
     transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
 }
 
-.info-section.active, .ai-box-section.active, .compare.active,#compare-tw.active {
+.info-section.active, .ai-box-section.active, .compare.active {
     opacity: 1;
     max-height: 80%;
 }
@@ -233,29 +233,31 @@ div {
 }
 
 /* Compare ////////////////////////////////// 修正 */
-/*.compare {*/
-/*    position: fixed;*/
-/*    top: 50%;*/
-/*    left: 50%;*/
-/*    transform: translate(-50%, -50%);*/
-/*    background-color: #1e1e1e;*/
-/*    padding: 0 20px; !* 初始padding為0 *!*/
-/*    z-index: 99999;*/
-/*    max-height: 0; !* 預設隱藏 *!*/
-/*    width: 80%;*/
-/*    overflow-y: hidden; !* 隱藏時不顯示滾動條 *!*/
-/*    opacity: 0; !* 預設透明 *!*/
-/*    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out, padding 0.5s ease-in-out;*/
-/*    border-radius: 10px;*/
-/*    pointer-events: none; !* 隱藏時不讓互動 *!*/
-/*}*/
+.compare {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #1e1e1e;
+    padding: 0 20px; /* 初始padding為0 */
+    z-index: 99999;
+    max-height: 0; /* 初始隱藏 */
+    width: 80%;
+    overflow: hidden; /* 隱藏時不顯示滾動條 */
+    opacity: 0; /* 預設透明 */
+    transition: opacity 0.5s ease-in-out, padding 0.5s ease-in-out;
+    border-radius: 10px;
+    pointer-events: none; /* 隱藏時不讓互動 */
+}
 
-/*.compare.active {*/
-/*    max-height: 1000px; !* 設置為足夠大的值來確保高度變化順滑 *!*/
-/*    opacity: 1; !* 展開後完全顯現 *!*/
-/*    padding: 20px; !* 展開時增加 padding *!*/
-/*    pointer-events: auto; !* 展開後允許互動 *!*/
-/*}*/
+.compare.active {
+    max-height: none; /* 讓高度由 JS 動態控制 */
+    opacity: 1; /* 展開後完全顯現 */
+    padding: 20px; /* 展開時增加 padding */
+    pointer-events: auto; /* 展開後允許互動 */
+    overflow-y: auto; /* 允許滾動 */
+}
+
 
 /* Hover 效果 */
 .compare:hover {
