@@ -1094,11 +1094,13 @@ function loadCompareSection(sectionId) {
         if (compareDiv.classList.contains('active')) {
             compareDiv.style.maxHeight = compareDiv.scrollHeight + 'px'; // 設置當前高度
             compareDiv.style.opacity = '1'; // 設置透明度為 1
+            compareDiv.style.overflowY = 'auto'; // 開啟滾動
 
-            // 稍後設置為 0 開始動畫
+            // 設置為 0 開始動畫收起
             setTimeout(() => {
                 compareDiv.style.maxHeight = '0'; // 收起動畫
                 compareDiv.style.opacity = '0'; // 透明度漸漸消失
+                compareDiv.style.overflowY = 'hidden'; // 收起後隱藏滾動條
             }, 10);
 
             // 移除 active class，等待動畫結束後隱藏
@@ -1114,6 +1116,7 @@ function loadCompareSection(sectionId) {
             setTimeout(() => {
                 compareDiv.style.maxHeight = compareDiv.scrollHeight + 'px'; // 展開至內部高度
                 compareDiv.style.opacity = '1'; // 透明度顯現
+                compareDiv.style.overflowY = 'auto'; // 展開後允許滾動
                 compareDiv.classList.add('active');
             }, 10);
         }
