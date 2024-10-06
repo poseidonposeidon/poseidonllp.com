@@ -233,8 +233,7 @@ div {
 }
 
 /* Compare ////////////////////////////////// 修正 */
-/* Compare section 修正 */
-.compare-section {
+.compare {
     position: fixed;
     top: 50%;
     left: 50%;
@@ -251,24 +250,23 @@ div {
     pointer-events: none; /* 隱藏時不讓互動 */
 }
 
-.compare-section.active {
+.compare.active {
     max-height: 80vh; /* 展開後的最大高度 */
     opacity: 1; /* 展開後變得完全不透明 */
     pointer-events: auto; /* 展開後允許互動 */
 }
 
-.compare-section:hover {
+.compare:hover {
     transform: scale(1.009); /* 當鼠標懸停時略微放大 */
     background-color: #2c2c2c; /* 懸停時改變背景色 */
 }
 
-/* Compare section content 過渡設置 */
-.compare-section-content {
+.compare-content {
     opacity: 0;
     transition: opacity 0.3s ease-in-out; /* 添加透明度過渡效果 */
 }
 
-.compare-section.active .compare-section-content {
+.compare.active .compare-content {
     opacity: 1;
 }
 

@@ -1081,18 +1081,24 @@ function loadCompareSection(sectionId) {
         `
     };
 
-    const compareSection = document.getElementById('section-container-compare-tw'); // 修正 ID 為 section-container-compare-tw
+    const compareSection = document.getElementById('section-container-compare-tw');
     if (compareSection) {
         // 設置動態內容
         compareSection.innerHTML = sections[sectionId] || '<p>Section not found</p>';
-        document.getElementById('compare').style.display = 'block'; // 顯示 #compare 區域
+        const compareDiv = document.getElementById('compare');
+        compareDiv.style.display = 'block'; // 顯示 #compare 區域
 
-        // 確保所有其他部分被模糊
-        const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)'); // 排除 #compare 和導航欄
+        // 激活 compare 的過渡效果
+        setTimeout(() => {
+            compareDiv.classList.add('active'); // 添加 active class，觸發展開動畫
+        }, 100);
+
+        // 確保其他部分被模糊
+        const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)');
         blurElements.forEach(el => el.classList.add('blur-background'));
 
-        // 移除展開部分的模糊效果
-        document.getElementById('compare').classList.remove('blur-background');
+        // 移除 compare 的模糊效果
+        compareDiv.classList.remove('blur-background');
     } else {
         console.error("Compare section not found");
     }
