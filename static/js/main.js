@@ -2039,14 +2039,16 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
         const response = await fetch(searchUrl);
         const data = await response.json();
 
-        // 過濾出包含 .TW 或 .TWO 的股票代碼
-        const match = data.find(item => item.symbol === stockCode || item.symbol.split('.')[0] === stockCode);
+        // 查找正確的股票代碼
+        const match = data.find(item => item.symbol.split('.')[0] === stockCode);
         if (match) {
             if (match.exchangeShortName === 'Taiwan Stock Exchange') {
                 return stockCode + '.TW';
             } else if (match.exchangeShortName === 'Taipei Exchange') {
                 return stockCode + '.TWO';
             }
+        } else {
+            console.error(`No match found for stock code: ${stockCode}`);
         }
     } catch (error) {
         console.error('Error fetching stock exchange:', error);
@@ -2082,6 +2084,7 @@ function displayComparisonResults(stock1, stock2) {
         </div>
     `;
 }
+
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
