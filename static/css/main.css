@@ -245,13 +245,11 @@ div {
     width: 80%;
     overflow: hidden;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
     border-radius: 10px;
-    display: none;
 }
 
 #compare.active {
-    display: block;
     max-height: 80vh;
     opacity: 1;
     overflow-y: auto;

@@ -1085,41 +1085,50 @@ function loadCompareSection(sectionId) {
         `
     };
 
-    const compareSection = document.getElementById('section-container-compare-tw');
-    if (compareSection) {
-        compareSection.innerHTML = sections[sectionId] || '<p>Section not found</p>';
-        const compareDiv = document.getElementById('compare');
+    const compareDiv = document.getElementById('compare');
+    const sectionContainer = document.getElementById('section-container-compare-tw');
 
-        // 如果 compareDiv 有 active class，則表示需要收起
+    if (sectionContainer) {
+        // Load content
+        sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+
+        // Toggle the section
         if (compareDiv.classList.contains('active')) {
-            compareDiv.style.maxHeight = compareDiv.scrollHeight + 'px'; // 設置當前高度
-            compareDiv.style.opacity = '1'; // 設置透明度為 1
-            compareDiv.style.overflowY = 'auto'; // 開啟滾動
+            // Closing the section
+            compareDiv.style.maxHeight = compareDiv.scrollHeight + 'px';
+            compareDiv.style.opacity = '1';
 
-            // 設置為 0 開始動畫收起
             setTimeout(() => {
-                compareDiv.style.maxHeight = '0'; // 收起動畫
-                compareDiv.style.opacity = '0'; // 透明度漸漸消失
-                compareDiv.style.overflowY = 'hidden'; // 收起後隱藏滾動條
+                compareDiv.style.maxHeight = '0';
+                compareDiv.style.opacity = '0';
+                compareDiv.style.overflowY = 'hidden';
             }, 10);
 
-            // 移除 active class，等待動畫結束後隱藏
             setTimeout(() => {
                 compareDiv.classList.remove('active');
-                compareDiv.style.display = 'none'; // 完全隱藏
+                compareDiv.style.display = 'none';
             }, 500);
         } else {
-            compareDiv.style.display = 'block'; // 先顯示區域
-            compareDiv.style.maxHeight = '0'; // 設置初始高度
-            compareDiv.style.opacity = '0'; // 設置初始透明度
+            // Opening the section
+            compareDiv.style.display = 'block';
+            compareDiv.style.maxHeight = '0';
+            compareDiv.style.opacity = '0';
+
+            // Force a reflow before adding the 'active' class
+            void compareDiv.offsetWidth;
 
             setTimeout(() => {
-                compareDiv.style.maxHeight = compareDiv.scrollHeight + 'px'; // 展開至內部高度
-                compareDiv.style.opacity = '1'; // 透明度顯現
-                compareDiv.style.overflowY = 'auto'; // 展開後允許滾動
+                compareDiv.style.maxHeight = compareDiv.scrollHeight + 'px';
+                compareDiv.style.opacity = '1';
+                compareDiv.style.overflowY = 'auto';
                 compareDiv.classList.add('active');
             }, 10);
         }
+
+        // Toggle the overlay
+        const overlay = document.querySelector('.overlay');
+        overlay.classList.toggle('active');
+        document.body.classList.toggle('modal-open');
     } else {
         console.error("Compare section not found");
     }
