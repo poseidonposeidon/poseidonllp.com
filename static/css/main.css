@@ -442,7 +442,8 @@ button:not(.info-input button):hover {
 #companyProfileContainerEU a,
 #companyProfileContainerKR a,
 #companyProfileContainerHK a,
-#companyProfileContainerCN a {
+#companyProfileContainerCN a,
+#chart-links a{
     color: #90caf9;
     transition: all 0.3s ease;
 }
@@ -453,7 +454,8 @@ button:not(.info-input button):hover {
 #companyProfileContainerEU a:hover,
 #companyProfileContainerKR a:hover,
 #companyProfileContainerHK a:hover,
-#companyProfileContainerCN a:hover {
+#companyProfileContainerCN a:hover,
+#chart-links a:hover{
     color: #ffffff;
 }
 

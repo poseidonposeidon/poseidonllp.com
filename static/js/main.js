@@ -1074,7 +1074,7 @@ function loadCompareSection(sectionId) {
                 <label for="stock2-tw">Enter Stock 2 :</label>
                 <input type="text" id="stock2-tw" placeholder="e.g., 2317">
                 
-                <button onclick="compareTaiwanStocks()">Compare</button>
+<!--                <button onclick="compareTaiwanStocks()">Compare</button>-->
             </div>
             
             <!-- 新增切換圖表的功能 -->
@@ -1121,8 +1121,6 @@ function loadCompareSection(sectionId) {
         console.error("Compare section not found");
     }
 }
-
-
 
 const baseUrl = 'https://api.poseidonllp.com';
 
