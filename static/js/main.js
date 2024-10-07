@@ -2110,7 +2110,7 @@ function drawGrossMarginChart(symbol1, symbol2, grossMarginData1, grossMarginDat
         chartInstance.destroy();
     }
 
-    // 統一兩個股票的年份範圍
+    // 確保日期範圍一致
     const commonYears = grossMarginData1
         .map(item => item.date)
         .filter(date => grossMarginData2.some(item => item.date === date));
