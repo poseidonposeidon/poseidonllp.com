@@ -1316,8 +1316,6 @@ async function fetchStockExchange(stockSymbol) {
     }
 }
 
-
-
 async function fetchTWStock() {
     const stockSymbol = document.getElementById('twStockSymbol').value.trim();
     const previousSymbol = document.getElementById('outputSymbolTW').getAttribute('data-last-symbol');
@@ -2028,14 +2026,22 @@ async function compareTaiwanStocks() {
 
         // Fetch stock data for stock 1
         const response1 = await fetch(`${apiUrl}${fullStockSymbol1}?apikey=${apiKey}`);
+        if (!response1.ok) {
+            alert('Error fetching data for stock 1');
+            return;
+        }
         const stockData1 = await response1.json();
 
         // Fetch stock data for stock 2
         const response2 = await fetch(`${apiUrl}${fullStockSymbol2}?apikey=${apiKey}`);
+        if (!response2.ok) {
+            alert('Error fetching data for stock 2');
+            return;
+        }
         const stockData2 = await response2.json();
 
         // Check if both stocks returned valid data
-        if (stockData1.length === 0 || stockData2.length === 0) {
+        if (!Array.isArray(stockData1) || stockData1.length === 0 || !Array.isArray(stockData2) || stockData2.length === 0) {
             alert('Could not retrieve data for one or both of the stocks.');
             return;
         }
