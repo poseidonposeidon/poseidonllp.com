@@ -1301,7 +1301,6 @@ async function fetchStockExchange(stockSymbol) {
             throw new Error('Network response was not ok');
         }
         const data = await response.json();
-        console.log(data); // 打印出返回的資料
 
         // 過濾出包含 .TW 或 .TWO 的結果
         const filteredData = data.filter(item => item.symbol.endsWith('.TW') || item.symbol.endsWith('.TWO'));
@@ -1316,6 +1315,8 @@ async function fetchStockExchange(stockSymbol) {
         return null;
     }
 }
+
+
 
 async function fetchTWStock() {
     const stockSymbol = document.getElementById('twStockSymbol').value.trim();
@@ -1986,9 +1987,6 @@ async function fetchStockSuggestionsCN(stockSymbol) {
         return [];
     }
 }
-
-
-
 
 //////////////////////////////Compare//////////////////////////////////////////////
 async function compareTaiwanStocks() {
