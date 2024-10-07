@@ -2042,10 +2042,13 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
         // 查找正確的股票代碼
         const match = data.find(item => item.symbol.split('.')[0] === stockCode);
         if (match) {
+            console.log(`Matched stock: ${match.symbol} - Exchange: ${match.exchangeShortName}`);
             if (match.exchangeShortName === 'Taiwan Stock Exchange') {
                 return stockCode + '.TW';
             } else if (match.exchangeShortName === 'Taipei Exchange') {
                 return stockCode + '.TWO';
+            } else {
+                console.error(`Unknown exchange: ${match.exchangeShortName}`);
             }
         } else {
             console.error(`No match found for stock code: ${stockCode}`);
@@ -2084,7 +2087,6 @@ function displayComparisonResults(stock1, stock2) {
         </div>
     `;
 }
-
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
