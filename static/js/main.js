@@ -1988,6 +1988,9 @@ async function fetchStockSuggestionsCN(stockSymbol) {
 }
 
 //////////////////////////////Compare//////////////////////////////////////////////
+// 全局變數來存儲當前圖表實例
+let chartInstance = null;
+
 async function compareTaiwanStocks() {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2090,6 +2093,11 @@ async function fetchGrossMargin(stockSymbol, apiKey) {
 function drawGrossMarginChart(symbol1, symbol2, grossMarginData1, grossMarginData2) {
     const ctx = document.getElementById('grossMarginChart').getContext('2d');
 
+    // 如果之前已經有圖表，先銷毀它
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
+
     const labels = grossMarginData1.map(item => item.date); // 假設兩者日期範圍相同
 
     const chartData = {
@@ -2110,7 +2118,8 @@ function drawGrossMarginChart(symbol1, symbol2, grossMarginData1, grossMarginDat
         ]
     };
 
-    new Chart(ctx, {
+    // 創建新的圖表
+    chartInstance = new Chart(ctx, {
         type: 'line',  // 使用折線圖
         data: chartData,
         options: {
