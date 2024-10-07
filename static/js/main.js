@@ -2073,20 +2073,29 @@ async function displayComparisonResults(stock1, stock2) {
 }
 
 // 獲取毛利率資料的函式
+// 獲取毛利率資料的函式，只取最近10年內的數據
 async function fetchGrossMargin(stockSymbol, apiKey) {
     const apiUrl = `https://financialmodelingprep.com/api/v3/ratios/${stockSymbol}?apikey=${apiKey}`;
+
+    // 計算10年前的日期
+    const today = new Date();
+    const tenYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
+
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        // 確保返回的年份範圍一致
+        // 過濾掉超過10年的數據
         return data
-            .filter(item => item.date)  // 過濾掉沒有日期的數據
+            .filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= tenYearsAgo;  // 只保留10年內的資料
+            })
             .map(item => ({
                 date: item.date,
                 grossMargin: item.grossProfitMargin
             }))
-            .reverse(); // 反轉順序以保證年份從過去到現在
+            .reverse();  // 確保日期順序從過去到現在
     } catch (error) {
         console.error('Error fetching gross margin data:', error);
         return [];
