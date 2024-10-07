@@ -2078,11 +2078,15 @@ async function fetchGrossMargin(stockSymbol, apiKey) {
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
-        // 假設毛利率數據存儲在 grossProfitMargin
-        return data.map(item => ({
-            date: item.date,
-            grossMargin: item.grossProfitMargin
-        }));
+
+        // 確保返回的年份範圍一致
+        return data
+            .filter(item => item.date)  // 過濾掉沒有日期的數據
+            .map(item => ({
+                date: item.date,
+                grossMargin: item.grossProfitMargin
+            }))
+            .reverse(); // 反轉順序以保證年份從過去到現在
     } catch (error) {
         console.error('Error fetching gross margin data:', error);
         return [];
@@ -2097,21 +2101,26 @@ function drawGrossMarginChart(symbol1, symbol2, grossMarginData1, grossMarginDat
         chartInstance.destroy();
     }
 
-    // 反轉年份，讓最早的年份在左邊
-    const labels = grossMarginData1.map(item => item.date).reverse(); // 反轉日期順序
+    // 統一兩個股票的年份範圍
+    const commonYears = grossMarginData1
+        .map(item => item.date)
+        .filter(date => grossMarginData2.some(item => item.date === date));
+
+    const filteredGrossMarginData1 = grossMarginData1.filter(item => commonYears.includes(item.date));
+    const filteredGrossMarginData2 = grossMarginData2.filter(item => commonYears.includes(item.date));
 
     const chartData = {
-        labels: labels,
+        labels: commonYears,
         datasets: [
             {
                 label: `${symbol1} Gross Margin`,
-                data: grossMarginData1.map(item => item.grossMargin).reverse(), // 反轉毛利率數據順序
+                data: filteredGrossMarginData1.map(item => item.grossMargin),
                 borderColor: 'rgba(75, 192, 192, 1)',
                 fill: false
             },
             {
                 label: `${symbol2} Gross Margin`,
-                data: grossMarginData2.map(item => item.grossMargin).reverse(), // 反轉毛利率數據順序
+                data: filteredGrossMarginData2.map(item => item.grossMargin),
                 borderColor: 'rgba(255, 99, 132, 1)',
                 fill: false
             }
