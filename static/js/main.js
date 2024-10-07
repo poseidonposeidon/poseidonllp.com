@@ -2000,7 +2000,7 @@ async function compareTaiwanStocks() {
     const apiUrl = 'https://financialmodelingprep.com/api/v3/profile/';
 
     try {
-        // 自動判斷股票 1 的證交所並加上 .TW 或 .TWO
+        // 修改部分：自動判斷股票 1 的證交所並加上 .TW 或 .TWO
         const exchangeShortName1 = await fetchStockExchange(stock1);
         let fullStockSymbol1 = '';
         if (exchangeShortName1 === 'Taiwan Stock Exchange') {
@@ -2012,7 +2012,7 @@ async function compareTaiwanStocks() {
             return;
         }
 
-        // 自動判斷股票 2 的證交所並加上 .TW 或 .TWO
+        // 修改部分：自動判斷股票 2 的證交所並加上 .TW 或 .TWO
         const exchangeShortName2 = await fetchStockExchange(stock2);
         let fullStockSymbol2 = '';
         if (exchangeShortName2 === 'Taiwan Stock Exchange') {
