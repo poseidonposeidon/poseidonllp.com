@@ -2071,19 +2071,8 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
     }
 }
 
-async function displayComparisonResults(stock1, stock2) {
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-
-    const grossMarginData1 = await fetchGrossMargin(stock1.symbol, apiKey);
-    const grossMarginData2 = await fetchGrossMargin(stock2.symbol, apiKey);
-
-    // 繪製圖表
-    drawGrossMarginChart(stock1.symbol, stock2.symbol, grossMarginData1, grossMarginData2);
-}
-
-// 獲取毛利率資料的函式
-// 獲取毛利率資料的函式，只取最近10年內的數據
-async function fetchGrossMargin(stockSymbol, apiKey) {
+// 獲取不同類型的毛利率、盈利率、稅後淨利率等數據
+async function fetchMarginData(stockSymbol, apiKey, type) {
     const apiUrl = `https://financialmodelingprep.com/api/v3/ratios/${stockSymbol}?apikey=${apiKey}`;
 
     // 計算10年前的日期
@@ -2094,6 +2083,16 @@ async function fetchGrossMargin(stockSymbol, apiKey) {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
+        // 根據不同類型返回不同的數據欄位
+        let marginField;
+        if (type === 'grossMargin') {
+            marginField = 'grossProfitMargin';
+        } else if (type === 'operatingMargin') {
+            marginField = 'operatingProfitMargin';
+        } else if (type === 'netProfitMargin') {
+            marginField = 'netProfitMargin';
+        }
+
         // 過濾掉超過10年的數據
         return data
             .filter(item => {
@@ -2102,16 +2101,48 @@ async function fetchGrossMargin(stockSymbol, apiKey) {
             })
             .map(item => ({
                 date: item.date,
-                grossMargin: item.grossProfitMargin
+                margin: item[marginField]
             }))
             .reverse();  // 確保日期順序從過去到現在
     } catch (error) {
-        console.error('Error fetching gross margin data:', error);
+        console.error(`Error fetching ${type} data:`, error);
         return [];
     }
 }
 
-function drawGrossMarginChart(symbol1, symbol2, grossMarginData1, grossMarginData2) {
+// 根據用戶選擇顯示不同的圖表
+async function displayChart(type) {
+    const stock1 = document.getElementById('stock1-tw').value.trim();
+    const stock2 = document.getElementById('stock2-tw').value.trim();
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    if (!stock1 || !stock2) {
+        alert('Please enter both stock symbols.');
+        return;
+    }
+
+    const fullStockSymbol1 = await fetchStockWithExchangeSuffix(stock1, apiKey);
+    const fullStockSymbol2 = await fetchStockWithExchangeSuffix(stock2, apiKey);
+
+    if (!fullStockSymbol1 || !fullStockSymbol2) {
+        alert('Unable to determine stock exchange for one or both symbols.');
+        return;
+    }
+
+    // 根據類型獲取對應的數據
+    const marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
+    const marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, type);
+
+    drawMarginChart(
+        `${fullStockSymbol1} ${type.charAt(0).toUpperCase() + type.slice(1).replace('Margin', ' Margin')}`,
+        `${fullStockSymbol2} ${type.charAt(0).toUpperCase() + type.slice(1).replace('Margin', ' Margin')}`,
+        marginData1,
+        marginData2
+    );
+}
+
+// 使用 Chart.js 繪製通用毛利率、盈利率、稅後淨利率圖表
+function drawMarginChart(label1, label2, marginData1, marginData2) {
     const ctx = document.getElementById('grossMarginChart').getContext('2d');
 
     // 如果之前已經有圖表，先銷毀它
@@ -2119,26 +2150,26 @@ function drawGrossMarginChart(symbol1, symbol2, grossMarginData1, grossMarginDat
         chartInstance.destroy();
     }
 
-    // 確保日期範圍一致
-    const commonYears = grossMarginData1
+    // 統一日期範圍
+    const commonYears = marginData1
         .map(item => item.date)
-        .filter(date => grossMarginData2.some(item => item.date === date));
+        .filter(date => marginData2.some(item => item.date === date));
 
-    const filteredGrossMarginData1 = grossMarginData1.filter(item => commonYears.includes(item.date));
-    const filteredGrossMarginData2 = grossMarginData2.filter(item => commonYears.includes(item.date));
+    const filteredMarginData1 = marginData1.filter(item => commonYears.includes(item.date));
+    const filteredMarginData2 = marginData2.filter(item => commonYears.includes(item.date));
 
     const chartData = {
         labels: commonYears,
         datasets: [
             {
-                label: `${symbol1} Gross Margin`,
-                data: filteredGrossMarginData1.map(item => item.grossMargin),
+                label: label1,
+                data: filteredMarginData1.map(item => item.margin),
                 borderColor: 'rgba(75, 192, 192, 1)',
                 fill: false
             },
             {
-                label: `${symbol2} Gross Margin`,
-                data: filteredGrossMarginData2.map(item => item.grossMargin),
+                label: label2,
+                data: filteredMarginData2.map(item => item.margin),
                 borderColor: 'rgba(255, 99, 132, 1)',
                 fill: false
             }
@@ -2172,6 +2203,7 @@ function drawGrossMarginChart(symbol1, symbol2, grossMarginData1, grossMarginDat
         }
     });
 }
+
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
