@@ -241,9 +241,9 @@ div {
     background-color: #1e1e1e;
     padding: 20px;
     z-index: 9999;
-    width: 80%;
+    width: 80%; /* 確保與其他section的寬度一致 */
     max-width: 800px;
-    max-height: 80%; /* 修改為與其他 section 相同 */
+    max-height: 80%; /* 高度調整，與其他section保持一致 */
     overflow-y: auto;
     opacity: 0;
     transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out, transform 0.5s ease-in-out;
