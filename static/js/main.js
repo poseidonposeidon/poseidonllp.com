@@ -2089,7 +2089,6 @@ async function fetchGrossMargin(stockSymbol, apiKey) {
     }
 }
 
-// 使用 Chart.js 繪製毛利率圖表
 function drawGrossMarginChart(symbol1, symbol2, grossMarginData1, grossMarginData2) {
     const ctx = document.getElementById('grossMarginChart').getContext('2d');
 
@@ -2098,20 +2097,21 @@ function drawGrossMarginChart(symbol1, symbol2, grossMarginData1, grossMarginDat
         chartInstance.destroy();
     }
 
-    const labels = grossMarginData1.map(item => item.date); // 假設兩者日期範圍相同
+    // 反轉年份，讓最早的年份在左邊
+    const labels = grossMarginData1.map(item => item.date).reverse(); // 反轉日期順序
 
     const chartData = {
         labels: labels,
         datasets: [
             {
                 label: `${symbol1} Gross Margin`,
-                data: grossMarginData1.map(item => item.grossMargin),
+                data: grossMarginData1.map(item => item.grossMargin).reverse(), // 反轉毛利率數據順序
                 borderColor: 'rgba(75, 192, 192, 1)',
                 fill: false
             },
             {
                 label: `${symbol2} Gross Margin`,
-                data: grossMarginData2.map(item => item.grossMargin),
+                data: grossMarginData2.map(item => item.grossMargin).reverse(), // 反轉毛利率數據順序
                 borderColor: 'rgba(255, 99, 132, 1)',
                 fill: false
             }
