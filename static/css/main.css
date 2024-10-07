@@ -285,11 +285,17 @@ div {
     flex: 1 1 auto;
 }
 
+#compare .info-input label {
+    flex: 1 1 100%; /* Label 佔滿一行 */
+}
+
 #compare .info-input input {
+    flex: 1 1 48%; /* 讓兩個輸入框佔每行的48%，避免重疊 */
     min-width: 150px;
 }
 
 #compare .info-input button {
+    flex: 1 1 100%; /* 按鈕佔滿一整行 */
     background-color: #1e1e1e;
     border: 2px solid #616161;
     padding: 10px;
@@ -297,11 +303,6 @@ div {
     color: #e0e0e0;
     transition: background-color 0.3s;
 }
-
-#compare .info-input button:hover {
-    background-color:  #757575;
-}
-
 /* Ensure content is hidden when section is closed */
 #compare:not(.active) .section-container {
     display: none;
