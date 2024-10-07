@@ -2033,31 +2033,29 @@ async function compareTaiwanStocks() {
 
 // 使用 API 判斷股票代碼是屬於 .TW 還是 .TWO
 async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
-    const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockCode}&limit=10&apikey=${apiKey}`;
+    const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockCode}&apikey=${apiKey}`;
 
     try {
         const response = await fetch(searchUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
         const data = await response.json();
 
-        // 查找正確的股票代碼
-        const match = data.find(item => item.symbol.split('.')[0] === stockCode);
-        if (match) {
-            console.log(`Matched stock: ${match.symbol} - Exchange: ${match.exchangeShortName}`);
-            if (match.exchangeShortName === 'Taiwan Stock Exchange') {
-                return stockCode + '.TW';
-            } else if (match.exchangeShortName === 'Taipei Exchange') {
-                return stockCode + '.TWO';
-            } else {
-                console.error(`Unknown exchange: ${match.exchangeShortName}`);
-            }
+        // 過濾出包含 .TW 或 .TWO 的結果
+        const filteredData = data.filter(item => item.symbol.endsWith('.TW') || item.symbol.endsWith('.TWO'));
+
+        if (filteredData.length > 0) {
+            const match = filteredData.find(item => item.symbol.split('.')[0] === stockCode);
+            return match ? (match.symbol.endsWith('.TW') ? stockCode + '.TW' : stockCode + '.TWO') : null;
         } else {
-            console.error(`No match found for stock code: ${stockCode}`);
+            return null;
         }
     } catch (error) {
         console.error('Error fetching stock exchange:', error);
+        return null;
     }
-
-    return null;  // 如果找不到匹配的股票代碼，返回 null
 }
 
 function displayComparisonResults(stock1, stock2) {
@@ -2087,6 +2085,7 @@ function displayComparisonResults(stock1, stock2) {
         </div>
     `;
 }
+
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
