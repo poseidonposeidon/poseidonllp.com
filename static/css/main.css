@@ -239,15 +239,15 @@ div {
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #1e1e1e;
-    padding: 20px;
+    padding: 40px; /* 增加内边距 */
     z-index: 9999;
-    width: 80%;
-    max-width: 800px; /* 限制最大宽度 */
-    max-height: 90vh; /* 使用视口高度的90%作为最大高度 */
-    overflow-y: auto; /* 允许垂直滚动，以防内容过多 */
+    width: 90%; /* 增加宽度 */
+    max-width: 1000px; /* 增加最大宽度 */
+    max-height: 90vh;
+    overflow-y: auto;
     opacity: 0;
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
-    border-radius: 10px;
+    border-radius: 15px; /* 增加圆角 */
     display: none;
 }
 
@@ -260,37 +260,62 @@ div {
 /* 调整内部元素的样式 */
 #compare h2 {
     margin-top: 0;
-    margin-bottom: 20px;
+    margin-bottom: 30px; /* 增加标题下方间距 */
+    font-size: 24px; /* 增加标题字体大小 */
 }
 
 #compare .info-input {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin-bottom: 20px;
+    flex-direction: column; /* 改为纵向排列 */
+    gap: 20px; /* 增加元素间距 */
+    margin-bottom: 30px;
 }
 
-#compare .info-input label,
-#compare .info-input input,
-#compare .info-input button {
-    flex: 1 1 auto;
+#compare .info-input label {
+    font-size: 18px; /* 增加标签字体大小 */
 }
 
 #compare .info-input input {
-    min-width: 150px;
+    padding: 12px; /* 增加输入框内边距 */
+    font-size: 16px; /* 增加输入框字体大小 */
+    border-radius: 5px;
+    border: 1px solid #444;
+    background-color: #2c2c2c;
+    color: #fff;
 }
 
 #compare .info-input button {
-    padding: 10px 20px;
-    background-color: #616161;
+    padding: 15px 30px; /* 增加按钮内边距 */
+    font-size: 18px; /* 增加按钮字体大小 */
+    background-color: #4CAF50;
     color: white;
     border: none;
+    border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s;
+    align-self: flex-start; /* 让按钮左对齐 */
 }
 
 #compare .info-input button:hover {
-    background-color: #757575;
+    background-color: #45a049;
+}
+
+/* 添加响应式布局 */
+@media (min-width: 768px) {
+    #compare .info-input {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    #compare .info-input label,
+    #compare .info-input input {
+        flex: 1 1 40%;
+    }
+
+    #compare .info-input button {
+        flex: 1 1 100%;
+        margin-top: 20px;
+    }
 }
 /* Ensure content is hidden when section is closed */
 #compare:not(.active) .section-container {
