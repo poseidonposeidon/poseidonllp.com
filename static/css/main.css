@@ -241,12 +241,12 @@ div {
     background-color: #1e1e1e;
     padding: 20px;
     z-index: 9999;
-    width: 80%; /* 確保與其他section的寬度一致 */
-    max-width: 800px;
-    max-height: 80%; /* 高度調整，與其他section保持一致 */
-    overflow-y: auto;
+    width: 80%;
+    max-width: 800px; /* 限制最大宽度 */
+    max-height: 90vh; /* 使用视口高度的90%作为最大高度 */
+    overflow-y: auto; /* 允许垂直滚动，以防内容过多 */
     opacity: 0;
-    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out, transform 0.5s ease-in-out;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
     border-radius: 10px;
     display: none;
 }
@@ -255,18 +255,9 @@ div {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
     display: block;
-    max-height: 80%; /* 與其他 active 狀態保持一致 */
 }
 
-#compare .section-container {
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
-}
-
-#compare.active .section-container {
-    opacity: 1;
-}
-
+/* 调整内部元素的样式 */
 #compare h2 {
     margin-top: 0;
     margin-bottom: 20px;
@@ -285,23 +276,21 @@ div {
     flex: 1 1 auto;
 }
 
-#compare .info-input label {
-    flex: 1 1 100%; /* Label 佔滿一行 */
-}
-
 #compare .info-input input {
-    flex: 1 1 48%; /* 讓兩個輸入框佔每行的48%，避免重疊 */
     min-width: 150px;
 }
 
 #compare .info-input button {
-    flex: 1 1 100%; /* 按鈕佔滿一整行 */
+    padding: 10px 20px;
     background-color: #1e1e1e;
-    border: 2px solid #616161;
-    padding: 10px;
-    border-radius: 5px;
-    color: #e0e0e0;
+    color: white;
+    border: none;
+    cursor: pointer;
     transition: background-color 0.3s;
+}
+
+#compare .info-input button:hover {
+    background-color: #757575;
 }
 /* Ensure content is hidden when section is closed */
 #compare:not(.active) .section-container {
