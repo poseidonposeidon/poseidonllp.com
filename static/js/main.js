@@ -2002,50 +2002,6 @@ async function fetchStockSuggestionsCN(stockSymbol) {
 // 全局變數來存儲當前圖表實例
 let chartInstance = null;
 
-async function compareTaiwanStocks() {
-    const stock1 = document.getElementById('stock1-tw').value.trim();
-    const stock2 = document.getElementById('stock2-tw').value.trim();
-
-    if (!stock1 || !stock2) {
-        alert('Please enter both stock symbols.');
-        return;
-    }
-
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/`;
-
-    // 自動判斷股票 1 和 2 是屬於 .TW 還是 .TWO
-    const fullStockSymbol1 = await fetchStockWithExchangeSuffix(stock1, apiKey);
-    const fullStockSymbol2 = await fetchStockWithExchangeSuffix(stock2, apiKey);
-
-    if (!fullStockSymbol1 || !fullStockSymbol2) {
-        alert('Unable to determine stock exchange for one or both symbols.');
-        return;
-    }
-
-    try {
-        // Fetch stock data for stock 1
-        const response1 = await fetch(`${apiUrl}${fullStockSymbol1}?apikey=${apiKey}`);
-        const stockData1 = await response1.json();
-
-        // Fetch stock data for stock 2
-        const response2 = await fetch(`${apiUrl}${fullStockSymbol2}?apikey=${apiKey}`);
-        const stockData2 = await response2.json();
-
-        // Check if both stocks returned valid data
-        if (stockData1.length === 0 || stockData2.length === 0) {
-            alert('Could not retrieve data for one or both of the stocks.');
-            return;
-        }
-
-        // Display comparison results
-        displayComparisonResults(stockData1[0], stockData2[0]);
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-        alert('There was an error retrieving stock data.');
-    }
-}
-
 // 使用 API 判斷股票代碼是屬於 .TW 還是 .TWO
 async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
     const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockCode}&apikey=${apiKey}`;
@@ -2095,7 +2051,7 @@ async function fetchMarginData(stockSymbol, apiKey, type) {
             marginField = 'netProfitMargin';
         }
 
-        // 過濾掉超過10年的數據
+        // 過濾掉超過10年的數據，並將 margin 值乘以 100
         return data
             .filter(item => {
                 const itemDate = new Date(item.date);
@@ -2103,7 +2059,7 @@ async function fetchMarginData(stockSymbol, apiKey, type) {
             })
             .map(item => ({
                 date: item.date,
-                margin: item[marginField]
+                margin: item[marginField] * 100 // 將 margin 數值放大 100 倍
             }))
             .reverse();  // 確保日期順序從過去到現在
     } catch (error) {
