@@ -2001,7 +2001,7 @@ async function compareTaiwanStocks() {
     }
 
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/`;
+    const apiUrl = 'https://financialmodelingprep.com/api/v3/profile/';
 
     try {
         // 自動判斷股票 1 的證交所並加上 .TW 或 .TWO
@@ -2078,8 +2078,6 @@ function displayComparisonResults(stock1, stock2) {
         </div>
     `;
 }
-
-
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
