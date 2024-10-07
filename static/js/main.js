@@ -1989,6 +1989,73 @@ async function fetchStockSuggestionsCN(stockSymbol) {
 
 
 
+
+//////////////////////////////Compare//////////////////////////////////////////////
+async function compareTaiwanStocks() {
+    const stock1 = document.getElementById('stock1-tw').value.trim();
+    const stock2 = document.getElementById('stock2-tw').value.trim();
+
+    if (!stock1 || !stock2) {
+        alert('Please enter both stock symbols.');
+        return;
+    }
+
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/`;
+
+    try {
+        // Fetch stock data for stock 1
+        const response1 = await fetch(`${apiUrl}${stock1}?apikey=${apiKey}`);
+        const stockData1 = await response1.json();
+
+        // Fetch stock data for stock 2
+        const response2 = await fetch(`${apiUrl}${stock2}?apikey=${apiKey}`);
+        const stockData2 = await response2.json();
+
+        // Check if both stocks returned valid data
+        if (stockData1.length === 0 || stockData2.length === 0) {
+            alert('Could not retrieve data for one or both of the stocks.');
+            return;
+        }
+
+        // Display comparison results
+        displayComparisonResults(stockData1[0], stockData2[0]);
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        alert('There was an error retrieving stock data.');
+    }
+}
+
+function displayComparisonResults(stock1, stock2) {
+    const comparisonResultContainer = document.getElementById('comparisonResultContainer-tw');
+
+    comparisonResultContainer.innerHTML = `
+        <h3>Comparison between ${stock1.symbol} and ${stock2.symbol}</h3>
+        <div class="comparison-row">
+            <div><strong>${stock1.symbol}</strong></div>
+            <div><strong>${stock2.symbol}</strong></div>
+        </div>
+        <div class="comparison-row">
+            <div>Company Name: ${stock1.companyName}</div>
+            <div>Company Name: ${stock2.companyName}</div>
+        </div>
+        <div class="comparison-row">
+            <div>Price: ${stock1.price}</div>
+            <div>Price: ${stock2.price}</div>
+        </div>
+        <div class="comparison-row">
+            <div>Market Cap: ${stock1.mktCap}</div>
+            <div>Market Cap: ${stock2.mktCap}</div>
+        </div>
+        <div class="comparison-row">
+            <div>Industry: ${stock1.industry}</div>
+            <div>Industry: ${stock2.industry}</div>
+        </div>
+    `;
+}
+
+
+
 //////////////////////////////Profile//////////////////////////////////////////////
 
 function fetchCompanyProfile(stockSymbol) {
