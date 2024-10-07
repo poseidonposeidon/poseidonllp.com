@@ -1077,6 +1077,13 @@ function loadCompareSection(sectionId) {
                 <button onclick="compareTaiwanStocks()">Compare</button>
             </div>
             
+            <!-- 新增切換圖表的功能 -->
+            <div class="chart-links">
+                <a href="#" onclick="displayChart('grossMargin')">Gross Margin</a> |
+                <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a> |
+                <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a>
+            </div>
+            
             <div id="comparisonResultContainer-tw">
                 <canvas id="grossMarginChart"></canvas>
                 <!-- Comparison results will be displayed here -->
@@ -1114,6 +1121,8 @@ function loadCompareSection(sectionId) {
         console.error("Compare section not found");
     }
 }
+
+
 
 const baseUrl = 'https://api.poseidonllp.com';
 
