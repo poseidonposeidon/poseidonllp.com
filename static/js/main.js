@@ -1068,10 +1068,10 @@ function loadCompareSection(sectionId) {
         'compare-tw': `
             <h2>Compare Taiwan Stocks</h2>
             <div class="info-input">
-                <label for="stock1-tw">Enter Stock 1 (Taiwan):</label>
+                <label for="stock1-tw">Enter Stock 1 :</label>
                 <input type="text" id="stock1-tw" placeholder="e.g., 2330">
                 
-                <label for="stock2-tw">Enter Stock 2 (Taiwan):</label>
+                <label for="stock2-tw">Enter Stock 2 :</label>
                 <input type="text" id="stock2-tw" placeholder="e.g., 2317">
                 
                 <button onclick="compareTaiwanStocks()">Compare</button>

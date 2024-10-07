@@ -242,11 +242,11 @@ div {
     padding: 20px;
     z-index: 9999;
     width: 80%;
-    max-width: 800px; /* 限制最大宽度 */
-    max-height: 90vh; /* 使用视口高度的90%作为最大高度 */
-    overflow-y: auto; /* 允许垂直滚动，以防内容过多 */
+    max-width: 800px;
+    max-height: 80%; /* 修改為與其他 section 相同 */
+    overflow-y: auto;
     opacity: 0;
-    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out, transform 0.5s ease-in-out;
     border-radius: 10px;
     display: none;
 }
@@ -255,6 +255,7 @@ div {
     opacity: 1;
     transform: translate(-50%, -50%) scale(1);
     display: block;
+    max-height: 80%; /* 與其他 active 狀態保持一致 */
 }
 
 #compare .section-container {
