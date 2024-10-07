@@ -2000,8 +2000,13 @@ async function compareTaiwanStocks() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/`;
 
     // 自動判斷股票 1 和 2 是屬於 .TW 還是 .TWO
-    const fullStockSymbol1 = appendExchangeSuffix(stock1);
-    const fullStockSymbol2 = appendExchangeSuffix(stock2);
+    const fullStockSymbol1 = await fetchStockWithExchangeSuffix(stock1, apiKey);
+    const fullStockSymbol2 = await fetchStockWithExchangeSuffix(stock2, apiKey);
+
+    if (!fullStockSymbol1 || !fullStockSymbol2) {
+        alert('Unable to determine stock exchange for one or both symbols.');
+        return;
+    }
 
     try {
         // Fetch stock data for stock 1
@@ -2026,16 +2031,28 @@ async function compareTaiwanStocks() {
     }
 }
 
-// 判斷股票代碼屬於 .TW 或 .TWO
-function appendExchangeSuffix(stockCode) {
-    const numericCode = parseInt(stockCode, 10);
-    if (numericCode >= 1100 && numericCode <= 9999) {
-        // 台灣證交所股票
-        return stockCode + '.TW';
-    } else {
-        // 櫃買中心股票
-        return stockCode + '.TWO';
+// 使用 API 判斷股票代碼是屬於 .TW 還是 .TWO
+async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
+    const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockCode}&limit=10&apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(searchUrl);
+        const data = await response.json();
+
+        // 過濾出包含 .TW 或 .TWO 的股票代碼
+        const match = data.find(item => item.symbol === stockCode || item.symbol.split('.')[0] === stockCode);
+        if (match) {
+            if (match.exchangeShortName === 'Taiwan Stock Exchange') {
+                return stockCode + '.TW';
+            } else if (match.exchangeShortName === 'Taipei Exchange') {
+                return stockCode + '.TWO';
+            }
+        }
+    } catch (error) {
+        console.error('Error fetching stock exchange:', error);
     }
+
+    return null;  // 如果找不到匹配的股票代碼，返回 null
 }
 
 function displayComparisonResults(stock1, stock2) {
@@ -2065,8 +2082,6 @@ function displayComparisonResults(stock1, stock2) {
         </div>
     `;
 }
-
-
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
