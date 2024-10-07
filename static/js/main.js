@@ -1992,8 +1992,8 @@ async function fetchStockSuggestionsCN(stockSymbol) {
 
 //////////////////////////////Compare//////////////////////////////////////////////
 async function compareTaiwanStocks() {
-    const stock1 = document.getElementById('stock1-tw').value.trim();
-    const stock2 = document.getElementById('stock2-tw').value.trim();
+    const stock1 = document.getElementById('stock1-tw').value.trim().toUpperCase();
+    const stock2 = document.getElementById('stock2-tw').value.trim().toUpperCase();
 
     if (!stock1 || !stock2) {
         alert('Please enter both stock symbols.');
@@ -2004,12 +2004,36 @@ async function compareTaiwanStocks() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/`;
 
     try {
+        // 自動判斷股票 1 的證交所並加上 .TW 或 .TWO
+        const exchangeShortName1 = await fetchStockExchange(stock1);
+        let fullStockSymbol1 = '';
+        if (exchangeShortName1 === 'Taiwan Stock Exchange') {
+            fullStockSymbol1 = stock1 + '.TW';
+        } else if (exchangeShortName1 === 'Taipei Exchange') {
+            fullStockSymbol1 = stock1 + '.TWO';
+        } else {
+            alert(`Unable to identify the exchange for stock: ${stock1}`);
+            return;
+        }
+
+        // 自動判斷股票 2 的證交所並加上 .TW 或 .TWO
+        const exchangeShortName2 = await fetchStockExchange(stock2);
+        let fullStockSymbol2 = '';
+        if (exchangeShortName2 === 'Taiwan Stock Exchange') {
+            fullStockSymbol2 = stock2 + '.TW';
+        } else if (exchangeShortName2 === 'Taipei Exchange') {
+            fullStockSymbol2 = stock2 + '.TWO';
+        } else {
+            alert(`Unable to identify the exchange for stock: ${stock2}`);
+            return;
+        }
+
         // Fetch stock data for stock 1
-        const response1 = await fetch(`${apiUrl}${stock1}?apikey=${apiKey}`);
+        const response1 = await fetch(`${apiUrl}${fullStockSymbol1}?apikey=${apiKey}`);
         const stockData1 = await response1.json();
 
         // Fetch stock data for stock 2
-        const response2 = await fetch(`${apiUrl}${stock2}?apikey=${apiKey}`);
+        const response2 = await fetch(`${apiUrl}${fullStockSymbol2}?apikey=${apiKey}`);
         const stockData2 = await response2.json();
 
         // Check if both stocks returned valid data
@@ -2020,6 +2044,7 @@ async function compareTaiwanStocks() {
 
         // Display comparison results
         displayComparisonResults(stockData1[0], stockData2[0]);
+
     } catch (error) {
         console.error('Error fetching stock data:', error);
         alert('There was an error retrieving stock data.');
