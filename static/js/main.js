@@ -1988,8 +1988,8 @@ async function fetchStockSuggestionsCN(stockSymbol) {
 
 //////////////////////////////Compare//////////////////////////////////////////////
 async function compareTaiwanStocks() {
-    const stock1 = document.getElementById('stock1-tw').value.trim();
-    const stock2 = document.getElementById('stock2-tw').value.trim();
+    const stock1 = document.getElementById('stock1-tw').value.trim().toUpperCase();
+    const stock2 = document.getElementById('stock2-tw').value.trim().toUpperCase();
 
     if (!stock1 || !stock2) {
         alert('Please enter both stock symbols.');
@@ -1997,13 +1997,33 @@ async function compareTaiwanStocks() {
     }
 
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/`;
-
-    // 自動判斷股票 1 和 2 是屬於 .TW 還是 .TWO
-    const fullStockSymbol1 = appendExchangeSuffix(stock1);
-    const fullStockSymbol2 = appendExchangeSuffix(stock2);
+    const apiUrl = 'https://financialmodelingprep.com/api/v3/profile/';
 
     try {
+        // 自動判斷股票 1 的證交所並加上 .TW 或 .TWO
+        const exchangeShortName1 = await fetchStockExchange(stock1);
+        let fullStockSymbol1 = '';
+        if (exchangeShortName1 === 'Taiwan Stock Exchange') {
+            fullStockSymbol1 = stock1 + '.TW';
+        } else if (exchangeShortName1 === 'Taipei Exchange') {
+            fullStockSymbol1 = stock1 + '.TWO';
+        } else {
+            alert(`Unable to identify the exchange for stock: ${stock1}`);
+            return;
+        }
+
+        // 自動判斷股票 2 的證交所並加上 .TW 或 .TWO
+        const exchangeShortName2 = await fetchStockExchange(stock2);
+        let fullStockSymbol2 = '';
+        if (exchangeShortName2 === 'Taiwan Stock Exchange') {
+            fullStockSymbol2 = stock2 + '.TW';
+        } else if (exchangeShortName2 === 'Taipei Exchange') {
+            fullStockSymbol2 = stock2 + '.TWO';
+        } else {
+            alert(`Unable to identify the exchange for stock: ${stock2}`);
+            return;
+        }
+
         // Fetch stock data for stock 1
         const response1 = await fetch(`${apiUrl}${fullStockSymbol1}?apikey=${apiKey}`);
         const stockData1 = await response1.json();
