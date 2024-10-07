@@ -1988,8 +1988,8 @@ async function fetchStockSuggestionsCN(stockSymbol) {
 
 //////////////////////////////Compare//////////////////////////////////////////////
 async function compareTaiwanStocks() {
-    const stock1 = document.getElementById('stock1-tw').value.trim().toUpperCase();
-    const stock2 = document.getElementById('stock2-tw').value.trim().toUpperCase();
+    const stock1 = document.getElementById('stock1-tw').value.trim();
+    const stock2 = document.getElementById('stock2-tw').value.trim();
 
     if (!stock1 || !stock2) {
         alert('Please enter both stock symbols.');
@@ -1997,33 +1997,13 @@ async function compareTaiwanStocks() {
     }
 
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = 'https://financialmodelingprep.com/api/v3/profile/';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/`;
+
+    // 自動判斷股票 1 和 2 是屬於 .TW 還是 .TWO
+    const fullStockSymbol1 = appendExchangeSuffix(stock1);
+    const fullStockSymbol2 = appendExchangeSuffix(stock2);
 
     try {
-        // 自動判斷股票 1 的證交所並加上 .TW 或 .TWO
-        const exchangeShortName1 = await fetchStockExchange(stock1);
-        let fullStockSymbol1 = '';
-        if (exchangeShortName1 === 'Taiwan Stock Exchange') {
-            fullStockSymbol1 = stock1 + '.TW';
-        } else if (exchangeShortName1 === 'Taipei Exchange') {
-            fullStockSymbol1 = stock1 + '.TWO';
-        } else {
-            alert(`Unable to identify the exchange for stock: ${stock1}`);
-            return;
-        }
-
-        // 自動判斷股票 2 的證交所並加上 .TW 或 .TWO
-        const exchangeShortName2 = await fetchStockExchange(stock2);
-        let fullStockSymbol2 = '';
-        if (exchangeShortName2 === 'Taiwan Stock Exchange') {
-            fullStockSymbol2 = stock2 + '.TW';
-        } else if (exchangeShortName2 === 'Taipei Exchange') {
-            fullStockSymbol2 = stock2 + '.TWO';
-        } else {
-            alert(`Unable to identify the exchange for stock: ${stock2}`);
-            return;
-        }
-
         // Fetch stock data for stock 1
         const response1 = await fetch(`${apiUrl}${fullStockSymbol1}?apikey=${apiKey}`);
         const stockData1 = await response1.json();
@@ -2043,6 +2023,18 @@ async function compareTaiwanStocks() {
     } catch (error) {
         console.error('Error fetching stock data:', error);
         alert('There was an error retrieving stock data.');
+    }
+}
+
+// 判斷股票代碼屬於 .TW 或 .TWO
+function appendExchangeSuffix(stockCode) {
+    const numericCode = parseInt(stockCode, 10);
+    if (numericCode >= 1100 && numericCode <= 9999) {
+        // 台灣證交所股票
+        return stockCode + '.TW';
+    } else {
+        // 櫃買中心股票
+        return stockCode + '.TWO';
     }
 }
 
@@ -2073,6 +2065,7 @@ function displayComparisonResults(stock1, stock2) {
         </div>
     `;
 }
+
 
 
 //////////////////////////////Profile//////////////////////////////////////////////
