@@ -1083,6 +1083,10 @@ function loadCompareSection(sectionId) {
                 <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a> |
                 <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a>
             </div>
+            <div id="loading" style="display: none; text-align: center;">
+                <p>Loading... Please wait.</p>
+            </div>
+
             
             <div id="comparisonResultContainer-tw">
                 <canvas id="grossMarginChart"></canvas>
@@ -2113,6 +2117,7 @@ async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const loadingElement = document.getElementById('loading'); // 獲取 loading 元素
 
     if (!stock1 || !stock2) {
         alert('Please enter both stock symbols.');
@@ -2127,16 +2132,29 @@ async function displayChart(type) {
         return;
     }
 
-    // 根據類型獲取對應的數據
-    const marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
-    const marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, type);
+    try {
+        // 顯示 Loading 畫面
+        loadingElement.style.display = 'block';
 
-    drawMarginChart(
-        `${fullStockSymbol1} ${type.charAt(0).toUpperCase() + type.slice(1).replace('Margin', ' Margin')}`,
-        `${fullStockSymbol2} ${type.charAt(0).toUpperCase() + type.slice(1).replace('Margin', ' Margin')}`,
-        marginData1,
-        marginData2
-    );
+        // 根據類型獲取對應的數據
+        const marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
+        const marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, type);
+
+        // 繪製圖表
+        drawMarginChart(
+            `${fullStockSymbol1} ${type.charAt(0).toUpperCase() + type.slice(1).replace('Margin', ' Margin')}`,
+            `${fullStockSymbol2} ${type.charAt(0).toUpperCase() + type.slice(1).replace('Margin', ' Margin')}`,
+            marginData1,
+            marginData2
+        );
+
+    } catch (error) {
+        console.error('Error fetching data:', error);
+        alert('There was an error retrieving stock data.');
+    } finally {
+        // 隱藏 Loading 畫面
+        loadingElement.style.display = 'none';
+    }
 }
 
 // 使用 Chart.js 繪製通用毛利率、盈利率、稅後淨利率圖表
@@ -2201,7 +2219,6 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         }
     });
 }
-
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
