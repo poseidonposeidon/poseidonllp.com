@@ -1999,13 +1999,17 @@ async function compareTaiwanStocks() {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/profile/`;
 
+    // 自動判斷股票 1 和 2 是屬於 .TW 還是 .TWO
+    const fullStockSymbol1 = appendExchangeSuffix(stock1);
+    const fullStockSymbol2 = appendExchangeSuffix(stock2);
+
     try {
         // Fetch stock data for stock 1
-        const response1 = await fetch(`${apiUrl}${stock1}?apikey=${apiKey}`);
+        const response1 = await fetch(`${apiUrl}${fullStockSymbol1}?apikey=${apiKey}`);
         const stockData1 = await response1.json();
 
         // Fetch stock data for stock 2
-        const response2 = await fetch(`${apiUrl}${stock2}?apikey=${apiKey}`);
+        const response2 = await fetch(`${apiUrl}${fullStockSymbol2}?apikey=${apiKey}`);
         const stockData2 = await response2.json();
 
         // Check if both stocks returned valid data
@@ -2019,6 +2023,17 @@ async function compareTaiwanStocks() {
     } catch (error) {
         console.error('Error fetching stock data:', error);
         alert('There was an error retrieving stock data.');
+    }
+}
+
+function appendExchangeSuffix(stockCode) {
+    const numericCode = parseInt(stockCode, 10);
+    if (numericCode >= 1100 && numericCode <= 9999) {
+        // 台灣證交所股票
+        return stockCode + '.TW';
+    } else {
+        // 櫃買中心股票
+        return stockCode + '.TWO';
     }
 }
 
@@ -2049,6 +2064,7 @@ function displayComparisonResults(stock1, stock2) {
         </div>
     `;
 }
+
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
