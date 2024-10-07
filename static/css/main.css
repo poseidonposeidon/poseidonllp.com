@@ -241,18 +241,20 @@ div {
     background-color: #1e1e1e;
     padding: 20px;
     z-index: 9999;
-    max-height: 0;
     width: 80%;
-    overflow: hidden;
+    max-width: 800px; /* 限制最大宽度 */
+    max-height: 90vh; /* 使用视口高度的90%作为最大高度 */
+    overflow-y: auto; /* 允许垂直滚动，以防内容过多 */
     opacity: 0;
-    transition: opacity 0.5s ease-in-out, max-height 0.5s ease-in-out;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
     border-radius: 10px;
+    display: none;
 }
 
 #compare.active {
-    max-height: 80vh;
     opacity: 1;
-    overflow-y: auto;
+    transform: translate(-50%, -50%) scale(1);
+    display: block;
 }
 
 #compare .section-container {
@@ -262,6 +264,41 @@ div {
 
 #compare.active .section-container {
     opacity: 1;
+}
+
+#compare h2 {
+    margin-top: 0;
+    margin-bottom: 20px;
+}
+
+#compare .info-input {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+#compare .info-input label,
+#compare .info-input input,
+#compare .info-input button {
+    flex: 1 1 auto;
+}
+
+#compare .info-input input {
+    min-width: 150px;
+}
+
+#compare .info-input button {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+#compare .info-input button:hover {
+    background-color: #45a049;
 }
 
 /* Ensure content is hidden when section is closed */

@@ -1066,21 +1066,19 @@ function loadAIBoxSection(sectionId) {
 function loadCompareSection(sectionId) {
     const sections = {
         'compare-tw': `
-            <div class="compare-section" id="compare-tw">
-                <h2>Compare Taiwan Stocks</h2>
-                <div class="info-input">
-                    <label for="stock1-tw">Enter Stock 1 (Taiwan):</label>
-                    <input type="text" id="stock1-tw" placeholder="e.g., 2330">
-                    
-                    <label for="stock2-tw">Enter Stock 2 (Taiwan):</label>
-                    <input type="text" id="stock2-tw" placeholder="e.g., 2317">
-                    
-                    <button onclick="compareTaiwanStocks()">Compare</button>
-                </div>
+            <h2>Compare Taiwan Stocks</h2>
+            <div class="info-input">
+                <label for="stock1-tw">Enter Stock 1 (Taiwan):</label>
+                <input type="text" id="stock1-tw" placeholder="e.g., 2330">
                 
-                <div id="comparisonResultContainer-tw">
-                    <!-- Comparison results will be displayed here -->
-                </div>
+                <label for="stock2-tw">Enter Stock 2 (Taiwan):</label>
+                <input type="text" id="stock2-tw" placeholder="e.g., 2317">
+                
+                <button onclick="compareTaiwanStocks()">Compare</button>
+            </div>
+            
+            <div id="comparisonResultContainer-tw">
+                <!-- Comparison results will be displayed here -->
             </div>
         `
     };
@@ -1095,34 +1093,16 @@ function loadCompareSection(sectionId) {
         // Toggle the section
         if (compareDiv.classList.contains('active')) {
             // Closing the section
-            compareDiv.style.maxHeight = compareDiv.scrollHeight + 'px';
-            compareDiv.style.opacity = '1';
-
+            compareDiv.classList.remove('active');
             setTimeout(() => {
-                compareDiv.style.maxHeight = '0';
-                compareDiv.style.opacity = '0';
-                compareDiv.style.overflowY = 'hidden';
-            }, 10);
-
-            setTimeout(() => {
-                compareDiv.classList.remove('active');
                 compareDiv.style.display = 'none';
             }, 500);
         } else {
             // Opening the section
             compareDiv.style.display = 'block';
-            compareDiv.style.maxHeight = '0';
-            compareDiv.style.opacity = '0';
-
             // Force a reflow before adding the 'active' class
             void compareDiv.offsetWidth;
-
-            setTimeout(() => {
-                compareDiv.style.maxHeight = compareDiv.scrollHeight + 'px';
-                compareDiv.style.opacity = '1';
-                compareDiv.style.overflowY = 'auto';
-                compareDiv.classList.add('active');
-            }, 10);
+            compareDiv.classList.add('active');
         }
 
         // Toggle the overlay
