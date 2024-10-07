@@ -459,6 +459,9 @@ button:not(.info-input button):hover {
     color: #ffffff;
 }
 
+.chart-links {
+    text-align: center;  /* 將連結元素置中 */
+}
 .section-container {
     margin-top: 20px;
 }
