@@ -1078,6 +1078,7 @@ function loadCompareSection(sectionId) {
             </div>
             
             <div id="comparisonResultContainer-tw">
+                <canvas id="grossMarginChart"></canvas>
                 <!-- Comparison results will be displayed here -->
             </div>
         `
@@ -2058,34 +2059,83 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
     }
 }
 
-function displayComparisonResults(stock1, stock2) {
-    const comparisonResultContainer = document.getElementById('comparisonResultContainer-tw');
+async function displayComparisonResults(stock1, stock2) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    comparisonResultContainer.innerHTML = `
-        <h3>Comparison between ${stock1.symbol} and ${stock2.symbol}</h3>
-        <div class="comparison-row">
-            <div><strong>${stock1.symbol}</strong></div>
-            <div><strong>${stock2.symbol}</strong></div>
-        </div>
-        <div class="comparison-row">
-            <div>Company Name: ${stock1.companyName}</div>
-            <div>Company Name: ${stock2.companyName}</div>
-        </div>
-        <div class="comparison-row">
-            <div>Price: ${stock1.price}</div>
-            <div>Price: ${stock2.price}</div>
-        </div>
-        <div class="comparison-row">
-            <div>Market Cap: ${stock1.mktCap}</div>
-            <div>Market Cap: ${stock2.mktCap}</div>
-        </div>
-        <div class="comparison-row">
-            <div>Industry: ${stock1.industry}</div>
-            <div>Industry: ${stock2.industry}</div>
-        </div>
-    `;
+    const grossMarginData1 = await fetchGrossMargin(stock1.symbol, apiKey);
+    const grossMarginData2 = await fetchGrossMargin(stock2.symbol, apiKey);
+
+    // 繪製圖表
+    drawGrossMarginChart(stock1.symbol, stock2.symbol, grossMarginData1, grossMarginData2);
 }
 
+// 獲取毛利率資料的函式
+async function fetchGrossMargin(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/ratios/${stockSymbol}?apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+        // 假設毛利率數據存儲在 grossProfitMargin
+        return data.map(item => ({
+            date: item.date,
+            grossMargin: item.grossProfitMargin
+        }));
+    } catch (error) {
+        console.error('Error fetching gross margin data:', error);
+        return [];
+    }
+}
+
+// 使用 Chart.js 繪製毛利率圖表
+function drawGrossMarginChart(symbol1, symbol2, grossMarginData1, grossMarginData2) {
+    const ctx = document.getElementById('grossMarginChart').getContext('2d');
+
+    const labels = grossMarginData1.map(item => item.date); // 假設兩者日期範圍相同
+
+    const chartData = {
+        labels: labels,
+        datasets: [
+            {
+                label: `${symbol1} Gross Margin`,
+                data: grossMarginData1.map(item => item.grossMargin),
+                borderColor: 'rgba(75, 192, 192, 1)',
+                fill: false
+            },
+            {
+                label: `${symbol2} Gross Margin`,
+                data: grossMarginData2.map(item => item.grossMargin),
+                borderColor: 'rgba(255, 99, 132, 1)',
+                fill: false
+            }
+        ]
+    };
+
+    new Chart(ctx, {
+        type: 'line',  // 使用折線圖
+        data: chartData,
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value + "%";  // 顯示百分比
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(tooltipItem) {
+                            return tooltipItem.raw.toFixed(2) + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
 
 //////////////////////////////Profile//////////////////////////////////////////////
 
