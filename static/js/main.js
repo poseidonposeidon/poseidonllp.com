@@ -2159,14 +2159,23 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         chartInstance.destroy();
     }
 
-    console.log('Chart Data:', marginData1, marginData2);  // 檢查資料是否正確
-
+    // 格式化日期只顯示 "年-月"
     const commonYears = marginData1
-        .map(item => item.date)
-        .filter(date => marginData2.some(item => item.date === date));
+        .map(item => {
+            const date = new Date(item.date);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            return `${year}-${month}`;
+        })
+        .filter(date => marginData2.some(item => {
+            const d = new Date(item.date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            return `${year}-${month}` === date;
+        }));
 
-    const filteredMarginData1 = marginData1.filter(item => commonYears.includes(item.date));
-    const filteredMarginData2 = marginData2.filter(item => commonYears.includes(item.date));
+    const filteredMarginData1 = marginData1.filter(item => commonYears.includes(new Date(item.date).getFullYear() + '-' + String(new Date(item.date).getMonth() + 1).padStart(2, '0')));
+    const filteredMarginData2 = marginData2.filter(item => commonYears.includes(new Date(item.date).getFullYear() + '-' + String(new Date(item.date).getMonth() + 1).padStart(2, '0')));
 
     const chartData = {
         labels: commonYears,
@@ -2192,10 +2201,10 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         options: {
             scales: {
                 y: {
-                    beginAtZero: false,  // 對 EPS 不強制從0開始
+                    beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            return value;  // 顯示 EPS 數字
+                            return value;
                         }
                     }
                 }
