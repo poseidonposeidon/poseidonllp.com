@@ -2248,7 +2248,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                 borderColor: 'rgba(75, 192, 192, 1)',
                 spanGaps: true,
                 fill: false,
-                tension: 0.3 // Add some curve to the line
+                tension: 0 // Add some curve to the line
             },
             {
                 label: label2,
@@ -2256,7 +2256,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                 borderColor: 'rgba(255, 99, 132, 1)',
                 spanGaps: true,
                 fill: false,
-                tension: 0.3 // Add some curve to the line
+                tension: 0// Add some curve to the line
             }
         ]
     };
