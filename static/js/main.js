@@ -2159,7 +2159,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         chartInstance.destroy();
     }
 
-    // 合併兩支股票的所有日期，並去除重複的月份
+    // 合併兩支股票的所有日期，並按 "年-月" 分組
     const allDates = [
         ...new Set([
             ...marginData1.map(item => {
@@ -2177,7 +2177,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         ])
     ].sort();  // 按時間排序
 
-    // 將 marginData1 和 marginData2 轉換為對應的日期數據
+    // 將數據映射到對應的月份上，填充空白數據
     const formattedMarginData1 = allDates.map(date => {
         const entry = marginData1.find(item => {
             const d = new Date(item.date);
@@ -2185,7 +2185,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
             const month = String(d.getMonth() + 1).padStart(2, '0');
             return `${year}-${month}` === date;
         });
-        return entry ? entry.margin : null;  // 如果找不到數據，則返回 null
+        return entry ? entry.margin : null;  // 如果找不到數據，返回 null
     });
 
     const formattedMarginData2 = allDates.map(date => {
@@ -2199,7 +2199,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
     });
 
     const chartData = {
-        labels: allDates,
+        labels: allDates,  // 使用 "年-月" 作為 X 軸標籤
         datasets: [
             {
                 label: label1,
@@ -2221,11 +2221,18 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         data: chartData,
         options: {
             scales: {
+                x: {
+                    ticks: {
+                        autoSkip: true,  // 自動跳過一些 X 軸標籤
+                        maxRotation: 0,  // 使 X 軸標籤保持水平
+                        minRotation: 0,
+                    }
+                },
                 y: {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            return value;
+                            return value;  // 顯示數據數值
                         }
                     }
                 }
