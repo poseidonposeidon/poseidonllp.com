@@ -2113,7 +2113,7 @@ async function fetchOperatingMarginGrowthRate(stockSymbol, apiKey) {
 
         // 確保抓取到的是最近五年的數據
         const today = new Date();
-        const fiveYearsAgo = new Date(today.setFullYear(today.getFullYear() - 5));
+        const fiveYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
 
         // 過濾掉超過5年的數據，並計算營業利益成長率
         const filteredData = data.filter(item => {
