@@ -2032,12 +2032,11 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
 async function fetchMarginData(stockSymbol, apiKey, type) {
     const apiUrl = `https://financialmodelingprep.com/api/v3/ratios/${stockSymbol}?apikey=${apiKey}`;
 
-    const today = new Date();
-    const tenYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
-
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
+
+        console.log('Fetched data:', data); // 檢查返回的資料結構
 
         // 根據不同類型返回不同的數據欄位
         let marginField;
@@ -2048,18 +2047,22 @@ async function fetchMarginData(stockSymbol, apiKey, type) {
         } else if (type === 'netProfitMargin') {
             marginField = 'netProfitMargin';
         } else if (type === 'eps') {  // 新增EPS的處理
-            marginField = 'eps';
+            marginField = 'eps';  // 確認 EPS 是否在這個欄位
         }
 
-        // 過濾掉超過10年的數據，並將 margin 或 EPS 數值處理
+        // 確保抓取到的是最近十年的數據
+        const today = new Date();
+        const tenYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
+
+        // 過濾掉超過10年的數據
         return data
             .filter(item => {
                 const itemDate = new Date(item.date);
-                return itemDate >= tenYearsAgo;
+                return itemDate >= tenYearsAgo;  // 只保留最近十年的資料
             })
             .map(item => ({
                 date: item.date,
-                margin: marginField === 'eps' ? item[marginField] : item[marginField] * 100
+                margin: marginField === 'eps' ? item[marginField] : item[marginField] * 100  // 如果是EPS，不需放大100倍
             }))
             .reverse();  // 確保日期順序從過去到現在
     } catch (error) {
@@ -2119,6 +2122,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         chartInstance.destroy();
     }
 
+    // 將日期範圍標準化
     const commonYears = marginData1
         .map(item => item.date)
         .filter(date => marginData2.some(item => item.date === date));
@@ -2144,18 +2148,18 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         ]
     };
 
+    // 設置 Y 軸為自動適應 EPS 數據
     chartInstance = new Chart(ctx, {
         type: 'line',
         data: chartData,
         options: {
             scales: {
                 y: {
-                    beginAtZero: true,
+                    beginAtZero: false,  // 對 EPS 不強制從0開始
                     ticks: {
                         callback: function(value) {
-                            // 如果是 EPS 圖表，顯示數值；否則顯示百分比
                             if (label1.includes('Eps') || label2.includes('Eps')) {
-                                return value; // 顯示原始數值
+                                return value; // 顯示 EPS 數字
                             } else {
                                 return value + "%"; // 顯示百分比
                             }
