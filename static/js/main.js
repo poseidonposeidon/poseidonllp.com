@@ -2159,36 +2159,57 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         chartInstance.destroy();
     }
 
-    // 格式化日期只顯示 "年-月"
-    const commonYears = marginData1
-        .map(item => {
-            const date = new Date(item.date);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            return `${year}-${month}`;
-        })
-        .filter(date => marginData2.some(item => {
+    // 合併兩支股票的所有日期，並去除重複的月份
+    const allDates = [
+        ...new Set([
+            ...marginData1.map(item => {
+                const date = new Date(item.date);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                return `${year}-${month}`;
+            }),
+            ...marginData2.map(item => {
+                const date = new Date(item.date);
+                const year = date.getFullYear();
+                const month = String(date.getMonth() + 1).padStart(2, '0');
+                return `${year}-${month}`;
+            })
+        ])
+    ].sort();  // 按時間排序
+
+    // 將 marginData1 和 marginData2 轉換為對應的日期數據
+    const formattedMarginData1 = allDates.map(date => {
+        const entry = marginData1.find(item => {
             const d = new Date(item.date);
             const year = d.getFullYear();
             const month = String(d.getMonth() + 1).padStart(2, '0');
             return `${year}-${month}` === date;
-        }));
+        });
+        return entry ? entry.margin : null;  // 如果找不到數據，則返回 null
+    });
 
-    const filteredMarginData1 = marginData1.filter(item => commonYears.includes(new Date(item.date).getFullYear() + '-' + String(new Date(item.date).getMonth() + 1).padStart(2, '0')));
-    const filteredMarginData2 = marginData2.filter(item => commonYears.includes(new Date(item.date).getFullYear() + '-' + String(new Date(item.date).getMonth() + 1).padStart(2, '0')));
+    const formattedMarginData2 = allDates.map(date => {
+        const entry = marginData2.find(item => {
+            const d = new Date(item.date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            return `${year}-${month}` === date;
+        });
+        return entry ? entry.margin : null;
+    });
 
     const chartData = {
-        labels: commonYears,
+        labels: allDates,
         datasets: [
             {
                 label: label1,
-                data: filteredMarginData1.map(item => item.margin),
+                data: formattedMarginData1,
                 borderColor: 'rgba(75, 192, 192, 1)',
                 fill: false
             },
             {
                 label: label2,
-                data: filteredMarginData2.map(item => item.margin),
+                data: formattedMarginData2,
                 borderColor: 'rgba(255, 99, 132, 1)',
                 fill: false
             }
@@ -2213,7 +2234,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                 tooltip: {
                     callbacks: {
                         label: function(tooltipItem) {
-                            return tooltipItem.raw.toFixed(2);
+                            return tooltipItem.raw !== null ? tooltipItem.raw.toFixed(2) : 'No data';
                         }
                     }
                 }
