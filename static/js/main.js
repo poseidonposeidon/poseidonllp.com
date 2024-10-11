@@ -2080,15 +2080,15 @@ async function fetchEPSData(stockSymbol, apiKey) {
 
         console.log('Fetched EPS data:', data); // 檢查返回的資料結構
 
-        // 確保抓取到的是最近十年的數據
+        // 確保抓取到的是最近五年的數據
         const today = new Date();
-        const tenYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
+        const fiveYearsAgo = new Date(today.setFullYear(today.getFullYear() - 5));
 
-        // 過濾掉超過10年的數據，並確保有EPS資料
+        // 過濾掉超過5年的數據，並確保有EPS資料
         return data
             .filter(item => {
                 const itemDate = new Date(item.date);
-                return itemDate >= tenYearsAgo && item.eps !== null;  // 只保留最近十年的資料並且EPS不為null
+                return itemDate >= fiveYearsAgo && item.eps !== null;  // 只保留最近五年的資料並且EPS不為null
             })
             .map(item => ({
                 date: item.date,
@@ -2205,12 +2205,14 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                 label: label1,
                 data: formattedMarginData1,
                 borderColor: 'rgba(75, 192, 192, 1)',
+                spanGaps: true,
                 fill: false
             },
             {
                 label: label2,
                 data: formattedMarginData2,
                 borderColor: 'rgba(255, 99, 132, 1)',
+                spanGaps: true,
                 fill: false
             }
         ]
