@@ -2159,7 +2159,8 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         chartInstance.destroy();
     }
 
-    // 將日期範圍標準化
+    console.log('Chart Data:', marginData1, marginData2);  // 檢查資料是否正確
+
     const commonYears = marginData1
         .map(item => item.date)
         .filter(date => marginData2.some(item => item.date === date));
@@ -2185,7 +2186,6 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         ]
     };
 
-    // 設置 Y 軸為自動適應 EPS 數據
     chartInstance = new Chart(ctx, {
         type: 'line',
         data: chartData,
@@ -2195,11 +2195,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                     beginAtZero: false,  // 對 EPS 不強制從0開始
                     ticks: {
                         callback: function(value) {
-                            if (label1.includes('Eps') || label2.includes('Eps')) {
-                                return value; // 顯示 EPS 數字
-                            } else {
-                                return value + "%"; // 顯示百分比
-                            }
+                            return value;  // 顯示 EPS 數字
                         }
                     }
                 }
@@ -2208,7 +2204,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                 tooltip: {
                     callbacks: {
                         label: function(tooltipItem) {
-                            return tooltipItem.raw.toFixed(2) + (label1.includes('Eps') || label2.includes('Eps') ? '' : '%');
+                            return tooltipItem.raw.toFixed(2);
                         }
                     }
                 }
