@@ -2071,6 +2071,36 @@ async function fetchMarginData(stockSymbol, apiKey, type) {
     }
 }
 
+async function fetchEPSData(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        console.log('Fetched EPS data:', data); // 檢查返回的資料結構
+
+        // 確保抓取到的是最近十年的數據
+        const today = new Date();
+        const tenYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
+
+        // 過濾掉超過10年的數據，並確保有EPS資料
+        return data
+            .filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= tenYearsAgo && item.eps !== null;  // 只保留最近十年的資料並且EPS不為null
+            })
+            .map(item => ({
+                date: item.date,
+                margin: item.eps  // 使用 EPS 數據
+            }))
+            .reverse();  // 確保日期順序從過去到現在
+    } catch (error) {
+        console.error('Error fetching EPS data:', error);
+        return [];
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2094,9 +2124,16 @@ async function displayChart(type) {
         // 顯示 Loading 畫面
         loadingElement.style.display = 'block';
 
-        // 根據類型獲取對應的數據
-        const marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
-        const marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, type);
+        let marginData1, marginData2;
+
+        // 根據類型選擇正確的 API 函數
+        if (type === 'eps') {
+            marginData1 = await fetchEPSData(fullStockSymbol1, apiKey);
+            marginData2 = await fetchEPSData(fullStockSymbol2, apiKey);
+        } else {
+            marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
+            marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, type);
+        }
 
         // 繪製圖表
         drawMarginChart(
