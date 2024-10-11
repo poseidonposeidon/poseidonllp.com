@@ -1082,6 +1082,7 @@ function loadCompareSection(sectionId) {
                 <a href="#" onclick="displayChart('grossMargin')">Gross Margin</a> |
                 <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a> |
                 <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a>
+                <a href="#" onclick="displayChart('eps')">EPS</a>
             </div>
             <div id="loading" style="display: none; text-align: center;">
                 <p>Loading... Please wait.</p>
@@ -2033,7 +2034,6 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
 async function fetchMarginData(stockSymbol, apiKey, type) {
     const apiUrl = `https://financialmodelingprep.com/api/v3/ratios/${stockSymbol}?apikey=${apiKey}`;
 
-    // 計算10年前的日期
     const today = new Date();
     const tenYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
 
@@ -2049,17 +2049,19 @@ async function fetchMarginData(stockSymbol, apiKey, type) {
             marginField = 'operatingProfitMargin';
         } else if (type === 'netProfitMargin') {
             marginField = 'netProfitMargin';
+        } else if (type === 'eps') {  // 新增EPS的處理
+            marginField = 'eps';
         }
 
-        // 過濾掉超過10年的數據，並將 margin 值乘以 100
+        // 過濾掉超過10年的數據，並將 margin 或 EPS 數值處理
         return data
             .filter(item => {
                 const itemDate = new Date(item.date);
-                return itemDate >= tenYearsAgo;  // 只保留10年內的資料
+                return itemDate >= tenYearsAgo;
             })
             .map(item => ({
                 date: item.date,
-                margin: item[marginField] * 100 // 將 margin 數值放大 100 倍
+                margin: marginField === 'eps' ? item[marginField] : item[marginField] * 100
             }))
             .reverse();  // 確保日期順序從過去到現在
     } catch (error) {
