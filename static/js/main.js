@@ -1082,7 +1082,8 @@ function loadCompareSection(sectionId) {
                 <a href="#" onclick="displayChart('grossMargin')">Gross Margin</a> |
                 <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a> |
                 <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a> |
-                <a href="#" onclick="displayChart('eps')">EPS</a>
+                <a href="#" onclick="displayChart('eps')">EPS</a> |
+                <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin Growth Rate</a>
             </div>
             <div id="loading" style="display: none; text-align: center;">
                 <p>Loading... Please wait.</p>
@@ -2101,6 +2102,43 @@ async function fetchEPSData(stockSymbol, apiKey) {
     }
 }
 
+async function fetchOperatingMarginGrowthRate(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/ratios/${stockSymbol}?apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        console.log('Fetched data for growth rate:', data); // 檢查返回的資料結構
+
+        // 確保抓取到的是最近五年的數據
+        const today = new Date();
+        const fiveYearsAgo = new Date(today.setFullYear(today.getFullYear() - 5));
+
+        // 過濾掉超過5年的數據，並計算營業利益成長率
+        const filteredData = data.filter(item => {
+            const itemDate = new Date(item.date);
+            return itemDate >= fiveYearsAgo && item.operatingProfitMargin !== null;
+        });
+
+        // 計算成長率
+        const growthRates = filteredData.map((item, index, array) => {
+            if (index === 0) return null;  // 第一筆數據無法計算成長率
+            const prevMargin = array[index - 1].operatingProfitMargin;
+            const growthRate = ((item.operatingProfitMargin - prevMargin) / prevMargin) * 100;
+            return {
+                date: item.date,
+                margin: growthRate
+            };
+        }).slice(1); // 去除第一筆無法計算成長率的數據
+
+        return growthRates.reverse(); // 確保日期順序從過去到現在
+    } catch (error) {
+        console.error(`Error fetching operating margin growth rate data:`, error);
+        return [];
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2130,6 +2168,9 @@ async function displayChart(type) {
         if (type === 'eps') {
             marginData1 = await fetchEPSData(fullStockSymbol1, apiKey);
             marginData2 = await fetchEPSData(fullStockSymbol2, apiKey);
+        } else if (type === 'operatingMarginGrowthRate') {
+            marginData1 = await fetchOperatingMarginGrowthRate(fullStockSymbol1, apiKey);
+            marginData2 = await fetchOperatingMarginGrowthRate(fullStockSymbol2, apiKey);
         } else {
             marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
             marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, type);
@@ -2206,14 +2247,16 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                 data: formattedMarginData1,
                 borderColor: 'rgba(75, 192, 192, 1)',
                 spanGaps: true,
-                fill: false
+                fill: false,
+                tension: 0.3 // Add some curve to the line
             },
             {
                 label: label2,
                 data: formattedMarginData2,
                 borderColor: 'rgba(255, 99, 132, 1)',
                 spanGaps: true,
-                fill: false
+                fill: false,
+                tension: 0.3 // Add some curve to the line
             }
         ]
     };
@@ -2234,6 +2277,9 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
+                            if (label1.includes('Growth Rate') || label2.includes('Growth Rate')) {
+                                return value + '%';  // 顯示百分比數據
+                            }
                             return value;  // 顯示數據數值
                         }
                     }
@@ -2243,7 +2289,14 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                 tooltip: {
                     callbacks: {
                         label: function(tooltipItem) {
-                            return tooltipItem.raw !== null ? tooltipItem.raw.toFixed(2) : 'No data';
+                            const rawValue = tooltipItem.raw;
+                            if (rawValue !== null) {
+                                if (label1.includes('Growth Rate') || label2.includes('Growth Rate')) {
+                                    return rawValue.toFixed(2) + '%';  // 顯示百分比格式
+                                }
+                                return rawValue.toFixed(2);
+                            }
+                            return 'No data';
                         }
                     }
                 }
