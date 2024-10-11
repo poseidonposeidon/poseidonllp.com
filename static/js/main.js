@@ -1081,7 +1081,7 @@ function loadCompareSection(sectionId) {
             <div class="chart-links">
                 <a href="#" onclick="displayChart('grossMargin')">Gross Margin</a> |
                 <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a> |
-                <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a>
+                <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a> |
                 <a href="#" onclick="displayChart('eps')">EPS</a>
             </div>
             <div id="loading" style="display: none; text-align: center;">
@@ -2003,7 +2003,6 @@ async function fetchStockSuggestionsCN(stockSymbol) {
 // 全局變數來存儲當前圖表實例
 let chartInstance = null;
 
-// 使用 API 判斷股票代碼是屬於 .TW 還是 .TWO
 async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
     const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockCode}&apikey=${apiKey}`;
 
@@ -2030,7 +2029,6 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
     }
 }
 
-// 獲取不同類型的毛利率、盈利率、稅後淨利率等數據
 async function fetchMarginData(stockSymbol, apiKey, type) {
     const apiUrl = `https://financialmodelingprep.com/api/v3/ratios/${stockSymbol}?apikey=${apiKey}`;
 
@@ -2070,7 +2068,6 @@ async function fetchMarginData(stockSymbol, apiKey, type) {
     }
 }
 
-// 根據用戶選擇顯示不同的圖表
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2115,16 +2112,13 @@ async function displayChart(type) {
     }
 }
 
-// 使用 Chart.js 繪製通用毛利率、盈利率、稅後淨利率圖表
 function drawMarginChart(label1, label2, marginData1, marginData2) {
     const ctx = document.getElementById('grossMarginChart').getContext('2d');
 
-    // 如果之前已經有圖表，先銷毀它
     if (chartInstance) {
         chartInstance.destroy();
     }
 
-    // 統一日期範圍
     const commonYears = marginData1
         .map(item => item.date)
         .filter(date => marginData2.some(item => item.date === date));
@@ -2150,9 +2144,8 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         ]
     };
 
-    // 創建新的圖表
     chartInstance = new Chart(ctx, {
-        type: 'line',  // 使用折線圖
+        type: 'line',
         data: chartData,
         options: {
             scales: {
@@ -2160,7 +2153,12 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return value + "%";  // 顯示百分比
+                            // 如果是 EPS 圖表，顯示數值；否則顯示百分比
+                            if (label1.includes('Eps') || label2.includes('Eps')) {
+                                return value; // 顯示原始數值
+                            } else {
+                                return value + "%"; // 顯示百分比
+                            }
                         }
                     }
                 }
@@ -2169,7 +2167,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                 tooltip: {
                     callbacks: {
                         label: function(tooltipItem) {
-                            return tooltipItem.raw.toFixed(2) + '%';
+                            return tooltipItem.raw.toFixed(2) + (label1.includes('Eps') || label2.includes('Eps') ? '' : '%');
                         }
                     }
                 }
