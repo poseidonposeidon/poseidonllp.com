@@ -1084,7 +1084,8 @@ function loadCompareSection(sectionId) {
                 <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a> |
                 <a href="#" onclick="displayChart('eps')">EPS</a> |
                 <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin Growth Rate</a> |
-                <a href="#" onclick="displayChart('roe')">ROE</a> 
+                <a href="#" onclick="displayChart('roe')">ROE</a> |
+                <a href="#" onclick="displayChart('stockPrice')">Stock Price</a>
             </div>
             <div id="loading" style="display: none; text-align: center;">
                 <p>Loading... Please wait.</p>
@@ -2142,6 +2143,36 @@ async function fetchOperatingMarginGrowthRate(stockSymbol, apiKey) {
     }
 }
 
+async function fetchStockPriceData(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        console.log('Fetched stock price data:', data); // 檢查返回的資料結構
+
+        // 確保抓取到的是最近十年的數據
+        const today = new Date();
+        const tenYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
+
+        // 過濾掉超過10年的數據
+        return data.historical
+            .filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= tenYearsAgo;  // 只保留最近十年的資料
+            })
+            .map(item => ({
+                date: item.date,
+                price: item.close  // 使用收盤價
+            }))
+            .reverse();  // 確保日期順序從過去到現在
+    } catch (error) {
+        console.error('Error fetching stock price data:', error);
+        return [];
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2177,6 +2208,9 @@ async function displayChart(type) {
         } else if (type === 'roe') {  // 新增 ROE 的處理
             marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, 'roe');
             marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, 'roe');
+        } else if (type === 'stockPrice') {  // 新增股價的處理
+            marginData1 = await fetchStockPriceData(fullStockSymbol1, apiKey);
+            marginData2 = await fetchStockPriceData(fullStockSymbol2, apiKey);
         } else {
             marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
             marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, type);
