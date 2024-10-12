@@ -1083,6 +1083,7 @@ function loadCompareSection(sectionId) {
                 <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a> |
                 <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a> |
                 <a href="#" onclick="displayChart('eps')">EPS</a> |
+                <a href="#" onclick="displayChart('revenueGrowthRate')">Revenue Growth Rate</a> |
                 <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin Growth Rate</a> |
                 <a href="#" onclick="displayChart('roe')">ROE</a> |
                 <a href="#" onclick="displayChart('stockPrice')">Stock Price</a>
@@ -2128,6 +2129,31 @@ async function fetchStockPriceData(stockSymbol, apiKey) {
     }
 }
 
+async function fetchRevenueGrowthRate(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        const growthRates = data.map((item, index, array) => {
+            if (index === array.length - 1) return null; // 最後一筆數據無法計算成長率
+            const currentRevenue = item.revenue;
+            const prevRevenue = array[index + 1].revenue;
+            const growthRate = ((currentRevenue - prevRevenue) / prevRevenue) * 100;
+            return {
+                date: item.date,
+                margin: growthRate
+            };
+        }).filter(item => item !== null).reverse();
+
+        return growthRates;
+    } catch (error) {
+        console.error('Error fetching revenue growth rate data:', error);
+        return [];
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2174,6 +2200,10 @@ async function displayChart(type) {
             case 'stockPrice':
                 data1 = await fetchStockPriceData(fullStockSymbol1, apiKey);
                 data2 = await fetchStockPriceData(fullStockSymbol2, apiKey);
+                break;
+            case 'revenueGrowthRate':  // 新增的 case
+                data1 = await fetchRevenueGrowthRate(fullStockSymbol1, apiKey);
+                data2 = await fetchRevenueGrowthRate(fullStockSymbol2, apiKey);
                 break;
             default:
                 throw new Error('Invalid chart type');
@@ -2256,7 +2286,7 @@ function drawChart(label1, label2, data1, data2, type) {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate'].includes(type)) {
+                            if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate'].includes(type)) {  // 包含 revenueGrowthRate
                                 return value + '%';
                             }
                             return value;
@@ -2270,7 +2300,7 @@ function drawChart(label1, label2, data1, data2, type) {
                         label: function(tooltipItem) {
                             const rawValue = tooltipItem.raw;
                             if (rawValue !== null) {
-                                if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate'].includes(type)) {
+                                if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate'].includes(type)) {  // 包含 revenueGrowthRate
                                     return rawValue.toFixed(2) + '%';
                                 }
                                 return type === 'stockPrice' ? '$' + rawValue.toFixed(2) : rawValue.toFixed(2);
