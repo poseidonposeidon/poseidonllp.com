@@ -2303,7 +2303,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                 x: {
                     ticks: {
                         autoSkip: true,  // 自動跳過一些 X 軸標籤
-                        maxRotation: 0,  // 使 X 軸標籤保持水平
+                        maxRotation: 45,  // 使 X 軸標籤保持水平
                         minRotation: 0,
                     }
                 },
