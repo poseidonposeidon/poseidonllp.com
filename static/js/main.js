@@ -2086,6 +2086,31 @@ async function fetchROEData(stockSymbol, apiKey) {
     }
 }
 
+async function fetchOperatingMarginGrowthRate(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        const growthRates = data.map((item, index, array) => {
+            if (index === array.length - 1) return null;  // 最後一筆數據無法計算成長率
+            const currentMargin = item.operatingIncome / item.revenue;
+            const prevMargin = array[index + 1].operatingIncome / array[index + 1].revenue;
+            const growthRate = ((currentMargin - prevMargin) / prevMargin) * 100;
+            return {
+                date: item.date,
+                margin: growthRate
+            };
+        }).filter(item => item !== null).reverse();
+
+        return growthRates;
+    } catch (error) {
+        console.error('Error fetching operating margin growth rate data:', error);
+        return [];
+    }
+}
+
 async function fetchStockPriceData(stockSymbol, apiKey) {
     const apiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=2010-01-01&apikey=${apiKey}`;
 
@@ -2142,6 +2167,10 @@ async function displayChart(type) {
                 data1 = await fetchROEData(fullStockSymbol1, apiKey);
                 data2 = await fetchROEData(fullStockSymbol2, apiKey);
                 break;
+            case 'operatingMarginGrowthRate':
+                data1 = await fetchOperatingMarginGrowthRate(fullStockSymbol1, apiKey);
+                data2 = await fetchOperatingMarginGrowthRate(fullStockSymbol2, apiKey);
+                break;
             case 'stockPrice':
                 data1 = await fetchStockPriceData(fullStockSymbol1, apiKey);
                 data2 = await fetchStockPriceData(fullStockSymbol2, apiKey);
@@ -2151,8 +2180,8 @@ async function displayChart(type) {
         }
 
         drawChart(
-            `${fullStockSymbol1} ${type.charAt(0).toUpperCase() + type.slice(1)}`,
-            `${fullStockSymbol2} ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+            `${fullStockSymbol1} ${type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1').trim()}`,
+            `${fullStockSymbol2} ${type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1').trim()}`,
             data1,
             data2,
             type
@@ -2177,12 +2206,12 @@ function drawChart(label1, label2, data1, data2, type) {
 
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
-        return entry ? entry.margin : null;
+        return entry ? (type === 'stockPrice' ? entry.price : entry.margin) : null;
     });
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
-        return entry ? entry.margin : null;
+        return entry ? (type === 'stockPrice' ? entry.price : entry.margin) : null;
     });
 
     const chartData = {
@@ -2227,7 +2256,7 @@ function drawChart(label1, label2, data1, data2, type) {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe'].includes(type)) {
+                            if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate'].includes(type)) {
                                 return value + '%';
                             }
                             return value;
@@ -2241,10 +2270,10 @@ function drawChart(label1, label2, data1, data2, type) {
                         label: function(tooltipItem) {
                             const rawValue = tooltipItem.raw;
                             if (rawValue !== null) {
-                                if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe'].includes(type)) {
+                                if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate'].includes(type)) {
                                     return rawValue.toFixed(2) + '%';
                                 }
-                                return rawValue.toFixed(2);
+                                return type === 'stockPrice' ? '$' + rawValue.toFixed(2) : rawValue.toFixed(2);
                             }
                             return 'No data';
                         }
