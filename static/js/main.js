@@ -1084,6 +1084,7 @@ function loadCompareSection(sectionId) {
                 <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a> |
                 <a href="#" onclick="displayChart('eps')">EPS</a> |
                 <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin Growth Rate</a>
+                <a href="#" onclick="displayChart('roe')">ROE</a> |
             </div>
             <div id="loading" style="display: none; text-align: center;">
                 <p>Loading... Please wait.</p>
@@ -2049,6 +2050,8 @@ async function fetchMarginData(stockSymbol, apiKey, type) {
             marginField = 'netProfitMargin';
         } else if (type === 'eps') {  // 新增EPS的處理
             marginField = 'eps';  // 確認 EPS 是否在這個欄位
+        } else if (type === 'roe') {  // 新增 ROE 的處理
+            marginField = 'returnOnEquity';  // 確認 ROE 是否在這個欄位
         }
 
         // 確保抓取到的是最近十年的數據
@@ -2171,6 +2174,9 @@ async function displayChart(type) {
         } else if (type === 'operatingMarginGrowthRate') {
             marginData1 = await fetchOperatingMarginGrowthRate(fullStockSymbol1, apiKey);
             marginData2 = await fetchOperatingMarginGrowthRate(fullStockSymbol2, apiKey);
+        } else if (type === 'roe') {  // 新增 ROE 的處理
+            marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, 'roe');
+            marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, 'roe');
         } else {
             marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
             marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, type);
