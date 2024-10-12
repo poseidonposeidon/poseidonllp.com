@@ -2156,17 +2156,32 @@ async function fetchStockPriceData(stockSymbol, apiKey) {
         const today = new Date();
         const tenYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
 
-        // 過濾掉超過10年的數據
-        return data.historical
+        const monthlyData = {};
+
+        data.historical
             .filter(item => {
                 const itemDate = new Date(item.date);
                 return itemDate >= tenYearsAgo;  // 只保留最近十年的資料
             })
-            .map(item => ({
-                date: item.date,
-                price: item.close  // 使用收盤價
-            }))
-            .reverse();  // 確保日期順序從過去到現在
+            .forEach(item => {
+                const itemDate = new Date(item.date);
+                const yearMonth = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}`;
+
+                // 初始化每月的資料，並求平均值
+                if (!monthlyData[yearMonth]) {
+                    monthlyData[yearMonth] = { total: 0, count: 0 };
+                }
+                monthlyData[yearMonth].total += item.close;
+                monthlyData[yearMonth].count += 1;
+            });
+
+        // 計算每月的平均股價
+        const monthlyAverages = Object.keys(monthlyData).map(month => ({
+            date: month,
+            price: monthlyData[month].total / monthlyData[month].count
+        }));
+
+        return monthlyAverages.reverse();  // 確保日期順序從過去到現在
     } catch (error) {
         console.error('Error fetching stock price data:', error);
         return [];
@@ -2240,43 +2255,22 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         chartInstance.destroy();
     }
 
-    // 合併兩支股票的所有日期，並按 "年-月" 分組
     const allDates = [
         ...new Set([
-            ...marginData1.map(item => {
-                const date = new Date(item.date);
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                return `${year}-${month}`;
-            }),
-            ...marginData2.map(item => {
-                const date = new Date(item.date);
-                const year = date.getFullYear();
-                const month = String(date.getMonth() + 1).padStart(2, '0');
-                return `${year}-${month}`;
-            })
+            ...marginData1.map(item => item.date),
+            ...marginData2.map(item => item.date)
         ])
     ].sort();  // 按時間排序
 
-    // 將數據映射到對應的月份上，填充空白數據
+    // 映射股價數據，按月份分組
     const formattedMarginData1 = allDates.map(date => {
-        const entry = marginData1.find(item => {
-            const d = new Date(item.date);
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            return `${year}-${month}` === date;
-        });
-        return entry ? entry.margin : null;  // 如果找不到數據，返回 null
+        const entry = marginData1.find(item => item.date === date);
+        return entry ? entry.price : null;  // 使用股價數據
     });
 
     const formattedMarginData2 = allDates.map(date => {
-        const entry = marginData2.find(item => {
-            const d = new Date(item.date);
-            const year = d.getFullYear();
-            const month = String(d.getMonth() + 1).padStart(2, '0');
-            return `${year}-${month}` === date;
-        });
-        return entry ? entry.margin : null;
+        const entry = marginData2.find(item => item.date === date);
+        return entry ? entry.price : null;
     });
 
     const chartData = {
@@ -2288,7 +2282,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                 borderColor: 'rgba(75, 192, 192, 1)',
                 spanGaps: true,
                 fill: false,
-                tension: 0 // Add some curve to the line
+                tension: 0  // 線條張力
             },
             {
                 label: label2,
@@ -2296,7 +2290,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                 borderColor: 'rgba(255, 99, 132, 1)',
                 spanGaps: true,
                 fill: false,
-                tension: 0// Add some curve to the line
+                tension: 0
             }
         ]
     };
@@ -2317,9 +2311,6 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            if (label1.includes('Growth Rate') || label2.includes('Growth Rate')) {
-                                return value + '%';  // 顯示百分比數據
-                            }
                             return value;  // 顯示數據數值
                         }
                     }
@@ -2331,10 +2322,7 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                         label: function(tooltipItem) {
                             const rawValue = tooltipItem.raw;
                             if (rawValue !== null) {
-                                if (label1.includes('Growth Rate') || label2.includes('Growth Rate')) {
-                                    return rawValue.toFixed(2) + '%';  // 顯示百分比格式
-                                }
-                                return rawValue.toFixed(2);
+                                return rawValue.toFixed(2);  // 顯示數據格式
                             }
                             return 'No data';
                         }
