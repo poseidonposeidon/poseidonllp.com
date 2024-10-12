@@ -2017,12 +2017,12 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
 
         const data = await response.json();
 
-        // 過濾出包含 .TW 或 .TWO 的結果
+        // Filter results ending with .TW or .TWO
         const filteredData = data.filter(item => item.symbol.endsWith('.TW') || item.symbol.endsWith('.TWO'));
 
         if (filteredData.length > 0) {
             const match = filteredData.find(item => item.symbol.split('.')[0] === stockCode);
-            return match ? (match.symbol.endsWith('.TW') ? stockCode + '.TW' : stockCode + '.TWO') : null;
+            return match ? match.symbol : null;
         } else {
             return null;
         }
@@ -2033,43 +2033,19 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
 }
 
 async function fetchMarginData(stockSymbol, apiKey, type) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/ratios/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=40&apikey=${apiKey}`;
 
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        console.log('Fetched data:', data); // 檢查返回的資料結構
-
-        // 根據不同類型返回不同的數據欄位
-        let marginField;
-        if (type === 'grossMargin') {
-            marginField = 'grossProfitMargin';
-        } else if (type === 'operatingMargin') {
-            marginField = 'operatingProfitMargin';
-        } else if (type === 'netProfitMargin') {
-            marginField = 'netProfitMargin';
-        } else if (type === 'eps') {  // 新增EPS的處理
-            marginField = 'eps';  // 確認 EPS 是否在這個欄位
-        } else if (type === 'roe') {  // 新增 ROE 的處理
-            marginField = 'returnOnEquity';  // 確認 ROE 是否在這個欄位
-        }
-
-        // 確保抓取到的是最近十年的數據
-        const today = new Date();
-        const tenYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
-
-        // 過濾掉超過10年的數據
-        return data
-            .filter(item => {
-                const itemDate = new Date(item.date);
-                return itemDate >= tenYearsAgo;  // 只保留最近十年的資料
-            })
-            .map(item => ({
-                date: item.date,
-                margin: marginField === 'eps' ? item[marginField] : item[marginField] * 100  // 如果是EPS，不需放大100倍
-            }))
-            .reverse();  // 確保日期順序從過去到現在
+        // Filter and map data based on type
+        return data.map(item => ({
+            date: item.date,
+            margin: type === 'grossMargin' ? (item.grossProfit / item.revenue) * 100 :
+                type === 'operatingMargin' ? (item.operatingIncome / item.revenue) * 100 :
+                    type === 'netProfitMargin' ? (item.netIncome / item.revenue) * 100 : null
+        })).filter(item => item.margin !== null).reverse();
     } catch (error) {
         console.error(`Error fetching ${type} data:`, error);
         return [];
@@ -2077,111 +2053,50 @@ async function fetchMarginData(stockSymbol, apiKey, type) {
 }
 
 async function fetchEPSData(stockSymbol, apiKey) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/historical/earning_calendar/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=20&apikey=${apiKey}`;
 
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        console.log('Fetched EPS data:', data); // 檢查返回的資料結構
-
-        // 確保抓取到的是最近五年的數據
-        const today = new Date();
-        const fiveYearsAgo = new Date(today.setFullYear(today.getFullYear() - 5));
-
-        // 過濾掉超過5年的數據，並確保有EPS資料
-        return data
-            .filter(item => {
-                const itemDate = new Date(item.date);
-                return itemDate >= fiveYearsAgo && item.eps !== null;  // 只保留最近五年的資料並且EPS不為null
-            })
-            .map(item => ({
-                date: item.date,
-                margin: item.eps  // 使用 EPS 數據
-            }))
-            .reverse();  // 確保日期順序從過去到現在
+        return data.map(item => ({
+            date: item.date,
+            margin: item.eps
+        })).filter(item => item.margin !== null).reverse();
     } catch (error) {
         console.error('Error fetching EPS data:', error);
         return [];
     }
 }
 
-async function fetchOperatingMarginGrowthRate(stockSymbol, apiKey) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/ratios/${stockSymbol}?apikey=${apiKey}`;
+async function fetchROEData(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/ratios/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
 
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        console.log('Fetched data for growth rate:', data); // 檢查返回的資料結構
-
-        // 確保抓取到的是最近五年的數據
-        const today = new Date();
-        const fiveYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
-
-        // 過濾掉超過5年的數據，並計算營業利益成長率
-        const filteredData = data.filter(item => {
-            const itemDate = new Date(item.date);
-            return itemDate >= fiveYearsAgo && item.operatingProfitMargin !== null;
-        });
-
-        // 計算成長率
-        const growthRates = filteredData.map((item, index, array) => {
-            if (index === 0) return null;  // 第一筆數據無法計算成長率
-            const prevMargin = array[index - 1].operatingProfitMargin;
-            const growthRate = ((item.operatingProfitMargin - prevMargin) / prevMargin) * 100;
-            return {
-                date: item.date,
-                margin: growthRate
-            };
-        }).slice(1); // 去除第一筆無法計算成長率的數據
-
-        return growthRates.reverse(); // 確保日期順序從過去到現在
+        return data.map(item => ({
+            date: item.date,
+            margin: item.returnOnEquity * 100
+        })).filter(item => item.margin !== null).reverse();
     } catch (error) {
-        console.error(`Error fetching operating margin growth rate data:`, error);
+        console.error('Error fetching ROE data:', error);
         return [];
     }
 }
 
 async function fetchStockPriceData(stockSymbol, apiKey) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=2010-01-01&apikey=${apiKey}`;
 
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        console.log('Fetched stock price data:', data); // 檢查返回的資料結構
-
-        // 確保抓取到的是最近十年的數據
-        const today = new Date();
-        const tenYearsAgo = new Date(today.setFullYear(today.getFullYear() - 10));
-
-        const monthlyData = {};
-
-        data.historical
-            .filter(item => {
-                const itemDate = new Date(item.date);
-                return itemDate >= tenYearsAgo;  // 只保留最近十年的資料
-            })
-            .forEach(item => {
-                const itemDate = new Date(item.date);
-                const yearMonth = `${itemDate.getFullYear()}-${String(itemDate.getMonth() + 1).padStart(2, '0')}`;
-
-                // 初始化每月的資料，並求平均值
-                if (!monthlyData[yearMonth]) {
-                    monthlyData[yearMonth] = { total: 0, count: 0 };
-                }
-                monthlyData[yearMonth].total += item.close;
-                monthlyData[yearMonth].count += 1;
-            });
-
-        // 計算每月的平均股價
-        const monthlyAverages = Object.keys(monthlyData).map(month => ({
-            date: month,
-            price: monthlyData[month].total / monthlyData[month].count
-        }));
-
-        return monthlyAverages.reverse();  // 確保日期順序從過去到現在
+        return data.historical.map(item => ({
+            date: item.date,
+            price: item.close
+        })).reverse();
     } catch (error) {
         console.error('Error fetching stock price data:', error);
         return [];
@@ -2192,7 +2107,7 @@ async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const loadingElement = document.getElementById('loading'); // 獲取 loading 元素
+    const loadingElement = document.getElementById('loading');
 
     if (!stock1 || !stock2) {
         alert('Please enter both stock symbols.');
@@ -2208,85 +2123,82 @@ async function displayChart(type) {
     }
 
     try {
-        // 顯示 Loading 畫面
         loadingElement.style.display = 'block';
 
-        let marginData1, marginData2;
+        let data1, data2;
 
-        // 根據類型選擇正確的 API 函數
-        if (type === 'eps') {
-            marginData1 = await fetchEPSData(fullStockSymbol1, apiKey);
-            marginData2 = await fetchEPSData(fullStockSymbol2, apiKey);
-        } else if (type === 'operatingMarginGrowthRate') {
-            marginData1 = await fetchOperatingMarginGrowthRate(fullStockSymbol1, apiKey);
-            marginData2 = await fetchOperatingMarginGrowthRate(fullStockSymbol2, apiKey);
-        } else if (type === 'roe') {  // 新增 ROE 的處理
-            marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, 'roe');
-            marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, 'roe');
-        } else if (type === 'stockPrice') {  // 新增股價的處理
-            marginData1 = await fetchStockPriceData(fullStockSymbol1, apiKey);
-            marginData2 = await fetchStockPriceData(fullStockSymbol2, apiKey);
-        } else {
-            marginData1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
-            marginData2 = await fetchMarginData(fullStockSymbol2, apiKey, type);
+        switch (type) {
+            case 'grossMargin':
+            case 'operatingMargin':
+            case 'netProfitMargin':
+                data1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
+                data2 = await fetchMarginData(fullStockSymbol2, apiKey, type);
+                break;
+            case 'eps':
+                data1 = await fetchEPSData(fullStockSymbol1, apiKey);
+                data2 = await fetchEPSData(fullStockSymbol2, apiKey);
+                break;
+            case 'roe':
+                data1 = await fetchROEData(fullStockSymbol1, apiKey);
+                data2 = await fetchROEData(fullStockSymbol2, apiKey);
+                break;
+            case 'stockPrice':
+                data1 = await fetchStockPriceData(fullStockSymbol1, apiKey);
+                data2 = await fetchStockPriceData(fullStockSymbol2, apiKey);
+                break;
+            default:
+                throw new Error('Invalid chart type');
         }
 
-        // 繪製圖表
-        drawMarginChart(
-            `${fullStockSymbol1} ${type.charAt(0).toUpperCase() + type.slice(1).replace('Margin', ' Margin')}`,
-            `${fullStockSymbol2} ${type.charAt(0).toUpperCase() + type.slice(1).replace('Margin', ' Margin')}`,
-            marginData1,
-            marginData2
+        drawChart(
+            `${fullStockSymbol1} ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+            `${fullStockSymbol2} ${type.charAt(0).toUpperCase() + type.slice(1)}`,
+            data1,
+            data2,
+            type
         );
 
     } catch (error) {
         console.error('Error fetching data:', error);
         alert('There was an error retrieving stock data.');
     } finally {
-        // 隱藏 Loading 畫面
         loadingElement.style.display = 'none';
     }
 }
 
-function drawMarginChart(label1, label2, marginData1, marginData2) {
+function drawChart(label1, label2, data1, data2, type) {
     const ctx = document.getElementById('grossMarginChart').getContext('2d');
 
     if (chartInstance) {
         chartInstance.destroy();
     }
 
-    const allDates = [
-        ...new Set([
-            ...marginData1.map(item => item.date),
-            ...marginData2.map(item => item.date)
-        ])
-    ].sort();  // 按時間排序
+    const allDates = [...new Set([...data1.map(item => item.date), ...data2.map(item => item.date)])].sort();
 
-    // 映射股價數據，按月份分組
-    const formattedMarginData1 = allDates.map(date => {
-        const entry = marginData1.find(item => item.date === date);
-        return entry ? entry.price : null;  // 使用股價數據
+    const formattedData1 = allDates.map(date => {
+        const entry = data1.find(item => item.date === date);
+        return entry ? entry.margin : null;
     });
 
-    const formattedMarginData2 = allDates.map(date => {
-        const entry = marginData2.find(item => item.date === date);
-        return entry ? entry.price : null;
+    const formattedData2 = allDates.map(date => {
+        const entry = data2.find(item => item.date === date);
+        return entry ? entry.margin : null;
     });
 
     const chartData = {
-        labels: allDates,  // 使用 "年-月" 作為 X 軸標籤
+        labels: allDates,
         datasets: [
             {
                 label: label1,
-                data: formattedMarginData1,
+                data: formattedData1,
                 borderColor: 'rgba(75, 192, 192, 1)',
                 spanGaps: true,
                 fill: false,
-                tension: 0  // 線條張力
+                tension: 0
             },
             {
                 label: label2,
-                data: formattedMarginData2,
+                data: formattedData2,
                 borderColor: 'rgba(255, 99, 132, 1)',
                 spanGaps: true,
                 fill: false,
@@ -2301,9 +2213,13 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         options: {
             scales: {
                 x: {
+                    type: 'time',
+                    time: {
+                        unit: 'quarter'
+                    },
                     ticks: {
-                        autoSkip: true,  // 自動跳過一些 X 軸標籤
-                        maxRotation: 45,  // 使 X 軸標籤保持水平
+                        autoSkip: true,
+                        maxRotation: 0,
                         minRotation: 0,
                     }
                 },
@@ -2311,7 +2227,10 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            return value;  // 顯示數據數值
+                            if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe'].includes(type)) {
+                                return value + '%';
+                            }
+                            return value;
                         }
                     }
                 }
@@ -2322,7 +2241,10 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
                         label: function(tooltipItem) {
                             const rawValue = tooltipItem.raw;
                             if (rawValue !== null) {
-                                return rawValue.toFixed(2);  // 顯示數據格式
+                                if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe'].includes(type)) {
+                                    return rawValue.toFixed(2) + '%';
+                                }
+                                return rawValue.toFixed(2);
                             }
                             return 'No data';
                         }
@@ -2332,7 +2254,6 @@ function drawMarginChart(label1, label2, marginData1, marginData2) {
         }
     });
 }
-
 //////////////////////////////Profile//////////////////////////////////////////////
 
 function fetchCompanyProfile(stockSymbol) {
