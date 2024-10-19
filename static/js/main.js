@@ -2884,21 +2884,30 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
 
 function calculatePEData(priceData, epsData) {
     const peData = priceData.map(priceEntry => {
-        const date = priceEntry.date;
-        // 尋找最接近的 EPS 日期
-        const matchingEpsEntry = epsData.find(epsEntry => {
-            // 假設日期格式一致，你可以調整這個條件來適應不同的日期格式
-            return new Date(epsEntry.date) <= new Date(date);
-        });
+        const priceDate = new Date(priceEntry.date);
 
-        // 確保有對應的 EPS 數據，並計算本益比/**/
+        // 使用 reduce 找到最接近且不晚於股價日期的 EPS
+        const matchingEpsEntry = epsData.reduce((closest, epsEntry) => {
+            const epsDate = new Date(epsEntry.date);
+            const dateDiff = priceDate - epsDate;
+
+            // 如果 EPS 日期比股價日期早且比當前找到的最接近，則選取該 EPS
+            if (dateDiff >= 0 && (!closest || dateDiff < (priceDate - new Date(closest.date)))) {
+                return epsEntry;
+            }
+            return closest;
+        }, null);  // 初始值設為 null
+
+        // 確保有對應的 EPS 數據，並計算 P/E Ratio
         if (matchingEpsEntry && matchingEpsEntry.eps) {
             const peRatio = priceEntry.close / matchingEpsEntry.eps;
             return {
-                date: date,
+                date: priceEntry.date,
                 peRatio: peRatio,
             };
         }
+
+        // 如果找不到對應的 EPS 資料，則返回 null
         return null;
     }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 的數據
 
