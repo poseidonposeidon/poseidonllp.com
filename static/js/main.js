@@ -2168,16 +2168,23 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
         // 將 EPS 和股價資料結合來計算外部 ROE
         const externalROEData = epsData.map(epsItem => {
             // 找到最接近 EPS 公布日期的股價
-            const stockPriceItem = stockPriceData.find(priceItem => {
+            let closestStockPrice = null;
+            let minDateDiff = Infinity;
+
+            stockPriceData.forEach(priceItem => {
                 const epsDate = new Date(epsItem.date);
                 const priceDate = new Date(priceItem.date);
-                // 若股價日期等於或稍後於 EPS 公布日期，選取最近的股價
-                return priceDate >= epsDate;
+                const dateDiff = Math.abs(epsDate - priceDate);
+
+                if (dateDiff < minDateDiff) {
+                    closestStockPrice = priceItem;
+                    minDateDiff = dateDiff;
+                }
             });
 
-            if (stockPriceItem) {
-                const externalROE = (epsItem.margin / stockPriceItem.price) * 100;  // 外部 ROE 計算
-                console.log(`EPS Date: ${epsItem.date}, Stock Price: ${stockPriceItem.price}, External ROE: ${externalROE}`);
+            if (closestStockPrice) {
+                const externalROE = (epsItem.margin / closestStockPrice.price) * 100;  // 外部 ROE 計算
+                console.log(`EPS Date: ${epsItem.date}, Stock Price: ${closestStockPrice.price}, External ROE: ${externalROE}`);
                 return {
                     date: epsItem.date,
                     margin: externalROE
@@ -2281,11 +2288,13 @@ function drawChart(label1, label2, data1, data2, type) {
 
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
+        // 如果日期沒有匹配的資料，返回 null，避免跳過
         return entry ? (type === 'stockPrice' ? entry.price : entry.margin) : null;
     });
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
+        // 如果日期沒有匹配的資料，返回 null，避免跳過
         return entry ? (type === 'stockPrice' ? entry.price : entry.margin) : null;
     });
 
