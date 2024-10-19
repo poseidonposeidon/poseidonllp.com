@@ -2239,7 +2239,8 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
 }
 
 async function fetchQuarterlyRevenueGrowthRate(stockSymbol, apiKey) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;  // 確保拉取足夠多的季度數據
+    // 確保拉取至少40個季度（10年）的數據
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
 
     try {
         const response = await fetch(apiUrl);
