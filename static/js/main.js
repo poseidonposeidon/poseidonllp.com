@@ -1086,8 +1086,10 @@ function loadCompareSection(sectionId) {
                 <a href="#" onclick="displayChart('revenueGrowthRate')">Revenue Growth Rate</a> |
                 <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin Growth Rate</a> |
                 <a href="#" onclick="displayChart('roe')">ROE</a> |
-                <a href="#" onclick="displayChart('stockPrice')">Stock Price</a>
+                <a href="#" onclick="displayChart('stockPrice')">Stock Price</a> |
+                <a href="#" onclick="displayChart('externalROE')">External ROE</a> <!-- 新增的外部ROE按鈕 -->
             </div>
+
             <div id="loading" style="display: none; text-align: center;">
                 <p>Loading... Please wait.</p>
             </div>
@@ -1132,7 +1134,6 @@ function loadCompareSection(sectionId) {
 }
 
 const baseUrl = 'https://api.poseidonllp.com';
-
 
 function sendMessage() {
     const inputField = document.getElementById('chat-input');
@@ -2154,6 +2155,33 @@ async function fetchRevenueGrowthRate(stockSymbol, apiKey) {
     }
 }
 
+async function fetchExternalROEData(stockSymbol, apiKey) {
+    try {
+        // Fetch the latest 4 quarters of EPS
+        const epsUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=4&apikey=${apiKey}`;
+        const epsResponse = await fetch(epsUrl);
+        const epsData = await epsResponse.json();
+        const epsSum = epsData.reduce((sum, item) => sum + item.eps, 0); // Sum of last 4 quarters EPS
+
+        // Fetch the current stock price
+        const priceUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
+        const priceResponse = await fetch(priceUrl);
+        const priceData = await priceResponse.json();
+        const currentPrice = priceData[0].price;
+
+        // Calculate external ROE (近四季EPS / 現在股價)
+        const externalROE = (epsSum / currentPrice) * 100;
+
+        return {
+            date: epsData[0].date, // Use the latest date
+            margin: externalROE
+        };
+    } catch (error) {
+        console.error('Error fetching external ROE data:', error);
+        return null;
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2201,9 +2229,13 @@ async function displayChart(type) {
                 data1 = await fetchStockPriceData(fullStockSymbol1, apiKey);
                 data2 = await fetchStockPriceData(fullStockSymbol2, apiKey);
                 break;
-            case 'revenueGrowthRate':  // 新增的 case
+            case 'revenueGrowthRate':
                 data1 = await fetchRevenueGrowthRate(fullStockSymbol1, apiKey);
                 data2 = await fetchRevenueGrowthRate(fullStockSymbol2, apiKey);
+                break;
+            case 'externalROE':  // 新增的 case
+                data1 = [await fetchExternalROEData(fullStockSymbol1, apiKey)];
+                data2 = [await fetchExternalROEData(fullStockSymbol2, apiKey)];
                 break;
             default:
                 throw new Error('Invalid chart type');
