@@ -820,7 +820,7 @@ button:not(.info-input button):hover {
 
 .chart-links .category {
     position: relative;
-    background-color: black; /* 使用與主題一致的背景色 */
+    background-color: #1e1e1e; /* 使用與主題一致的背景色 */
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
