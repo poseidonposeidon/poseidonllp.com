@@ -838,8 +838,8 @@ button:not(.info-input button):hover {
 }
 
 .chart-links .category .submenu {
-    max-height: 0;
-    overflow: hidden;
+    max-height: none;
+    overflow: visible;
     transition: max-height 0.5s ease-out, opacity 0.3s ease-out;
     opacity: 0;
     background-color: #1e1e1e; /* 子選單背景色保持一致 */
