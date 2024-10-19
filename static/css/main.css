@@ -812,70 +812,62 @@ button:not(.info-input button):hover {
 
 .chart-links {
     display: flex;
-    justify-content: center;
+    justify-content: center; /* 讓選項居中排列 */
     align-items: center;
-    gap: 200px;
+    gap: 200px; /* 保持選項之間的距離 */
     margin-top: 20px;
     width: 100%;
 }
 
 .chart-links .category {
     position: relative;
-    background-color: #1e1e1e;
+    background-color: #1e1e1e; /* 使用一致的背景顏色 */
     padding: 10px 20px;
     border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
     text-align: center;
-    white-space: nowrap;
+    white-space: nowrap; /* 防止文字換行 */
 }
 
-.chart-links .category .title {
-    cursor: pointer;
+.chart-links .category:hover .submenu {
+    max-height: 1000px; /* 設置一個足夠大的高度來顯示所有選項 */
+    opacity: 1;
 }
 
 .chart-links .category .submenu {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.6s ease-out, opacity 0.6s ease-out;
+    max-height: none;
+    overflow: visible;
+    transition: max-height 0.5s ease-out, opacity 0.3s ease-out;
     opacity: 0;
-    background-color: #1e1e1e;
+    background-color: #1e1e1e; /* 子選單背景色保持一致 */
     border-radius: 5px;
-    position: absolute;
-    top: 100%;
+    position: absolute; /* 絕對定位以便子選單在 hover 時展示 */
+    top: 100%; /* 將子選單放在主選項的下方 */
     left: 0;
     right: 0;
-    min-width: 150px;  /* 設置最小寬度，確保文字不會被截斷 */
-    width: auto; /* 自動調整寬度以適應內容 */
-    height: auto;
 }
 
-.chart-links .category .title:hover + .submenu {
-    max-height: 200px;
+.chart-links .category:hover .submenu {
+    max-height: 200px; /* 根據內容調整最大高度 */
     opacity: 1;
-    transition-delay: 0s; /* 當 hover 時立即展開 */
 }
 
 .chart-links .category .submenu a {
     display: block;
     padding: 10px 15px;
-    color: #90caf9;
+    color: #90caf9; /* 使用一致的字體顏色 */
     text-decoration: none;
     font-size: 16px;
     transition: background-color 0.3s ease, color 0.3s ease;
-    white-space: nowrap;
+    white-space: nowrap; /* 防止子選單中的文字換行 */
 }
 
 .chart-links .category .submenu a:hover {
-    background-color: #1e1e1e;
-    color: #ffffff;
+    background-color: #1e1e1e; /* hover 時背景變深 */
+    color: #ffffff; /* hover 時字體顏色變白 */
 }
 
-.chart-links .category:hover .submenu {
-    transition-delay: 0s; /* 當 hover 時，無延遲立即展開 */
-}
-
-.chart-links .category:not(:hover) .submenu {
-    transition-delay: 0.3s; /* 當鼠標移開時，延遲 0.3 秒才開始收起 */
-}
 
 
 
