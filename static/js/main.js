@@ -1093,9 +1093,8 @@ function loadCompareSection(sectionId) {
                         <a href="#" onclick="displayChart('grossMargin')">Gross Margin</a>
                         <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a>
                         <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a>
-                        <a href="#" onclick="displayChart('externalROE')">External ROE</a>
                         <a href="#" onclick="displayChart('roe')">ROE</a>
-                        
+                        <a href="#" onclick="displayChart('externalROE')">External ROE</a>
                     </div>
                 </div>
             
