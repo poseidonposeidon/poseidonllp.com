@@ -2866,8 +2866,9 @@ function fetchCNIncomeStatement() {
 }
 
 function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
-    // 並行請求股價和 EPS 數據
-    Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
+    const quarterEpsApiUrl = `${epsApiUrl}?period=quarter&limit=120&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`;  // 使用季度數據
+    // 並行請求股價和季度 EPS 數據
+    Promise.all([fetch(priceApiUrl), fetch(quarterEpsApiUrl)])
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
             if (priceData.historical && Array.isArray(epsData)) {
