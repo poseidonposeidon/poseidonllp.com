@@ -2055,7 +2055,7 @@ async function fetchMarginData(stockSymbol, apiKey, type) {
 }
 
 async function fetchEPSData(stockSymbol, apiKey) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=20&apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=40&apikey=${apiKey}`;  // 增加 limit 到 40，這樣可以獲取10年的資料
 
     try {
         const response = await fetch(apiUrl);
