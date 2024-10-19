@@ -1080,7 +1080,7 @@ function loadCompareSection(sectionId) {
             <!-- 新增切換圖表的功能 -->
             <div class="chart-links">
                 <div class="category">
-                    <span class="title" onclick="toggleMenu('financials')">財報</span>
+                    <span class="title" onclick="toggleMenu('financials')">Financial Report</span>
                     <div class="submenu" id="financials">
                         <a href="#" onclick="displayChart('eps')">EPS</a>
                         <a href="#" onclick="displayChart('stockPrice')">Stock Price</a>
@@ -1088,7 +1088,7 @@ function loadCompareSection(sectionId) {
                 </div>
             
                 <div class="category">
-                    <span class="title" onclick="toggleMenu('profitability')">獲利性</span>
+                    <span class="title" onclick="toggleMenu('profitability')">Profitability</span>
                     <div class="submenu" id="profitability">
                         <a href="#" onclick="displayChart('grossMargin')">Gross Margin</a>
                         <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a>
@@ -1099,7 +1099,7 @@ function loadCompareSection(sectionId) {
                 </div>
             
                 <div class="category">
-                    <span class="title" onclick="toggleMenu('growth')">成長性</span>
+                    <span class="title" onclick="toggleMenu('growth')">Growth</span>
                     <div class="submenu" id="growth">
                         <a href="#" onclick="displayChart('revenueGrowthRate')">Revenue Growth Rate</a>
                         <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin Growth Rate</a>
