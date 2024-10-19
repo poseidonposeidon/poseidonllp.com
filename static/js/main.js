@@ -1079,16 +1079,34 @@ function loadCompareSection(sectionId) {
             
             <!-- 新增切換圖表的功能 -->
             <div class="chart-links">
-                <a href="#" onclick="displayChart('grossMargin')">Gross Margin</a> |
-                <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a> |
-                <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a> |
-                <a href="#" onclick="displayChart('eps')">EPS</a> |
-                <a href="#" onclick="displayChart('revenueGrowthRate')">Revenue Growth Rate</a> |
-                <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin Growth Rate</a> |
-                <a href="#" onclick="displayChart('roe')">ROE</a> |
-                <a href="#" onclick="displayChart('stockPrice')">Stock Price</a> |
-                <a href="#" onclick="displayChart('externalROE')">External ROE</a> <!-- 新增的外部ROE按鈕 -->
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('financials')">財報</span>
+                    <div class="submenu" id="financials">
+                        <a href="#" onclick="displayChart('eps')">EPS</a>
+                        <a href="#" onclick="displayChart('stockPrice')">Stock Price</a>
+                    </div>
+                </div>
+            
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('profitability')">獲利性</span>
+                    <div class="submenu" id="profitability">
+                        <a href="#" onclick="displayChart('grossMargin')">Gross Margin</a>
+                        <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a>
+                        <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a>
+                        <a href="#" onclick="displayChart('roe')">ROE</a>
+                        <a href="#" onclick="displayChart('externalROE')">External ROE</a>
+                    </div>
+                </div>
+            
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('growth')">成長性</span>
+                    <div class="submenu" id="growth">
+                        <a href="#" onclick="displayChart('revenueGrowthRate')">Revenue Growth Rate</a>
+                        <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin Growth Rate</a>
+                    </div>
+                </div>
             </div>
+
 
             <div id="loading" style="display: none; text-align: center;">
                 <p>Loading... Please wait.</p>
@@ -1130,6 +1148,15 @@ function loadCompareSection(sectionId) {
         document.body.classList.toggle('modal-open');
     } else {
         console.error("Compare section not found");
+    }
+}
+
+function toggleMenu(menuId) {
+    const submenu = document.getElementById(menuId);
+    if (submenu.style.display === "block") {
+        submenu.style.display = "none";
+    } else {
+        submenu.style.display = "block";
     }
 }
 

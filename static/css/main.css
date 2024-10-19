@@ -807,3 +807,44 @@ button:not(.info-input button):hover {
 .closebtn:hover {
     color: black;
 }
+
+
+
+.chart-links {
+    display: flex;
+    gap: 20px;
+}
+
+.category {
+    position: relative;
+}
+
+.title {
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.submenu {
+    display: none;
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 10px;
+    z-index: 1000;
+}
+
+.submenu a {
+    display: block;
+    padding: 5px 10px;
+    text-decoration: none;
+    color: #333;
+}
+
+.submenu a:hover {
+    background-color: #f1f1f1;
+}
+
+/* Hover 展開 */
+.category:hover .submenu {
+    display: block;
+}
