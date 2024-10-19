@@ -2906,6 +2906,7 @@ function calculatePEData(priceData, epsData) {
         }, null);  // 初始值設為 null，避免選取錯誤的 EPS
 
         // 確保有對應的 EPS 數據，並計算 P/E Ratio
+        // 此處需要確認 `matchingEpsEntry.eps` 是正確的欄位名稱
         if (matchingEpsEntry && matchingEpsEntry.eps) {
             const peRatio = priceEntry.close / matchingEpsEntry.eps;  // 本益比 = 股價 / EPS
 
