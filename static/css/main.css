@@ -810,59 +810,44 @@ button:not(.info-input button):hover {
 
 
 
-.chart-links {
-    display: flex;
-    justify-content: space-between; /* 使用 space-between 讓區塊之間平分可用空間 */
-    align-items: center;
-    gap: 30px; /* 保持連結之間的距離 */
-    margin-top: 20px;
-}
-
 .chart-links .category {
     position: relative;
-    background-color: #1e1e1e; /* 使用與主題一致的背景色 */
+    background-color: #1e1e1e;
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    flex: 1; /* 讓每個 category 平均分配空間 */
-    text-align: center; /* 讓文字在區塊內置中 */
 }
 
 .chart-links .category:hover {
-    background-color: #1e1e1e; /* hover 時略微改變背景顏色 */
-}
-
-.chart-links .category .title {
-    color: #90caf9; /* 使用與主題一致的字體顏色 */
-    font-size: 18px;
-    font-weight: bold;
+    background-color: #1e1e1e; /* 當 hover 時，背景稍微變暗 */
 }
 
 .chart-links .category .submenu {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+    transition: max-height 0.5s ease-out, opacity 0.3s ease-out;
     opacity: 0;
 }
 
-.chart-links .category.active .submenu {
-    max-height: 200px; /* 最大高度可以根據實際需要調整 */
+.chart-links .category:hover .submenu {
+    max-height: 200px; /* 或其他合適的最大高度，根據具體內容調整 */
     opacity: 1;
 }
 
 .chart-links .category .submenu a {
     display: block;
     padding: 10px 15px;
-    color: #90caf9; /* 保持字體顏色一致 */
+    color: #90caf9;
     text-decoration: none;
     font-size: 16px;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .chart-links .category .submenu a:hover {
-    background-color: #1e1e1e; /* hover 時背景改變 */
-    color: #ffffff; /* hover 時文字顏色改變 */
+    background-color: #1e1e1e;
+    color: #ffffff;
 }
+
 
 
