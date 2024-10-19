@@ -2328,14 +2328,15 @@ function drawChart(label1, label2, data1, data2, type) {
                     }
                 },
                 y: {
-                    beginAtZero: false,
+                    beginAtZero: false,  // 設置為 false，避免 y 軸從 0 開始
+                    min: 0.8,  // 手動設定最小值，使數據更明顯
+                    max: 2,    // 手動設定最大值，讓 ROE 的數據不被壓縮
                     ticks: {
                         callback: function(value) {
-                            // 如果是外部ROE，顯示百分比
                             if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE'].includes(type)) {
-                                return value + '%';  // 加上百分比符號
+                                return value + '%';  // 顯示百分比
                             }
-                            return value;  // 保留原始顯示
+                            return value;
                         }
                     }
                 }
@@ -2346,11 +2347,10 @@ function drawChart(label1, label2, data1, data2, type) {
                         label: function(tooltipItem) {
                             const rawValue = tooltipItem.raw;
                             if (rawValue !== null) {
-                                // 如果是外部ROE，顯示百分比
                                 if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE'].includes(type)) {
-                                    return rawValue.toFixed(2) + '%';  // 顯示百分比格式
+                                    return rawValue.toFixed(2) + '%';
                                 }
-                                return type === 'stockPrice' ? '$' + rawValue.toFixed(2) : rawValue.toFixed(2);  // 顯示股價時使用$符號
+                                return type === 'stockPrice' ? '$' + rawValue.toFixed(2) : rawValue.toFixed(2);
                             }
                             return 'No data';
                         }
