@@ -1153,10 +1153,18 @@ function loadCompareSection(sectionId) {
 
 function toggleMenu(menuId) {
     const submenu = document.getElementById(menuId);
-    if (submenu.style.display === "block") {
-        submenu.style.display = "none";
+    const category = submenu.parentElement; // 取得 category 元素
+
+    if (category.classList.contains('active')) {
+        // 若已展開，則收起
+        submenu.style.maxHeight = '0';
+        submenu.style.opacity = '0';
+        category.classList.remove('active');
     } else {
-        submenu.style.display = "block";
+        // 若尚未展開，則展開
+        submenu.style.maxHeight = submenu.scrollHeight + 'px'; // 使用實際內容高度
+        submenu.style.opacity = '1';
+        category.classList.add('active');
     }
 }
 

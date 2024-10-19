@@ -838,14 +838,15 @@ button:not(.info-input button):hover {
 }
 
 .chart-links .category .submenu {
-    display: none; /* 子選單默認隱藏 */
-    position: absolute;
-    top: 100%;
-    left: 0;
-    background-color: #1e1e1e;
-    border-radius: 5px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    z-index: 1000;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+    opacity: 0;
+}
+
+.chart-links .category.active .submenu {
+    max-height: 200px; /* 最大高度可以根據實際需要調整 */
+    opacity: 1;
 }
 
 .chart-links .category:hover .submenu {
