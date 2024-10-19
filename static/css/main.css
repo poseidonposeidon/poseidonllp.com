@@ -812,7 +812,7 @@ button:not(.info-input button):hover {
 
 .chart-links {
     display: flex;
-    justify-content: center;
+    justify-content: space-between; /* 使用 space-between 讓區塊之間平分可用空間 */
     align-items: center;
     gap: 30px; /* 保持連結之間的距離 */
     margin-top: 20px;
@@ -825,10 +825,12 @@ button:not(.info-input button):hover {
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    flex: 1; /* 讓每個 category 平均分配空間 */
+    text-align: center; /* 讓文字在區塊內置中 */
 }
 
 .chart-links .category:hover {
-    background-color: #1e1e1e; /* hover 時輕微改變背景顏色 */
+    background-color: #2c2c2c; /* hover 時略微改變背景顏色 */
 }
 
 .chart-links .category .title {
@@ -849,10 +851,6 @@ button:not(.info-input button):hover {
     opacity: 1;
 }
 
-.chart-links .category:hover .submenu {
-    display: block; /* hover 時顯示子選單 */
-}
-
 .chart-links .category .submenu a {
     display: block;
     padding: 10px 15px;
@@ -863,11 +861,8 @@ button:not(.info-input button):hover {
 }
 
 .chart-links .category .submenu a:hover {
-    background-color: #1e1e1e; /* hover 時背景改變 */
+    background-color: #333; /* hover 時背景改變 */
     color: #ffffff; /* hover 時文字顏色改變 */
 }
 
-.chart-links .category .submenu a:active {
-    background-color: #1e1e1e; /* 當按下時，背景色略微變深 */
-}
 
