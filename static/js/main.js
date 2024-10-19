@@ -2275,11 +2275,14 @@ async function fetchQuarterlyRevenueGrowthRate(stockSymbol, apiKey) {
 
 async function fetchPERatioData(stockSymbol, apiKey) {
     try {
-        // 獲取每日股價資料
+        // 並行獲取每日股價資料和 EPS 資料（按季度）
         const stockPriceData = await fetchStockPriceData(stockSymbol, apiKey);
-        console.log("Fetched Stock Price Data:", stockPriceData);
+        const epsData = await fetchEPSData(stockSymbol, apiKey);
 
-        // 獲取 EPS 資料（按季度）
+        console.log("Fetched Stock Price Data:", stockPriceData);
+        console.log("Fetched EPS Data:", epsData);
+
+        // 計算每日的 P/E ratio (股價 / EPS)
         const peData = stockPriceData.map(priceEntry => {
             const priceDate = new Date(priceEntry.date);
 
@@ -2302,7 +2305,6 @@ async function fetchPERatioData(stockSymbol, apiKey) {
             // 如果找不到對應的 EPS 資料，則返回 null
             return null;
         }).filter(entry => entry !== null);  // 過濾掉沒有對應 EPS 的日期
-    
 
         return peData.reverse(); // 將數據順序反轉，從舊到新
     } catch (error) {
@@ -2406,18 +2408,16 @@ function drawChart(label1, label2, data1, data2, type) {
 
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
-        // 如果日期沒有匹配的資料，返回 null，避免跳過
-        return entry ? (type === 'stockPrice' ? entry.price : entry.margin) : null;
+        return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
     });
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
-        // 如果日期沒有匹配的資料，返回 null，避免跳過
-        return entry ? (type === 'stockPrice' ? entry.price : entry.margin) : null;
+        return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
     });
 
-    // 根據是否是 EPS 判斷要使用的圖表類型
-    const chartType = type === 'eps' ? 'bar' : 'line';
+    // 根據是否是 EPS 或 P/E ratio 判斷要使用的圖表類型
+    const chartType = (type === 'eps' || type === 'peRatio') ? 'bar' : 'line';
 
     const chartData = {
         labels: allDates,
@@ -2425,19 +2425,19 @@ function drawChart(label1, label2, data1, data2, type) {
             {
                 label: label1,
                 data: formattedData1,
-                borderColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'rgba(75, 192, 192, 1)',
-                backgroundColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'transparent',  // 給 Bar 圖的 EPS 填充顏色
+                borderColor: type === 'eps' || type === 'peRatio' ? 'rgba(75, 192, 192, 0.7)' : 'rgba(75, 192, 192, 1)',
+                backgroundColor: type === 'eps' || type === 'peRatio' ? 'rgba(75, 192, 192, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
                 spanGaps: true,
-                fill: type === 'eps',  // 填充顏色，Bar 圖適用
+                fill: type === 'eps' || type === 'peRatio',  // 填充顏色，Bar 圖適用
                 tension: 0
             },
             {
                 label: label2,
                 data: formattedData2,
-                borderColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'rgba(255, 99, 132, 1)',
-                backgroundColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'transparent',  // 給 Bar 圖的 EPS 填充顏色
+                borderColor: type === 'eps' || type === 'peRatio' ? 'rgba(255, 99, 132, 0.7)' : 'rgba(255, 99, 132, 1)',
+                backgroundColor: type === 'eps' || type === 'peRatio' ? 'rgba(255, 99, 132, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
                 spanGaps: true,
-                fill: type === 'eps',  // 填充顏色，Bar 圖適用
+                fill: type === 'eps' || type === 'peRatio',  // 填充顏色，Bar 圖適用
                 tension: 0
             }
         ]
@@ -2460,11 +2460,11 @@ function drawChart(label1, label2, data1, data2, type) {
                     }
                 },
                 y: {
-                    beginAtZero: false,  // 設置為 false，避免 y 軸從 0 開始
+                    beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE'].includes(type)) {
-                                return value + '%';  // 顯示百分比
+                            if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
+                                return value.toFixed(2) + (type === 'peRatio' ? '' : '%');  // P/E 比率顯示為數值，其他顯示為百分比
                             }
                             return value;
                         }
@@ -2477,8 +2477,8 @@ function drawChart(label1, label2, data1, data2, type) {
                         label: function(tooltipItem) {
                             const rawValue = tooltipItem.raw;
                             if (rawValue !== null) {
-                                if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE'].includes(type)) {
-                                    return rawValue.toFixed(2) + '%';
+                                if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
+                                    return rawValue.toFixed(2) + (type === 'peRatio' ? '' : '%');
                                 }
                                 return type === 'stockPrice' ? '$' + rawValue.toFixed(2) : rawValue.toFixed(2);
                             }
@@ -2489,8 +2489,7 @@ function drawChart(label1, label2, data1, data2, type) {
             }
         }
     });
-}
-//////////////////////////////Profile//////////////////////////////////////////////
+}//////////////////////////////Profile//////////////////////////////////////////////
 
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
