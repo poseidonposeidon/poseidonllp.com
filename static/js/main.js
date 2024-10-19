@@ -2167,16 +2167,16 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
 
         // 將 EPS 和股價資料結合來計算外部 ROE
         const externalROEData = epsData.map(epsItem => {
-            // 找到最接近 EPS 公布日期的股價
+            // 找到最接近 EPS 公布日期的股價，但日期必須大於等於 EPS 公布日
             let closestStockPrice = null;
             let minDateDiff = Infinity;
 
             stockPriceData.forEach(priceItem => {
                 const epsDate = new Date(epsItem.date);
                 const priceDate = new Date(priceItem.date);
-                const dateDiff = Math.abs(epsDate - priceDate);
+                const dateDiff = priceDate - epsDate;  // 只選擇大於等於 EPS 公佈日的股價
 
-                if (dateDiff < minDateDiff) {
+                if (dateDiff >= 0 && dateDiff < minDateDiff) {
                     closestStockPrice = priceItem;
                     minDateDiff = dateDiff;
                 }
@@ -2254,8 +2254,8 @@ async function displayChart(type) {
                 data2 = await fetchRevenueGrowthRate(fullStockSymbol2, apiKey);
                 break;
             case 'externalROE':  // 新增的 case
-                data1 = [await fetchExternalROEData(fullStockSymbol1, apiKey)];
-                data2 = [await fetchExternalROEData(fullStockSymbol2, apiKey)];
+                data1 = await fetchExternalROEData(fullStockSymbol1, apiKey);
+                data2 = await fetchExternalROEData(fullStockSymbol2, apiKey);
                 break;
             default:
                 throw new Error('Invalid chart type');
