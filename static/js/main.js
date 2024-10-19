@@ -2871,6 +2871,7 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
             if (priceData.historical && Array.isArray(epsData)) {
+                // 調用 calculatePEData 計算 P/E ratio
                 const peData = calculatePEData(priceData.historical, epsData);
                 displayPEBandChart(peData, chartId); // 傳入對應的圖表 ID
             } else {
@@ -2896,11 +2897,11 @@ function calculatePEData(priceData, epsData) {
                 return epsEntry;
             }
             return closest;
-        }, null);  // 初始值設為 null
+        }, epsData[0]);  // 初始值設為 epsData[0]，避免 null
 
         // 確保有對應的 EPS 數據，並計算 P/E Ratio
         if (matchingEpsEntry && matchingEpsEntry.eps) {
-            const peRatio = priceEntry.close / matchingEpsEntry.eps;
+            const peRatio = priceEntry.close / matchingEpsEntry.eps;  // 本益比 = 股價 / EPS
             return {
                 date: priceEntry.date,
                 peRatio: peRatio,
@@ -2911,7 +2912,7 @@ function calculatePEData(priceData, epsData) {
         return null;
     }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 的數據
 
-    return peData;
+    return peData.reverse();  // 確保數據從舊到新
 }
 
 function resetState(chartId, containerId) {
