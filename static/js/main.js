@@ -2866,19 +2866,12 @@ function fetchCNIncomeStatement() {
 }
 
 function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
-    const quarterEpsApiUrl = `${epsApiUrl}?period=quarter&limit=120&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`;  // 確保使用季度數據
-    // 並行請求股價和季度 EPS 數據
-    Promise.all([fetch(priceApiUrl), fetch(quarterEpsApiUrl)])
+    // 並行請求股價和 EPS 數據
+    Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
             if (priceData.historical && Array.isArray(epsData)) {
-                // 檢查 EPS 數據是否正確
-                console.log('EPS Data:', epsData);
-
-                // 確保 EPS 數據已按日期排序
-                const sortedEpsData = epsData.sort((a, b) => new Date(a.date) - new Date(b.date));
-                // 調用 calculatePEData 計算 P/E ratio
-                const peData = calculatePEData(priceData.historical, sortedEpsData);
+                const peData = calculatePEData(priceData.historical, epsData);
                 displayPEBandChart(peData, chartId); // 傳入對應的圖表 ID
             } else {
                 console.error("Invalid data from price or EPS API");
@@ -2891,39 +2884,25 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
 
 function calculatePEData(priceData, epsData) {
     const peData = priceData.map(priceEntry => {
-        const priceDate = new Date(priceEntry.date);
+        const date = priceEntry.date;
+        // 尋找最接近的 EPS 日期
+        const matchingEpsEntry = epsData.find(epsEntry => {
+            // 假設日期格式一致，你可以調整這個條件來適應不同的日期格式
+            return new Date(epsEntry.date) <= new Date(date);
+        });
 
-        // 使用 reduce 找到最接近且不晚於股價日期的 EPS
-        const matchingEpsEntry = epsData.reduce((closest, epsEntry) => {
-            const epsDate = new Date(epsEntry.date);
-            const dateDiff = priceDate - epsDate;
-
-            // 如果 EPS 日期比股價日期早且比當前找到的最接近，則選取該 EPS
-            if (dateDiff >= 0 && (!closest || dateDiff < (priceDate - new Date(closest.date)))) {
-                return epsEntry;
-            }
-            return closest;
-        }, null);  // 初始值設為 null，避免選取錯誤的 EPS
-
-        // 確保有對應的 EPS 數據，並計算 P/E Ratio
-        // 此處需要確認 `matchingEpsEntry.eps` 是正確的欄位名稱
+        // 確保有對應的 EPS 數據，並計算本益比/**/
         if (matchingEpsEntry && matchingEpsEntry.eps) {
-            const peRatio = priceEntry.close / matchingEpsEntry.eps;  // 本益比 = 股價 / EPS
-
-            // 打印股價和對應的 EPS 到控制台，確認是否正確匹配
-            console.log(`Date: ${priceEntry.date}, Stock Price: ${priceEntry.close}, EPS: ${matchingEpsEntry.eps}, P/E Ratio: ${peRatio}`);
-
+            const peRatio = priceEntry.close / matchingEpsEntry.eps;
             return {
-                date: priceEntry.date,
+                date: date,
                 peRatio: peRatio,
             };
         }
-
-        // 如果找不到對應的 EPS 資料，則返回 null
         return null;
     }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 的數據
 
-    return peData.reverse();  // 確保數據從舊到新
+    return peData;
 }
 
 function resetState(chartId, containerId) {
