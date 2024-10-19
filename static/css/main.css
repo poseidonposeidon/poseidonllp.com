@@ -816,6 +816,7 @@ button:not(.info-input button):hover {
     align-items: center;
     gap: 30px; /* 保持選項之間的距離 */
     margin-top: 20px;
+    width: 100%;
 }
 
 .chart-links .category {
@@ -825,9 +826,9 @@ button:not(.info-input button):hover {
     border-radius: 8px;
     cursor: pointer;
     transition: background-color 0.3s ease;
-    flex: 1; /* 平均分配空間，讓選項佔據相同寬度 */
     text-align: center;
     
+
 }
 
 .chart-links .category:hover {
