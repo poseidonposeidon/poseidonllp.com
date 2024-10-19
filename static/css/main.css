@@ -830,7 +830,7 @@ button:not(.info-input button):hover {
 }
 
 .chart-links .category:hover {
-    background-color: #2c2c2c; /* hover 時略微改變背景顏色 */
+    background-color: #1e1e1e; /* hover 時略微改變背景顏色 */
 }
 
 .chart-links .category .title {
@@ -861,7 +861,7 @@ button:not(.info-input button):hover {
 }
 
 .chart-links .category .submenu a:hover {
-    background-color: #333; /* hover 時背景改變 */
+    background-color: #1e1e1e; /* hover 時背景改變 */
     color: #ffffff; /* hover 時文字顏色改變 */
 }
 
