@@ -2280,28 +2280,29 @@ async function fetchPERatioData(stockSymbol, apiKey) {
         console.log("Fetched Stock Price Data:", stockPriceData);
 
         // 獲取 EPS 資料（按季度）
-        const epsData = await fetchEPSData(stockSymbol, apiKey);
-        console.log("Fetched EPS Data:", epsData);
-
-        // 計算每日的 P/E ratio (股價 / EPS)
         const peData = stockPriceData.map(priceEntry => {
-            const date = priceEntry.date;
+            const priceDate = new Date(priceEntry.date);
 
-            // 尋找最接近的 EPS 日期，確保日期小於或等於當前的股價日期
-            const matchingEpsEntry = epsData.find(epsEntry => new Date(epsEntry.date) <= new Date(date));
+            // 使用 reduce 找到最接近且不晚於股價日期的 EPS
+            const matchingEpsEntry = epsData.reduce((closest, epsEntry) => {
+                const epsDate = new Date(epsEntry.date);
+                const dateDiff = priceDate - epsDate;
+                return (dateDiff >= 0 && dateDiff < (priceDate - new Date(closest.date))) ? epsEntry : closest;
+            }, epsData[0]);  // 默認選取第一個 EPS 作為初始值
 
             // 確保有對應的 EPS 數據，並計算 P/E Ratio
             if (matchingEpsEntry && matchingEpsEntry.margin) {
                 const peRatio = priceEntry.price / matchingEpsEntry.margin;  // 本益比 = 股價 / EPS
                 return {
-                    date: date,
+                    date: priceEntry.date,
                     peRatio: peRatio,
                 };
             }
 
             // 如果找不到對應的 EPS 資料，則返回 null
             return null;
-        }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 的日期
+        }).filter(entry => entry !== null);  // 過濾掉沒有對應 EPS 的日期
+    
 
         return peData.reverse(); // 將數據順序反轉，從舊到新
     } catch (error) {
