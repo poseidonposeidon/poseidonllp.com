@@ -2161,20 +2161,34 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
         const epsUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=4&apikey=${apiKey}`;
         const epsResponse = await fetch(epsUrl);
         const epsData = await epsResponse.json();
-        const epsSum = epsData.reduce((sum, item) => sum + item.eps, 0); // Sum of last 4 quarters EPS
 
-        // Fetch the current stock price
-        const priceUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
-        const priceResponse = await fetch(priceUrl);
-        const priceData = await priceResponse.json();
-        const currentPrice = priceData[0].price;
+        // 檢查是否正確取得了至少四季的 EPS 數據
+        if (!epsData || epsData.length < 4) {
+            throw new Error('Not enough EPS data for external ROE calculation.');
+        }
 
-        // Calculate external ROE (近四季EPS / 現在股價)
-        const externalROE = (epsSum / currentPrice) * 100;
+        let epsSum = 0;
+        for (const epsEntry of epsData) {
+            // Fetch historical stock price for the EPS announcement date
+            const priceUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=${epsEntry.date}&to=${epsEntry.date}&apikey=${apiKey}`;
+            const priceResponse = await fetch(priceUrl);
+            const priceData = await priceResponse.json();
 
+            if (priceData.historical && priceData.historical.length > 0) {
+                const stockPriceOnEpsDate = priceData.historical[0].close;
+
+                // 用EPS / 股價計算ROE，並累加
+                const roeForQuarter = (epsEntry.eps / stockPriceOnEpsDate) * 100;
+                epsSum += roeForQuarter;
+            } else {
+                throw new Error(`No stock price data available for date: ${epsEntry.date}`);
+            }
+        }
+
+        // 返回最近一季的 EPS 公布日期和累計的 ROE
         return {
-            date: epsData[0].date, // Use the latest date
-            margin: externalROE
+            date: epsData[0].date, // 使用最近一季的日期作為標記
+            margin: epsSum / 4 // 平均外部ROE
         };
     } catch (error) {
         console.error('Error fetching external ROE data:', error);
