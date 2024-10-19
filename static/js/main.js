@@ -2371,30 +2371,35 @@ function drawChart(label1, label2, data1, data2, type) {
         return entry ? (type === 'stockPrice' ? entry.price : entry.margin) : null;
     });
 
+    // 根據是否是 EPS 判斷要使用的圖表類型
+    const chartType = type === 'eps' ? 'bar' : 'line';
+
     const chartData = {
         labels: allDates,
         datasets: [
             {
                 label: label1,
                 data: formattedData1,
-                borderColor: 'rgba(75, 192, 192, 1)',
+                borderColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'rgba(75, 192, 192, 1)',
+                backgroundColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'transparent',  // 給 Bar 圖的 EPS 填充顏色
                 spanGaps: true,
-                fill: false,
+                fill: type === 'eps',  // 填充顏色，Bar 圖適用
                 tension: 0
             },
             {
                 label: label2,
                 data: formattedData2,
-                borderColor: 'rgba(255, 99, 132, 1)',
+                borderColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'rgba(255, 99, 132, 1)',
+                backgroundColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'transparent',  // 給 Bar 圖的 EPS 填充顏色
                 spanGaps: true,
-                fill: false,
+                fill: type === 'eps',  // 填充顏色，Bar 圖適用
                 tension: 0
             }
         ]
     };
 
     chartInstance = new Chart(ctx, {
-        type: 'line',
+        type: chartType,  // 根據類型使用不同的圖表
         data: chartData,
         options: {
             scales: {
