@@ -2157,51 +2157,33 @@ async function fetchRevenueGrowthRate(stockSymbol, apiKey) {
 
 async function fetchExternalROEData(stockSymbol, apiKey) {
     try {
-        // Fetch EPS data for the past 10 years (40 quarters)
-        const epsUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=40&apikey=${apiKey}`;
-        const epsResponse = await fetch(epsUrl);
-        const epsData = await epsResponse.json();
+        // 獲取 EPS 資料
+        const epsData = await fetchEPSData(stockSymbol, apiKey);
 
-        // 檢查是否取得了足夠的 EPS 數據 (40 個季度)
-        if (!epsData || epsData.length < 40) {
-            throw new Error('Not enough EPS data for 10 years of external ROE calculation.');
-        }
+        // 獲取股價資料
+        const stockPriceData = await fetchStockPriceData(stockSymbol, apiKey);
 
-        let externalROEData = [];
+        // 將 EPS 和股價資料結合來計算外部 ROE
+        const externalROEData = epsData.map(epsItem => {
+            // 找到相同日期的股價
+            const stockPriceItem = stockPriceData.find(priceItem => priceItem.date === epsItem.date);
 
-        // 遍歷每一季的 EPS 資料，並計算對應的外部ROE
-        for (const epsEntry of epsData) {
-            // 使用較大範圍的日期查詢股價，前後各查5天，避免因交易日問題找不到股價
-            let priceUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=${getDateRange(epsEntry.date, -5)}&to=${getDateRange(epsEntry.date, 5)}&apikey=${apiKey}`;
-            let priceResponse = await fetch(priceUrl);
-            let priceData = await priceResponse.json();
-
-            // 根據日期排序並選取最接近EPS公佈日期的股價
-            if (priceData.historical && priceData.historical.length > 0) {
-                priceData.historical.sort((a, b) => Math.abs(new Date(a.date) - new Date(epsEntry.date)) - Math.abs(new Date(b.date) - new Date(epsEntry.date)));
-                const closestPrice = priceData.historical[0].close;
-                const roeForQuarter = (epsEntry.eps / closestPrice) * 100;
-                externalROEData.push({
-                    date: epsEntry.date,
-                    margin: roeForQuarter
-                });
+            if (stockPriceItem) {
+                const externalROE = (epsItem.margin / stockPriceItem.price) * 100;  // 外部 ROE 計算
+                return {
+                    date: epsItem.date,
+                    margin: externalROE
+                };
             } else {
-                console.warn(`No available stock price data around date: ${epsEntry.date}`);
+                return null;  // 若找不到匹配的股價資料，則返回 null
             }
-        }
+        }).filter(item => item !== null).reverse();  // 移除 null 並且將資料順序反轉（日期由舊到新）
 
-        // 返回完整的外部ROE資料
-        return externalROEData;  // 返回包含多個季數的陣列
+        return externalROEData;
     } catch (error) {
         console.error('Error fetching external ROE data:', error);
         return [];
     }
-}
-// 輔助函式：用於計算日期範圍
-function getDateRange(dateString, offsetDays) {
-    const date = new Date(dateString);
-    date.setDate(date.getDate() + offsetDays);
-    return date.toISOString().split('T')[0];  // 返回 YYYY-MM-DD 格式
 }
 
 async function displayChart(type) {
