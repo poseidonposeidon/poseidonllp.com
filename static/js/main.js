@@ -2871,8 +2871,10 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
             if (priceData.historical && Array.isArray(epsData)) {
+                // 確保 EPS 數據已按日期排序
+                const sortedEpsData = epsData.sort((a, b) => new Date(a.date) - new Date(b.date));
                 // 調用 calculatePEData 計算 P/E ratio
-                const peData = calculatePEData(priceData.historical, epsData);
+                const peData = calculatePEData(priceData.historical, sortedEpsData);
                 displayPEBandChart(peData, chartId); // 傳入對應的圖表 ID
             } else {
                 console.error("Invalid data from price or EPS API");
@@ -2884,14 +2886,11 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
 }
 
 function calculatePEData(priceData, epsData) {
-    // 確保 EPS 數據按日期排序，從舊到新
-    const sortedEpsData = epsData.sort((a, b) => new Date(a.date) - new Date(b.date));
-
     const peData = priceData.map(priceEntry => {
         const priceDate = new Date(priceEntry.date);
 
         // 使用 reduce 找到最接近且不晚於股價日期的 EPS
-        const matchingEpsEntry = sortedEpsData.reduce((closest, epsEntry) => {
+        const matchingEpsEntry = epsData.reduce((closest, epsEntry) => {
             const epsDate = new Date(epsEntry.date);
             const dateDiff = priceDate - epsDate;
 
@@ -2906,7 +2905,7 @@ function calculatePEData(priceData, epsData) {
         if (matchingEpsEntry && matchingEpsEntry.eps) {
             const peRatio = priceEntry.close / matchingEpsEntry.eps;  // 本益比 = 股價 / EPS
 
-            // 打印股價和對應的 EPS 到控制台
+            // 打印股價和對應的 EPS 到控制台，確認是否正確匹配
             console.log(`Date: ${priceEntry.date}, Stock Price: ${priceEntry.close}, EPS: ${matchingEpsEntry.eps}, P/E Ratio: ${peRatio}`);
 
             return {
