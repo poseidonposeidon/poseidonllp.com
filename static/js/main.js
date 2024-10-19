@@ -1101,8 +1101,9 @@ function loadCompareSection(sectionId) {
                 <div class="category">
                     <span class="title" onclick="toggleMenu('growth')">Growth</span>
                     <div class="submenu" id="growth">
-                        <a href="#" onclick="displayChart('revenueGrowthRate')">Revenue Growth Rate</a>
-                        <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin Growth Rate</a>
+<!--                        <a href="#" onclick="displayChart('revenueGrowthRate')">Revenue Growth Rate</a>-->
+<!--                        <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin Growth Rate</a>-->
+                            <a href="#" onclick="displayChart('quarterlyRevenueGrowthRate')">Quarterly Revenue Growth Rate</a>
                     </div>
                 </div>
             </div>
@@ -2237,6 +2238,32 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
     }
 }
 
+async function fetchQuarterlyRevenueGrowthRate(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;  // 確保拉取足夠多的季度數據
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        // 計算季度的營收成長率
+        const growthRates = data.map((item, index, array) => {
+            if (index === array.length - 1) return null; // 最後一筆數據無法計算成長率
+            const currentRevenue = item.revenue;
+            const prevRevenue = array[index + 1].revenue;
+            const growthRate = ((currentRevenue - prevRevenue) / prevRevenue) * 100;  // 計算季度成長率
+            return {
+                date: item.date,
+                margin: growthRate
+            };
+        }).filter(item => item !== null).reverse();  // 將數據順序由舊到新排列
+
+        return growthRates;
+    } catch (error) {
+        console.error('Error fetching quarterly revenue growth rate data:', error);
+        return [];
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2288,9 +2315,13 @@ async function displayChart(type) {
                 data1 = await fetchRevenueGrowthRate(fullStockSymbol1, apiKey);
                 data2 = await fetchRevenueGrowthRate(fullStockSymbol2, apiKey);
                 break;
-            case 'externalROE':  // 新增的 case
+            case 'externalROE':
                 data1 = await fetchExternalROEData(fullStockSymbol1, apiKey);
                 data2 = await fetchExternalROEData(fullStockSymbol2, apiKey);
+                break;
+            case 'quarterlyRevenueGrowthRate':  // 新增季度營收成長率的 case
+                data1 = await fetchQuarterlyRevenueGrowthRate(fullStockSymbol1, apiKey);
+                data2 = await fetchQuarterlyRevenueGrowthRate(fullStockSymbol2, apiKey);
                 break;
             default:
                 throw new Error('Invalid chart type');
