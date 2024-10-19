@@ -2884,11 +2884,14 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
 }
 
 function calculatePEData(priceData, epsData) {
+    // 確保 EPS 數據按日期排序，從舊到新
+    const sortedEpsData = epsData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
     const peData = priceData.map(priceEntry => {
         const priceDate = new Date(priceEntry.date);
 
         // 使用 reduce 找到最接近且不晚於股價日期的 EPS
-        const matchingEpsEntry = epsData.reduce((closest, epsEntry) => {
+        const matchingEpsEntry = sortedEpsData.reduce((closest, epsEntry) => {
             const epsDate = new Date(epsEntry.date);
             const dateDiff = priceDate - epsDate;
 
@@ -2897,7 +2900,7 @@ function calculatePEData(priceData, epsData) {
                 return epsEntry;
             }
             return closest;
-        }, epsData[0]);  // 初始值設為 epsData[0]，避免 null
+        }, null);  // 初始值設為 null，避免選取錯誤的 EPS
 
         // 確保有對應的 EPS 數據，並計算 P/E Ratio
         if (matchingEpsEntry && matchingEpsEntry.eps) {
