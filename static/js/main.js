@@ -2245,17 +2245,24 @@ async function fetchQuarterlyRevenueGrowthRate(stockSymbol, apiKey) {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        // 計算季度的營收成長率
-        const growthRates = data.map((item, index, array) => {
-            if (index === array.length - 1) return null; // 最後一筆數據無法計算成長率
-            const currentRevenue = item.revenue;
-            const prevRevenue = array[index + 1].revenue;
-            const growthRate = ((currentRevenue - prevRevenue) / prevRevenue) * 100;  // 計算季度成長率
-            return {
-                date: item.date,
-                margin: growthRate
-            };
-        }).filter(item => item !== null).reverse();  // 將數據順序由舊到新排列
+        // 確保數據是按照日期順序排列（從最新到最舊）
+        const sortedData = data.reverse();
+
+        // 計算同比成長率，即相同季度之間的成長率 (2024Q1 vs 2023Q1)
+        const growthRates = sortedData.map((item, index, array) => {
+            // 找到去年同一季度的數據 (index - 4 是去年的同一季度)
+            const previousYearSameQuarterIndex = index - 4;  // 往前4個季度
+            if (previousYearSameQuarterIndex >= 0) {
+                const currentRevenue = item.revenue;
+                const previousRevenue = array[previousYearSameQuarterIndex].revenue;
+                const growthRate = ((currentRevenue - previousRevenue) / previousRevenue) * 100;
+                return {
+                    date: item.date,
+                    margin: growthRate
+                };
+            }
+            return null; // 如果沒有對應的前一年同季度，返回 null
+        }).filter(item => item !== null);  // 移除 null 的項目
 
         return growthRates;
     } catch (error) {

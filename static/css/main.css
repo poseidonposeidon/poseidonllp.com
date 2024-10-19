@@ -824,21 +824,17 @@ button:not(.info-input button):hover {
     background-color: #1e1e1e; /* 使用一致的背景顏色 */
     padding: 10px 20px;
     border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
     text-align: center;
-
-
+    white-space: nowrap; /* 防止文字換行 */
 }
 
-.chart-links .category:hover .submenu {
-    max-height: 1000px; /* 設置一個足夠大的高度來顯示所有選項 */
-    opacity: 1;
+.chart-links .category .title {
+    cursor: pointer; /* 設定游標為點擊狀態 */
 }
 
 .chart-links .category .submenu {
-    max-height: none;
-    overflow: visible;
+    max-height: 0;
+    overflow: hidden;
     transition: max-height 0.5s ease-out, opacity 0.3s ease-out;
     opacity: 0;
     background-color: #1e1e1e; /* 子選單背景色保持一致 */
@@ -849,7 +845,7 @@ button:not(.info-input button):hover {
     right: 0;
 }
 
-.chart-links .category:hover .submenu {
+.chart-links .category .title:hover + .submenu {
     max-height: 200px; /* 根據內容調整最大高度 */
     opacity: 1;
 }
@@ -861,12 +857,14 @@ button:not(.info-input button):hover {
     text-decoration: none;
     font-size: 16px;
     transition: background-color 0.3s ease, color 0.3s ease;
+    white-space: nowrap; /* 防止子選單中的文字換行 */
 }
 
 .chart-links .category .submenu a:hover {
     background-color: #1e1e1e; /* hover 時背景變深 */
     color: #ffffff; /* hover 時字體顏色變白 */
 }
+
 
 
 
