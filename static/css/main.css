@@ -814,7 +814,7 @@ button:not(.info-input button):hover {
     display: flex;
     justify-content: center; /* 讓選項居中排列 */
     align-items: center;
-    gap: 50px; /* 保持選項之間的距離 */
+    gap: 200px; /* 保持選項之間的距離 */
     margin-top: 20px;
     width: 100%;
 }
@@ -831,8 +831,9 @@ button:not(.info-input button):hover {
 
 }
 
-.chart-links .category:hover {
-    background-color: #1e1e1e; /* hover 時背景稍微變暗 */
+.chart-links .category:hover .submenu {
+    max-height: 300px; /* 設置一個足夠大的高度來顯示所有選項 */
+    opacity: 1;
 }
 
 .chart-links .category .submenu {
