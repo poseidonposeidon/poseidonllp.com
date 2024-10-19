@@ -2338,8 +2338,6 @@ function drawChart(label1, label2, data1, data2, type) {
                 },
                 y: {
                     beginAtZero: false,  // 設置為 false，避免 y 軸從 0 開始
-                    min: 0.8,  // 手動設定最小值，使數據更明顯
-                    max: 2,    // 手動設定最大值，讓 ROE 的數據不被壓縮
                     ticks: {
                         callback: function(value) {
                             if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE'].includes(type)) {
