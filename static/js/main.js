@@ -2159,9 +2159,11 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
     try {
         // 獲取 EPS 資料
         const epsData = await fetchEPSData(stockSymbol, apiKey);
+        console.log("Fetched EPS Data:", epsData);
 
         // 獲取股價資料
         const stockPriceData = await fetchStockPriceData(stockSymbol, apiKey);
+        console.log("Fetched Stock Price Data:", stockPriceData);
 
         // 將 EPS 和股價資料結合來計算外部 ROE
         const externalROEData = epsData.map(epsItem => {
@@ -2175,11 +2177,13 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
 
             if (stockPriceItem) {
                 const externalROE = (epsItem.margin / stockPriceItem.price) * 100;  // 外部 ROE 計算
+                console.log(`EPS Date: ${epsItem.date}, Stock Price: ${stockPriceItem.price}, External ROE: ${externalROE}`);
                 return {
                     date: epsItem.date,
                     margin: externalROE
                 };
             } else {
+                console.log(`No matching stock price found for EPS date: ${epsItem.date}`);
                 return null;  // 若找不到匹配的股價資料，則返回 null
             }
         }).filter(item => item !== null).reverse();  // 移除 null 並且將資料順序反轉（日期由舊到新）
