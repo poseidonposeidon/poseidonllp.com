@@ -2157,17 +2157,19 @@ async function fetchRevenueGrowthRate(stockSymbol, apiKey) {
 
 async function fetchExternalROEData(stockSymbol, apiKey) {
     try {
-        // Fetch the latest 4 quarters of EPS
-        const epsUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=4&apikey=${apiKey}`;
+        // Fetch EPS data for the past 10 years (40 quarters)
+        const epsUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=40&apikey=${apiKey}`;
         const epsResponse = await fetch(epsUrl);
         const epsData = await epsResponse.json();
 
-        // 檢查是否正確取得了至少四季的 EPS 數據
-        if (!epsData || epsData.length < 4) {
-            throw new Error('Not enough EPS data for external ROE calculation.');
+        // 檢查是否取得了足夠的 EPS 數據 (40 個季度)
+        if (!epsData || epsData.length < 40) {
+            throw new Error('Not enough EPS data for 10 years of external ROE calculation.');
         }
 
-        let epsSum = 0;
+        let externalROEData = [];
+
+        // 遍歷每一季的 EPS 資料，並計算對應的外部ROE
         for (const epsEntry of epsData) {
             // Fetch historical stock price for the EPS announcement date
             let priceUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=${epsEntry.date}&to=${epsEntry.date}&apikey=${apiKey}`;
@@ -2186,22 +2188,25 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
                 if (priceData.historical.length > 0) {
                     const stockPriceOnEpsDate = priceData.historical[0].close;
                     const roeForQuarter = (epsEntry.eps / stockPriceOnEpsDate) * 100;
-                    epsSum += roeForQuarter;
+                    externalROEData.push({
+                        date: epsEntry.date,
+                        margin: roeForQuarter
+                    });
                 } else {
                     throw new Error(`No available stock price data around date: ${epsEntry.date}`);
                 }
             } else {
                 const stockPriceOnEpsDate = priceData.historical[0].close;
                 const roeForQuarter = (epsEntry.eps / stockPriceOnEpsDate) * 100;
-                epsSum += roeForQuarter;
+                externalROEData.push({
+                    date: epsEntry.date,
+                    margin: roeForQuarter
+                });
             }
         }
 
-        // 返回最近一季的 EPS 公布日期和累計的 ROE
-        return {
-            date: epsData[0].date, // 使用最近一季的日期作為標記
-            margin: epsSum / 4 // 平均外部ROE
-        };
+        // 返回過去10年的外部ROE資料
+        return externalROEData;
     } catch (error) {
         console.error('Error fetching external ROE data:', error);
         return null;
