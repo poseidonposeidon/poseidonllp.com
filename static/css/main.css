@@ -832,7 +832,7 @@ button:not(.info-input button):hover {
 }
 
 .chart-links .category:hover .submenu {
-    max-height: 300px; /* 設置一個足夠大的高度來顯示所有選項 */
+    max-height: 500px; /* 設置一個足夠大的高度來顯示所有選項 */
     opacity: 1;
 }
 
