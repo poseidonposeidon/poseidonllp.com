@@ -814,7 +814,7 @@ button:not(.info-input button):hover {
     display: flex;
     justify-content: center; /* 讓選項居中排列 */
     align-items: center;
-    gap: 30px; /* 保持選項之間的距離 */
+    gap: 50px; /* 保持選項之間的距離 */
     margin-top: 20px;
     width: 100%;
 }
