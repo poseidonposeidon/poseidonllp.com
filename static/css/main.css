@@ -837,6 +837,7 @@ button:not(.info-input button):hover {
 
 .chart-links .category .submenu {
     max-height: none;
+    width: auto;
     overflow: visible;
     transition: max-height 0.5s ease-out, opacity 0.3s ease-out;
     opacity: 0;
