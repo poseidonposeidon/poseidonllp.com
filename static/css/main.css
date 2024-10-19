@@ -245,7 +245,7 @@ div {
     height: auto;
     max-width: 1000px; /* 增加最大宽度 */
     max-height:  none;
-    overflow-y: auto;
+    overflow-y: scroll;
     opacity: 0;
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
     border-radius: 15px; /* 增加圆角 */
