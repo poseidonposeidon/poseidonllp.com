@@ -2171,37 +2171,22 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
 
         // 遍歷每一季的 EPS 資料，並計算對應的外部ROE
         for (const epsEntry of epsData) {
-            // Fetch historical stock price for the EPS announcement date
-            let priceUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=${epsEntry.date}&to=${epsEntry.date}&apikey=${apiKey}`;
+            // 使用較大範圍的日期查詢股價，前後各查5天，避免因交易日問題找不到股價
+            let priceUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=${getDateRange(epsEntry.date, -5)}&to=${getDateRange(epsEntry.date, 5)}&apikey=${apiKey}`;
             let priceResponse = await fetch(priceUrl);
             let priceData = await priceResponse.json();
 
-            // 如果當天沒有股價數據，查找最近的交易日
-            if (!priceData.historical || priceData.historical.length === 0) {
-                console.warn(`No stock price available for date: ${epsEntry.date}. Trying to find the closest trading day.`);
-                priceUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?serietype=line&apikey=${apiKey}`;
-                priceResponse = await fetch(priceUrl);
-                priceData = await priceResponse.json();
-
-                // 根據日期過濾，找到最近的交易日
-                priceData.historical = priceData.historical.filter(item => new Date(item.date) <= new Date(epsEntry.date));
-                if (priceData.historical.length > 0) {
-                    const stockPriceOnEpsDate = priceData.historical[0].close;
-                    const roeForQuarter = (epsEntry.eps / stockPriceOnEpsDate) * 100;
-                    externalROEData.push({
-                        date: epsEntry.date,
-                        margin: roeForQuarter
-                    });
-                } else {
-                    throw new Error(`No available stock price data around date: ${epsEntry.date}`);
-                }
-            } else {
-                const stockPriceOnEpsDate = priceData.historical[0].close;
-                const roeForQuarter = (epsEntry.eps / stockPriceOnEpsDate) * 100;
+            // 根據日期排序並選取最接近EPS公佈日期的股價
+            if (priceData.historical && priceData.historical.length > 0) {
+                priceData.historical.sort((a, b) => Math.abs(new Date(a.date) - new Date(epsEntry.date)) - Math.abs(new Date(b.date) - new Date(epsEntry.date)));
+                const closestPrice = priceData.historical[0].close;
+                const roeForQuarter = (epsEntry.eps / closestPrice) * 100;
                 externalROEData.push({
                     date: epsEntry.date,
                     margin: roeForQuarter
                 });
+            } else {
+                console.warn(`No available stock price data around date: ${epsEntry.date}`);
             }
         }
 
@@ -2211,6 +2196,12 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
         console.error('Error fetching external ROE data:', error);
         return null;
     }
+}
+// 輔助函式：用於計算日期範圍
+function getDateRange(dateString, offsetDays) {
+    const date = new Date(dateString);
+    date.setDate(date.getDate() + offsetDays);
+    return date.toISOString().split('T')[0];  // 返回 YYYY-MM-DD 格式
 }
 
 async function displayChart(type) {
