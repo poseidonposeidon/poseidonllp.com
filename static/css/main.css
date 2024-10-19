@@ -812,58 +812,71 @@ button:not(.info-input button):hover {
 
 .chart-links {
     display: flex;
-    justify-content: center; /* 讓選項居中排列 */
+    justify-content: center;
     align-items: center;
-    gap: 200px; /* 保持選項之間的距離 */
+    gap: 200px;
     margin-top: 20px;
     width: 100%;
 }
 
 .chart-links .category {
     position: relative;
-    background-color: #1e1e1e; /* 使用一致的背景顏色 */
+    background-color: #1e1e1e;
     padding: 10px 20px;
     border-radius: 8px;
     text-align: center;
-    white-space: nowrap; /* 防止文字換行 */
+    white-space: nowrap;
 }
 
 .chart-links .category .title {
-    cursor: pointer; /* 設定游標為點擊狀態 */
+    cursor: pointer;
 }
 
 .chart-links .category .submenu {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.5s ease-out, opacity 0.3s ease-out;
+    transition: max-height 0.6s ease-out, opacity 0.6s ease-out;
     opacity: 0;
-    background-color: #1e1e1e; /* 子選單背景色保持一致 */
+    background-color: #1e1e1e;
     border-radius: 5px;
-    position: absolute; /* 絕對定位以便子選單在 hover 時展示 */
-    top: 100%; /* 將子選單放在主選項的下方 */
+    position: absolute;
+    top: 100%;
     left: 0;
     right: 0;
+    min-width: 150px;  /* 設置最小寬度，確保文字不會被截斷 */
+    width: auto; /* 自動調整寬度以適應內容 */
 }
 
 .chart-links .category .title:hover + .submenu {
-    max-height: 200px; /* 根據內容調整最大高度 */
+    max-height: 200px;
     opacity: 1;
+    transition-delay: 0s; /* 當 hover 時立即展開 */
 }
 
 .chart-links .category .submenu a {
     display: block;
     padding: 10px 15px;
-    color: #90caf9; /* 使用一致的字體顏色 */
+    color: #90caf9;
     text-decoration: none;
     font-size: 16px;
     transition: background-color 0.3s ease, color 0.3s ease;
-    white-space: nowrap; /* 防止子選單中的文字換行 */
+    white-space: normal; /* 允許換行，確保文字顯示完整 */
 }
 
 .chart-links .category .submenu a:hover {
-    background-color: #1e1e1e; /* hover 時背景變深 */
-    color: #ffffff; /* hover 時字體顏色變白 */
+    background-color: #1e1e1e;
+    color: #ffffff;
 }
+
+.chart-links .category:hover .submenu {
+    transition-delay: 0s; /* 當 hover 時，無延遲立即展開 */
+}
+
+.chart-links .category:not(:hover) .submenu {
+    transition-delay: 0.3s; /* 當鼠標移開時，延遲 0.3 秒才開始收起 */
+}
+
+
 
 
 
