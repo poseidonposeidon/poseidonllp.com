@@ -2170,18 +2170,30 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
         let epsSum = 0;
         for (const epsEntry of epsData) {
             // Fetch historical stock price for the EPS announcement date
-            const priceUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=${epsEntry.date}&to=${epsEntry.date}&apikey=${apiKey}`;
-            const priceResponse = await fetch(priceUrl);
-            const priceData = await priceResponse.json();
+            let priceUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=${epsEntry.date}&to=${epsEntry.date}&apikey=${apiKey}`;
+            let priceResponse = await fetch(priceUrl);
+            let priceData = await priceResponse.json();
 
-            if (priceData.historical && priceData.historical.length > 0) {
+            // 如果當天沒有股價數據，查找最近的交易日
+            if (!priceData.historical || priceData.historical.length === 0) {
+                console.warn(`No stock price available for date: ${epsEntry.date}. Trying to find the closest trading day.`);
+                priceUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?serietype=line&apikey=${apiKey}`;
+                priceResponse = await fetch(priceUrl);
+                priceData = await priceResponse.json();
+
+                // 根據日期過濾，找到最近的交易日
+                priceData.historical = priceData.historical.filter(item => new Date(item.date) <= new Date(epsEntry.date));
+                if (priceData.historical.length > 0) {
+                    const stockPriceOnEpsDate = priceData.historical[0].close;
+                    const roeForQuarter = (epsEntry.eps / stockPriceOnEpsDate) * 100;
+                    epsSum += roeForQuarter;
+                } else {
+                    throw new Error(`No available stock price data around date: ${epsEntry.date}`);
+                }
+            } else {
                 const stockPriceOnEpsDate = priceData.historical[0].close;
-
-                // 用EPS / 股價計算ROE，並累加
                 const roeForQuarter = (epsEntry.eps / stockPriceOnEpsDate) * 100;
                 epsSum += roeForQuarter;
-            } else {
-                throw new Error(`No stock price data available for date: ${epsEntry.date}`);
             }
         }
 
