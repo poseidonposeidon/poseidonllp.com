@@ -2190,11 +2190,11 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
             }
         }
 
-        // 返回過去10年的外部ROE資料
-        return externalROEData;
+        // 返回完整的外部ROE資料
+        return externalROEData;  // 返回包含多個季數的陣列
     } catch (error) {
         console.error('Error fetching external ROE data:', error);
-        return null;
+        return [];
     }
 }
 // 輔助函式：用於計算日期範圍
