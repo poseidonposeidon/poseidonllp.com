@@ -242,8 +242,9 @@ div {
     padding: 40px; /* 增加内边距 */
     z-index: 9999;
     width: 90%; /* 增加宽度 */
+    height: auto;
     max-width: 1000px; /* 增加最大宽度 */
-    max-height:  1000px;
+    max-height:  none;
     overflow-y: auto;
     opacity: 0;
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
