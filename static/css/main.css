@@ -253,6 +253,7 @@ div {
 
 #compare.active {
     opacity: 1;
+    max-height:  1000px;
     transform: translate(-50%, -50%) scale(1);
     display: block;
 }
