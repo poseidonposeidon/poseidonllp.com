@@ -243,7 +243,7 @@ div {
     z-index: 9999;
     width: 90%; /* 增加宽度 */
     max-width: 1000px; /* 增加最大宽度 */
-    max-height:  calc(100vh - 20px);
+    max-height:  1000px;
     overflow-y: auto;
     opacity: 0;
     transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
