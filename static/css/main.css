@@ -845,6 +845,7 @@ button:not(.info-input button):hover {
     right: 0;
     min-width: 150px;  /* 設置最小寬度，確保文字不會被截斷 */
     width: auto; /* 自動調整寬度以適應內容 */
+    height: auto;
 }
 
 .chart-links .category .title:hover + .submenu {
@@ -860,7 +861,7 @@ button:not(.info-input button):hover {
     text-decoration: none;
     font-size: 16px;
     transition: background-color 0.3s ease, color 0.3s ease;
-    white-space: nowrap; 
+    white-space: nowrap;
 }
 
 .chart-links .category .submenu a:hover {
