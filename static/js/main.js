@@ -2275,44 +2275,35 @@ async function fetchQuarterlyRevenueGrowthRate(stockSymbol, apiKey) {
 
 async function fetchPERatioData(stockSymbol, apiKey) {
     try {
-        // 獲取 EPS 資料
-        const epsData = await fetchEPSData(stockSymbol, apiKey);
-        console.log("Fetched EPS Data:", epsData);
-
-        // 獲取股價資料
+        // 獲取每日股價資料
         const stockPriceData = await fetchStockPriceData(stockSymbol, apiKey);
         console.log("Fetched Stock Price Data:", stockPriceData);
 
-        // 計算 P/E ratio (股價 / EPS)
-        const peRatioData = epsData.map(epsItem => {
-            // 找到最接近 EPS 公布日期的股價
-            let closestStockPrice = null;
-            let minDateDiff = Infinity;
+        // 獲取 EPS 資料（按季度）
+        const epsData = await fetchEPSData(stockSymbol, apiKey);
+        console.log("Fetched EPS Data:", epsData);
 
-            stockPriceData.forEach(priceItem => {
-                const epsDate = new Date(epsItem.date);
-                const priceDate = new Date(priceItem.date);
-                const dateDiff = priceDate - epsDate;  // 找到最近的股價日期
+        // 計算每日的 P/E ratio (股價 / EPS)
+        const peData = stockPriceData.map(priceEntry => {
+            const date = priceEntry.date;
 
-                if (dateDiff >= 0 && dateDiff < minDateDiff) {
-                    closestStockPrice = priceItem;
-                    minDateDiff = dateDiff;
-                }
-            });
+            // 尋找最接近的 EPS 日期，確保日期小於或等於當前的股價日期
+            const matchingEpsEntry = epsData.find(epsEntry => new Date(epsEntry.date) <= new Date(date));
 
-            if (closestStockPrice && epsItem.margin) {
-                const peRatio = closestStockPrice.price / epsItem.margin;  // P/E ratio 計算
-                console.log(`EPS Date: ${epsItem.date}, Stock Price: ${closestStockPrice.price}, P/E Ratio: ${peRatio}`);
+            // 確保有對應的 EPS 數據，並計算 P/E Ratio
+            if (matchingEpsEntry && matchingEpsEntry.margin) {
+                const peRatio = priceEntry.price / matchingEpsEntry.margin;  // 本益比 = 股價 / EPS
                 return {
-                    date: epsItem.date,
-                    margin: peRatio
+                    date: date,
+                    peRatio: peRatio,
                 };
-            } else {
-                return null;  // 如果找不到匹配的股價或 EPS 為 null，返回 null
             }
-        }).filter(item => item !== null);  // 移除 null 值
 
-        return peRatioData.reverse();  // 反轉數據順序
+            // 如果找不到對應的 EPS 資料，則返回 null
+            return null;
+        }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 的日期
+
+        return peData.reverse(); // 將數據順序反轉，從舊到新
     } catch (error) {
         console.error('Error fetching P/E ratio data:', error);
         return [];
@@ -2897,7 +2888,7 @@ function calculatePEData(priceData, epsData) {
             return new Date(epsEntry.date) <= new Date(date);
         });
 
-        // 確保有對應的 EPS 數據，並計算本益比
+        // 確保有對應的 EPS 數據，並計算本益比/**/
         if (matchingEpsEntry && matchingEpsEntry.eps) {
             const peRatio = priceEntry.close / matchingEpsEntry.eps;
             return {
