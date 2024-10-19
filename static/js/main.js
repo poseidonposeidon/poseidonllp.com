@@ -1084,6 +1084,7 @@ function loadCompareSection(sectionId) {
                     <div class="submenu" id="financials">
                         <a href="#" onclick="displayChart('stockPrice')">Stock Price</a>
                         <a href="#" onclick="displayChart('eps')">EPS</a>
+                        <a href="#" onclick="displayChart('peRatio')">P/E Ratio</a>
                     </div>
                 </div>
             
@@ -2272,6 +2273,52 @@ async function fetchQuarterlyRevenueGrowthRate(stockSymbol, apiKey) {
     }
 }
 
+async function fetchPERatioData(stockSymbol, apiKey) {
+    try {
+        // 獲取 EPS 資料
+        const epsData = await fetchEPSData(stockSymbol, apiKey);
+        console.log("Fetched EPS Data:", epsData);
+
+        // 獲取股價資料
+        const stockPriceData = await fetchStockPriceData(stockSymbol, apiKey);
+        console.log("Fetched Stock Price Data:", stockPriceData);
+
+        // 計算 P/E ratio (股價 / EPS)
+        const peRatioData = epsData.map(epsItem => {
+            // 找到最接近 EPS 公布日期的股價
+            let closestStockPrice = null;
+            let minDateDiff = Infinity;
+
+            stockPriceData.forEach(priceItem => {
+                const epsDate = new Date(epsItem.date);
+                const priceDate = new Date(priceItem.date);
+                const dateDiff = priceDate - epsDate;  // 找到最近的股價日期
+
+                if (dateDiff >= 0 && dateDiff < minDateDiff) {
+                    closestStockPrice = priceItem;
+                    minDateDiff = dateDiff;
+                }
+            });
+
+            if (closestStockPrice && epsItem.margin) {
+                const peRatio = closestStockPrice.price / epsItem.margin;  // P/E ratio 計算
+                console.log(`EPS Date: ${epsItem.date}, Stock Price: ${closestStockPrice.price}, P/E Ratio: ${peRatio}`);
+                return {
+                    date: epsItem.date,
+                    margin: peRatio
+                };
+            } else {
+                return null;  // 如果找不到匹配的股價或 EPS 為 null，返回 null
+            }
+        }).filter(item => item !== null);  // 移除 null 值
+
+        return peRatioData.reverse();  // 反轉數據順序
+    } catch (error) {
+        console.error('Error fetching P/E ratio data:', error);
+        return [];
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2297,6 +2344,11 @@ async function displayChart(type) {
         let data1, data2;
 
         switch (type) {
+            // 新增 P/E ratio 的 case
+            case 'peRatio':
+                data1 = await fetchPERatioData(fullStockSymbol1, apiKey);
+                data2 = await fetchPERatioData(fullStockSymbol2, apiKey);
+                break;
             case 'grossMargin':
             case 'operatingMargin':
             case 'netProfitMargin':
