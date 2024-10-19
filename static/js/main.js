@@ -2408,16 +2408,18 @@ function drawChart(label1, label2, data1, data2, type) {
 
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
+        // 如果日期沒有匹配的資料，返回 null，避免跳過
         return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
     });
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
+        // 如果日期沒有匹配的資料，返回 null，避免跳過
         return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
     });
 
-    // 根據是否是 EPS 或 P/E ratio 判斷要使用的圖表類型
-    const chartType = (type === 'eps' || type === 'peRatio') ? 'bar' : 'line';
+    // 根據是否是 EPS 判斷要使用的圖表類型，P/E ratio 使用折線圖
+    const chartType = (type === 'eps') ? 'bar' : 'line';
 
     const chartData = {
         labels: allDates,
@@ -2425,19 +2427,19 @@ function drawChart(label1, label2, data1, data2, type) {
             {
                 label: label1,
                 data: formattedData1,
-                borderColor: type === 'eps' || type === 'peRatio' ? 'rgba(75, 192, 192, 0.7)' : 'rgba(75, 192, 192, 1)',
-                backgroundColor: type === 'eps' || type === 'peRatio' ? 'rgba(75, 192, 192, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
+                borderColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'rgba(75, 192, 192, 1)',
+                backgroundColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
                 spanGaps: true,
-                fill: type === 'eps' || type === 'peRatio',  // 填充顏色，Bar 圖適用
+                fill: type === 'eps',  // 填充顏色，Bar 圖適用
                 tension: 0
             },
             {
                 label: label2,
                 data: formattedData2,
-                borderColor: type === 'eps' || type === 'peRatio' ? 'rgba(255, 99, 132, 0.7)' : 'rgba(255, 99, 132, 1)',
-                backgroundColor: type === 'eps' || type === 'peRatio' ? 'rgba(255, 99, 132, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
+                borderColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'rgba(255, 99, 132, 1)',
+                backgroundColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
                 spanGaps: true,
-                fill: type === 'eps' || type === 'peRatio',  // 填充顏色，Bar 圖適用
+                fill: type === 'eps',  // 填充顏色，Bar 圖適用
                 tension: 0
             }
         ]
@@ -2489,7 +2491,8 @@ function drawChart(label1, label2, data1, data2, type) {
             }
         }
     });
-}//////////////////////////////Profile//////////////////////////////////////////////
+}
+//////////////////////////////Profile//////////////////////////////////////////////
 
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
