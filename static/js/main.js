@@ -2905,6 +2905,10 @@ function calculatePEData(priceData, epsData) {
         // 確保有對應的 EPS 數據，並計算 P/E Ratio
         if (matchingEpsEntry && matchingEpsEntry.eps) {
             const peRatio = priceEntry.close / matchingEpsEntry.eps;  // 本益比 = 股價 / EPS
+
+            // 打印股價和對應的 EPS 到控制台
+            console.log(`Date: ${priceEntry.date}, Stock Price: ${priceEntry.close}, EPS: ${matchingEpsEntry.eps}, P/E Ratio: ${peRatio}`);
+
             return {
                 date: priceEntry.date,
                 peRatio: peRatio,
