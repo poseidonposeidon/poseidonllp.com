@@ -1339,7 +1339,7 @@ function fetchJPStock() {
             fetchJPCompanyPrice(stockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestionsJP();
+                clearSuggestions();
             }, 1500); // 延迟1秒后清除建议框
         });
     }
@@ -1432,7 +1432,7 @@ async function fetchTWStock() {
             fetchTWCompanyPrice(fullStockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestionsTW();
+                clearSuggestions();
             }, 1500); // 延迟1秒后清除建议框
         });
     }
@@ -1489,7 +1489,7 @@ function fetchEUStock() {
             fetchEUCompanyPrice(stockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestionsEU();
+                clearSuggestions();
             }, 1500); // 延迟1秒后清除建议框
         });
     }
@@ -1546,7 +1546,7 @@ function fetchKRStock() {
             fetchKRCompanyPrice(stockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestionsKR();
+                clearSuggestions();
             }, 1500); // 延迟1秒后清除建议框
         });
     }
@@ -1603,7 +1603,7 @@ function fetchHKStock() {
             fetchHKCompanyPrice(stockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestionsHK();
+                clearSuggestions();
             }, 1500); // 延迟1秒后清除建议框
         });
     }
@@ -1660,7 +1660,7 @@ function fetchCNStock() {
             fetchCNCompanyPrice(stockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestionsCN();
+                clearSuggestions();
             }, 1500); // 延迟1秒后清除建议框
         });
     }
