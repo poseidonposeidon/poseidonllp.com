@@ -3145,8 +3145,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 新增：創建本益比河流圖
     setTimeout(() => {
         fetchPEBandData(
-            `https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
-            `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=120&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
+            `https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?timeseries=3650&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,  // 改成3650天（10年）
+            `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=40&period=quarter&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,  // 確保是10年的季度數據
             `peBandChart_${chartId}` // 傳入帶有 chartId 的唯一 ID
         );
     }, 500);
