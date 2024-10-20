@@ -2784,9 +2784,10 @@ async function fetchTWIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter${period}&apikey=${apiKey}`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartTW');
 
+    // 確保季度數據正確查詢
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
+    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartTW');
 }
 
 function fetchEUIncomeStatement() {
@@ -2891,7 +2892,7 @@ function calculatePEData(priceData, epsData) {
             return new Date(epsEntry.date) <= new Date(date);
         });
 
-        // 確保有對應的 EPS 數據，並計算本益比/**/
+        // 確保有對應的 EPS 數據，並計算本益比
         if (matchingEpsEntry && matchingEpsEntry.eps) {
             const peRatio = priceEntry.close / matchingEpsEntry.eps;
             return {
