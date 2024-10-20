@@ -3391,7 +3391,9 @@ function displayPEBandChart(peData, chartId) {
     }
 
     const ctx = canvas.getContext('2d');
-    const dates = peData.map(entry => entry.date);
+
+    // 確保將日期轉換為 Date 對象
+    const dates = peData.map(entry => new Date(entry.date));
     const peRatios = peData.map(entry => entry.peRatio);
 
     // 檢查是否已有先前的圖表實例
@@ -3417,7 +3419,7 @@ function displayPEBandChart(peData, chartId) {
                     type: 'time',
                     time: {
                         unit: 'year',
-                        tooltipFormat: 'yyyy-MM-dd',
+                        tooltipFormat: 'YYYY-MM-DD',  // 修正為大寫
                     },
                     title: {
                         display: true,
