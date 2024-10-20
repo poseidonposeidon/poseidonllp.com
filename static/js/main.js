@@ -2742,11 +2742,11 @@ function fetchIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
 
     // 新增：本益比河流圖的 API 請求
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
-
-    // 獲取本益比河流圖的數據
-    fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart);
+    // const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
+    // const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
+    //
+    // // 獲取本益比河流圖的數據
+    // fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart);
 }
 
 function fetchJPIncomeStatement() {
