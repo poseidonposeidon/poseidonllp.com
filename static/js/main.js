@@ -2890,15 +2890,21 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
 function calculatePEData(priceData, epsData) {
     const peData = priceData.map(priceEntry => {
         const date = priceEntry.date;
-        // 尋找最接近的 EPS 日期
-        const matchingEpsEntry = epsData.find(epsEntry => {
-            // 假設日期格式一致，你可以調整這個條件來適應不同的日期格式
-            return new Date(epsEntry.date) <= new Date(date);
-        });
+        const priceDate = new Date(date);
+
+        // 尋找過去四季的 EPS 數據，將其累加起來
+        const cumulativeEPS = epsData.reduce((acc, epsEntry) => {
+            const epsDate = new Date(epsEntry.date);
+            if (epsDate <= priceDate && acc.count < 4) {
+                acc.total += epsEntry.eps;
+                acc.count += 1;
+            }
+            return acc;
+        }, { total: 0, count: 0 }).total;
 
         // 確保有對應的 EPS 數據，並計算本益比
-        if (matchingEpsEntry && matchingEpsEntry.eps) {
-            const peRatio = priceEntry.close / matchingEpsEntry.eps;
+        if (cumulativeEPS > 0) {
+            const peRatio = priceEntry.close / cumulativeEPS;
             return {
                 date: date,
                 peRatio: peRatio,
