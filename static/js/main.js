@@ -2282,20 +2282,22 @@ async function fetchPERatioData(stockSymbol, apiKey) {
         console.log("Fetched Stock Price Data:", stockPriceData);
         console.log("Fetched EPS Data:", epsData);
 
-        // 計算每日的 P/E ratio (股價 / EPS)
+        // 計算每日的 P/E ratio (股價 / 過去四季EPS總和)
         const peData = stockPriceData.map(priceEntry => {
             const priceDate = new Date(priceEntry.date);
 
-            // 使用 reduce 找到最接近且不晚於股價日期的 EPS
-            const matchingEpsEntry = epsData.reduce((closest, epsEntry) => {
-                const epsDate = new Date(epsEntry.date);
-                const dateDiff = priceDate - epsDate;
-                return (dateDiff >= 0 && dateDiff < (priceDate - new Date(closest.date))) ? epsEntry : closest;
-            }, epsData[0]);  // 默認選取第一個 EPS 作為初始值
+            // 找到股價日期之前最近的四個季度的 EPS 資料
+            const recentFourQuarters = epsData
+                .filter(epsEntry => new Date(epsEntry.date) <= priceDate) // 找到日期不晚於當前股價日期的 EPS
+                .sort((a, b) => new Date(b.date) - new Date(a.date))      // 按日期降序排序
+                .slice(0, 4);                                             // 取最近的四個季度
 
-            // 確保有對應的 EPS 數據，並計算 P/E Ratio
-            if (matchingEpsEntry && matchingEpsEntry.margin) {
-                const peRatio = priceEntry.price / matchingEpsEntry.margin;  // 本益比 = 股價 / EPS
+            // 計算最近四個季度的 EPS 總和
+            const totalEPS = recentFourQuarters.reduce((sum, epsEntry) => sum + (epsEntry.margin || 0), 0);
+
+            // 確保有對應的 EPS 總和，並計算 P/E Ratio
+            if (totalEPS > 0) {
+                const peRatio = priceEntry.price / totalEPS;  // 本益比 = 股價 / 最近四季EPS累加
                 return {
                     date: priceEntry.date,
                     peRatio: peRatio,
