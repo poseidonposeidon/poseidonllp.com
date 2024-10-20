@@ -2202,33 +2202,29 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
         const stockPriceData = await fetchStockPriceData(stockSymbol, apiKey);
         console.log("Fetched Stock Price Data:", stockPriceData);
 
-        // 將 EPS 和股價資料結合來計算外部 ROE
-        const externalROEData = epsData.map(epsItem => {
-            // 找到最接近 EPS 公布日期的股價，但日期必須大於等於 EPS 公布日
-            let closestStockPrice = null;
-            let minDateDiff = Infinity;
+        // 將 EPS 和股價資料結合來計算外部 ROE（近四季 EPS 累計 / 股價）
+        const externalROEData = stockPriceData.map(priceItem => {
+            const priceDate = new Date(priceItem.date);
 
-            stockPriceData.forEach(priceItem => {
-                const epsDate = new Date(epsItem.date);
-                const priceDate = new Date(priceItem.date);
-                const dateDiff = priceDate - epsDate;  // 只選擇大於等於 EPS 公佈日的股價
+            // 找到所有日期不晚於股價日期的 EPS 資料
+            const pastEPSData = epsData.filter(epsItem => new Date(epsItem.date) <= priceDate);
 
-                if (dateDiff >= 0 && dateDiff < minDateDiff) {
-                    closestStockPrice = priceItem;
-                    minDateDiff = dateDiff;
-                }
-            });
+            // 按日期降序排序，取最近的四個季度
+            const recentFourEPS = pastEPSData.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
 
-            if (closestStockPrice) {
-                const externalROE = (epsItem.margin / closestStockPrice.price) * 100;  // 外部 ROE 計算
-                console.log(`EPS Date: ${epsItem.date}, Stock Price: ${closestStockPrice.price}, External ROE: ${externalROE}`);
+            // 計算四個季度的 EPS 總和
+            const totalEPS = recentFourEPS.reduce((sum, epsItem) => sum + (epsItem.margin || 0), 0);
+
+            if (totalEPS > 0) {
+                const externalROE = (totalEPS / priceItem.price) * 100;  // 外部 ROE 計算
+                console.log(`Stock Price Date: ${priceItem.date}, Total EPS: ${totalEPS}, Stock Price: ${priceItem.price}, External ROE: ${externalROE}`);
                 return {
-                    date: epsItem.date,
+                    date: priceItem.date,
                     margin: externalROE
                 };
             } else {
-                console.log(`No matching stock price found for EPS date: ${epsItem.date}`);
-                return null;  // 若找不到匹配的股價資料，則返回 null
+                console.log(`Not enough EPS data for stock price date: ${priceItem.date}`);
+                return null;  // 若找不到足夠的 EPS 資料，則返回 null
             }
         }).filter(item => item !== null).reverse();  // 移除 null 並且將資料順序反轉（日期由舊到新）
 
