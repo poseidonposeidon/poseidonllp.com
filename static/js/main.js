@@ -2743,7 +2743,7 @@ function fetchIncomeStatement() {
 
     // 新增：本益比河流圖的 API 請求
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter${period}&apikey=${apiKey}`;
 
     // 獲取本益比河流圖的數據
     fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart);
@@ -2765,7 +2765,7 @@ function fetchJPIncomeStatement() {
 
     // 請求本益比河流圖的資料
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter${period}&apikey=${apiKey}`;
     fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartJP'); // 傳入對應的 chartId
 }
 
@@ -2784,7 +2784,7 @@ async function fetchTWIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter${period}&apikey=${apiKey}`;
     fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartTW');
 
 }
