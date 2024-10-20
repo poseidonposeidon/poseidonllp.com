@@ -2243,14 +2243,22 @@ async function fetchQuarterlyRevenueGrowthRate(stockSymbol, apiKey) {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        // 確保數據是按照日期順序排列（從最新到最舊）
-        const sortedData = data.reverse();
+        // 確保數據是按照日期順序排列（從舊到新）
+        const sortedData = data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
         // 計算同比成長率，即相同季度之間的成長率 (2024Q1 vs 2023Q1)
         const growthRates = sortedData.map((item, index, array) => {
             // 找到去年同一季度的數據 (index - 4 是去年的同一季度)
-            const previousYearSameQuarterIndex = index - 4;  // 往前4個季度
-            if (previousYearSameQuarterIndex >= 0) {
+            const previousYearSameQuarterIndex = array.findIndex((prevItem, i) => {
+                const currentDate = new Date(item.date);
+                const prevDate = new Date(prevItem.date);
+                return (
+                    currentDate.getFullYear() - 1 === prevDate.getFullYear() &&
+                    currentDate.getMonth() === prevDate.getMonth()
+                );
+            });
+
+            if (previousYearSameQuarterIndex !== -1) {
                 const currentRevenue = item.revenue;
                 const previousRevenue = array[previousYearSameQuarterIndex].revenue;
                 const growthRate = ((currentRevenue - previousRevenue) / previousRevenue) * 100;
@@ -2402,17 +2410,17 @@ function drawChart(label1, label2, data1, data2, type) {
         chartInstance.destroy();
     }
 
-    const allDates = [...new Set([...data1.map(item => item.date), ...data2.map(item => item.date)])].sort();
+    // 找出所有的日期，去重並排序
+    const allDates = [...new Set([...data1.map(item => item.date), ...data2.map(item => item.date)])].sort((a, b) => new Date(a) - new Date(b));
 
+    // 確保每個日期在兩個數據集中都有值，若缺少則填 null
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
-        // 如果日期沒有匹配的資料，返回 null，避免跳過
         return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
     });
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
-        // 如果日期沒有匹配的資料，返回 null，避免跳過
         return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
     });
 
