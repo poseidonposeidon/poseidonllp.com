@@ -3419,7 +3419,7 @@ function displayPEBandChart(peData, chartId) {
                     type: 'time',
                     time: {
                         unit: 'year',
-                        tooltipFormat: 'YYYY-MM-DD',  // 修正為大寫
+                        tooltipFormat: 'yyyy-MM-dd',  // 使用小寫 'yyyy'
                     },
                     title: {
                         display: true,
