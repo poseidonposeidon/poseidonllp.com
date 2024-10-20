@@ -2742,8 +2742,8 @@ function fetchIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
 
     // 新增：本益比河流圖的 API 請求
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter${period}&apikey=${apiKey}`;
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
 
     // 獲取本益比河流圖的數據
     fetchPEBandData(priceApiUrl, epsApiUrl, displayPEBandChart);
@@ -2764,8 +2764,8 @@ function fetchJPIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period , yearRange);
 
     // 請求本益比河流圖的資料
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter${period}&apikey=${apiKey}`;
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
     fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartJP'); // 傳入對應的 chartId
 }
 
@@ -2784,8 +2784,6 @@ async function fetchTWIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
-
-    // 確保季度數據正確查詢
     const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
     fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartTW');
 }
@@ -2805,7 +2803,7 @@ function fetchEUIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
     fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartEU');
 }
 
@@ -2823,8 +2821,8 @@ function fetchKRIncomeStatement() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period ,yearRange);
 
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
     fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartKR');
 }
 
@@ -2842,8 +2840,8 @@ function fetchHKIncomeStatement() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period ,yearRange);
 
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
     fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartHK');
 }
 
@@ -2861,8 +2859,8 @@ function fetchCNIncomeStatement() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
 
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=120&apikey=${apiKey}`;
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
     fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartCN');
 }
 
