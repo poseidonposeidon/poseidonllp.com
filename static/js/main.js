@@ -1102,9 +1102,10 @@ function loadCompareSection(sectionId) {
                 <div class="category">
                     <span class="title" onclick="toggleMenu('growth')">Growth</span>
                     <div class="submenu" id="growth">
-<!--                        <a href="#" onclick="displayChart('revenueGrowthRate')">Revenue Growth Rate</a>-->
-<!--                        <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin Growth Rate</a>-->
                             <a href="#" onclick="displayChart('quarterlyRevenueGrowthRate')">Revenue YoY</a>
+                            <a href="#" onclick="displayChart('revenueGrowthRate')">Revenue YoY</a>
+                            <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin YoY</a>
+                            
                     </div>
                 </div>
             </div>
