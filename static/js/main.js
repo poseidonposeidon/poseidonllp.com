@@ -2452,15 +2452,59 @@ function drawChart(label1, label2, data1, data2, type) {
     // 找出所有的日期，去重並排序
     const allDates = [...new Set([...data1.map(item => item.date), ...data2.map(item => item.date)])].sort((a, b) => new Date(a) - new Date(b));
 
-    // 確保每個日期在兩個數據集中都有值，若缺少則填 null
+    // 根據不同類型，確保每個日期在兩個數據集中都有值，若缺少則填 null
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
-        return entry ? entry.grossMarginYoY : null;  // 使用 grossMarginYoY 屬性
+
+        // 根據不同的 type 選擇對應的屬性
+        if (!entry) return null;
+
+        switch (type) {
+            case 'grossMargin':
+            case 'grossMarginYoY':
+                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
+            case 'operatingMargin':
+                return entry.operatingMargin !== undefined ? entry.operatingMargin : null;
+            case 'netProfitMargin':
+                return entry.netProfitMargin !== undefined ? entry.netProfitMargin : null;
+            case 'roe':
+                return entry.roe !== undefined ? entry.roe : null;
+            case 'peRatio':
+                return entry.peRatio !== undefined ? entry.peRatio : null;
+            case 'stockPrice':
+                return entry.price !== undefined ? entry.price : null;
+            case 'eps':
+                return entry.eps !== undefined ? entry.eps : null;
+            default:
+                return null;
+        }
     });
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
-        return entry ? entry.grossMarginYoY : null;  // 使用 grossMarginYoY 屬性
+
+        // 根據不同的 type 選擇對應的屬性
+        if (!entry) return null;
+
+        switch (type) {
+            case 'grossMargin':
+            case 'grossMarginYoY':
+                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
+            case 'operatingMargin':
+                return entry.operatingMargin !== undefined ? entry.operatingMargin : null;
+            case 'netProfitMargin':
+                return entry.netProfitMargin !== undefined ? entry.netProfitMargin : null;
+            case 'roe':
+                return entry.roe !== undefined ? entry.roe : null;
+            case 'peRatio':
+                return entry.peRatio !== undefined ? entry.peRatio : null;
+            case 'stockPrice':
+                return entry.price !== undefined ? entry.price : null;
+            case 'eps':
+                return entry.eps !== undefined ? entry.eps : null;
+            default:
+                return null;
+        }
     });
 
     // 根據是否是 EPS 判斷要使用的圖表類型，P/E ratio 使用折線圖
@@ -2511,7 +2555,7 @@ function drawChart(label1, label2, data1, data2, type) {
                     ticks: {
                         callback: function(value) {
                             if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
-                                return value.toFixed(2) + '%';  // P/E 比率顯示為數值，其他顯示為百分比
+                                return value.toFixed(2) + (type === 'peRatio' ? '' : '%');  // P/E 比率顯示為數值，其他顯示為百分比
                             }
                             return value;
                         }
@@ -2525,7 +2569,7 @@ function drawChart(label1, label2, data1, data2, type) {
                             const rawValue = tooltipItem.raw;
                             if (rawValue !== null) {
                                 if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
-                                    return rawValue.toFixed(2) + '%';
+                                    return rawValue.toFixed(2) + (type === 'peRatio' ? '' : '%');
                                 }
                                 return type === 'stockPrice' ? '$' + rawValue.toFixed(2) : rawValue.toFixed(2);
                             }
