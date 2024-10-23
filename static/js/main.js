@@ -2321,24 +2321,29 @@ async function fetchPERatioData(stockSymbol, apiKey) {
 }
 
 async function fetchGrossMarginYoY(stockSymbol, apiKey) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=annual&limit=10&apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=10&apikey=${apiKey}`;
 
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        // 計算毛利率 YoY，毛利率 = (毛利 / 營收) * 100
+        console.log("Fetched data:", data);  // 檢查拉取到的季度數據
+
+        // 按季度計算毛利率 YoY，毛利率 = (毛利 / 營收) * 100
         const grossMarginYoY = data.map((item, index, array) => {
-            if (index === array.length - 1) return null; // 最後一筆數據無法計算同比成長率
+            // 查找去年的同一季度，通常 index - 4 是去年同一季度的數據
+            if (index < 4) return null;  // 如果當前數據在前四筆，無法計算同比
             const currentGrossMargin = (item.grossProfit / item.revenue) * 100;
-            const previousGrossMargin = (array[index + 1].grossProfit / array[index + 1].revenue) * 100;
+            const previousGrossMargin = (array[index - 4].grossProfit / array[index - 4].revenue) * 100;
             const growthRate = ((currentGrossMargin - previousGrossMargin) / previousGrossMargin) * 100;
 
             return {
                 date: item.date,
                 grossMarginYoY: growthRate
             };
-        }).filter(item => item !== null).reverse(); // 移除 null 並且反轉順序（日期由舊到新）
+        }).filter(item => item !== null).reverse(); // 移除無法計算的數據並反轉順序（由舊到新）
+
+        console.log("Processed data:", grossMarginYoY);  // 檢查處理後的結果
 
         return grossMarginYoY;
     } catch (error) {
