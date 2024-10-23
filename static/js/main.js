@@ -2321,7 +2321,7 @@ async function fetchPERatioData(stockSymbol, apiKey) {
 }
 
 async function fetchGrossMarginYoY(stockSymbol, apiKey) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=10&apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
 
     try {
         const response = await fetch(apiUrl);
