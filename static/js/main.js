@@ -2455,12 +2455,12 @@ function drawChart(label1, label2, data1, data2, type) {
     // 確保每個日期在兩個數據集中都有值，若缺少則填 null
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
-        return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
+        return entry ? entry.grossMarginYoY : null;  // 使用 grossMarginYoY 屬性
     });
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
-        return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
+        return entry ? entry.grossMarginYoY : null;  // 使用 grossMarginYoY 屬性
     });
 
     // 根據是否是 EPS 判斷要使用的圖表類型，P/E ratio 使用折線圖
@@ -2472,20 +2472,20 @@ function drawChart(label1, label2, data1, data2, type) {
             {
                 label: label1,
                 data: formattedData1,
-                borderColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'rgba(75, 192, 192, 1)',
-                backgroundColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'transparent',  // 給折線圖透明背景
                 spanGaps: true,
-                fill: type === 'eps',  // 填充顏色，Bar 圖適用
-                tension: 0
+                fill: false,  // 不填充顏色，讓折線圖保持透明
+                tension: 0.1
             },
             {
                 label: label2,
                 data: formattedData2,
-                borderColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'rgba(255, 99, 132, 1)',
-                backgroundColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'transparent',  // 給折線圖透明背景
                 spanGaps: true,
-                fill: type === 'eps',  // 填充顏色，Bar 圖適用
-                tension: 0
+                fill: false,  // 不填充顏色，讓折線圖保持透明
+                tension: 0.1
             }
         ]
     };
@@ -2511,7 +2511,7 @@ function drawChart(label1, label2, data1, data2, type) {
                     ticks: {
                         callback: function(value) {
                             if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
-                                return value.toFixed(2) + (type === 'peRatio' ? '' : '%');  // P/E 比率顯示為數值，其他顯示為百分比
+                                return value.toFixed(2) + '%';  // P/E 比率顯示為數值，其他顯示為百分比
                             }
                             return value;
                         }
@@ -2525,7 +2525,7 @@ function drawChart(label1, label2, data1, data2, type) {
                             const rawValue = tooltipItem.raw;
                             if (rawValue !== null) {
                                 if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
-                                    return rawValue.toFixed(2) + (type === 'peRatio' ? '' : '%');
+                                    return rawValue.toFixed(2) + '%';
                                 }
                                 return type === 'stockPrice' ? '$' + rawValue.toFixed(2) : rawValue.toFixed(2);
                             }
