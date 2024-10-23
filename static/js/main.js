@@ -1105,7 +1105,7 @@ function loadCompareSection(sectionId) {
                             <a href="#" onclick="displayChart('quarterlyRevenueGrowthRate')">Revenue YoY</a>
 <!--                            <a href="#" onclick="displayChart('revenueGrowthRate')">Gross Margin YoY</a>-->
 <!--                            <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin YoY</a>-->
-                            
+                            <a href="#" onclick="displayChart('grossMarginYoY')">Gross Margin YoY</a>
                     </div>
                 </div>
             </div>
@@ -2320,6 +2320,33 @@ async function fetchPERatioData(stockSymbol, apiKey) {
     }
 }
 
+async function fetchGrossMarginYoY(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=annual&limit=10&apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        // 計算毛利率 YoY，毛利率 = (毛利 / 營收) * 100
+        const grossMarginYoY = data.map((item, index, array) => {
+            if (index === array.length - 1) return null; // 最後一筆數據無法計算同比成長率
+            const currentGrossMargin = (item.grossProfit / item.revenue) * 100;
+            const previousGrossMargin = (array[index + 1].grossProfit / array[index + 1].revenue) * 100;
+            const growthRate = ((currentGrossMargin - previousGrossMargin) / previousGrossMargin) * 100;
+
+            return {
+                date: item.date,
+                grossMarginYoY: growthRate
+            };
+        }).filter(item => item !== null).reverse(); // 移除 null 並且反轉順序（日期由舊到新）
+
+        return grossMarginYoY;
+    } catch (error) {
+        console.error('Error fetching gross margin YoY data:', error);
+        return [];
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2384,6 +2411,12 @@ async function displayChart(type) {
                 data1 = await fetchQuarterlyRevenueGrowthRate(fullStockSymbol1, apiKey);
                 data2 = await fetchQuarterlyRevenueGrowthRate(fullStockSymbol2, apiKey);
                 break;
+
+            case 'grossMarginYoY':
+                data1 = await fetchGrossMarginYoY(fullStockSymbol1, apiKey);
+                data2 = await fetchGrossMarginYoY(fullStockSymbol2, apiKey);
+                break;
+
             default:
                 throw new Error('Invalid chart type');
         }
