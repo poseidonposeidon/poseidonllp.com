@@ -2545,7 +2545,9 @@ function drawChart(label1, label2, data1, data2, type) {
         if (type === 'grossMarginYoY') {
             return entry ? entry.grossMarginYoY : null;
         }
-
+        if (type === 'operatingMarginYoY') {
+            return entry ? entry.operatingMarginYoY : null;
+        }
         if (type === 'netProfitYoY') {
             return entry ? entry.netProfitYoY : null;
         }
