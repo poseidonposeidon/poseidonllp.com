@@ -2337,8 +2337,12 @@ async function fetchGrossMarginYoY(stockSymbol, apiKey) {
             const previousGrossMargin = (array[index - 4].grossProfit / array[index - 4].revenue) * 100;
             const growthRate = ((currentGrossMargin - previousGrossMargin) / previousGrossMargin) * 100;
 
+            // 使用 Date 物件增大年份
+            const currentDate = new Date(item.date);
+            currentDate.setFullYear(currentDate.getFullYear() + 1);  // 年份加一
+
             return {
-                date: item.date,
+                date: currentDate.toISOString().split('T')[0],  // 格式化日期
                 grossMarginYoY: growthRate
             };
         }).filter(item => item !== null).reverse(); // 移除無法計算的數據並反轉順序（由舊到新）
