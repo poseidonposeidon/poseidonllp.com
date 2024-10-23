@@ -1106,6 +1106,7 @@ function loadCompareSection(sectionId) {
 <!--                            <a href="#" onclick="displayChart('revenueGrowthRate')">Gross Margin YoY</a>-->
 <!--                            <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin YoY</a>-->
                             <a href="#" onclick="displayChart('grossMarginYoY')">Gross Margin YoY</a>
+                            <a href="#" onclick="displayChart('operatingMarginYoY')">Operating Margin YoY</a>
                     </div>
                 </div>
             </div>
@@ -2356,6 +2357,42 @@ async function fetchGrossMarginYoY(stockSymbol, apiKey) {
     }
 }
 
+async function fetchOperatingMarginYoY(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        console.log("Fetched data:", data);  // 檢查拉取到的季度數據
+
+        // 按季度計算營業利潤率 YoY，營業利潤率 = (營業收入 / 營收) * 100
+        const operatingMarginYoY = data.map((item, index, array) => {
+            // 查找去年的同一季度，通常 index - 4 是去年同一季度的數據
+            if (index < 4) return null;  // 如果當前數據在前四筆，無法計算同比
+            const currentOperatingMargin = (item.operatingIncome / item.revenue) * 100;
+            const previousOperatingMargin = (array[index - 4].operatingIncome / array[index - 4].revenue) * 100;
+            const growthRate = ((currentOperatingMargin - previousOperatingMargin) / previousOperatingMargin) * 100;
+
+            // 使用 Date 物件增大年份
+            const currentDate = new Date(item.date);
+            currentDate.setFullYear(currentDate.getFullYear() + 1);  // 年份加一
+
+            return {
+                date: currentDate.toISOString().split('T')[0],  // 格式化日期
+                operatingMarginYoY: growthRate
+            };
+        }).filter(item => item !== null).reverse(); // 移除無法計算的數據並反轉順序（由舊到新）
+
+        console.log("Processed data:", operatingMarginYoY);  // 檢查處理後的結果
+
+        return operatingMarginYoY;
+    } catch (error) {
+        console.error('Error fetching operating margin YoY data:', error);
+        return [];
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2424,6 +2461,10 @@ async function displayChart(type) {
             case 'grossMarginYoY':
                 data1 = await fetchGrossMarginYoY(fullStockSymbol1, apiKey);
                 data2 = await fetchGrossMarginYoY(fullStockSymbol2, apiKey);
+                break;
+            case 'operatingMarginYoY':
+                data1 = await fetchOperatingMarginYoY(fullStockSymbol1, apiKey);
+                data2 = await fetchOperatingMarginYoY(fullStockSymbol2, apiKey);
                 break;
 
             default:
