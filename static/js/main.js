@@ -1107,6 +1107,7 @@ function loadCompareSection(sectionId) {
 <!--                            <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin YoY</a>-->
                             <a href="#" onclick="displayChart('grossMarginYoY')">Gross Margin YoY</a>
                             <a href="#" onclick="displayChart('operatingMarginYoY')">Operating Margin YoY</a>
+                            <a href="#" onclick="displayChart('netProfitYoY')">Net ProfitYoY</a>
                     </div>
                 </div>
             </div>
@@ -2393,6 +2394,42 @@ async function fetchOperatingMarginYoY(stockSymbol, apiKey) {
     }
 }
 
+async function fetchNetProfitYoY(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
+
+        console.log("Fetched data:", data);  // 檢查拉取到的季度數據
+
+        // 按季度計算淨利潤率 YoY，淨利潤率 = (淨利潤 / 營收) * 100
+        const netProfitYoY = data.map((item, index, array) => {
+            // 查找去年的同一季度，通常 index - 4 是去年同一季度的數據
+            if (index < 4) return null;  // 如果當前數據在前四筆，無法計算同比
+            const currentNetProfit = (item.netIncome / item.revenue) * 100;
+            const previousNetProfit = (array[index - 4].netIncome / array[index - 4].revenue) * 100;
+            const growthRate = ((currentNetProfit - previousNetProfit) / previousNetProfit) * 100;
+
+            // 使用 Date 物件增大年份
+            const currentDate = new Date(item.date);
+            currentDate.setFullYear(currentDate.getFullYear() + 1);  // 年份加一
+
+            return {
+                date: currentDate.toISOString().split('T')[0],  // 格式化日期
+                netProfitYoY: growthRate
+            };
+        }).filter(item => item !== null).reverse(); // 移除無法計算的數據並反轉順序（由舊到新）
+
+        console.log("Processed data:", netProfitYoY);  // 檢查處理後的結果
+
+        return netProfitYoY;
+    } catch (error) {
+        console.error('Error fetching net profit YoY data:', error);
+        return [];
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2466,7 +2503,10 @@ async function displayChart(type) {
                 data1 = await fetchOperatingMarginYoY(fullStockSymbol1, apiKey);
                 data2 = await fetchOperatingMarginYoY(fullStockSymbol2, apiKey);
                 break;
-
+            case 'netProfitYoY':
+                data1 = await fetchNetProfitYoY(fullStockSymbol1, apiKey);
+                data2 = await fetchNetProfitYoY(fullStockSymbol2, apiKey);
+                break;
             default:
                 throw new Error('Invalid chart type');
         }
@@ -2501,13 +2541,13 @@ function drawChart(label1, label2, data1, data2, type) {
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
 
-        // 對 grossMarginYoY 和 operatingMarginYoY 進行單獨處理，其他指標保持原有邏輯
+        // 對 grossMarginYoY 和 netProfitYoY 進行單獨處理，其他指標保持原有邏輯
         if (type === 'grossMarginYoY') {
             return entry ? entry.grossMarginYoY : null;
         }
 
-        if (type === 'operatingMarginYoY') {
-            return entry ? entry.operatingMarginYoY : null;
+        if (type === 'netProfitYoY') {
+            return entry ? entry.netProfitYoY : null;
         }
 
         return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
@@ -2516,13 +2556,13 @@ function drawChart(label1, label2, data1, data2, type) {
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
 
-        // 對 grossMarginYoY 和 operatingMarginYoY 進行單獨處理，其他指標保持原有邏輯
+        // 對 grossMarginYoY 和 netProfitYoY 進行單獨處理，其他指標保持原有邏輯
         if (type === 'grossMarginYoY') {
             return entry ? entry.grossMarginYoY : null;
         }
 
-        if (type === 'operatingMarginYoY') {
-            return entry ? entry.operatingMarginYoY : null;
+        if (type === 'netProfitYoY') {
+            return entry ? entry.netProfitYoY : null;
         }
 
         return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
@@ -2537,20 +2577,20 @@ function drawChart(label1, label2, data1, data2, type) {
             {
                 label: label1,
                 data: formattedData1,
-                borderColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'rgba(75, 192, 192, 1)',
-                backgroundColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
+                borderColor: 'rgba(75, 192, 192, 1)',
+                backgroundColor: 'transparent',  // 給折線圖透明背景
                 spanGaps: true,
-                fill: type === 'eps',  // 填充顏色，Bar 圖適用
-                tension: 0
+                fill: false,  // 不填充顏色，讓折線圖保持透明
+                tension: 0.1
             },
             {
                 label: label2,
                 data: formattedData2,
-                borderColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'rgba(255, 99, 132, 1)',
-                backgroundColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
+                borderColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: 'transparent',  // 給折線圖透明背景
                 spanGaps: true,
-                fill: type === 'eps',  // 填充顏色，Bar 圖適用
-                tension: 0
+                fill: false,  // 不填充顏色，讓折線圖保持透明
+                tension: 0.1
             }
         ]
     };
@@ -2575,7 +2615,7 @@ function drawChart(label1, label2, data1, data2, type) {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
+                            if (['grossMarginYoY', 'netProfitYoY', 'grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
                                 return value.toFixed(2) + (type === 'peRatio' ? '' : '%');  // P/E 比率顯示為數值，其他顯示為百分比
                             }
                             return value;
@@ -2589,7 +2629,7 @@ function drawChart(label1, label2, data1, data2, type) {
                         label: function(tooltipItem) {
                             const rawValue = tooltipItem.raw;
                             if (rawValue !== null) {
-                                if (['grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
+                                if (['grossMarginYoY', 'netProfitYoY', 'grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
                                     return rawValue.toFixed(2) + (type === 'peRatio' ? '' : '%');
                                 }
                                 return type === 'stockPrice' ? '$' + rawValue.toFixed(2) : rawValue.toFixed(2);
