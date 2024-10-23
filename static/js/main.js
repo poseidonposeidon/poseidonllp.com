@@ -2452,59 +2452,27 @@ function drawChart(label1, label2, data1, data2, type) {
     // 找出所有的日期，去重並排序
     const allDates = [...new Set([...data1.map(item => item.date), ...data2.map(item => item.date)])].sort((a, b) => new Date(a) - new Date(b));
 
-    // 根據不同類型，確保每個日期在兩個數據集中都有值，若缺少則填 null
+    // 確保每個日期在兩個數據集中都有值，若缺少則填 null
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
 
-        // 根據不同的 type 選擇對應的屬性
-        if (!entry) return null;
-
-        switch (type) {
-            case 'grossMargin':
-            case 'grossMarginYoY':
-                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
-            case 'operatingMargin':
-                return entry.operatingMargin !== undefined ? entry.operatingMargin : null;
-            case 'netProfitMargin':
-                return entry.netProfitMargin !== undefined ? entry.netProfitMargin : null;
-            case 'roe':
-                return entry.roe !== undefined ? entry.roe : null;
-            case 'peRatio':
-                return entry.peRatio !== undefined ? entry.peRatio : null;
-            case 'stockPrice':
-                return entry.price !== undefined ? entry.price : null;
-            case 'eps':
-                return entry.eps !== undefined ? entry.eps : null;
-            default:
-                return null;
+        // 對 grossMarginYoY 進行單獨處理，其他指標保持原有邏輯
+        if (type === 'grossMarginYoY') {
+            return entry ? entry.grossMarginYoY : null;
         }
+
+        return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
     });
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
 
-        // 根據不同的 type 選擇對應的屬性
-        if (!entry) return null;
-
-        switch (type) {
-            case 'grossMargin':
-            case 'grossMarginYoY':
-                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
-            case 'operatingMargin':
-                return entry.operatingMargin !== undefined ? entry.operatingMargin : null;
-            case 'netProfitMargin':
-                return entry.netProfitMargin !== undefined ? entry.netProfitMargin : null;
-            case 'roe':
-                return entry.roe !== undefined ? entry.roe : null;
-            case 'peRatio':
-                return entry.peRatio !== undefined ? entry.peRatio : null;
-            case 'stockPrice':
-                return entry.price !== undefined ? entry.price : null;
-            case 'eps':
-                return entry.eps !== undefined ? entry.eps : null;
-            default:
-                return null;
+        // 對 grossMarginYoY 進行單獨處理，其他指標保持原有邏輯
+        if (type === 'grossMarginYoY') {
+            return entry ? entry.grossMarginYoY : null;
         }
+
+        return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
     });
 
     // 根據是否是 EPS 判斷要使用的圖表類型，P/E ratio 使用折線圖
@@ -2516,20 +2484,20 @@ function drawChart(label1, label2, data1, data2, type) {
             {
                 label: label1,
                 data: formattedData1,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'transparent',  // 給折線圖透明背景
+                borderColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'rgba(75, 192, 192, 1)',
+                backgroundColor: type === 'eps' ? 'rgba(75, 192, 192, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
                 spanGaps: true,
-                fill: false,  // 不填充顏色，讓折線圖保持透明
-                tension: 0.1
+                fill: type === 'eps',  // 填充顏色，Bar 圖適用
+                tension: 0
             },
             {
                 label: label2,
                 data: formattedData2,
-                borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: 'transparent',  // 給折線圖透明背景
+                borderColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'rgba(255, 99, 132, 1)',
+                backgroundColor: type === 'eps' ? 'rgba(255, 99, 132, 0.7)' : 'transparent',  // 給 Bar 圖填充顏色
                 spanGaps: true,
-                fill: false,  // 不填充顏色，讓折線圖保持透明
-                tension: 0.1
+                fill: type === 'eps',  // 填充顏色，Bar 圖適用
+                tension: 0
             }
         ]
     };
