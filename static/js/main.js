@@ -2501,9 +2501,13 @@ function drawChart(label1, label2, data1, data2, type) {
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
 
-        // 對 grossMarginYoY 進行單獨處理，其他指標保持原有邏輯
+        // 對 grossMarginYoY 和 operatingMarginYoY 進行單獨處理，其他指標保持原有邏輯
         if (type === 'grossMarginYoY') {
             return entry ? entry.grossMarginYoY : null;
+        }
+
+        if (type === 'operatingMarginYoY') {
+            return entry ? entry.operatingMarginYoY : null;
         }
 
         return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
@@ -2512,9 +2516,13 @@ function drawChart(label1, label2, data1, data2, type) {
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
 
-        // 對 grossMarginYoY 進行單獨處理，其他指標保持原有邏輯
+        // 對 grossMarginYoY 和 operatingMarginYoY 進行單獨處理，其他指標保持原有邏輯
         if (type === 'grossMarginYoY') {
             return entry ? entry.grossMarginYoY : null;
+        }
+
+        if (type === 'operatingMarginYoY') {
+            return entry ? entry.operatingMarginYoY : null;
         }
 
         return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
