@@ -2335,8 +2335,8 @@ async function fetchGrossMarginYoY(stockSymbol, apiKey) {
         const grossMarginYoY = data.map((item, index, array) => {
             // 查找去年的同一季度，通常 index - 4 是去年同一季度的數據
             if (index < 4) return null;  // 如果當前數據在前四筆，無法計算同比
-            const currentGrossMargin = (item.grossProfit / item.revenue) * 100;
-            const previousGrossMargin = (array[index - 4].grossProfit / array[index - 4].revenue) * 100;
+            const currentGrossMargin = item.grossProfit ;
+            const previousGrossMargin = array[index - 4].grossProfit ;
             const growthRate = ((currentGrossMargin - previousGrossMargin) / previousGrossMargin) * 100;
 
             // 使用 Date 物件增大年份
@@ -2371,8 +2371,8 @@ async function fetchOperatingMarginYoY(stockSymbol, apiKey) {
         const operatingMarginYoY = data.map((item, index, array) => {
             // 查找去年的同一季度，通常 index - 4 是去年同一季度的數據
             if (index < 4) return null;  // 如果當前數據在前四筆，無法計算同比
-            const currentOperatingMargin = (item.operatingIncome / item.revenue) * 100;
-            const previousOperatingMargin = (array[index - 4].operatingIncome / array[index - 4].revenue) * 100;
+            const currentOperatingMargin = item.operatingIncome ;
+            const previousOperatingMargin = array[index - 4].operatingIncome ;
             const growthRate = ((currentOperatingMargin - previousOperatingMargin) / previousOperatingMargin) * 100;
 
             // 使用 Date 物件增大年份
@@ -2407,8 +2407,8 @@ async function fetchNetProfitYoY(stockSymbol, apiKey) {
         const netProfitYoY = data.map((item, index, array) => {
             // 查找去年的同一季度，通常 index - 4 是去年同一季度的數據
             if (index < 4) return null;  // 如果當前數據在前四筆，無法計算同比
-            const currentNetProfit = (item.netIncome / item.revenue) * 100;
-            const previousNetProfit = (array[index - 4].netIncome / array[index - 4].revenue) * 100;
+            const currentNetProfit = item.netIncome ;
+            const previousNetProfit = array[index - 4].netIncome;
             const growthRate = ((currentNetProfit - previousNetProfit) / previousNetProfit) * 100;
 
             // 使用 Date 物件增大年份
