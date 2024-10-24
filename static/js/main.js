@@ -2540,38 +2540,49 @@ function drawChart(label1, label2, data1, data2, type) {
     // 找出所有的日期，去重並排序
     const allDates = [...new Set([...data1.map(item => item.date), ...data2.map(item => item.date)])].sort((a, b) => new Date(a) - new Date(b));
 
+    // 調試輸出，檢查日期
+    console.log('All Dates:', allDates);
+
     // 確保每個日期在兩個數據集中都有值，若缺少則填 null
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
 
-        // 確保每種情況下數據都有值，否則返回 null
+        if (!entry) return null;
+
         switch (type) {
             case 'grossMarginYoY':
-                return entry ? entry.grossMarginYoY : null;
+                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
             case 'operatingMarginYoY':
-                return entry ? entry.operatingMarginYoY : null;
+                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
             case 'netProfitYoY':
-                return entry ? entry.netProfitYoY : null;
+                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
             default:
-                return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
+                return (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin);
         }
     });
+
+    // 調試輸出，檢查格式化後的數據1
+    console.log('Formatted Data 1:', formattedData1);
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
 
-        // 確保每種情況下數據都有值，否則返回 null
+        if (!entry) return null;
+
         switch (type) {
             case 'grossMarginYoY':
-                return entry ? entry.grossMarginYoY : null;
+                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
             case 'operatingMarginYoY':
-                return entry ? entry.operatingMarginYoY : null;
+                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
             case 'netProfitYoY':
-                return entry ? entry.netProfitYoY : null;
+                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
             default:
-                return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
+                return (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin);
         }
     });
+
+    // 調試輸出，檢查格式化後的數據2
+    console.log('Formatted Data 2:', formattedData2);
 
     // 根據是否是 EPS 判斷要使用的圖表類型，P/E ratio 使用折線圖
     const chartType = (type === 'eps') ? 'bar' : 'line';
@@ -2597,6 +2608,9 @@ function drawChart(label1, label2, data1, data2, type) {
             }
         ]
     };
+
+    // 調試輸出，檢查繪製的數據
+    console.log('Chart Data:', chartData);
 
     chartInstance = new Chart(ctx, {
         type: chartType,  // 根據類型使用不同的圖表
