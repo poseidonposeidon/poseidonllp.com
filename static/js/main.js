@@ -2334,25 +2334,29 @@ async function fetchGrossMarginYoY(stockSymbol, apiKey) {
         // 確保數據按照季度順序排列（從舊到新），如果API返回順序正確，可省略此步驟
         const sortedData = data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-        // 按季度計算毛利率 YoY，毛利率 = (毛利 / 營收) * 100
-        const grossMarginYoY = sortedData.map((item, index, array) => {
+        // 按季度計算毛利同比變化 = (今年Qx毛利 - 去年Qx毛利) / 去年Qx毛利
+        const grossProfitYoY = sortedData.map((item, index, array) => {
             // 查找去年的同一季度，通常 index - 4 是去年同一季度的數據
             if (index < 4) return null;  // 如果當前數據在前四筆，無法計算同比
-            const currentGrossMargin = (item.grossProfit / item.revenue) * 100;  // 計算當前季度的毛利率
-            const previousGrossMargin = (array[index - 4].grossProfit / array[index - 4].revenue) * 100;  // 去年同一季度的毛利率
-            const growthRate = ((currentGrossMargin - previousGrossMargin) / previousGrossMargin) * 100;
+
+            const currentGrossProfit = item.grossProfit;  // 當前季度的毛利總額
+            const previousGrossProfit = array[index - 4].grossProfit;  // 去年同一季度的毛利總額
+
+            if (previousGrossProfit === 0) return null;  // 避免除以0
+
+            const growthRate = ((currentGrossProfit - previousGrossProfit) / previousGrossProfit) * 100;  // 計算同比變化
 
             return {
                 date: item.date,  // 使用原有日期
-                grossMarginYoY: growthRate
+                grossProfitYoY: growthRate
             };
-        }).filter(item => item !== null).reverse(); // 移除無法計算的數據並反轉順序（由舊到新）
+        }).filter(item => item !== null).reverse();  // 移除無法計算的數據並反轉順序（由舊到新）
 
-        console.log("Processed data:", grossMarginYoY);  // 檢查處理後的結果
+        console.log("Processed data:", grossProfitYoY);  // 檢查處理後的結果
 
-        return grossMarginYoY;
+        return grossProfitYoY;
     } catch (error) {
-        console.error('Error fetching gross margin YoY data:', error);
+        console.error('Error fetching gross profit YoY data:', error);
         return [];
     }
 }
