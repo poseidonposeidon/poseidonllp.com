@@ -2538,14 +2538,14 @@ function drawChart(label1, label2, data1, data2, type) {
     }
 
     // 找出所有的日期，去重並排序
-    const allDates = [...new Set([...data1.map(item => item.date), ...data2.map(item => item.date)])].sort((a, b) => new Date(a) - new Date(b));
+    const allDates = [...new Set([...data1.map(item => item.date.split('T')[0]), ...data2.map(item => item.date.split('T')[0])])].sort((a, b) => new Date(a) - new Date(b));
 
     // 調試輸出，檢查日期
     console.log('All Dates:', allDates);
 
     // 確保每個日期在兩個數據集中都有值，若缺少則填 null
     const formattedData1 = allDates.map(date => {
-        const entry = data1.find(item => item.date === date);
+        const entry = data1.find(item => item.date.split('T')[0] === date);
 
         if (!entry) return null;
 
@@ -2560,12 +2560,9 @@ function drawChart(label1, label2, data1, data2, type) {
                 return (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin);
         }
     });
-
-    // 調試輸出，檢查格式化後的數據1
-    console.log('Formatted Data 1:', formattedData1);
 
     const formattedData2 = allDates.map(date => {
-        const entry = data2.find(item => item.date === date);
+        const entry = data2.find(item => item.date.split('T')[0] === date);
 
         if (!entry) return null;
 
@@ -2581,10 +2578,10 @@ function drawChart(label1, label2, data1, data2, type) {
         }
     });
 
-    // 調試輸出，檢查格式化後的數據2
+    // 調試輸出，檢查格式化後的數據
+    console.log('Formatted Data 1:', formattedData1);
     console.log('Formatted Data 2:', formattedData2);
 
-    // 根據是否是 EPS 判斷要使用的圖表類型，P/E ratio 使用折線圖
     const chartType = (type === 'eps') ? 'bar' : 'line';
 
     const chartData = {
@@ -2594,26 +2591,23 @@ function drawChart(label1, label2, data1, data2, type) {
                 label: label1,
                 data: formattedData1,
                 borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'transparent',  // 給折線圖透明背景
+                backgroundColor: 'transparent',
                 spanGaps: true,
-                fill: false,  // 不填充顏色，讓折線圖保持透明
+                fill: false,
             },
             {
                 label: label2,
                 data: formattedData2,
                 borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: 'transparent',  // 給折線圖透明背景
+                backgroundColor: 'transparent',
                 spanGaps: true,
-                fill: false,  // 不填充顏色，讓折線圖保持透明
+                fill: false,
             }
         ]
     };
 
-    // 調試輸出，檢查繪製的數據
-    console.log('Chart Data:', chartData);
-
     chartInstance = new Chart(ctx, {
-        type: chartType,  // 根據類型使用不同的圖表
+        type: chartType,
         data: chartData,
         options: {
             scales: {
@@ -2633,7 +2627,7 @@ function drawChart(label1, label2, data1, data2, type) {
                     ticks: {
                         callback: function(value) {
                             if (['grossMarginYoY', 'netProfitYoY', 'grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
-                                return value.toFixed(2) + (type === 'peRatio' ? '' : '%');  // P/E 比率顯示為數值，其他顯示為百分比
+                                return value.toFixed(2) + (type === 'peRatio' ? '' : '%');
                             }
                             return value;
                         }
