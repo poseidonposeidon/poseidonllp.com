@@ -2329,10 +2329,10 @@ async function fetchGrossMarginYoY(stockSymbol, apiKey) {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
-        console.log("Fetched data:", data);  // 檢查拉取到的季度數據
-
-        // 確保數據按照季度順序排列（從舊到新），如果API返回順序正確，可省略此步驟
+        // 確保數據按照季度日期從舊到新排序
         const sortedData = data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        console.log("Sorted data:", sortedData);  // 檢查排序後的數據
 
         // 按季度計算毛利同比變化 = (今年Qx毛利 - 去年Qx毛利) / 去年Qx毛利
         const grossProfitYoY = sortedData.map((item, index, array) => {
@@ -2347,7 +2347,7 @@ async function fetchGrossMarginYoY(stockSymbol, apiKey) {
             const growthRate = ((currentGrossProfit - previousGrossProfit) / previousGrossProfit) * 100;  // 計算同比變化
 
             return {
-                date: item.date,  // 使用原有日期
+                date: item.date,  // 保持原有日期格式
                 grossProfitYoY: growthRate
             };
         }).filter(item => item !== null).reverse();  // 移除無法計算的數據並反轉順序（由舊到新）
