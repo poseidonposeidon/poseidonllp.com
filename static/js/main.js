@@ -1106,8 +1106,8 @@ function loadCompareSection(sectionId) {
 <!--                            <a href="#" onclick="displayChart('revenueGrowthRate')">Gross Margin YoY</a>-->
 <!--                            <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin YoY</a>-->
                             <a href="#" onclick="displayChart('grossMarginYoY')">Gross Margin YoY</a>
-                            <a href="#" onclick="displayChart('operatingMarginYoY')">Operating Margin YoY</a>
-                            <a href="#" onclick="displayChart('netProfitYoY')">Net ProfitYoY</a>
+<!--                            <a href="#" onclick="displayChart('operatingMarginYoY')">Operating Margin YoY</a>-->
+<!--                            <a href="#" onclick="displayChart('netProfitYoY')">Net ProfitYoY</a>-->
                     </div>
                 </div>
             </div>
