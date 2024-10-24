@@ -2347,7 +2347,7 @@ async function fetchGrossMarginYoY(stockSymbol, apiKey) {
             const growthRate = ((currentGrossProfit - previousGrossProfit) / previousGrossProfit) * 100;  // 計算同比變化
 
             return {
-                date: item.date,  // 保持原有日期格式
+                date: item.date.split('T')[0],  // 去除時間部分，保留日期
                 grossProfitYoY: growthRate
             };
         }).filter(item => item !== null).reverse();  // 移除無法計算的數據並反轉順序（由舊到新）
@@ -2537,13 +2537,11 @@ function drawChart(label1, label2, data1, data2, type) {
         chartInstance.destroy();
     }
 
-    // 找出所有的日期，去重並排序
+    // 找出所有的日期，去重並排序，確保格式一致
     const allDates = [...new Set([...data1.map(item => item.date.split('T')[0]), ...data2.map(item => item.date.split('T')[0])])].sort((a, b) => new Date(a) - new Date(b));
 
-    // 調試輸出，檢查日期
-    console.log('All Dates:', allDates);
+    console.log('All Dates:', allDates);  // 調試輸出
 
-    // 確保每個日期在兩個數據集中都有值，若缺少則填 null
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date.split('T')[0] === date);
 
@@ -2551,13 +2549,9 @@ function drawChart(label1, label2, data1, data2, type) {
 
         switch (type) {
             case 'grossMarginYoY':
-                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
-            case 'operatingMarginYoY':
-                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
-            case 'netProfitYoY':
-                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+                return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
             default:
-                return (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin);
+                return null;
         }
     });
 
@@ -2568,19 +2562,14 @@ function drawChart(label1, label2, data1, data2, type) {
 
         switch (type) {
             case 'grossMarginYoY':
-                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
-            case 'operatingMarginYoY':
-                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
-            case 'netProfitYoY':
-                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+                return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
             default:
-                return (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin);
+                return null;
         }
     });
 
-    // 調試輸出，檢查格式化後的數據
-    console.log('Formatted Data 1:', formattedData1);
-    console.log('Formatted Data 2:', formattedData2);
+    console.log('Formatted Data 1:', formattedData1);  // 調試輸出
+    console.log('Formatted Data 2:', formattedData2);  // 調試輸出
 
     const chartType = (type === 'eps') ? 'bar' : 'line';
 
@@ -2606,6 +2595,8 @@ function drawChart(label1, label2, data1, data2, type) {
         ]
     };
 
+    console.log('Chart Data:', chartData);  // 調試輸出
+
     chartInstance = new Chart(ctx, {
         type: chartType,
         data: chartData,
@@ -2626,10 +2617,7 @@ function drawChart(label1, label2, data1, data2, type) {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            if (['grossMarginYoY', 'netProfitYoY', 'grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
-                                return value.toFixed(2) + (type === 'peRatio' ? '' : '%');
-                            }
-                            return value;
+                            return value.toFixed(2) + '%';  // 顯示百分比
                         }
                     }
                 }
@@ -2639,13 +2627,7 @@ function drawChart(label1, label2, data1, data2, type) {
                     callbacks: {
                         label: function(tooltipItem) {
                             const rawValue = tooltipItem.raw;
-                            if (rawValue !== null) {
-                                if (['grossMarginYoY', 'netProfitYoY', 'grossMargin', 'operatingMargin', 'netProfitMargin', 'roe', 'operatingMarginGrowthRate', 'revenueGrowthRate', 'externalROE', 'peRatio'].includes(type)) {
-                                    return rawValue.toFixed(2) + (type === 'peRatio' ? '' : '%');
-                                }
-                                return type === 'stockPrice' ? '$' + rawValue.toFixed(2) : rawValue.toFixed(2);
-                            }
-                            return 'No data';
+                            return rawValue !== null ? rawValue.toFixed(2) + '%' : 'No data';
                         }
                     }
                 }
