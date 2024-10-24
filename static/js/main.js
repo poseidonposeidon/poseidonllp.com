@@ -2095,16 +2095,19 @@ async function fetchMarginData(stockSymbol, apiKey, type) {
 }
 
 async function fetchEPSData(stockSymbol, apiKey) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=40&apikey=${apiKey}`;  // 增加 limit 到 40，這樣可以獲取10年的資料
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
 
     try {
         const response = await fetch(apiUrl);
         const data = await response.json();
 
+        console.log("Fetched EPS Data:", data);  // 調試輸出 EPS 數據
+
+        // 確保 EPS 數據非空且格式正確
         return data.map(item => ({
             date: item.date,
-            margin: item.eps
-        })).filter(item => item.margin !== null).reverse();
+            eps: item.eps !== null && item.eps !== undefined ? item.eps : null  // 處理空值情況
+        })).filter(item => item.eps !== null).reverse();  // 只返回非空的 EPS 並倒序排列
     } catch (error) {
         console.error('Error fetching EPS data:', error);
         return [];
