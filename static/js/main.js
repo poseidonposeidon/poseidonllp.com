@@ -2585,7 +2585,7 @@ function drawChart(label1, label2, data1, data2, type) {
                 backgroundColor: 'transparent',  // 給折線圖透明背景
                 spanGaps: true,
                 fill: false,  // 不填充顏色，讓折線圖保持透明
-                tension: 0.1
+                // tension: 0.1
             },
             {
                 label: label2,
@@ -2594,7 +2594,7 @@ function drawChart(label1, label2, data1, data2, type) {
                 backgroundColor: 'transparent',  // 給折線圖透明背景
                 spanGaps: true,
                 fill: false,  // 不填充顏色，讓折線圖保持透明
-                tension: 0.1
+                // tension: 0.1
             }
         ]
     };
