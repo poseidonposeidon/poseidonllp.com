@@ -2331,20 +2331,19 @@ async function fetchGrossMarginYoY(stockSymbol, apiKey) {
 
         console.log("Fetched data:", data);  // 檢查拉取到的季度數據
 
+        // 確保數據按照季度順序排列（從舊到新），如果API返回順序正確，可省略此步驟
+        const sortedData = data.sort((a, b) => new Date(a.date) - new Date(b.date));
+
         // 按季度計算毛利率 YoY，毛利率 = (毛利 / 營收) * 100
-        const grossMarginYoY = data.map((item, index, array) => {
+        const grossMarginYoY = sortedData.map((item, index, array) => {
             // 查找去年的同一季度，通常 index - 4 是去年同一季度的數據
             if (index < 4) return null;  // 如果當前數據在前四筆，無法計算同比
-            const currentGrossMargin = item.grossProfit ;
-            const previousGrossMargin = array[index - 4].grossProfit ;
+            const currentGrossMargin = (item.grossProfit / item.revenue) * 100;  // 計算當前季度的毛利率
+            const previousGrossMargin = (array[index - 4].grossProfit / array[index - 4].revenue) * 100;  // 去年同一季度的毛利率
             const growthRate = ((currentGrossMargin - previousGrossMargin) / previousGrossMargin) * 100;
 
-            // 使用 Date 物件增大年份
-            const currentDate = new Date(item.date);
-            currentDate.setFullYear(currentDate.getFullYear() + 1);  // 年份加一
-
             return {
-                date: currentDate.toISOString().split('T')[0],  // 格式化日期
+                date: item.date,  // 使用原有日期
                 grossMarginYoY: growthRate
             };
         }).filter(item => item !== null).reverse(); // 移除無法計算的數據並反轉順序（由舊到新）
