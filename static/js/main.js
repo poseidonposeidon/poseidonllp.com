@@ -2544,34 +2544,32 @@ function drawChart(label1, label2, data1, data2, type) {
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
 
-        if (!entry) return null;
-
+        // 確保每種情況下數據都有值，否則返回 null
         switch (type) {
             case 'grossMarginYoY':
-                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
+                return entry ? entry.grossMarginYoY : null;
             case 'operatingMarginYoY':
-                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
+                return entry ? entry.operatingMarginYoY : null;
             case 'netProfitYoY':
-                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+                return entry ? entry.netProfitYoY : null;
             default:
-                return (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin);
+                return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
         }
     });
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
 
-        if (!entry) return null;
-
+        // 確保每種情況下數據都有值，否則返回 null
         switch (type) {
             case 'grossMarginYoY':
-                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
+                return entry ? entry.grossMarginYoY : null;
             case 'operatingMarginYoY':
-                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
+                return entry ? entry.operatingMarginYoY : null;
             case 'netProfitYoY':
-                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+                return entry ? entry.netProfitYoY : null;
             default:
-                return (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin);
+                return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
         }
     });
 
