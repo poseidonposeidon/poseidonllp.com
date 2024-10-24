@@ -2547,9 +2547,34 @@ function drawChart(label1, label2, data1, data2, type) {
 
         if (!entry) return null;
 
+        // 針對不同類型的數據進行對應處理
         switch (type) {
             case 'grossMarginYoY':
                 return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
+            case 'operatingMarginYoY':
+                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
+            case 'netProfitYoY':
+                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+            case 'grossMargin':
+            case 'operatingMargin':
+            case 'netProfitMargin':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'eps':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'roe':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'operatingMarginGrowthRate':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'stockPrice':
+                return entry.price !== undefined ? entry.price : null;
+            case 'revenueGrowthRate':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'externalROE':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'quarterlyRevenueGrowthRate':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'peRatio':
+                return entry.peRatio !== undefined ? entry.peRatio : null;
             default:
                 return null;
         }
@@ -2560,9 +2585,34 @@ function drawChart(label1, label2, data1, data2, type) {
 
         if (!entry) return null;
 
+        // 針對不同類型的數據進行對應處理
         switch (type) {
             case 'grossMarginYoY':
                 return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
+            case 'operatingMarginYoY':
+                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
+            case 'netProfitYoY':
+                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+            case 'grossMargin':
+            case 'operatingMargin':
+            case 'netProfitMargin':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'eps':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'roe':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'operatingMarginGrowthRate':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'stockPrice':
+                return entry.price !== undefined ? entry.price : null;
+            case 'revenueGrowthRate':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'externalROE':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'quarterlyRevenueGrowthRate':
+                return entry.margin !== undefined ? entry.margin : null;
+            case 'peRatio':
+                return entry.peRatio !== undefined ? entry.peRatio : null;
             default:
                 return null;
         }
@@ -2617,7 +2667,7 @@ function drawChart(label1, label2, data1, data2, type) {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            return value.toFixed(2) + '%';  // 顯示百分比
+                            return value.toFixed(2) + '%';  // 顯示百分比或數值
                         }
                     }
                 }
