@@ -2544,35 +2544,35 @@ function drawChart(label1, label2, data1, data2, type) {
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date === date);
 
-        // 對 grossMarginYoY 和 netProfitYoY 進行單獨處理，其他指標保持原有邏輯
-        if (type === 'grossMarginYoY') {
-            return entry ? entry.grossMarginYoY : null;
-        }
-        if (type === 'operatingMarginYoY') {
-            return entry ? entry.operatingMarginYoY : null;
-        }
-        if (type === 'netProfitYoY') {
-            return entry ? entry.netProfitYoY : null;
-        }
+        if (!entry) return null;
 
-        return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
+        switch (type) {
+            case 'grossMarginYoY':
+                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
+            case 'operatingMarginYoY':
+                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
+            case 'netProfitYoY':
+                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+            default:
+                return (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin);
+        }
     });
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date === date);
 
-        // 對 grossMarginYoY 和 netProfitYoY 進行單獨處理，其他指標保持原有邏輯
-        if (type === 'grossMarginYoY') {
-            return entry ? entry.grossMarginYoY : null;
-        }
-        if (type === 'operatingMarginYoY') {
-            return entry ? entry.operatingMarginYoY : null;
-        }
-        if (type === 'netProfitYoY') {
-            return entry ? entry.netProfitYoY : null;
-        }
+        if (!entry) return null;
 
-        return entry ? (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin) : null;
+        switch (type) {
+            case 'grossMarginYoY':
+                return entry.grossMarginYoY !== undefined ? entry.grossMarginYoY : null;
+            case 'operatingMarginYoY':
+                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
+            case 'netProfitYoY':
+                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+            default:
+                return (type === 'stockPrice' ? entry.price : entry.peRatio || entry.margin);
+        }
     });
 
     // 根據是否是 EPS 判斷要使用的圖表類型，P/E ratio 使用折線圖
@@ -2588,7 +2588,6 @@ function drawChart(label1, label2, data1, data2, type) {
                 backgroundColor: 'transparent',  // 給折線圖透明背景
                 spanGaps: true,
                 fill: false,  // 不填充顏色，讓折線圖保持透明
-                // tension: 0.1
             },
             {
                 label: label2,
@@ -2597,7 +2596,6 @@ function drawChart(label1, label2, data1, data2, type) {
                 backgroundColor: 'transparent',  // 給折線圖透明背景
                 spanGaps: true,
                 fill: false,  // 不填充顏色，讓折線圖保持透明
-                // tension: 0.1
             }
         ]
     };
