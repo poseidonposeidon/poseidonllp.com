@@ -2555,11 +2555,11 @@ function drawChart(label1, label2, data1, data2, type) {
                 return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
             case 'netProfitYoY':
                 return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+            case 'eps':
+                return entry.eps !== undefined ? entry.eps : null;  // 處理EPS數據
             case 'grossMargin':
             case 'operatingMargin':
             case 'netProfitMargin':
-                return entry.margin !== undefined ? entry.margin : null;
-            case 'eps':
                 return entry.margin !== undefined ? entry.margin : null;
             case 'roe':
                 return entry.margin !== undefined ? entry.margin : null;
@@ -2593,11 +2593,11 @@ function drawChart(label1, label2, data1, data2, type) {
                 return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
             case 'netProfitYoY':
                 return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+            case 'eps':
+                return entry.eps !== undefined ? entry.eps : null;  // 處理EPS數據
             case 'grossMargin':
             case 'operatingMargin':
             case 'netProfitMargin':
-                return entry.margin !== undefined ? entry.margin : null;
-            case 'eps':
                 return entry.margin !== undefined ? entry.margin : null;
             case 'roe':
                 return entry.margin !== undefined ? entry.margin : null;
@@ -2621,6 +2621,7 @@ function drawChart(label1, label2, data1, data2, type) {
     console.log('Formatted Data 1:', formattedData1);  // 調試輸出
     console.log('Formatted Data 2:', formattedData2);  // 調試輸出
 
+    // 對 EPS 使用 Bar 圖
     const chartType = (type === 'eps') ? 'bar' : 'line';
 
     const chartData = {
@@ -2630,7 +2631,7 @@ function drawChart(label1, label2, data1, data2, type) {
                 label: label1,
                 data: formattedData1,
                 borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: 'transparent',
+                backgroundColor: (type === 'eps') ? 'rgba(75, 192, 192, 0.7)' : 'transparent',  // 如果是 EPS 使用 Bar 的填充色
                 spanGaps: true,
                 fill: false,
             },
@@ -2638,7 +2639,7 @@ function drawChart(label1, label2, data1, data2, type) {
                 label: label2,
                 data: formattedData2,
                 borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: 'transparent',
+                backgroundColor: (type === 'eps') ? 'rgba(255, 99, 132, 0.7)' : 'transparent',  // 如果是 EPS 使用 Bar 的填充色
                 spanGaps: true,
                 fill: false,
             }
@@ -2667,7 +2668,7 @@ function drawChart(label1, label2, data1, data2, type) {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            return value.toFixed(2) + '%';  // 顯示百分比或數值
+                            return type === 'eps' ? value.toFixed(2) : value.toFixed(2) + '%';  // EPS 顯示數值, 其他顯示百分比
                         }
                     }
                 }
@@ -2677,7 +2678,7 @@ function drawChart(label1, label2, data1, data2, type) {
                     callbacks: {
                         label: function(tooltipItem) {
                             const rawValue = tooltipItem.raw;
-                            return rawValue !== null ? rawValue.toFixed(2) + '%' : 'No data';
+                            return rawValue !== null ? rawValue.toFixed(2) + (type === 'eps' ? '' : '%') : 'No data';
                         }
                     }
                 }
