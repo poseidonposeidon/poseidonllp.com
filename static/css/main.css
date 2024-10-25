@@ -834,7 +834,9 @@ button:not(.info-input button):hover {
     cursor: pointer;
 }
 
-.chart-links .category .title:hover + .submenu {
+/* 當滑鼠懸停在 .category 或 .submenu 上時保持展開 */
+.chart-links .category:hover .submenu,
+.chart-links .category .submenu:hover {
     max-height: 200px; /* 設置一個足夠大的高度來顯示所有選項 */
     opacity: 1;
     transition: max-height 0.5s ease-out, opacity 0.5s ease-out; /* 保持展開時的動畫流暢 */
@@ -867,7 +869,6 @@ button:not(.info-input button):hover {
     background-color: #1e1e1e; /* hover 時背景變深 */
     color: #ffffff; /* hover 時字體顏色變白 */
 }
-
 
 
 
