@@ -812,26 +812,22 @@ button:not(.info-input button):hover {
 
 .chart-links {
     display: flex;
-    justify-content: space-around; /* 修改為保持均勻分佈 */
-    align-items: flex-start; /* 保持項目從頂部對齊 */
-    gap: 200px;
+    justify-content: center; /* 讓選項居中排列 */
+    align-items: center;
+    gap: 200px; /* 保持選項之間的距離 */
     margin-top: 20px;
     width: 100%;
 }
 
-.chart-links .category-container {
-    position: relative; /* 使每個 category 獨立進行定位 */
-    display: flex;
-    justify-content: center;
-}
-
 .chart-links .category {
-    background-color: #1e1e1e;
+    position: relative;
+    background-color: #1e1e1e; /* 使用一致的背景顏色 */
     padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
+    transition: background-color 0.3s ease;
     text-align: center;
-    white-space: nowrap;
+    white-space: nowrap; /* 防止文字換行 */
 }
 
 .chart-links .category .title {
@@ -843,23 +839,23 @@ button:not(.info-input button):hover {
 .chart-links .category .submenu:hover {
     max-height: 200px; /* 設置一個足夠大的高度來顯示所有選項 */
     opacity: 1;
-    transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+    transition: max-height 0.5s ease-out, opacity 0.5s ease-out; /* 調整展開動畫 */
 }
 
 .chart-links .category .submenu {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 0.5s ease-in, opacity 0.4s ease-in;
+    transition: max-height 0.5s ease-in, opacity 0.4s ease-in; /* 調整收起動畫 */
     opacity: 0;
     background-color: #1e1e1e;
     border-radius: 5px;
     position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%); /* 保持子選單水平居中 */
+    top: 100%;  /* 子選單放置在 title 之下 */
+    left: 0;    /* 子選單與父容器左側對齊 */
+    right: 0;
     white-space: normal; /* 允許文字換行 */
-    min-width: 200px;
-    word-wrap: break-word;
+    min-width: 200px; /* 設置最小寬度 */
+    word-wrap: break-word; /* 允許文字在必要時換行 */
 }
 
 .chart-links .category .submenu a {
@@ -869,11 +865,12 @@ button:not(.info-input button):hover {
     text-decoration: none;
     font-size: 16px;
     transition: background-color 0.3s ease, color 0.3s ease;
+    white-space: nowrap; /* 防止子選單中的文字換行 */
 }
 
 .chart-links .category .submenu a:hover {
-    background-color: #1e1e1e;
-    color: #ffffff;
+    background-color: #1e1e1e; /* hover 時背景變深 */
+    color: #ffffff; /* hover 時字體顏色變白 */
 }
 
 
