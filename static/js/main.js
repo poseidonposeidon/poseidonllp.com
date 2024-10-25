@@ -2298,36 +2298,28 @@ async function fetchPERatioData(stockSymbol, apiKey) {
             return [];
         }
 
-        // 計算每日的 P/E ratio (股價 / 過去四季EPS總和)
+        // 計算每日的 P/E ratio (股價 / 最近一個季度 EPS)
         const peData = stockPriceData.map(priceEntry => {
             const priceDate = new Date(priceEntry.date);
 
-            // 找到股價日期之前最近的四個季度的 EPS 資料
-            const recentFourQuarters = epsData
+            // 找到股價日期之前最近的一個季度的 EPS 資料
+            const recentEPS = epsData
                 .filter(epsEntry => new Date(epsEntry.date) <= priceDate) // 找到日期不晚於當前股價日期的 EPS
-                .sort((a, b) => new Date(b.date) - new Date(a.date))      // 按日期降序排序
-                .slice(0, 4);                                             // 取最近的四個季度
+                .sort((a, b) => new Date(b.date) - new Date(a.date))[0];  // 取最近的一個季度
 
-            // 如果找不到足夠的 EPS 資料，跳過該日期
-            if (recentFourQuarters.length < 4) {
-                console.warn(`Not enough EPS data for date ${priceEntry.date}`);
+            // 如果找不到對應的 EPS 資料，跳過該日期
+            if (!recentEPS || recentEPS.eps === null) {
+                console.warn(`No EPS data for date ${priceEntry.date}`);
                 return null;
             }
 
-            // 計算最近四個季度的 EPS 總和
-            const totalEPS = recentFourQuarters.reduce((sum, epsEntry) => sum + (epsEntry.eps || 0), 0);
+            // 計算 P/E Ratio
+            const peRatio = priceEntry.price / recentEPS.eps;
 
-            // 確保有對應的 EPS 總和，並計算 P/E Ratio
-            if (totalEPS > 0) {
-                const peRatio = priceEntry.price / totalEPS;  // 本益比 = 股價 / 最近四季EPS累加
-                return {
-                    date: priceEntry.date,
-                    peRatio: peRatio,
-                };
-            }
-
-            // 如果找不到對應的 EPS 資料，則返回 null
-            return null;
+            return {
+                date: priceEntry.date,
+                peRatio: peRatio,
+            };
         }).filter(entry => entry !== null);  // 過濾掉沒有對應 EPS 的日期
 
         return peData.reverse(); // 將數據順序反轉，從舊到新
