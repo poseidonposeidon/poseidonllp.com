@@ -2292,6 +2292,12 @@ async function fetchPERatioData(stockSymbol, apiKey) {
         console.log("Fetched Stock Price Data:", stockPriceData);
         console.log("Fetched EPS Data:", epsData);
 
+        // 檢查資料是否齊全
+        if (!stockPriceData.length || !epsData.length) {
+            console.error('Stock price or EPS data is missing.');
+            return [];
+        }
+
         // 計算每日的 P/E ratio (股價 / 過去四季EPS總和)
         const peData = stockPriceData.map(priceEntry => {
             const priceDate = new Date(priceEntry.date);
@@ -2302,8 +2308,14 @@ async function fetchPERatioData(stockSymbol, apiKey) {
                 .sort((a, b) => new Date(b.date) - new Date(a.date))      // 按日期降序排序
                 .slice(0, 4);                                             // 取最近的四個季度
 
+            // 如果找不到足夠的 EPS 資料，跳過該日期
+            if (recentFourQuarters.length < 4) {
+                console.warn(`Not enough EPS data for date ${priceEntry.date}`);
+                return null;
+            }
+
             // 計算最近四個季度的 EPS 總和
-            const totalEPS = recentFourQuarters.reduce((sum, epsEntry) => sum + (epsEntry.margin || 0), 0);
+            const totalEPS = recentFourQuarters.reduce((sum, epsEntry) => sum + (epsEntry.eps || 0), 0);
 
             // 確保有對應的 EPS 總和，並計算 P/E Ratio
             if (totalEPS > 0) {
