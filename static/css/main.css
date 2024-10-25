@@ -845,20 +845,23 @@ button:not(.info-input button):hover {
 .chart-links .category .submenu {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 1s ease-in, opacity 0.8s ease-in; /* 增加收起動畫的時間 */
+    transition: max-height 1s ease-in, opacity 0.8s ease-in;
     opacity: 0;
-    background-color: #1e1e1e; /* 子選單背景色保持一致 */
+    background-color: #1e1e1e;
     border-radius: 5px;
     position: absolute;
     top: 100%;
     left: 0;
     right: 0;
+    white-space: normal; /* 允許文字換行 */
+    min-width: 200px; /* 增加寬度來防止文字被截斷 */
+    word-wrap: break-word; /* 避免文字超出邊界 */
 }
 
 .chart-links .category .submenu a {
     display: block;
     padding: 10px 15px;
-    color: #90caf9; /* 使用一致的字體顏色 */
+    color: #90caf9;
     text-decoration: none;
     font-size: 16px;
     transition: background-color 0.3s ease, color 0.3s ease;
