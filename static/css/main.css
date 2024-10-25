@@ -830,9 +830,23 @@ button:not(.info-input button):hover {
     white-space: nowrap; /* 防止文字換行 */
 }
 
-.chart-links .category:hover .submenu {
-    max-height: 1000px; /* 設置一個足夠大的高度來顯示所有選項 */
+.chart-links .category .title:hover + .submenu {
+    max-height: 200px; /* 根據內容調整最大高度 */
     opacity: 1;
+}
+
+.chart-links .category .submenu {
+    max-height: 0;
+    width: auto;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out, opacity 0.3s ease-out;
+    opacity: 0;
+    background-color: #1e1e1e; /* 子選單背景色保持一致 */
+    border-radius: 5px;
+    position: absolute; /* 絕對定位以便子選單在 hover 時展示 */
+    top: 100%; /* 將子選單放在主選項的下方 */
+    left: 0;
+    right: 0;
 }
 
 .chart-links .category .submenu {
