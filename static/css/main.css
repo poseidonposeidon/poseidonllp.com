@@ -839,23 +839,23 @@ button:not(.info-input button):hover {
 .chart-links .category .submenu:hover {
     max-height: 200px; /* 設置一個足夠大的高度來顯示所有選項 */
     opacity: 1;
-    transition: max-height 0.5s ease-out, opacity 0.5s ease-out; /* 保持展開時的動畫流暢 */
+    transition: max-height 0.3s ease-out, opacity 0.3s ease-out; /* 調整為更快速的展開動畫 */
 }
 
 .chart-links .category .submenu {
     max-height: 0;
     overflow: hidden;
-    transition: max-height 1s ease-in, opacity 0.8s ease-in;
+    transition: max-height 0.5s ease-in, opacity 0.4s ease-in; /* 調整為更快速的收起動畫 */
     opacity: 0;
     background-color: #1e1e1e;
     border-radius: 5px;
-    position: relative;
+    position: absolute;
     top: 100%;
     left: 0;
     right: 0;
     white-space: normal; /* 允許文字換行 */
-    min-width: 200px; /* 增加寬度來防止文字被截斷 */
-    word-wrap: break-word; /* 避免文字超出邊界 */
+    min-width: 200px; /* 設置最小寬度 */
+    word-wrap: break-word; /* 允許文字在必要時換行 */
 }
 
 .chart-links .category .submenu a {
