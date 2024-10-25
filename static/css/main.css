@@ -813,7 +813,7 @@ button:not(.info-input button):hover {
 .chart-links {
     display: flex;
     justify-content: center; /* 讓選項居中排列 */
-    align-items: center;
+    align-items: flex-start; /* 調整對齊方式，讓所有 category 向上對齊 */
     gap: 200px; /* 保持選項之間的距離 */
     margin-top: 20px;
     width: 100%;
@@ -832,6 +832,7 @@ button:not(.info-input button):hover {
 
 .chart-links .category .title {
     cursor: pointer;
+    display: inline-block;  /* 確保 title 是 inline 元素 */
 }
 
 /* 當滑鼠懸停在 .category 或 .submenu 上時保持展開 */
@@ -851,11 +852,12 @@ button:not(.info-input button):hover {
     border-radius: 5px;
     position: absolute;
     top: 100%;  /* 子選單放置在 title 之下 */
-    left: 0;    /* 子選單與父容器左側對齊 */
-    right: 0;
+    left: 50%;    /* 子選單左側對齊 category */
+    transform: translateX(-50%); /* 使子選單居中於 title */
     white-space: normal; /* 允許文字換行 */
     min-width: 200px; /* 設置最小寬度 */
     word-wrap: break-word; /* 允許文字在必要時換行 */
+    z-index: 10; /* 確保子選單在其他元素上方 */
 }
 
 .chart-links .category .submenu a {
@@ -872,6 +874,7 @@ button:not(.info-input button):hover {
     background-color: #1e1e1e; /* hover 時背景變深 */
     color: #ffffff; /* hover 時字體顏色變白 */
 }
+
 
 
 
