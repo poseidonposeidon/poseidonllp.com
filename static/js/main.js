@@ -2219,7 +2219,7 @@ async function fetchExternalROEData(stockSymbol, apiKey) {
             const recentFourEPS = pastEPSData.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
 
             // 計算四個季度的 EPS 總和
-            const totalEPS = recentFourEPS.reduce((sum, epsItem) => sum + (epsItem.margin || 0), 0);
+            const totalEPS = recentFourEPS.reduce((sum, epsItem) => sum + (epsItem.eps || 0), 0);  // 使用 eps 而非 margin
 
             if (totalEPS > 0) {
                 const externalROE = (totalEPS / priceItem.price) * 100;  // 外部 ROE 計算
