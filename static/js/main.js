@@ -2684,6 +2684,8 @@ function drawChart(label1, label2, data1, data2, type) {
                             // 根據不同的 type 調整顯示格式
                             if (type === 'stockPrice') {
                                 return '$' + value.toFixed(2);  // Stock Price 顯示為美元格式
+                            } else if (type === 'peRatio') {
+                                return value.toFixed(2);  // 不附加百分比
                             }
                             return type === 'eps' ? value.toFixed(2) : value.toFixed(2) + '%';  // EPS 顯示數值, 其他顯示百分比
                         }
@@ -2695,7 +2697,12 @@ function drawChart(label1, label2, data1, data2, type) {
                     callbacks: {
                         label: function(tooltipItem) {
                             const rawValue = tooltipItem.raw;
-                            return rawValue !== null ? (type === 'stockPrice' ? '$' + rawValue.toFixed(2) : rawValue.toFixed(2) + (type === 'eps' ? '' : '%')) : 'No data';
+                            if (rawValue !== null) {
+                                if (type === 'stockPrice') return '$' + rawValue.toFixed(2);
+                                else if (type === 'peRatio') return rawValue.toFixed(2); // 不附加百分比
+                                return rawValue.toFixed(2) + (type === 'eps' ? '' : '%');
+                            }
+                            return 'No data';
                         }
                     }
                 }
