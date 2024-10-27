@@ -2550,91 +2550,61 @@ function drawChart(label1, label2, data1, data2, type) {
         chartInstance.destroy();
     }
 
-    // 找出所有的日期，去重並排序，確保格式一致
     const allDates = [...new Set([...data1.map(item => item.date.split('T')[0]), ...data2.map(item => item.date.split('T')[0])])].sort((a, b) => new Date(a) - new Date(b));
 
-    console.log('All Dates:', allDates);  // 調試輸出
+    console.log('All Dates:', allDates);
 
     const formattedData1 = allDates.map(date => {
         const entry = data1.find(item => item.date.split('T')[0] === date);
-
         if (!entry) return null;
 
-        // 針對不同類型的數據進行對應處理
         switch (type) {
-            case 'grossMarginYoY':
-                return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
-            case 'operatingMarginYoY':
-                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
-            case 'netProfitYoY':
-                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
-            case 'eps':
-                return entry.eps !== undefined ? entry.eps : null;  // 處理EPS數據
+            case 'grossMarginYoY': return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
+            case 'operatingMarginYoY': return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
+            case 'netProfitYoY': return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+            case 'eps': return entry.eps !== undefined ? entry.eps : null;
             case 'grossMargin':
             case 'operatingMargin':
             case 'netProfitMargin':
-                return entry.margin !== undefined ? entry.margin : null;
             case 'roe':
-                return entry.margin !== undefined ? entry.margin : null;
             case 'operatingMarginGrowthRate':
-                return entry.margin !== undefined ? entry.margin : null;
-            case 'stockPrice':
-                return entry.price !== undefined ? entry.price : null;
             case 'revenueGrowthRate':
-                return entry.margin !== undefined ? entry.margin : null;
             case 'externalROE':
-                return entry.margin !== undefined ? entry.margin : null;
             case 'quarterlyRevenueGrowthRate':
                 return entry.margin !== undefined ? entry.margin : null;
-            case 'peRatio':
-                return entry.peRatio !== undefined ? entry.peRatio : null;
-            default:
-                return null;
+            case 'stockPrice': return entry.price !== undefined ? entry.price : null;
+            case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
+            default: return null;
         }
     });
 
     const formattedData2 = allDates.map(date => {
         const entry = data2.find(item => item.date.split('T')[0] === date);
-
         if (!entry) return null;
 
-        // 針對不同類型的數據進行對應處理
         switch (type) {
-            case 'grossMarginYoY':
-                return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
-            case 'operatingMarginYoY':
-                return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
-            case 'netProfitYoY':
-                return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
-            case 'eps':
-                return entry.eps !== undefined ? entry.eps : null;  // 處理EPS數據
+            case 'grossMarginYoY': return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
+            case 'operatingMarginYoY': return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
+            case 'netProfitYoY': return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+            case 'eps': return entry.eps !== undefined ? entry.eps : null;
             case 'grossMargin':
             case 'operatingMargin':
             case 'netProfitMargin':
-                return entry.margin !== undefined ? entry.margin : null;
             case 'roe':
-                return entry.margin !== undefined ? entry.margin : null;
             case 'operatingMarginGrowthRate':
-                return entry.margin !== undefined ? entry.margin : null;
-            case 'stockPrice':
-                return entry.price !== undefined ? entry.price : null;
             case 'revenueGrowthRate':
-                return entry.margin !== undefined ? entry.margin : null;
             case 'externalROE':
-                return entry.margin !== undefined ? entry.margin : null;
             case 'quarterlyRevenueGrowthRate':
                 return entry.margin !== undefined ? entry.margin : null;
-            case 'peRatio':
-                return entry.peRatio !== undefined ? entry.peRatio : null;
-            default:
-                return null;
+            case 'stockPrice': return entry.price !== undefined ? entry.price : null;
+            case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
+            default: return null;
         }
     });
 
-    console.log('Formatted Data 1:', formattedData1);  // 調試輸出
-    console.log('Formatted Data 2:', formattedData2);  // 調試輸出
+    console.log('Formatted Data 1:', formattedData1);
+    console.log('Formatted Data 2:', formattedData2);
 
-    // 對 EPS 使用 Bar 圖
     const chartType = (type === 'eps') ? 'bar' : 'line';
 
     const chartData = {
@@ -2644,7 +2614,7 @@ function drawChart(label1, label2, data1, data2, type) {
                 label: label1,
                 data: formattedData1,
                 borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: (type === 'eps') ? 'rgba(75, 192, 192, 0.7)' : 'transparent',  // 如果是 EPS 使用 Bar 的填充色
+                backgroundColor: (type === 'eps') ? 'rgba(75, 192, 192, 0.7)' : 'transparent',
                 spanGaps: true,
                 fill: false,
             },
@@ -2652,14 +2622,14 @@ function drawChart(label1, label2, data1, data2, type) {
                 label: label2,
                 data: formattedData2,
                 borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: (type === 'eps') ? 'rgba(255, 99, 132, 0.7)' : 'transparent',  // 如果是 EPS 使用 Bar 的填充色
+                backgroundColor: (type === 'eps') ? 'rgba(255, 99, 132, 0.7)' : 'transparent',
                 spanGaps: true,
                 fill: false,
             }
         ]
     };
 
-    console.log('Chart Data:', chartData);  // 調試輸出
+    console.log('Chart Data:', chartData);
 
     chartInstance = new Chart(ctx, {
         type: chartType,
@@ -2668,26 +2638,19 @@ function drawChart(label1, label2, data1, data2, type) {
             scales: {
                 x: {
                     type: 'time',
-                    time: {
-                        unit: 'quarter'
-                    },
-                    ticks: {
-                        autoSkip: true,
-                        maxRotation: 0,
-                        minRotation: 0,
-                    }
+                    time: { unit: 'quarter' },
+                    ticks: { autoSkip: true, maxRotation: 0, minRotation: 0 }
                 },
                 y: {
                     beginAtZero: false,
                     ticks: {
                         callback: function(value) {
-                            // 根據不同的 type 調整顯示格式
                             if (type === 'stockPrice') {
-                                return '$' + value.toFixed(2);  // Stock Price 顯示為美元格式
+                                return '$' + value.toFixed(2);
                             } else if (type === 'peRatio') {
                                 return value.toFixed(2);  // 不附加百分比
                             }
-                            return type === 'eps' ? value.toFixed(2) : value.toFixed(2) + '%';  // EPS 顯示數值, 其他顯示百分比
+                            return type === 'eps' ? value.toFixed(2) : value.toFixed(2) + '%';
                         }
                     }
                 }
