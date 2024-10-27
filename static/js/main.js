@@ -2313,12 +2313,12 @@ async function fetchPERatioData(stockSymbol, apiKey) {
                 return null;
             }
 
-            // 計算 P/E Ratio 並取整數
-            const peRatio = Math.round(priceEntry.price / recentEPS.eps);
+            // 計算 P/E Ratio 並保留小數點後兩位
+            const peRatio = (priceEntry.price / recentEPS.eps).toFixed(2);
 
             return {
                 date: priceEntry.date,
-                peRatio: peRatio,  // 取整數後的 P/E Ratio
+                peRatio: parseFloat(peRatio),  // 保留兩位小數後的 P/E Ratio
             };
         }).filter(entry => entry !== null);  // 過濾掉沒有對應 EPS 的日期
 
