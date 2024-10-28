@@ -2305,7 +2305,7 @@ async function fetchPERatioData(stockSymbol, apiKey) {
             // 找到股價日期之前最近的四個季度的 EPS 資料
             const recentFourEPS = epsData
                 .filter(epsEntry => new Date(epsEntry.date) <= priceDate)  // 找到日期不晚於當前股價日期的 EPS
-                .sort((a, b) => new Date(b.date) - new Date(a.date))       // 按日期排序，最近的在前
+                .sort((a, b) => new Date(b.date) - new Date(a.date))       // 按日期降序排序，最近的在前
                 .slice(0, 4);                                              // 取最近的四個季度
 
             // 如果找不到足夠的 EPS 資料，跳過該日期
@@ -2316,6 +2316,12 @@ async function fetchPERatioData(stockSymbol, apiKey) {
 
             // 累加四個季度的 EPS 值
             const totalEPS = recentFourEPS.reduce((sum, epsEntry) => sum + (epsEntry.eps || 0), 0);
+
+            // 如果累加的 totalEPS 為 0，則跳過該日期
+            if (totalEPS === 0) {
+                console.warn(`Total EPS for the last four quarters is zero on date ${priceEntry.date}`);
+                return null;
+            }
 
             // 計算 P/E Ratio 並保留小數點後兩位
             const peRatio = (priceEntry.price / totalEPS).toFixed(2);
