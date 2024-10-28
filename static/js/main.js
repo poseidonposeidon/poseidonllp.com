@@ -2242,24 +2242,25 @@ async function fetchPERatioData(stockSymbol, apiKey) {
         const peData = stockPriceData.map(priceItem => {
             const priceDate = new Date(priceItem.date);
 
+            // 找到股價日期之前最近的四個季度的 EPS 資料
             const pastEPSData = epsData.filter(epsItem => new Date(epsItem.date) <= priceDate);
             const recentFourEPS = pastEPSData.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 4);
-            const totalEPS = recentFourEPS.reduce((sum, epsItem) => sum + (epsItem.eps || 0), 0);  // 使用 eps 而非 margin                                            // 取最近的四個季度
-
+            const totalEPS = recentFourEPS.reduce((sum, epsItem) => sum + (epsItem.eps || 0), 0);
 
             // 如果累加的 totalEPS 為 0，則跳過該日期
             if (totalEPS > 0) {
-                const peData = priceItem.price / totalEPS ;  // 外部 ROE 計算
-                console.log(`Stock Price Date: ${priceItem.date}, Total EPS: ${totalEPS}, Stock Price: ${priceItem.price}, PE ratio: ${peData}`);
+                const peRatio = priceItem.price / totalEPS;
+                console.log(`Stock Price Date: ${priceItem.date}, Total EPS: ${totalEPS}, Stock Price: ${priceItem.price}, PE ratio: ${peRatio}`);
                 return {
                     date: priceItem.date,
-                    margin: peData
+                    peRatio: parseFloat(peRatio.toFixed(2)) // 使用 peRatio 作為鍵名
                 };
             } else {
                 console.log(`Not enough EPS data for stock price date: ${priceItem.date}`);
-                return null;  // 若找不到足夠的 EPS 資料，則返回 null
+                return null;
             }
         }).filter(item => item !== null).reverse();  // 移除 null 並且將資料順序反轉（日期由舊到新）
+
         return peData;
 
     } catch (error) {
