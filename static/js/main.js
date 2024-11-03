@@ -1084,6 +1084,7 @@ function loadCompareSection(sectionId) {
                     <div class="submenu" id="financials">
                         <a href="#" onclick="displayChart('stockPrice')">Stock Price</a>
                         <a href="#" onclick="displayChart('eps')">EPS</a>
+                        <a href="#" onclick="displayChart('revenue')">Revenue</a>
                         <a href="#" onclick="displayChart('peRatio')">P/E Ratio</a>
                     </div>
                 </div>
@@ -2428,6 +2429,29 @@ async function fetchNetProfitYoY(stockSymbol, apiKey) {
     }
 }
 
+async function fetchRevenueData(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+
+        // Map data to include only the date and revenue
+        return data.map(item => ({
+            date: item.date,
+            revenue: item.revenue
+        })).filter(item => item.revenue !== null).reverse(); // Reverse to show data from oldest to newest
+
+    } catch (error) {
+        console.error('Error fetching revenue data:', error);
+        return [];
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2453,7 +2477,6 @@ async function displayChart(type) {
         let data1, data2;
 
         switch (type) {
-            // 新增 P/E ratio 的 case
             case 'peRatio':
                 data1 = await fetchPERatioData(fullStockSymbol1, apiKey);
                 data2 = await fetchPERatioData(fullStockSymbol2, apiKey);
@@ -2505,6 +2528,10 @@ async function displayChart(type) {
                 data1 = await fetchNetProfitYoY(fullStockSymbol1, apiKey);
                 data2 = await fetchNetProfitYoY(fullStockSymbol2, apiKey);
                 break;
+            case 'revenue': // 新增 revenue 的 case
+                data1 = await fetchRevenueData(fullStockSymbol1, apiKey);
+                data2 = await fetchRevenueData(fullStockSymbol2, apiKey);
+                break;
             default:
                 throw new Error('Invalid chart type');
         }
@@ -2553,7 +2580,8 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'revenueGrowthRate':
             case 'externalROE':
             case 'quarterlyRevenueGrowthRate':
-                return entry.margin !== undefined ? entry.margin : null;
+            case 'revenue':
+                return entry.revenue !== undefined ? entry.revenue : null;
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
             default: return null;
@@ -2577,7 +2605,8 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'revenueGrowthRate':
             case 'externalROE':
             case 'quarterlyRevenueGrowthRate':
-                return entry.margin !== undefined ? entry.margin : null;
+            case 'revenue':
+                return entry.revenue !== undefined ? entry.revenue : null;
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
             default: return null;
@@ -2587,7 +2616,7 @@ function drawChart(label1, label2, data1, data2, type) {
     console.log('Formatted Data 1:', formattedData1);
     console.log('Formatted Data 2:', formattedData2);
 
-    const chartType = (type === 'eps') ? 'bar' : 'line';
+    const chartType = (type === 'eps' || type === 'revenue') ? 'bar' : 'line';
 
     const chartData = {
         labels: allDates,
@@ -2596,7 +2625,7 @@ function drawChart(label1, label2, data1, data2, type) {
                 label: label1,
                 data: formattedData1,
                 borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: (type === 'eps') ? 'rgba(75, 192, 192, 0.7)' : 'transparent',
+                backgroundColor: (type === 'eps' || type === 'revenue') ? 'rgba(75, 192, 192, 0.7)' : 'transparent',
                 spanGaps: true,
                 fill: false,
             },
@@ -2604,7 +2633,7 @@ function drawChart(label1, label2, data1, data2, type) {
                 label: label2,
                 data: formattedData2,
                 borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: (type === 'eps') ? 'rgba(255, 99, 132, 0.7)' : 'transparent',
+                backgroundColor: (type === 'eps' || type === 'revenue') ? 'rgba(255, 99, 132, 0.7)' : 'transparent',
                 spanGaps: true,
                 fill: false,
             }
@@ -2632,7 +2661,7 @@ function drawChart(label1, label2, data1, data2, type) {
                             } else if (type === 'peRatio') {
                                 return value.toFixed(2);  // 不附加百分比
                             }
-                            return type === 'eps' ? value.toFixed(2) : value.toFixed(2) + '%';
+                            return type === 'eps' || type === 'revenue' ? value.toFixed(2) : value.toFixed(2) + '%';
                         }
                     }
                 }
@@ -2645,7 +2674,7 @@ function drawChart(label1, label2, data1, data2, type) {
                             if (rawValue !== null) {
                                 if (type === 'stockPrice') return '$' + rawValue.toFixed(2);
                                 else if (type === 'peRatio') return rawValue.toFixed(2); // 不附加百分比
-                                return rawValue.toFixed(2) + (type === 'eps' ? '' : '%');
+                                return rawValue.toFixed(2) + (type === 'eps' || type === 'revenue' ? '' : '%');
                             }
                             return 'No data';
                         }
