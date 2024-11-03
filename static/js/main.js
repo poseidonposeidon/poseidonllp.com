@@ -2518,7 +2518,6 @@ async function fetchOperatingIncomeData(stockSymbol, apiKey) {
     }
 }
 
-
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2663,7 +2662,7 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'costOfRevenue':
             case 'operatingExpenses':
             case 'operatingIncome':
-                return entry.revenue !== undefined ? entry.revenue : null;
+                return entry.operatingIncome !== undefined ? entry.operatingIncome : null;
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
             default: return null;
@@ -2691,7 +2690,7 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'costOfRevenue':
             case 'operatingExpenses':
             case 'operatingIncome':
-                return entry.revenue !== undefined ? entry.revenue : null;
+                return entry.operatingIncome !== undefined ? entry.operatingIncome : null;
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
             default: return null;
