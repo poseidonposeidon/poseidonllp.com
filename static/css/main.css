@@ -838,16 +838,16 @@ button:not(.info-input button):hover {
 /* 當滑鼠懸停在 .category 或 .submenu 上時保持展開 */
 .chart-links .category:hover .submenu,
 .chart-links .category .submenu:hover {
-    max-height: 200px; /* 設置一個足夠大的高度來顯示所有選項 */
+    max-height: 500px; /* 設置一個足夠大的高度來顯示所有選項 */
     opacity: 1;
     transition: max-height 0.5s ease-out, opacity 0.5s ease-out; /* 調整展開動畫 */
 }
 
 .chart-links .category .submenu {
-    max-height: none; /* 移除高度限制，使子選單自動展開 */
-    overflow: visible; /* 確保子選單內容顯示完整 */
-    transition: max-height 0.5s ease-in, opacity 0.4s ease-in;
-    opacity: 1;
+    max-height: 0; /* 預設為收起狀態 */
+    overflow: hidden; /* 隱藏多餘內容 */
+    transition: max-height 0.5s ease-in, opacity 0.4s ease-in; /* 收起動畫 */
+    opacity: 0;
     background-color: #1e1e1e;
     border-radius: 5px;
     position: absolute;
