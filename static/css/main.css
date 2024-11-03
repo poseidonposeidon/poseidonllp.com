@@ -844,15 +844,15 @@ button:not(.info-input button):hover {
 }
 
 .chart-links .category .submenu {
-    max-height: 500px; /* 增加高度來顯示更多選項 */
-    overflow: auto; /* 如果超出，則顯示滾動條 */
-    transition: max-height 0.5s ease-in, opacity 0.4s ease-in; /* 調整動畫效果 */
-    opacity: 1; /* 確保子選單顯示 */
+    max-height: none; /* 移除高度限制，使子選單自動展開 */
+    overflow: visible; /* 確保子選單內容顯示完整 */
+    transition: max-height 0.5s ease-in, opacity 0.4s ease-in;
+    opacity: 1;
     background-color: #1e1e1e;
     border-radius: 5px;
     position: absolute;
     top: 100%;  /* 子選單放置在 title 之下 */
-    left: 50%;    /* 子選單左側對齊 category */
+    left: 50%;  /* 子選單左側對齊 category */
     transform: translateX(-50%); /* 使子選單居中於 title */
     white-space: normal; /* 允許文字換行 */
     min-width: 200px; /* 設置最小寬度 */
