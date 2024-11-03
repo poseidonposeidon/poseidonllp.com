@@ -2661,7 +2661,7 @@ function drawChart(label1, label2, data1, data2, type) {
                             } else if (type === 'peRatio') {
                                 return value.toFixed(2);  // 不附加百分比
                             }
-                            return type === 'eps' || type === 'revenue' ? value.toFixed(2) : value.toFixed(2) + '%';
+                            return type === 'eps' || type === 'revenue' ? value.toLocaleString() : value.toFixed(2) + '%'; // 格式化數字，每三位加上逗號
                         }
                     }
                 }
@@ -2674,7 +2674,7 @@ function drawChart(label1, label2, data1, data2, type) {
                             if (rawValue !== null) {
                                 if (type === 'stockPrice') return '$' + rawValue.toFixed(2);
                                 else if (type === 'peRatio') return rawValue.toFixed(2); // 不附加百分比
-                                return rawValue.toFixed(2) + (type === 'eps' || type === 'revenue' ? '' : '%');
+                                return rawValue.toLocaleString(); // 每三位加上逗號
                             }
                             return 'No data';
                         }
