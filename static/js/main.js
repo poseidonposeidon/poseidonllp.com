@@ -1087,6 +1087,7 @@ function loadCompareSection(sectionId) {
                         <a href="#" onclick="displayChart('revenue')">Revenue</a>
                         <a href="#" onclick="displayChart('costOfRevenue')">Cost of Revenue</a>
                         <a href="#" onclick="displayChart('operatingExpenses')">Operating Expenses</a>
+                        <a href="#" onclick="displayChart('operatingIncome')">Operating Income</a>
                         <a href="#" onclick="displayChart('peRatio')">P/E Ratio</a>
                     </div>
                 </div>
@@ -2494,6 +2495,30 @@ async function fetchOperatingExpensesData(stockSymbol, apiKey) {
     }
 }
 
+async function fetchOperatingIncomeData(stockSymbol, apiKey) {
+    try {
+        const response = await fetch(`https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?apikey=${apiKey}`);
+        if (!response.ok) {
+            throw new Error(`Failed to fetch operating income data for ${stockSymbol}`);
+        }
+        const data = await response.json();
+
+        // Filter and format data for the past 10 years (40 quarters)
+        const operatingIncomeData = data
+            .slice(0, 40) // Limit to the most recent 40 quarters
+            .map(item => ({
+                date: item.date,
+                operatingIncome: item.operatingIncome
+            }));
+
+        return operatingIncomeData;
+    } catch (error) {
+        console.error('Error fetching operating income data:', error);
+        throw error;
+    }
+}
+
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2582,6 +2607,10 @@ async function displayChart(type) {
                 data1 = await fetchOperatingExpensesData(fullStockSymbol1, apiKey);
                 data2 = await fetchOperatingExpensesData(fullStockSymbol2, apiKey);
                 break;
+            case 'operatingIncome':
+                data1 = await fetchOperatingIncomeData(fullStockSymbol1, apiKey);
+                data2 = await fetchOperatingIncomeData(fullStockSymbol2, apiKey);
+                break;
             default:
                 throw new Error('Invalid chart type');
         }
@@ -2633,6 +2662,7 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'revenue':
             case 'costOfRevenue':
             case 'operatingExpenses':
+            case 'operatingIncome':
                 return entry.revenue !== undefined ? entry.revenue : null;
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
@@ -2660,6 +2690,7 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'revenue':
             case 'costOfRevenue':
             case 'operatingExpenses':
+            case 'operatingIncome':
                 return entry.revenue !== undefined ? entry.revenue : null;
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
@@ -2670,7 +2701,7 @@ function drawChart(label1, label2, data1, data2, type) {
     console.log('Formatted Data 1:', formattedData1);
     console.log('Formatted Data 2:', formattedData2);
 
-    const chartType = (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses') ? 'bar' : 'line';
+    const chartType = (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome') ? 'bar' : 'line';
 
     const chartData = {
         labels: allDates,
@@ -2679,7 +2710,7 @@ function drawChart(label1, label2, data1, data2, type) {
                 label: label1,
                 data: formattedData1,
                 borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses') ? 'rgba(75, 192, 192, 0.7)' : 'transparent',
+                backgroundColor: (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome') ? 'rgba(75, 192, 192, 0.7)' : 'transparent',
                 spanGaps: true,
                 fill: false,
             },
@@ -2687,7 +2718,7 @@ function drawChart(label1, label2, data1, data2, type) {
                 label: label2,
                 data: formattedData2,
                 borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses') ? 'rgba(255, 99, 132, 0.7)' : 'transparent',
+                backgroundColor: (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome') ? 'rgba(255, 99, 132, 0.7)' : 'transparent',
                 spanGaps: true,
                 fill: false,
             }
@@ -2713,9 +2744,9 @@ function drawChart(label1, label2, data1, data2, type) {
                             if (type === 'stockPrice') {
                                 return '$' + value.toFixed(2);
                             } else if (type === 'peRatio') {
-                                return value.toFixed(2);  // 不附加百分比
+                                return value.toFixed(2);
                             }
-                            return type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' ? value.toLocaleString() : value.toFixed(2) + '%'; // 格式化數字，每三位加上逗號
+                            return type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome' ? value.toLocaleString() : value.toFixed(2) + '%';
                         }
                     }
                 }
@@ -2727,8 +2758,8 @@ function drawChart(label1, label2, data1, data2, type) {
                             const rawValue = tooltipItem.raw;
                             if (rawValue !== null) {
                                 if (type === 'stockPrice') return '$' + rawValue.toFixed(2);
-                                else if (type === 'peRatio') return rawValue.toFixed(2); // 不附加百分比
-                                return rawValue.toLocaleString(); // 每三位加上逗號
+                                else if (type === 'peRatio') return rawValue.toFixed(2);
+                                return rawValue.toLocaleString();
                             }
                             return 'No data';
                         }
