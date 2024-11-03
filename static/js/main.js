@@ -2497,7 +2497,7 @@ async function fetchOperatingExpensesData(stockSymbol, apiKey) {
 
 async function fetchOperatingIncomeData(stockSymbol, apiKey) {
     try {
-        const response = await fetch(`https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?apikey=${apiKey}`);
+        const response = await fetch(`https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`);
         if (!response.ok) {
             throw new Error(`Failed to fetch operating income data for ${stockSymbol}`);
         }
