@@ -1085,6 +1085,7 @@ function loadCompareSection(sectionId) {
                         <a href="#" onclick="displayChart('stockPrice')">Stock Price</a>
                         <a href="#" onclick="displayChart('eps')">EPS</a>
                         <a href="#" onclick="displayChart('revenue')">Revenue</a>
+                        <a href="#" onclick="displayChart('costOfRevenue')">Cost of Revenue</a>
                         <a href="#" onclick="displayChart('peRatio')">P/E Ratio</a>
                     </div>
                 </div>
@@ -2452,6 +2453,26 @@ async function fetchRevenueData(stockSymbol, apiKey) {
     }
 }
 
+async function fetchCostOfRevenueData(stockSymbol, apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+
+        return data.map(item => ({
+            date: item.date,
+            revenue: item.costOfRevenue !== null && item.costOfRevenue !== undefined ? item.costOfRevenue : null
+        })).filter(item => item.revenue !== null).reverse(); // 只返回非空的 Cost of Revenue 並倒序排列
+    } catch (error) {
+        console.error('Error fetching cost of revenue data:', error);
+        return [];
+    }
+}
+
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
     const stock2 = document.getElementById('stock2-tw').value.trim();
@@ -2528,9 +2549,13 @@ async function displayChart(type) {
                 data1 = await fetchNetProfitYoY(fullStockSymbol1, apiKey);
                 data2 = await fetchNetProfitYoY(fullStockSymbol2, apiKey);
                 break;
-            case 'revenue': // 新增 revenue 的 case
+            case 'revenue':
                 data1 = await fetchRevenueData(fullStockSymbol1, apiKey);
                 data2 = await fetchRevenueData(fullStockSymbol2, apiKey);
+                break;
+            case 'costOfRevenue':
+                data1 = await fetchCostOfRevenueData(fullStockSymbol1, apiKey);
+                data2 = await fetchCostOfRevenueData(fullStockSymbol2, apiKey);
                 break;
             default:
                 throw new Error('Invalid chart type');
@@ -2581,6 +2606,7 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'externalROE':
             case 'quarterlyRevenueGrowthRate':
             case 'revenue':
+            case 'costOfRevenue':
                 return entry.revenue !== undefined ? entry.revenue : null;
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
@@ -2606,6 +2632,7 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'externalROE':
             case 'quarterlyRevenueGrowthRate':
             case 'revenue':
+            case 'costOfRevenue':
                 return entry.revenue !== undefined ? entry.revenue : null;
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
@@ -2616,7 +2643,7 @@ function drawChart(label1, label2, data1, data2, type) {
     console.log('Formatted Data 1:', formattedData1);
     console.log('Formatted Data 2:', formattedData2);
 
-    const chartType = (type === 'eps' || type === 'revenue') ? 'bar' : 'line';
+    const chartType = (type === 'eps' || type === 'revenue' || type === 'costOfRevenue') ? 'bar' : 'line';
 
     const chartData = {
         labels: allDates,
@@ -2625,7 +2652,7 @@ function drawChart(label1, label2, data1, data2, type) {
                 label: label1,
                 data: formattedData1,
                 borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: (type === 'eps' || type === 'revenue') ? 'rgba(75, 192, 192, 0.7)' : 'transparent',
+                backgroundColor: (type === 'eps' || type === 'revenue' || type === 'costOfRevenue') ? 'rgba(75, 192, 192, 0.7)' : 'transparent',
                 spanGaps: true,
                 fill: false,
             },
@@ -2633,7 +2660,7 @@ function drawChart(label1, label2, data1, data2, type) {
                 label: label2,
                 data: formattedData2,
                 borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: (type === 'eps' || type === 'revenue') ? 'rgba(255, 99, 132, 0.7)' : 'transparent',
+                backgroundColor: (type === 'eps' || type === 'revenue' || type === 'costOfRevenue') ? 'rgba(255, 99, 132, 0.7)' : 'transparent',
                 spanGaps: true,
                 fill: false,
             }
@@ -2661,7 +2688,7 @@ function drawChart(label1, label2, data1, data2, type) {
                             } else if (type === 'peRatio') {
                                 return value.toFixed(2);  // 不附加百分比
                             }
-                            return type === 'eps' || type === 'revenue' ? value.toLocaleString() : value.toFixed(2) + '%'; // 格式化數字，每三位加上逗號
+                            return type === 'eps' || type === 'revenue' || type === 'costOfRevenue' ? value.toLocaleString() : value.toFixed(2) + '%'; // 格式化數字，每三位加上逗號
                         }
                     }
                 }
