@@ -844,10 +844,10 @@ button:not(.info-input button):hover {
 }
 
 .chart-links .category .submenu {
-    max-height: 0;
-    overflow: hidden;
-    transition: max-height 0.5s ease-in, opacity 0.4s ease-in; /* 調整收起動畫 */
-    opacity: 0;
+    max-height: 500px; /* 增加高度來顯示更多選項 */
+    overflow: auto; /* 如果超出，則顯示滾動條 */
+    transition: max-height 0.5s ease-in, opacity 0.4s ease-in; /* 調整動畫效果 */
+    opacity: 1; /* 確保子選單顯示 */
     background-color: #1e1e1e;
     border-radius: 5px;
     position: absolute;
