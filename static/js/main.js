@@ -1241,7 +1241,12 @@ function sendMessage() {
             });
     }
 }
-
+document.getElementById("chat-input").addEventListener("keydown", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();  // 防止換行
+        sendMessage();
+    }
+});
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
