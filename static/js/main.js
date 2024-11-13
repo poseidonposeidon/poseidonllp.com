@@ -1126,7 +1126,7 @@ function loadCompareSection(sectionId) {
             </div>
 
             <div id="comparisonResultContainer-tw">
-                <canvas id="grossMarginChart" width="800" height="400"></canvas>
+                <canvas id="grossMarginChart" style="width: 100%; height: 400px;"></canvas>
                 <!-- Comparison results will be displayed here -->
             </div>
         `
@@ -2711,6 +2711,8 @@ function drawChart(labels, dataSets, type) {
         type: chartType,
         data: chartData,
         options: {
+            responsive: true,             // 開啟響應式
+            maintainAspectRatio: false,   // 可調整的寬高比，讓高度可以固定
             scales: {
                 x: {
                     type: 'time',
