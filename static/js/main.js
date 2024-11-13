@@ -1246,57 +1246,58 @@ function sendMessage() {
     }
 }
 
-async function uploadPDF() {
-    const fileInput = document.getElementById('pdf-file');
-    const chatBox = document.getElementById('chat-box');
+function uploadPDF() {
+    const input = document.getElementById('file-input');
+    const chatBox = document.getElementById('chat-box'); // 假設您想在 chatBox 中顯示 GPT 回應
+    const file = input.files[0];
 
-    // 檢查是否有選擇檔案
-    if (fileInput.files.length === 0) {
-        alert('Please select a PDF file.');
+    if (!file) {
+        alert("Please select a file");
         return;
     }
 
     const formData = new FormData();
-    formData.append('file', fileInput.files[0]);
+    formData.append('file', file);
 
-    // 顯示 "Uploading PDF..." 的提示
-    const messageDiv = document.createElement('div');
-    messageDiv.classList.add('chat-message');
-    messageDiv.textContent = 'Uploading PDF...';
-    chatBox.appendChild(messageDiv);
+    // 顯示 "Loading..." 提示
+    const loadingDiv = document.createElement('div');
+    loadingDiv.classList.add('chat-loading');
+    loadingDiv.textContent = 'Processing PDF...';
+    chatBox.appendChild(loadingDiv);
 
-    // 滾動至最新消息
-    chatBox.scrollTop = chatBox.scrollHeight;
+    fetch(`${baseUrl}/upload_pdf`, {
+        method: 'POST',
+        body: formData,  // 使用 FormData 傳遞文件
+        credentials: 'include'  // 跨域請求帶上憑證（如果需要）
+    })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            // 刪除 "Loading..." 提示
+            chatBox.removeChild(loadingDiv);
 
-    try {
-        const response = await fetch(`${baseUrl}/upload_pdf`, {
-            method: 'POST',
-            body: formData,
+            // 顯示 GPT 回應
+            const responseDiv = document.createElement('div');
+            responseDiv.classList.add('chat-response');
+            responseDiv.textContent = data.reply || '無法取得回應';
+            chatBox.appendChild(responseDiv);
+        })
+        .catch(error => {
+            console.error("Error uploading PDF:", error);
+
+            // 刪除 "Loading..." 提示
+            chatBox.removeChild(loadingDiv);
+
+            // 顯示錯誤訊息
+            const responseDiv = document.createElement('div');
+            responseDiv.classList.add('chat-response');
+            responseDiv.textContent = '無法處理您的文件';
+            chatBox.appendChild(responseDiv);
         });
-
-        if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const data = await response.json();
-
-        // 移除上傳提示
-        chatBox.removeChild(messageDiv);
-
-        // 顯示 GPT 回覆
-        const responseDiv = document.createElement('div');
-        responseDiv.classList.add('chat-response');
-        responseDiv.textContent = data.reply || '無回應。'; // 如果回應為空顯示 "無回應"
-        chatBox.appendChild(responseDiv);
-    } catch (error) {
-        console.error('Error uploading PDF:', error);
-
-        // 顯示錯誤訊息
-        const errorDiv = document.createElement('div');
-        errorDiv.classList.add('chat-response');
-        errorDiv.textContent = 'PDF 上傳失敗，請再試一次。';
-        chatBox.appendChild(errorDiv);
-    }
 }
 
 
