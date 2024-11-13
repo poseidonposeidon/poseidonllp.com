@@ -1074,7 +1074,14 @@ function loadCompareSection(sectionId) {
                 <label for="stock2-tw">Enter Stock 2 :</label>
                 <input type="text" id="stock2-tw" placeholder="e.g., 2317">
                 
-<!--                <button onclick="compareTaiwanStocks()">Compare</button>-->
+                <label for="stock3-tw">Enter Stock 3 :</label>
+                <input type="text" id="stock3-tw" placeholder="e.g., 2881">
+
+                <label for="stock4-tw">Enter Stock 4 :</label>
+                <input type="text" id="stock4-tw" placeholder="e.g., 1301">
+
+                <label for="stock5-tw">Enter Stock 5 :</label>
+                <input type="text" id="stock5-tw" placeholder="e.g., 1101">
             </div>
             
             <!-- 新增切換圖表的功能 -->
@@ -1106,22 +1113,18 @@ function loadCompareSection(sectionId) {
                 <div class="category">
                     <span class="title" onclick="toggleMenu('growth')">Growth</span>
                     <div class="submenu" id="growth">
-                            <a href="#" onclick="displayChart('quarterlyRevenueGrowthRate')">Revenue YoY</a>
-<!--                            <a href="#" onclick="displayChart('revenueGrowthRate')">Gross Margin YoY</a>-->
-<!--                            <a href="#" onclick="displayChart('operatingMarginGrowthRate')">Operating Margin YoY</a>-->
-                            <a href="#" onclick="displayChart('grossMarginYoY')">Gross Margin YoY</a>
-                            <a href="#" onclick="displayChart('operatingMarginYoY')">Operating Margin YoY</a>
-                            <a href="#" onclick="displayChart('netProfitYoY')">Net ProfitYoY</a>
+                        <a href="#" onclick="displayChart('quarterlyRevenueGrowthRate')">Revenue YoY</a>
+                        <a href="#" onclick="displayChart('grossMarginYoY')">Gross Margin YoY</a>
+                        <a href="#" onclick="displayChart('operatingMarginYoY')">Operating Margin YoY</a>
+                        <a href="#" onclick="displayChart('netProfitYoY')">Net Profit YoY</a>
                     </div>
                 </div>
             </div>
-
 
             <div id="loading" style="display: none; text-align: center;">
                 <p>Loading... Please wait.</p>
             </div>
 
-            
             <div id="comparisonResultContainer-tw">
                 <canvas id="grossMarginChart"></canvas>
                 <!-- Comparison results will be displayed here -->
@@ -1159,6 +1162,7 @@ function loadCompareSection(sectionId) {
         console.error("Compare section not found");
     }
 }
+
 
 function toggleMenu(menuId) {
     const submenu = document.getElementById(menuId);
