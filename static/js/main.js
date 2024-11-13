@@ -1267,20 +1267,20 @@ function uploadPDF() {
 
     fetch(`${baseUrl}/upload_pdf`, {
         method: 'POST',
-        body: formData,  // 使用 FormData 傳遞文件
-        credentials: 'include'  // 跨域請求帶上憑證（如果需要）
+        body: formData,
+        credentials: 'include'
     })
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                return response.text().then(text => {
+                    throw new Error(`HTTP error! status: ${response.status}, response: ${text}`);
+                });
             }
             return response.json();
         })
         .then(data => {
-            // 刪除 "Loading..." 提示
             chatBox.removeChild(loadingDiv);
 
-            // 顯示 GPT 回應
             const responseDiv = document.createElement('div');
             responseDiv.classList.add('chat-response');
             responseDiv.textContent = data.reply || '無法取得回應';
@@ -1289,13 +1289,11 @@ function uploadPDF() {
         .catch(error => {
             console.error("Error uploading PDF:", error);
 
-            // 刪除 "Loading..." 提示
             chatBox.removeChild(loadingDiv);
 
-            // 顯示錯誤訊息
             const responseDiv = document.createElement('div');
             responseDiv.classList.add('chat-response');
-            responseDiv.textContent = '無法處理您的文件';
+            responseDiv.textContent = `無法處理您的文件: ${error.message}`;
             chatBox.appendChild(responseDiv);
         });
 }
