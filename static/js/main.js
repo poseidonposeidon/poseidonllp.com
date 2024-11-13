@@ -2653,13 +2653,14 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'revenue': return entry.revenue !== undefined ? entry.revenue : null;
             case 'costOfRevenue': return entry.revenue !== undefined ? entry.revenue : null;
             case 'operatingExpenses': return entry.revenue !== undefined ? entry.revenue : null;
-            case 'grossMargin': return entry.margin !== undefined ? entry.margin : null;  // 毛利率
-            case 'operatingMargin': return entry.margin !== undefined ? entry.margin : null;  // 營業利潤率
-            case 'netProfitMargin': return entry.margin !== undefined ? entry.margin : null;  // 淨利率
-            case 'roe': return entry.margin !== undefined ? entry.margin : null;  // 股東權益報酬率
-            case 'externalROE': return entry.margin !== undefined ? entry.margin : null;  // 外部 ROE
-            case 'revenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;  // 收益成長率
-            case 'quarterlyRevenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;  // 季度收益成長率
+            case 'grossMargin': return entry.margin !== undefined ? entry.margin : null;
+            case 'operatingMargin': return entry.margin !== undefined ? entry.margin : null;
+            case 'netProfitMargin': return entry.margin !== undefined ? entry.margin : null;
+            case 'roe': return entry.margin !== undefined ? entry.margin : null;
+            case 'externalROE': return entry.margin !== undefined ? entry.margin : null;
+            case 'revenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
+            case 'quarterlyRevenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
+            case 'operatingIncome': return entry.operatingIncome !== undefined ? entry.operatingIncome : null; // 正確處理 operatingIncome
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
             default: return null;
@@ -2678,13 +2679,14 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'revenue': return entry.revenue !== undefined ? entry.revenue : null;
             case 'costOfRevenue': return entry.revenue !== undefined ? entry.revenue : null;
             case 'operatingExpenses': return entry.revenue !== undefined ? entry.revenue : null;
-            case 'grossMargin': return entry.margin !== undefined ? entry.margin : null;  // 毛利率
-            case 'operatingMargin': return entry.margin !== undefined ? entry.margin : null;  // 營業利潤率
-            case 'netProfitMargin': return entry.margin !== undefined ? entry.margin : null;  // 淨利率
-            case 'roe': return entry.margin !== undefined ? entry.margin : null;  // 股東權益報酬率
-            case 'externalROE': return entry.margin !== undefined ? entry.margin : null;  // 外部 ROE
-            case 'revenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;  // 收益成長率
-            case 'quarterlyRevenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;  // 季度收益成長率
+            case 'grossMargin': return entry.margin !== undefined ? entry.margin : null;
+            case 'operatingMargin': return entry.margin !== undefined ? entry.margin : null;
+            case 'netProfitMargin': return entry.margin !== undefined ? entry.margin : null;
+            case 'roe': return entry.margin !== undefined ? entry.margin : null;
+            case 'externalROE': return entry.margin !== undefined ? entry.margin : null;
+            case 'revenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
+            case 'quarterlyRevenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
+            case 'operatingIncome': return entry.operatingIncome !== undefined ? entry.operatingIncome : null; // 正確處理 operatingIncome
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
             default: return null;
