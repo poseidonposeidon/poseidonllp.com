@@ -1049,6 +1049,10 @@ function loadAIBoxSection(sectionId) {
                         <textarea id="chat-input" rows="2" placeholder="Type your message here..."></textarea>
                         <button id="send-btn" onclick="sendMessage()">Send</button>
                     </div>
+                    <div class="file-upload-container">
+                        <input type="file" id="pdf-file" accept=".pdf" />
+                        <button onclick="uploadPDF()">Upload PDF</button>
+                    </div>
                 </div>
             </div>`
     };
@@ -1241,6 +1245,60 @@ function sendMessage() {
             });
     }
 }
+
+async function uploadPDF() {
+    const fileInput = document.getElementById('pdf-file');
+    const chatBox = document.getElementById('chat-box');
+
+    // 檢查是否有選擇檔案
+    if (fileInput.files.length === 0) {
+        alert('Please select a PDF file.');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    // 顯示 "Uploading PDF..." 的提示
+    const messageDiv = document.createElement('div');
+    messageDiv.classList.add('chat-message');
+    messageDiv.textContent = 'Uploading PDF...';
+    chatBox.appendChild(messageDiv);
+
+    // 滾動至最新消息
+    chatBox.scrollTop = chatBox.scrollHeight;
+
+    try {
+        const response = await fetch(`${baseUrl}/upload_pdf`, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        // 移除上傳提示
+        chatBox.removeChild(messageDiv);
+
+        // 顯示 GPT 回覆
+        const responseDiv = document.createElement('div');
+        responseDiv.classList.add('chat-response');
+        responseDiv.textContent = data.reply || '無回應。'; // 如果回應為空顯示 "無回應"
+        chatBox.appendChild(responseDiv);
+    } catch (error) {
+        console.error('Error uploading PDF:', error);
+
+        // 顯示錯誤訊息
+        const errorDiv = document.createElement('div');
+        errorDiv.classList.add('chat-response');
+        errorDiv.textContent = 'PDF 上傳失敗，請再試一次。';
+        chatBox.appendChild(errorDiv);
+    }
+}
+
 
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
