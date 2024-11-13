@@ -2520,20 +2520,20 @@ async function fetchOperatingIncomeData(stockSymbol, apiKey) {
 
 async function displayChart(type) {
     const stock1 = document.getElementById('stock1-tw').value.trim();
-    const stock2 = document.getElementById('stock2-tw').value.trim();
+    const stock2 = document.getElementById('stock2-tw').value.trim();  // 可以不輸入第二支股票
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const loadingElement = document.getElementById('loading');
 
-    if (!stock1 || !stock2) {
-        alert('Please enter both stock symbols.');
+    if (!stock1) {
+        alert('Please enter a stock symbol.');
         return;
     }
 
     const fullStockSymbol1 = await fetchStockWithExchangeSuffix(stock1, apiKey);
-    const fullStockSymbol2 = await fetchStockWithExchangeSuffix(stock2, apiKey);
+    const fullStockSymbol2 = stock2 ? await fetchStockWithExchangeSuffix(stock2, apiKey) : null;
 
-    if (!fullStockSymbol1 || !fullStockSymbol2) {
-        alert('Unable to determine stock exchange for one or both symbols.');
+    if (!fullStockSymbol1) {
+        alert('Unable to determine stock exchange for the symbol.');
         return;
     }
 
@@ -2545,70 +2545,69 @@ async function displayChart(type) {
         switch (type) {
             case 'peRatio':
                 data1 = await fetchPERatioData(fullStockSymbol1, apiKey);
-                data2 = await fetchPERatioData(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchPERatioData(fullStockSymbol2, apiKey) : null;
                 break;
             case 'grossMargin':
             case 'operatingMargin':
             case 'netProfitMargin':
                 data1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
-                data2 = await fetchMarginData(fullStockSymbol2, apiKey, type);
+                data2 = fullStockSymbol2 ? await fetchMarginData(fullStockSymbol2, apiKey, type) : null;
                 break;
             case 'eps':
                 data1 = await fetchEPSData(fullStockSymbol1, apiKey);
-                data2 = await fetchEPSData(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchEPSData(fullStockSymbol2, apiKey) : null;
                 break;
             case 'roe':
                 data1 = await fetchROEData(fullStockSymbol1, apiKey);
-                data2 = await fetchROEData(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchROEData(fullStockSymbol2, apiKey) : null;
                 break;
             case 'operatingMarginGrowthRate':
                 data1 = await fetchOperatingMarginGrowthRate(fullStockSymbol1, apiKey);
-                data2 = await fetchOperatingMarginGrowthRate(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchOperatingMarginGrowthRate(fullStockSymbol2, apiKey) : null;
                 break;
             case 'stockPrice':
                 data1 = await fetchStockPriceData(fullStockSymbol1, apiKey);
-                data2 = await fetchStockPriceData(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchStockPriceData(fullStockSymbol2, apiKey) : null;
                 break;
             case 'revenueGrowthRate':
                 data1 = await fetchRevenueGrowthRate(fullStockSymbol1, apiKey);
-                data2 = await fetchRevenueGrowthRate(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchRevenueGrowthRate(fullStockSymbol2, apiKey) : null;
                 break;
             case 'externalROE':
                 data1 = await fetchExternalROEData(fullStockSymbol1, apiKey);
-                data2 = await fetchExternalROEData(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchExternalROEData(fullStockSymbol2, apiKey) : null;
                 break;
-            case 'quarterlyRevenueGrowthRate':  // 新增季度營收成長率的 case
+            case 'quarterlyRevenueGrowthRate':
                 data1 = await fetchQuarterlyRevenueGrowthRate(fullStockSymbol1, apiKey);
-                data2 = await fetchQuarterlyRevenueGrowthRate(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchQuarterlyRevenueGrowthRate(fullStockSymbol2, apiKey) : null;
                 break;
-
             case 'grossMarginYoY':
                 data1 = await fetchGrossMarginYoY(fullStockSymbol1, apiKey);
-                data2 = await fetchGrossMarginYoY(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchGrossMarginYoY(fullStockSymbol2, apiKey) : null;
                 break;
             case 'operatingMarginYoY':
                 data1 = await fetchOperatingMarginYoY(fullStockSymbol1, apiKey);
-                data2 = await fetchOperatingMarginYoY(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchOperatingMarginYoY(fullStockSymbol2, apiKey) : null;
                 break;
             case 'netProfitYoY':
                 data1 = await fetchNetProfitYoY(fullStockSymbol1, apiKey);
-                data2 = await fetchNetProfitYoY(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchNetProfitYoY(fullStockSymbol2, apiKey) : null;
                 break;
             case 'revenue':
                 data1 = await fetchRevenueData(fullStockSymbol1, apiKey);
-                data2 = await fetchRevenueData(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchRevenueData(fullStockSymbol2, apiKey) : null;
                 break;
             case 'costOfRevenue':
                 data1 = await fetchCostOfRevenueData(fullStockSymbol1, apiKey);
-                data2 = await fetchCostOfRevenueData(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchCostOfRevenueData(fullStockSymbol2, apiKey) : null;
                 break;
             case 'operatingExpenses':
                 data1 = await fetchOperatingExpensesData(fullStockSymbol1, apiKey);
-                data2 = await fetchOperatingExpensesData(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchOperatingExpensesData(fullStockSymbol2, apiKey) : null;
                 break;
             case 'operatingIncome':
                 data1 = await fetchOperatingIncomeData(fullStockSymbol1, apiKey);
-                data2 = await fetchOperatingIncomeData(fullStockSymbol2, apiKey);
+                data2 = fullStockSymbol2 ? await fetchOperatingIncomeData(fullStockSymbol2, apiKey) : null;
                 break;
             default:
                 throw new Error('Invalid chart type');
@@ -2616,7 +2615,7 @@ async function displayChart(type) {
 
         drawChart(
             `${fullStockSymbol1} ${type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1').trim()}`,
-            `${fullStockSymbol2} ${type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1').trim()}`,
+            fullStockSymbol2 ? `${fullStockSymbol2} ${type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1').trim()}` : null,
             data1,
             data2,
             type
