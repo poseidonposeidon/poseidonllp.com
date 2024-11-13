@@ -1242,12 +1242,6 @@ function sendMessage() {
     }
 }
 
-document.getElementById("chat-input").addEventListener("keydown", function(event) {
-    if (event.key === "Enter") {
-        event.preventDefault();  // 防止換行
-        sendMessage();
-    }
-});
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
@@ -2559,7 +2553,6 @@ async function displayChart(type) {
         // 檢查是否有未成功獲取的股票代碼
         if (fullStockSymbols.includes(null)) {
             alert('Unable to determine stock exchange for one or more symbols.');
-            loadingElement.style.display = 'none';  // 隱藏載入動畫
             return;
         }
 
@@ -2571,64 +2564,59 @@ async function displayChart(type) {
             const fullStockSymbol = fullStockSymbols[i];
             let data;
 
-            try {
-                switch (type) {
-                    case 'peRatio':
-                        data = await fetchPERatioData(fullStockSymbol, apiKey);
-                        break;
-                    case 'grossMargin':
-                    case 'operatingMargin':
-                    case 'netProfitMargin':
-                        data = await fetchMarginData(fullStockSymbol, apiKey, type);
-                        break;
-                    case 'eps':
-                        data = await fetchEPSData(fullStockSymbol, apiKey);
-                        break;
-                    case 'roe':
-                        data = await fetchROEData(fullStockSymbol, apiKey);
-                        break;
-                    case 'operatingMarginGrowthRate':
-                        data = await fetchOperatingMarginGrowthRate(fullStockSymbol, apiKey);
-                        break;
-                    case 'stockPrice':
-                        data = await fetchStockPriceData(fullStockSymbol, apiKey);
-                        break;
-                    case 'revenueGrowthRate':
-                        data = await fetchRevenueGrowthRate(fullStockSymbol, apiKey);
-                        break;
-                    case 'externalROE':
-                        data = await fetchExternalROEData(fullStockSymbol, apiKey);
-                        break;
-                    case 'quarterlyRevenueGrowthRate':
-                        data = await fetchQuarterlyRevenueGrowthRate(fullStockSymbol, apiKey);
-                        break;
-                    case 'grossMarginYoY':
-                        data = await fetchGrossMarginYoY(fullStockSymbol, apiKey);
-                        break;
-                    case 'operatingMarginYoY':
-                        data = await fetchOperatingMarginYoY(fullStockSymbol, apiKey);
-                        break;
-                    case 'netProfitYoY':
-                        data = await fetchNetProfitYoY(fullStockSymbol, apiKey);
-                        break;
-                    case 'revenue':
-                        data = await fetchRevenueData(fullStockSymbol, apiKey);
-                        break;
-                    case 'costOfRevenue':
-                        data = await fetchCostOfRevenueData(fullStockSymbol, apiKey);
-                        break;
-                    case 'operatingExpenses':
-                        data = await fetchOperatingExpensesData(fullStockSymbol, apiKey);
-                        break;
-                    case 'operatingIncome':
-                        data = await fetchOperatingIncomeData(fullStockSymbol, apiKey);
-                        break;
-                    default:
-                        throw new Error('Invalid chart type');
-                }
-            } catch (dataFetchError) {
-                console.error(`Error fetching data for ${fullStockSymbol}:`, dataFetchError);
-                continue;
+            switch (type) {
+                case 'peRatio':
+                    data = await fetchPERatioData(fullStockSymbol, apiKey);
+                    break;
+                case 'grossMargin':
+                case 'operatingMargin':
+                case 'netProfitMargin':
+                    data = await fetchMarginData(fullStockSymbol, apiKey, type);
+                    break;
+                case 'eps':
+                    data = await fetchEPSData(fullStockSymbol, apiKey);
+                    break;
+                case 'roe':
+                    data = await fetchROEData(fullStockSymbol, apiKey);
+                    break;
+                case 'operatingMarginGrowthRate':
+                    data = await fetchOperatingMarginGrowthRate(fullStockSymbol, apiKey);
+                    break;
+                case 'stockPrice':
+                    data = await fetchStockPriceData(fullStockSymbol, apiKey);
+                    break;
+                case 'revenueGrowthRate':
+                    data = await fetchRevenueGrowthRate(fullStockSymbol, apiKey);
+                    break;
+                case 'externalROE':
+                    data = await fetchExternalROEData(fullStockSymbol, apiKey);
+                    break;
+                case 'quarterlyRevenueGrowthRate':
+                    data = await fetchQuarterlyRevenueGrowthRate(fullStockSymbol, apiKey);
+                    break;
+                case 'grossMarginYoY':
+                    data = await fetchGrossMarginYoY(fullStockSymbol, apiKey);
+                    break;
+                case 'operatingMarginYoY':
+                    data = await fetchOperatingMarginYoY(fullStockSymbol, apiKey);
+                    break;
+                case 'netProfitYoY':
+                    data = await fetchNetProfitYoY(fullStockSymbol, apiKey);
+                    break;
+                case 'revenue':
+                    data = await fetchRevenueData(fullStockSymbol, apiKey);
+                    break;
+                case 'costOfRevenue':
+                    data = await fetchCostOfRevenueData(fullStockSymbol, apiKey);
+                    break;
+                case 'operatingExpenses':
+                    data = await fetchOperatingExpensesData(fullStockSymbol, apiKey);
+                    break;
+                case 'operatingIncome':
+                    data = await fetchOperatingIncomeData(fullStockSymbol, apiKey);
+                    break;
+                default:
+                    throw new Error('Invalid chart type');
             }
 
             if (!data || data.length === 0) {
@@ -2658,7 +2646,7 @@ async function displayChart(type) {
 function drawChart(labels, dataSets, type) {
     const ctx = document.getElementById('grossMarginChart').getContext('2d');
 
-    if (chartInstance && typeof chartInstance.destroy === 'function') {
+    if (chartInstance) {
         chartInstance.destroy();
     }
 
