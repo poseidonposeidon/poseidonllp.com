@@ -2523,107 +2523,118 @@ async function fetchOperatingIncomeData(stockSymbol, apiKey) {
 }
 
 async function displayChart(type) {
-    const stock1 = document.getElementById('stock1-tw').value.trim();
-    const stock2 = document.getElementById('stock2-tw').value.trim();  // 可以不輸入第二支股票
+    const stockInputs = [
+        'stock1-tw',
+        'stock2-tw',
+        'stock3-tw',
+        'stock4-tw',
+        'stock5-tw'
+    ];
+
+    const stocks = stockInputs
+        .map(id => document.getElementById(id).value.trim())
+        .filter(stock => stock);  // 過濾空的股票輸入
+
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const loadingElement = document.getElementById('loading');
 
-    if (!stock1) {
-        alert('Please enter a stock symbol.');
-        return;
-    }
-
-    const fullStockSymbol1 = await fetchStockWithExchangeSuffix(stock1, apiKey);
-    const fullStockSymbol2 = stock2 ? await fetchStockWithExchangeSuffix(stock2, apiKey) : null;
-
-    if (!fullStockSymbol1) {
-        alert('Unable to determine stock exchange for the symbol.');
+    if (stocks.length === 0) {
+        alert('Please enter at least one stock symbol.');
         return;
     }
 
     try {
         loadingElement.style.display = 'block';
 
-        let data1, data2;
+        // 使用 Promise.all 獲取每支股票的完整代碼
+        const fullStockSymbols = await Promise.all(
+            stocks.map(stock => fetchStockWithExchangeSuffix(stock, apiKey))
+        );
 
-        switch (type) {
-            case 'peRatio':
-                data1 = await fetchPERatioData(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchPERatioData(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'grossMargin':
-            case 'operatingMargin':
-            case 'netProfitMargin':
-                data1 = await fetchMarginData(fullStockSymbol1, apiKey, type);
-                data2 = fullStockSymbol2 ? await fetchMarginData(fullStockSymbol2, apiKey, type) : null;
-                break;
-            case 'eps':
-                data1 = await fetchEPSData(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchEPSData(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'roe':
-                data1 = await fetchROEData(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchROEData(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'operatingMarginGrowthRate':
-                data1 = await fetchOperatingMarginGrowthRate(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchOperatingMarginGrowthRate(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'stockPrice':
-                data1 = await fetchStockPriceData(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchStockPriceData(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'revenueGrowthRate':
-                data1 = await fetchRevenueGrowthRate(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchRevenueGrowthRate(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'externalROE':
-                data1 = await fetchExternalROEData(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchExternalROEData(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'quarterlyRevenueGrowthRate':
-                data1 = await fetchQuarterlyRevenueGrowthRate(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchQuarterlyRevenueGrowthRate(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'grossMarginYoY':
-                data1 = await fetchGrossMarginYoY(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchGrossMarginYoY(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'operatingMarginYoY':
-                data1 = await fetchOperatingMarginYoY(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchOperatingMarginYoY(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'netProfitYoY':
-                data1 = await fetchNetProfitYoY(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchNetProfitYoY(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'revenue':
-                data1 = await fetchRevenueData(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchRevenueData(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'costOfRevenue':
-                data1 = await fetchCostOfRevenueData(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchCostOfRevenueData(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'operatingExpenses':
-                data1 = await fetchOperatingExpensesData(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchOperatingExpensesData(fullStockSymbol2, apiKey) : null;
-                break;
-            case 'operatingIncome':
-                data1 = await fetchOperatingIncomeData(fullStockSymbol1, apiKey);
-                data2 = fullStockSymbol2 ? await fetchOperatingIncomeData(fullStockSymbol2, apiKey) : null;
-                break;
-            default:
-                throw new Error('Invalid chart type');
+        // 檢查是否有未成功獲取的股票代碼
+        if (fullStockSymbols.includes(null)) {
+            alert('Unable to determine stock exchange for one or more symbols.');
+            return;
         }
 
-        drawChart(
-            `${fullStockSymbol1} ${type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1').trim()}`,
-            fullStockSymbol2 ? `${fullStockSymbol2} ${type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1').trim()}` : null,
-            data1,
-            data2,
-            type
-        );
+        // 加載所有數據並處理
+        const dataSets = [];
+        const labels = [];
+
+        for (let i = 0; i < fullStockSymbols.length; i++) {
+            const fullStockSymbol = fullStockSymbols[i];
+            let data;
+
+            switch (type) {
+                case 'peRatio':
+                    data = await fetchPERatioData(fullStockSymbol, apiKey);
+                    break;
+                case 'grossMargin':
+                case 'operatingMargin':
+                case 'netProfitMargin':
+                    data = await fetchMarginData(fullStockSymbol, apiKey, type);
+                    break;
+                case 'eps':
+                    data = await fetchEPSData(fullStockSymbol, apiKey);
+                    break;
+                case 'roe':
+                    data = await fetchROEData(fullStockSymbol, apiKey);
+                    break;
+                case 'operatingMarginGrowthRate':
+                    data = await fetchOperatingMarginGrowthRate(fullStockSymbol, apiKey);
+                    break;
+                case 'stockPrice':
+                    data = await fetchStockPriceData(fullStockSymbol, apiKey);
+                    break;
+                case 'revenueGrowthRate':
+                    data = await fetchRevenueGrowthRate(fullStockSymbol, apiKey);
+                    break;
+                case 'externalROE':
+                    data = await fetchExternalROEData(fullStockSymbol, apiKey);
+                    break;
+                case 'quarterlyRevenueGrowthRate':
+                    data = await fetchQuarterlyRevenueGrowthRate(fullStockSymbol, apiKey);
+                    break;
+                case 'grossMarginYoY':
+                    data = await fetchGrossMarginYoY(fullStockSymbol, apiKey);
+                    break;
+                case 'operatingMarginYoY':
+                    data = await fetchOperatingMarginYoY(fullStockSymbol, apiKey);
+                    break;
+                case 'netProfitYoY':
+                    data = await fetchNetProfitYoY(fullStockSymbol, apiKey);
+                    break;
+                case 'revenue':
+                    data = await fetchRevenueData(fullStockSymbol, apiKey);
+                    break;
+                case 'costOfRevenue':
+                    data = await fetchCostOfRevenueData(fullStockSymbol, apiKey);
+                    break;
+                case 'operatingExpenses':
+                    data = await fetchOperatingExpensesData(fullStockSymbol, apiKey);
+                    break;
+                case 'operatingIncome':
+                    data = await fetchOperatingIncomeData(fullStockSymbol, apiKey);
+                    break;
+                default:
+                    throw new Error('Invalid chart type');
+            }
+
+            if (!data || data.length === 0) {
+                console.warn(`No data found for ${fullStockSymbol}`);
+                continue;
+            }
+
+            dataSets.push(data);
+            labels.push(`${fullStockSymbol} ${type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1').trim()}`);
+        }
+
+        if (dataSets.length === 0) {
+            alert('No data available for the selected stocks.');
+            return;
+        }
+
+        drawChart(labels, dataSets, type);
 
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -2640,12 +2651,10 @@ function drawChart(labels, dataSets, type) {
         chartInstance.destroy();
     }
 
-    // 合併所有股票的日期並去重排序
     const allDates = [...new Set(dataSets.flatMap(data => data.map(item => item.date.split('T')[0])))].sort((a, b) => new Date(a) - new Date(b));
 
     console.log('All Dates:', allDates);
 
-    // 格式化每支股票的數據
     const formattedDataSets = dataSets.map((data, index) => {
         const formattedData = allDates.map(date => {
             const entry = data.find(item => item.date.split('T')[0] === date);
@@ -2685,7 +2694,7 @@ function drawChart(labels, dataSets, type) {
             label: labels[index],
             data: formattedData,
             borderColor: colors[index % colors.length],
-            backgroundColor: (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome') ? colors[index % colors.length].replace('1)', '0.7)') : 'transparent',
+            backgroundColor: colors[index % colors.length].replace('1)', '0.7)'),
             spanGaps: true,
             fill: false
         };
