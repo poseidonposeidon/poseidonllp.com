@@ -1241,6 +1241,7 @@ function sendMessage() {
             });
     }
 }
+
 document.getElementById("chat-input").addEventListener("keydown", function(event) {
     if (event.key === "Enter") {
         event.preventDefault();  // 防止換行
@@ -2651,7 +2652,7 @@ async function displayChart(type) {
 function drawChart(labels, dataSets, type) {
     const ctx = document.getElementById('grossMarginChart').getContext('2d');
 
-    if (chartInstance) {
+    if (chartInstance && typeof chartInstance.destroy === 'function') {
         chartInstance.destroy();
     }
 
