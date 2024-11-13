@@ -1050,7 +1050,7 @@ function loadAIBoxSection(sectionId) {
                         <button id="send-btn" onclick="sendMessage()">Send</button>
                     </div>
                     <div class="file-upload-container">
-                        <input type="file" id="pdf-file" accept=".pdf" />
+                        <input type="file" id="file-input" accept="application/pdf">
                         <button onclick="uploadPDF()">Upload PDF</button>
                     </div>
                 </div>
@@ -1248,11 +1248,11 @@ function sendMessage() {
 
 function uploadPDF() {
     const input = document.getElementById('file-input');
-    const chatBox = document.getElementById('chat-box'); // 假設您想在 chatBox 中顯示 GPT 回應
-    const file = input.files[0];
+    const chatBox = document.getElementById('chat-box');
+    const file = input ? input.files[0] : null;
 
     if (!file) {
-        alert("Please select a file");
+        alert("Please select a PDF file to upload.");
         return;
     }
 
@@ -1268,19 +1268,19 @@ function uploadPDF() {
     fetch(`${baseUrl}/upload_pdf`, {
         method: 'POST',
         body: formData,
-        credentials: 'include'
+        credentials: 'include'  // 確保跨域請求帶上憑證（如果需要）
     })
         .then(response => {
             if (!response.ok) {
-                return response.text().then(text => {
-                    throw new Error(`HTTP error! status: ${response.status}, response: ${text}`);
-                });
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
+            // 刪除 "Loading..." 提示
             chatBox.removeChild(loadingDiv);
 
+            // 顯示 GPT 回應
             const responseDiv = document.createElement('div');
             responseDiv.classList.add('chat-response');
             responseDiv.textContent = data.reply || '無法取得回應';
@@ -1289,11 +1289,13 @@ function uploadPDF() {
         .catch(error => {
             console.error("Error uploading PDF:", error);
 
+            // 刪除 "Loading..." 提示
             chatBox.removeChild(loadingDiv);
 
+            // 顯示錯誤訊息
             const responseDiv = document.createElement('div');
             responseDiv.classList.add('chat-response');
-            responseDiv.textContent = `無法處理您的文件: ${error.message}`;
+            responseDiv.textContent = '無法處理您的文件';
             chatBox.appendChild(responseDiv);
         });
 }
