@@ -2633,98 +2633,70 @@ async function displayChart(type) {
     }
 }
 
-function drawChart(label1, label2, data1, data2, type) {
+function drawChart(labels, dataSets, type) {
     const ctx = document.getElementById('grossMarginChart').getContext('2d');
 
     if (chartInstance) {
         chartInstance.destroy();
     }
 
-    // 如果只有一支股票，忽略 data2
-    const allDates = [...new Set([...data1.map(item => item.date.split('T')[0]), ...(data2 ? data2.map(item => item.date.split('T')[0]) : [])])].sort((a, b) => new Date(a) - new Date(b));
+    // 合併所有股票的日期並去重排序
+    const allDates = [...new Set(dataSets.flatMap(data => data.map(item => item.date.split('T')[0])))].sort((a, b) => new Date(a) - new Date(b));
 
     console.log('All Dates:', allDates);
 
-    const formattedData1 = allDates.map(date => {
-        const entry = data1.find(item => item.date.split('T')[0] === date);
-        if (!entry) return null;
+    // 格式化每支股票的數據
+    const formattedDataSets = dataSets.map((data, index) => {
+        const formattedData = allDates.map(date => {
+            const entry = data.find(item => item.date.split('T')[0] === date);
+            if (!entry) return null;
 
-        switch (type) {
-            case 'grossMarginYoY': return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
-            case 'operatingMarginYoY': return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
-            case 'netProfitYoY': return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
-            case 'eps': return entry.eps !== undefined ? entry.eps : null;
-            case 'revenue': return entry.revenue !== undefined ? entry.revenue : null;
-            case 'costOfRevenue': return entry.revenue !== undefined ? entry.revenue : null;
-            case 'operatingExpenses': return entry.revenue !== undefined ? entry.revenue : null;
-            case 'grossMargin': return entry.margin !== undefined ? entry.margin : null;
-            case 'operatingMargin': return entry.margin !== undefined ? entry.margin : null;
-            case 'netProfitMargin': return entry.margin !== undefined ? entry.margin : null;
-            case 'roe': return entry.margin !== undefined ? entry.margin : null;
-            case 'externalROE': return entry.margin !== undefined ? entry.margin : null;
-            case 'revenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
-            case 'quarterlyRevenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
-            case 'operatingIncome': return entry.operatingIncome !== undefined ? entry.operatingIncome : null;
-            case 'stockPrice': return entry.price !== undefined ? entry.price : null;
-            case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
-            default: return null;
-        }
+            switch (type) {
+                case 'grossMarginYoY': return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
+                case 'operatingMarginYoY': return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
+                case 'netProfitYoY': return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
+                case 'eps': return entry.eps !== undefined ? entry.eps : null;
+                case 'revenue': return entry.revenue !== undefined ? entry.revenue : null;
+                case 'costOfRevenue': return entry.revenue !== undefined ? entry.revenue : null;
+                case 'operatingExpenses': return entry.revenue !== undefined ? entry.revenue : null;
+                case 'grossMargin': return entry.margin !== undefined ? entry.margin : null;
+                case 'operatingMargin': return entry.margin !== undefined ? entry.margin : null;
+                case 'netProfitMargin': return entry.margin !== undefined ? entry.margin : null;
+                case 'roe': return entry.margin !== undefined ? entry.margin : null;
+                case 'externalROE': return entry.margin !== undefined ? entry.margin : null;
+                case 'revenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
+                case 'quarterlyRevenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
+                case 'operatingIncome': return entry.operatingIncome !== undefined ? entry.operatingIncome : null;
+                case 'stockPrice': return entry.price !== undefined ? entry.price : null;
+                case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
+                default: return null;
+            }
+        });
+
+        const colors = [
+            'rgba(75, 192, 192, 1)',
+            'rgba(255, 99, 132, 1)',
+            'rgba(54, 162, 235, 1)',
+            'rgba(255, 206, 86, 1)',
+            'rgba(153, 102, 255, 1)'
+        ];
+
+        return {
+            label: labels[index],
+            data: formattedData,
+            borderColor: colors[index % colors.length],
+            backgroundColor: (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome') ? colors[index % colors.length].replace('1)', '0.7)') : 'transparent',
+            spanGaps: true,
+            fill: false
+        };
     });
-
-    const formattedData2 = data2 ? allDates.map(date => {
-        const entry = data2.find(item => item.date.split('T')[0] === date);
-        if (!entry) return null;
-
-        switch (type) {
-            case 'grossMarginYoY': return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
-            case 'operatingMarginYoY': return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
-            case 'netProfitYoY': return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
-            case 'eps': return entry.eps !== undefined ? entry.eps : null;
-            case 'revenue': return entry.revenue !== undefined ? entry.revenue : null;
-            case 'costOfRevenue': return entry.revenue !== undefined ? entry.revenue : null;
-            case 'operatingExpenses': return entry.revenue !== undefined ? entry.revenue : null;
-            case 'grossMargin': return entry.margin !== undefined ? entry.margin : null;
-            case 'operatingMargin': return entry.margin !== undefined ? entry.margin : null;
-            case 'netProfitMargin': return entry.margin !== undefined ? entry.margin : null;
-            case 'roe': return entry.margin !== undefined ? entry.margin : null;
-            case 'externalROE': return entry.margin !== undefined ? entry.margin : null;
-            case 'revenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
-            case 'quarterlyRevenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
-            case 'operatingIncome': return entry.operatingIncome !== undefined ? entry.operatingIncome : null;
-            case 'stockPrice': return entry.price !== undefined ? entry.price : null;
-            case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
-            default: return null;
-        }
-    }) : null;
-
-    console.log('Formatted Data 1:', formattedData1);
-    console.log('Formatted Data 2:', formattedData2);
 
     const chartType = (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome') ? 'bar' : 'line';
 
     const chartData = {
         labels: allDates,
-        datasets: [
-            {
-                label: label1,
-                data: formattedData1,
-                borderColor: 'rgba(75, 192, 192, 1)',
-                backgroundColor: (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome') ? 'rgba(75, 192, 192, 0.7)' : 'transparent',
-                spanGaps: true,
-                fill: false,
-            },
-            ...(formattedData2 ? [{
-                label: label2,
-                data: formattedData2,
-                borderColor: 'rgba(255, 99, 132, 1)',
-                backgroundColor: (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome') ? 'rgba(255, 99, 132, 0.7)' : 'transparent',
-                spanGaps: true,
-                fill: false,
-            }] : [])
-        ]
+        datasets: formattedDataSets
     };
-
-    console.log('Chart Data:', chartData);
 
     chartInstance = new Chart(ctx, {
         type: chartType,
