@@ -1126,7 +1126,7 @@ function loadCompareSection(sectionId) {
             </div>
 
             <div id="comparisonResultContainer-tw">
-                <canvas id="grossMarginChart"></canvas>
+                <canvas id="grossMarginChart" width="800" height="400"></canvas>
                 <!-- Comparison results will be displayed here -->
             </div>
         `
