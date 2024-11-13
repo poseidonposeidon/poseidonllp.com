@@ -2636,7 +2636,8 @@ function drawChart(label1, label2, data1, data2, type) {
         chartInstance.destroy();
     }
 
-    const allDates = [...new Set([...data1.map(item => item.date.split('T')[0]), ...data2.map(item => item.date.split('T')[0])])].sort((a, b) => new Date(a) - new Date(b));
+    // 如果只有一支股票，忽略 data2
+    const allDates = [...new Set([...data1.map(item => item.date.split('T')[0]), ...(data2 ? data2.map(item => item.date.split('T')[0]) : [])])].sort((a, b) => new Date(a) - new Date(b));
 
     console.log('All Dates:', allDates);
 
@@ -2659,14 +2660,14 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'externalROE': return entry.margin !== undefined ? entry.margin : null;
             case 'revenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
             case 'quarterlyRevenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
-            case 'operatingIncome': return entry.operatingIncome !== undefined ? entry.operatingIncome : null; // 正確處理 operatingIncome
+            case 'operatingIncome': return entry.operatingIncome !== undefined ? entry.operatingIncome : null;
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
             default: return null;
         }
     });
 
-    const formattedData2 = allDates.map(date => {
+    const formattedData2 = data2 ? allDates.map(date => {
         const entry = data2.find(item => item.date.split('T')[0] === date);
         if (!entry) return null;
 
@@ -2685,13 +2686,12 @@ function drawChart(label1, label2, data1, data2, type) {
             case 'externalROE': return entry.margin !== undefined ? entry.margin : null;
             case 'revenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
             case 'quarterlyRevenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
-            case 'operatingIncome': return entry.operatingIncome !== undefined ? entry.operatingIncome : null; // 正確處理 operatingIncome
+            case 'operatingIncome': return entry.operatingIncome !== undefined ? entry.operatingIncome : null;
             case 'stockPrice': return entry.price !== undefined ? entry.price : null;
             case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
             default: return null;
         }
-    });
-
+    }) : null;
 
     console.log('Formatted Data 1:', formattedData1);
     console.log('Formatted Data 2:', formattedData2);
@@ -2709,14 +2709,14 @@ function drawChart(label1, label2, data1, data2, type) {
                 spanGaps: true,
                 fill: false,
             },
-            {
+            ...(formattedData2 ? [{
                 label: label2,
                 data: formattedData2,
                 borderColor: 'rgba(255, 99, 132, 1)',
                 backgroundColor: (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome') ? 'rgba(255, 99, 132, 0.7)' : 'transparent',
                 spanGaps: true,
                 fill: false,
-            }
+            }] : [])
         ]
     };
 
