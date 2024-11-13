@@ -3176,21 +3176,13 @@ function fetchCNIncomeStatement() {
     fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartCN');
 }
 
-function fetchPEBandData(stockSymbol, chartId) {
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-
-    // API URLs 直接設定為 10 年的範圍
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=2010-01-01&apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
-
-    // 同時請求價格和 EPS 數據
+function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
     Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
             console.log("Price Data (Expected 10 years):", priceData);
             console.log("EPS Data (Expected 10 years of quarterly data):", epsData);
 
-            // 驗證資料並計算本益比
             if (priceData.historical && Array.isArray(epsData)) {
                 const peData = calculatePEData(priceData.historical, epsData);
                 if (peData && peData.length > 0) {
@@ -3476,7 +3468,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 新增：創建本益比河流圖
     setTimeout(() => {
         fetchPEBandData(
-            `https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?from=2010-01-01&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,  // 改成3650天（10年）
+            `https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?timeseries=3650&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,  // 改成3650天（10年）
             `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=40&period=quarter&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,  // 確保是10年的季度數據
             peBandCanvasId // 傳入帶有 chartId 的唯一 ID
         );
