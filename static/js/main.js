@@ -1163,7 +1163,6 @@ function loadCompareSection(sectionId) {
     }
 }
 
-
 function toggleMenu(menuId) {
     const submenu = document.getElementById(menuId);
     const category = submenu.parentElement; // 取得 category 元素
@@ -2713,6 +2712,7 @@ function drawChart(labels, dataSets, type) {
         options: {
             responsive: true,             // 開啟響應式
             maintainAspectRatio: false,   // 可調整的寬高比，讓高度可以固定
+            aspectRatio: 2,
             scales: {
                 x: {
                     type: 'time',
