@@ -5058,18 +5058,35 @@ function displayEarningsCallTranscript(transcript, container) {
     container.innerHTML = htmlContent;
 }
 
-// 修正的下載函式
 function downloadTranscript(stockSymbol, content) {
-    // 組裝檔案名稱
+    // 建立檔案名稱
     const fileName = `${stockSymbol}_Transcript.docx`;
 
-    // 建立檔案內容
-    const fileContent = `Stock Symbol: ${stockSymbol}\n\n${content}`;
+    // 使用 Docxtemplater 生成 .docx 文件
+    const zip = new PizZip();
+    const doc = new window.docxtemplater(zip, {
+        paragraphLoop: true,
+        linebreaks: true,
+    });
 
-    // 創建 Blob 並觸發下載
-    const blob = new Blob([fileContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
+    // 設定文檔的內容
+    const docContent = `Stock Symbol: ${stockSymbol}\n\n${content}`;
+    doc.loadZip(
+        new PizZip(
+            `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
+            `<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` +
+            `<w:body><w:p><w:r><w:t>${docContent.replace(/\n/g, "</w:t></w:r></w:p><w:p><w:r><w:t>")}</w:t></w:r></w:p></w:body></w:document>`
+        )
+    );
+
+    // 生成 Blob 並觸發下載
+    const out = doc.getZip().generate({
+        type: "blob",
+        mimeType:
+            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(out);
     link.download = fileName;
     document.body.appendChild(link);
     link.click();
