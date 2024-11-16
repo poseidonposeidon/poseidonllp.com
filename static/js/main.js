@@ -5083,7 +5083,8 @@ function downloadTranscript(stockSymbol, content) {
                 `<w:p><w:r><w:t>${escapeHtml(line)}</w:t></w:r></w:p>`
         )
         .join("");
-
+    console.log(PizZip); // 正常情況下應返回函式定義
+    console.log(Docxtemplater); // 正常情況下應返回函式定義
     // 創建一個空的 PizZip 文檔
     const zip = new PizZip();
     zip.file(
@@ -5121,8 +5122,7 @@ function downloadTranscript(stockSymbol, content) {
         alert("無法生成 .docx 文件。");
     }
 }
-console.log(PizZip); // 正常情況下應返回函式定義
-console.log(Docxtemplater); // 正常情況下應返回函式定義
+
 
 function expandTranscript(event) {
     event.stopPropagation(); // 防止觸發區塊固定功能
