@@ -5054,14 +5054,14 @@ function displayEarningsCallTranscript(transcript, container) {
     htmlContent += '<button id="expandButton" class="transcript-button" onclick="expandTranscript(event)">Read More</button>';
     htmlContent += '<button id="collapseButton" class="transcript-button" style="display: none;" onclick="collapseTranscript(event)">Read Less</button>';
     htmlContent += '<button id="copyButton" class="transcript-button" onclick="copyTranscript()">Copy</button>';
-    htmlContent += `<button id="downloadButton" class="transcript-button" onclick="downloadTranscript('${transcript.symbol}', \`${transcript.content.replace(/`/g, '\\`')}\`)">Download .docs</button>`;
+    htmlContent += `<button id="downloadButton" class="transcript-button" onclick="downloadTranscript('${transcript.symbol}', \`${transcript.content.replace(/`/g, '\\`')}\`)">Download Word</button>`;
     container.innerHTML = htmlContent;
 }
 
 // 修正的下載函式
 function downloadTranscript(stockSymbol, content) {
     // 組裝檔案名稱
-    const fileName = `${stockSymbol}_Transcript.docs`;
+    const fileName = `${stockSymbol}_Transcript.docx`;
 
     // 建立檔案內容
     const fileContent = `Stock Symbol: ${stockSymbol}\n\n${content}`;
