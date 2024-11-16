@@ -2181,21 +2181,56 @@ async function fetchEPSData(stockSymbol, apiKey) {
 }
 
 async function fetchROEData(stockSymbol, apiKey) {
-    const apiUrl = `https://financialmodelingprep.com/api/v3/ratios/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
+    const incomeStatementUrl = `https://financialmodelingprep.com/api/v3/financials/income-statement/${stockSymbol}?period=quarter&apikey=${apiKey}`;
+    const balanceSheetUrl = `https://financialmodelingprep.com/api/v3/financials/balance-sheet-statement/${stockSymbol}?period=quarter&apikey=${apiKey}`;
 
     try {
-        const response = await fetch(apiUrl);
-        const data = await response.json();
+        // 獲取收入報表和資產負債表數據
+        const [incomeResponse, balanceResponse] = await Promise.all([
+            fetch(incomeStatementUrl),
+            fetch(balanceSheetUrl),
+        ]);
 
-        return data.map(item => ({
-            date: item.date,
-            margin: item.returnOnEquity * 100
-        })).filter(item => item.margin !== null).reverse();
+        const incomeData = await incomeResponse.json();
+        const balanceData = await balanceResponse.json();
+
+        // 確保數據存在
+        if (!incomeData.financials || !balanceData.financials) {
+            throw new Error("Invalid financial data");
+        }
+
+        const incomeStatements = incomeData.financials;
+        const balanceSheets = balanceData.financials;
+
+        // 計算每季的 ROE
+        const roeData = balanceSheets.map((balanceSheet, index) => {
+            const equity = parseFloat(balanceSheet["Total equity"]);
+            if (isNaN(equity) || equity === 0) return null;
+
+            // 確保有足夠的數據來計算前四季 net income
+            const recentIncomes = incomeStatements.slice(index, index + 4);
+            if (recentIncomes.length < 4) return null;
+
+            const totalNetIncome = recentIncomes.reduce((sum, income) => {
+                const netIncome = parseFloat(income["Net Income"]);
+                return sum + (isNaN(netIncome) ? 0 : netIncome);
+            }, 0);
+
+            const roe = (totalNetIncome / equity) * 100;
+            return {
+                date: balanceSheet.date,
+                roe: parseFloat(roe.toFixed(2)), // 保留兩位小數
+            };
+        });
+
+        // 過濾掉無效數據並反轉結果
+        return roeData.filter(item => item !== null).reverse();
     } catch (error) {
-        console.error('Error fetching ROE data:', error);
+        console.error("Error fetching custom ROE data:", error);
         return [];
     }
 }
+
 
 async function fetchOperatingMarginGrowthRate(stockSymbol, apiKey) {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarter&limit=40&apikey=${apiKey}`;
