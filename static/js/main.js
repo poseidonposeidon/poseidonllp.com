@@ -5048,13 +5048,31 @@ function displayEarningsCallTranscript(transcript, container) {
     let paragraphs = splitTranscriptIntoParagraphs(transcript.content);
 
     // 組裝HTML內容
-    let htmlContent = dateContent;  // 加上日期內容
+    let htmlContent = dateContent; // 加上日期內容
     htmlContent += `<div id="transcriptPreview">${paragraphs.slice(0, 3).join('')}...</div>`;
     htmlContent += `<div id="fullTranscript" style="display:none; white-space: normal;">${paragraphs.join('')}</div>`;
     htmlContent += '<button id="expandButton" class="transcript-button" onclick="expandTranscript(event)">Read More</button>';
     htmlContent += '<button id="collapseButton" class="transcript-button" style="display: none;" onclick="collapseTranscript(event)">Read Less</button>';
     htmlContent += '<button id="copyButton" class="transcript-button" onclick="copyTranscript()">Copy</button>';
+    htmlContent += `<button id="downloadButton" class="transcript-button" onclick="downloadTranscript('${transcript.symbol}', '${transcript.content}')">Download .docs</button>`;
     container.innerHTML = htmlContent;
+}
+
+function downloadTranscript(stockSymbol, content) {
+    // 組裝檔案名稱
+    const fileName = `${stockSymbol}_Transcript.docs`;
+
+    // 建立檔案內容
+    const fileContent = `Stock Symbol: ${stockSymbol}\n\n${content}`;
+
+    // 創建 Blob 並觸發下載
+    const blob = new Blob([fileContent], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
 
 function expandTranscript(event) {
@@ -5105,7 +5123,6 @@ function fetchData_Transcript(apiUrl, callback, containerId) {
             container.innerHTML = '<p>數據加載錯誤。請檢查控制台了解更多詳情。</p>';
         });
 }
-
 
 //////////////法說會日曆 Earnings Call Calendar/////////////////
 
