@@ -5062,23 +5062,36 @@ function downloadTranscript(stockSymbol, content) {
     // 檔案名稱
     const fileName = `${stockSymbol}_Transcript.docx`;
 
+    // HTML 特殊字符轉義
+    function escapeHtml(unsafe) {
+        return unsafe
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+
     // 建立檔案內容的模板
     const docContent = `Stock Symbol: ${stockSymbol}\n\n${content}`;
 
-    // 創建一個空的 Docxtemplater 文檔
+    // 創建 XML 格式的段落
+    const xmlContent = docContent
+        .split("\n")
+        .map(
+            line =>
+                `<w:p><w:r><w:t>${escapeHtml(line)}</w:t></w:r></w:p>`
+        )
+        .join("");
+
+    // 創建一個空的 PizZip 文檔
     const zip = new PizZip();
     zip.file(
         "word/document.xml",
         `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
         <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
             <w:body>
-                ${docContent
-            .split("\n")
-            .map(
-                line =>
-                    `<w:p><w:r><w:t>${line}</w:t></w:r></w:p>`
-            )
-            .join("")}
+                ${xmlContent}
             </w:body>
         </w:document>`
     );
@@ -5108,6 +5121,8 @@ function downloadTranscript(stockSymbol, content) {
         alert("無法生成 .docx 文件。");
     }
 }
+console.log(PizZip); // 正常情況下應返回函式定義
+console.log(Docxtemplater); // 正常情況下應返回函式定義
 
 function expandTranscript(event) {
     event.stopPropagation(); // 防止觸發區塊固定功能
