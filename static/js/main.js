@@ -5059,38 +5059,54 @@ function displayEarningsCallTranscript(transcript, container) {
 }
 
 function downloadTranscript(stockSymbol, content) {
-    // 建立檔案名稱
+    // 檔案名稱
     const fileName = `${stockSymbol}_Transcript.docx`;
 
-    // 使用 Docxtemplater 生成 .docx 文件
+    // 建立檔案內容的模板
+    const docContent = `Stock Symbol: ${stockSymbol}\n\n${content}`;
+
+    // 創建一個空的 Docxtemplater 文檔
     const zip = new PizZip();
-    const doc = new window.docxtemplater(zip, {
+    zip.file(
+        "word/document.xml",
+        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+        <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+            <w:body>
+                ${docContent
+            .split("\n")
+            .map(
+                line =>
+                    `<w:p><w:r><w:t>${line}</w:t></w:r></w:p>`
+            )
+            .join("")}
+            </w:body>
+        </w:document>`
+    );
+
+    // 加載到 Docxtemplater
+    const doc = new Docxtemplater(zip, {
         paragraphLoop: true,
         linebreaks: true,
     });
 
-    // 設定文檔的內容
-    const docContent = `Stock Symbol: ${stockSymbol}\n\n${content}`;
-    doc.loadZip(
-        new PizZip(
-            `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>` +
-            `<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">` +
-            `<w:body><w:p><w:r><w:t>${docContent.replace(/\n/g, "</w:t></w:r></w:p><w:p><w:r><w:t>")}</w:t></w:r></w:p></w:body></w:document>`
-        )
-    );
+    try {
+        // 生成 Blob 並觸發下載
+        const out = doc.getZip().generate({
+            type: "blob",
+            mimeType:
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        });
 
-    // 生成 Blob 並觸發下載
-    const out = doc.getZip().generate({
-        type: "blob",
-        mimeType:
-            "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    });
-    const link = document.createElement("a");
-    link.href = URL.createObjectURL(out);
-    link.download = fileName;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+        const link = document.createElement("a");
+        link.href = URL.createObjectURL(out);
+        link.download = fileName;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Error generating .docx:", error);
+        alert("無法生成 .docx 文件。");
+    }
 }
 
 function expandTranscript(event) {
