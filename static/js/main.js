@@ -5054,75 +5054,28 @@ function displayEarningsCallTranscript(transcript, container) {
     htmlContent += '<button id="expandButton" class="transcript-button" onclick="expandTranscript(event)">Read More</button>';
     htmlContent += '<button id="collapseButton" class="transcript-button" style="display: none;" onclick="collapseTranscript(event)">Read Less</button>';
     htmlContent += '<button id="copyButton" class="transcript-button" onclick="copyTranscript()">Copy</button>';
-    htmlContent += `<button id="downloadButton" class="transcript-button" onclick="downloadTranscript('${transcript.symbol}', \`${transcript.content.replace(/`/g, '\\`')}\`)">Download Word</button>`;
+    htmlContent += `<button id="downloadButton" class="transcript-button" onclick="downloadTranscript('${transcript.symbol}', \`${transcript.content.replace(/`/g, '\\`')}\`)">Download Txt</button>`;
     container.innerHTML = htmlContent;
 }
 
 function downloadTranscript(stockSymbol, content) {
     // 檔案名稱
-    const fileName = `${stockSymbol}_Transcript.docx`;
+    const fileName = `${stockSymbol}_Transcript.txt`;
 
-    // HTML 特殊字符轉義
-    function escapeHtml(unsafe) {
-        return unsafe
-            .replace(/&/g, "&amp;")
-            .replace(/</g, "&lt;")
-            .replace(/>/g, "&gt;")
-            .replace(/"/g, "&quot;")
-            .replace(/'/g, "&#039;");
-    }
+    // 建立檔案內容
+    const fileContent = `Stock Symbol: ${stockSymbol}\n\n${content}`;
 
-    // 建立檔案內容的模板
-    const docContent = `Stock Symbol: ${stockSymbol}\n\n${content}`;
+    // 創建 Blob 對象
+    const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
 
-    // 創建 XML 格式的段落
-    const xmlContent = docContent
-        .split("\n")
-        .map(
-            line =>
-                `<w:p><w:r><w:t>${escapeHtml(line)}</w:t></w:r></w:p>`
-        )
-        .join("");
-    console.log(PizZip); // 正常情況下應返回函式定義
-    console.log(Docxtemplater); // 正常情況下應返回函式定義
-    // 創建一個空的 PizZip 文檔
-    const zip = new PizZip();
-    zip.file(
-        "word/document.xml",
-        `<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-        <w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-            <w:body>
-                ${xmlContent}
-            </w:body>
-        </w:document>`
-    );
-
-    // 加載到 Docxtemplater
-    const doc = new Docxtemplater(zip, {
-        paragraphLoop: true,
-        linebreaks: true,
-    });
-
-    try {
-        // 生成 Blob 並觸發下載
-        const out = doc.getZip().generate({
-            type: "blob",
-            mimeType:
-                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        });
-
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(out);
-        link.download = fileName;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    } catch (error) {
-        console.error("Error generating .docx:", error);
-        alert("無法生成 .docx 文件。");
-    }
+    // 生成下載鏈接並觸發下載
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = fileName;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
 }
-
 
 function expandTranscript(event) {
     event.stopPropagation(); // 防止觸發區塊固定功能
