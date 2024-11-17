@@ -702,7 +702,7 @@ button:not(.info-input button):hover {
 .chat-container {
     display: flex;
     flex-direction: column;
-    height: 400px;
+    height: 600px; /* 增加高度，從 400px 改為 600px */
     border: 1px solid #616161;
     border-radius: 5px;
     overflow: hidden;
@@ -716,6 +716,7 @@ button:not(.info-input button):hover {
     border-bottom: 1px solid #616161;
     display: flex;
     flex-direction: column;
+    height: 500px; /* 增加顯示訊息的可視高度 */
 }
 
 .chat-input-container {
@@ -737,7 +738,7 @@ button:not(.info-input button):hover {
     padding: 10px;
     margin: 5px 0;
     border-radius: 10px;
-    max-width: 60%;
+    max-width: 80%;
     word-wrap: break-word;
     display: inline-block;
 }
