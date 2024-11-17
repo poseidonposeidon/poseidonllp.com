@@ -1197,7 +1197,7 @@ function sendMessage() {
         messageDiv.textContent = message;
         chatBox.appendChild(messageDiv);
 
-        inputField.value = '';  // 清除輸入欄位
+        inputField.value = ''; // 清除輸入欄位
 
         // 創建 "Loading..." 提示
         const loadingDiv = document.createElement('div');
@@ -1208,39 +1208,41 @@ function sendMessage() {
         // 滾動到最新的聊天內容
         chatBox.scrollTop = chatBox.scrollHeight;
 
-        fetch(`${baseUrl}/chat_llm`, {  // 修改成新的路徑
+        fetch(`${baseUrl}/chat_llm`, {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ message: message })  // 傳遞使用者輸入
+            body: JSON.stringify({ message: message }),
         })
-            .then(response => {
+            .then((response) => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
-                return response.json(); // 解析回應為 JSON
+                return response.json();
             })
-            .then(data => {
+            .then((data) => {
                 // 刪除 "Loading..." 提示
                 chatBox.removeChild(loadingDiv);
 
                 // 顯示 AI 回覆
                 const responseDiv = document.createElement('div');
                 responseDiv.classList.add('chat-response');
-                responseDiv.textContent = data.reply || '此功能測試中';  // 當回應為空時顯示 "此功能測試中"
+
+                // 解析 Markdown 格式
+                responseDiv.innerHTML = parseMarkdown(data.reply || '此功能測試中');
                 chatBox.appendChild(responseDiv);
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error fetching LLM response:', error);
 
                 // 刪除 "Loading..." 提示
                 chatBox.removeChild(loadingDiv);
 
-                // 顯示錯誤訊息或 "此功能測試中"
+                // 顯示錯誤訊息
                 const responseDiv = document.createElement('div');
                 responseDiv.classList.add('chat-response');
-                responseDiv.textContent = '此功能測試中';
+                responseDiv.textContent = '無法處理您的請求';
                 chatBox.appendChild(responseDiv);
             });
     }
@@ -1252,7 +1254,7 @@ function uploadPDF() {
     const file = input ? input.files[0] : null;
 
     if (!file) {
-        alert("Please select a PDF file to upload.");
+        alert('Please select a PDF file to upload.');
         return;
     }
 
@@ -1268,26 +1270,28 @@ function uploadPDF() {
     fetch(`${baseUrl}/upload_pdf`, {
         method: 'POST',
         body: formData,
-        credentials: 'include'  // 確保跨域請求帶上憑證（如果需要）
+        credentials: 'include', // 確保跨域請求帶上憑證（如果需要）
     })
-        .then(response => {
+        .then((response) => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
-        .then(data => {
+        .then((data) => {
             // 刪除 "Loading..." 提示
             chatBox.removeChild(loadingDiv);
 
             // 顯示 GPT 回應
             const responseDiv = document.createElement('div');
             responseDiv.classList.add('chat-response');
-            responseDiv.textContent = data.reply || '無法取得回應';
+
+            // 解析 Markdown 格式
+            responseDiv.innerHTML = parseMarkdown(data.reply || '無法取得回應');
             chatBox.appendChild(responseDiv);
         })
-        .catch(error => {
-            console.error("Error uploading PDF:", error);
+        .catch((error) => {
+            console.error('Error uploading PDF:', error);
 
             // 刪除 "Loading..." 提示
             chatBox.removeChild(loadingDiv);
@@ -1300,6 +1304,14 @@ function uploadPDF() {
         });
 }
 
+// Markdown 解析函數
+function parseMarkdown(markdown) {
+    // 將 Markdown 格式轉換為 HTML
+    return markdown
+        .replace(/^###\s*(.*$)/gim, '<h3>$1</h3>') // 標題格式
+        .replace(/^-\s*(.*$)/gim, '<li>$1</li>') // 條列項目
+        .replace(/\n/g, ''); // 移除多餘換行
+}
 
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
