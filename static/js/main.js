@@ -1304,13 +1304,17 @@ function uploadPDF() {
         });
 }
 
-// Markdown 解析函數
 function parseMarkdown(markdown) {
     // 將 Markdown 格式轉換為 HTML
     return markdown
-        .replace(/^###\s*(.*$)/gim, '<h3>$1</h3>') // 標題格式
-        .replace(/^-\s*(.*$)/gim, '<li>$1</li>') // 條列項目
-        .replace(/\n/g, ''); // 移除多餘換行
+        .replace(/^####\s*(.*$)/gim, '<h4>$1</h4>') // 四級標題
+        .replace(/^###\s*(.*$)/gim, '<h3>$1</h3>') // 三級標題
+        .replace(/^##\s*(.*$)/gim, '<h2>$1</h2>') // 二級標題
+        .replace(/^#\s*(.*$)/gim, '<h1>$1</h1>') // 一級標題
+        .replace(/^\*\*\s*(.*$)/gim, '<strong>$1</strong>') // 粗體
+        .replace(/^-\s*(.*$)/gim, '<li>$1</li>') // 無序列表
+        .replace(/^\d+\.\s*(.*$)/gim, '<li>$1</li>') // 有序列表
+        .replace(/\n/g, '<br>'); // 保留換行結構
 }
 
 //////////////////////////////////////////////////////////////////////////////
