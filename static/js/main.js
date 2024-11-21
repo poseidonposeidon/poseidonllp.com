@@ -4280,7 +4280,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
         }
     });
 }
-
+///
 function createPieChart(data, chartId) {
     const canvas = document.getElementById(chartId);
 
