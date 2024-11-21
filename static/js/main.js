@@ -4054,6 +4054,7 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
         debtToAssetRate: ['Debt to Asset Rate']
     };
 
+    // 填充 rows 資料
     filteredDataForTable.forEach((entry) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
@@ -4133,6 +4134,7 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
 
     // 創建容器結構，並綁定唯一的下載按鈕ID
     const downloadButtonId = `downloadBtn_${chartId}`;
+    const pieChartId = `${chartId}Pie`;
     container.innerHTML = `
         <button id="${downloadButtonId}">Download as Excel</button>
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
@@ -4143,23 +4145,18 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
         <div id="chartContainer" style="margin-top: 20px;">
             <canvas id="${chartId}"></canvas>
         </div>
+        <div id="pieChartContainer" style="margin-top: 20px;">
+            <canvas id="${pieChartId}"></canvas>
+        </div>
     `;
 
-    // 設置scroll位置
-    setTimeout(() => {
-        const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
-        if (scrollContainer) {
-            scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-            if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
-                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-            }
-        }
-    }, 100);
-
-    // 創建圖表，僅使用篩選後的數據（刪除多出來的那一年）
+    // 創建條形圖表
     createCombinedBalanceSheetChart(filteredDataForChart, chartId);
 
-    // 清除舊的事件並綁定新的下載按鈕事件
+    // 創建圓餅圖，僅使用最新數據
+    createPieChart(filteredDataForChart, pieChartId);
+
+    // 綁定下載按鈕
     bindDownloadButton_BS(rows, data[0].symbol, downloadButtonId, "Balance Sheet");
 }
 
@@ -4178,7 +4175,6 @@ function bindDownloadButton_BS(rows, symbol, buttonId, sheetName) {
     }, 100);  // 延遲執行以確保 DOM 已完全更新
 }
 
-// 下载 Excel 文件的函数
 function downloadExcel_BS(rows, symbol, sheetName) {
     // Check if rows is defined and not empty
     if (!rows || Object.keys(rows).length === 0) {
@@ -4285,10 +4281,61 @@ function createCombinedBalanceSheetChart(data, chartId) {
     });
 }
 
+function createPieChart(data, chartId) {
+    const canvas = document.getElementById(chartId);
+
+    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+        console.error(`Canvas element with id ${chartId} not found or is not a canvas element.`);
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    // 銷毀現有圖表實例（如果存在）
+    if (balanceSheetChartInstances[chartId]) {
+        balanceSheetChartInstances[chartId].destroy();
+    }
+
+    // 提取最新數據
+    const latestData = data[0]; // 假設數據已按日期排序，取第一個
+    const { totalAssets, totalLiabilities, totalEquity } = latestData;
+
+    balanceSheetChartInstances[chartId] = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['Total Assets', 'Total Liabilities', 'Total Equity'],
+            datasets: [
+                {
+                    label: 'Balance Sheet Composition',
+                    data: [totalAssets, totalLiabilities, totalEquity],
+                    backgroundColor: [
+                        'rgba(75, 192, 192, 0.6)', // Assets
+                        'rgba(153, 102, 255, 0.6)', // Liabilities
+                        'rgba(54, 162, 235, 0.6)' // Equity
+                    ],
+                    borderColor: [
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(54, 162, 235, 1)'
+                    ],
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top'
+                }
+            }
+        }
+    });
+}
+
 function formatNumber(value) {
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
-
 
 ///////////////////////////////////現金流表Cashflow///////////////
 let cashflowChartInstances = {}; // 用於存儲不同國家的圖表實例
