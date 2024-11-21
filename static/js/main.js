@@ -4296,11 +4296,11 @@ function createPieChart(data, chartId) {
         balanceSheetChartInstances[chartId].destroy();
     }
 
-    // 確保數據按日期排序（降序，最新日期在前）
-    const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+    // 確保數據按日期排序（升序，最舊日期在前）
+    const sortedData = data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 提取最新數據
-    const latestData = sortedData[0]; // 確保最新的數據在第一位
+    // 提取最新數據（升序排列後，最後一個數據為最新）
+    const latestData = sortedData[sortedData.length - 1];
     if (!latestData) {
         console.error('No data available for the pie chart.');
         return;
