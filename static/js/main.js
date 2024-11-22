@@ -3584,7 +3584,6 @@ function updateDisplayedYears(data, container, chartId, operatingChartId, period
 function createOperatingChart(data, chartId) {
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 保留所有有效的数据，过滤掉增长率为 null 的数据
     const validData = data.filter(entry => entry.growthRate !== null);
 
     const ctx = document.getElementById(chartId).getContext('2d');
@@ -3601,37 +3600,37 @@ function createOperatingChart(data, chartId) {
                 {
                     label: 'Revenue',
                     data: validData.map(entry => entry.revenue),
-                    borderColor: 'rgba(120, 190, 180, 1)', // 柔和的青色
-                    backgroundColor: 'rgba(120, 190, 180, 0.6)', // 半透明
+                    borderColor: 'rgba(102, 205, 170, 1)', // 柔和綠色
+                    backgroundColor: 'rgba(102, 205, 170, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Cost of Revenue',
                     data: validData.map(entry => entry.costOfRevenue),
-                    borderColor: 'rgba(130, 145, 210, 1)', // 柔和的藍紫色
-                    backgroundColor: 'rgba(130, 145, 210, 0.6)', // 半透明
+                    borderColor: 'rgba(135, 206, 250, 1)', // 淡藍色
+                    backgroundColor: 'rgba(135, 206, 250, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Expenses',
                     data: validData.map(entry => entry.operatingExpenses),
-                    borderColor: 'rgba(210, 175, 140, 1)', // 柔和的米黃色
-                    backgroundColor: 'rgba(210, 175, 140, 0.6)', // 半透明
+                    borderColor: 'rgba(255, 165, 79, 1)', // 柔和橙色
+                    backgroundColor: 'rgba(255, 165, 79, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Income',
                     data: validData.map(entry => entry.operatingIncome),
-                    borderColor: 'rgba(215, 140, 130, 1)', // 柔和的紅色
-                    backgroundColor: 'rgba(215, 140, 130, 0.6)', // 半透明
+                    borderColor: 'rgba(240, 128, 128, 1)', // 溫暖紅色
+                    backgroundColor: 'rgba(240, 128, 128, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Growth Rate',
                     data: validData.map(entry => entry.growthRate),
                     type: 'line',
-                    borderColor: 'rgba(200, 170, 100, 1)', // 柔和的金色
-                    backgroundColor: 'rgba(200, 170, 100, 0.6)', // 半透明
+                    borderColor: 'rgba(255, 215, 0, 1)', // 金黃色
+                    backgroundColor: 'rgba(255, 215, 0, 0.6)', // 半透明
                     yAxisID: 'y1'
                 }
             ]
