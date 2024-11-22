@@ -4146,7 +4146,7 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
             <canvas id="${chartId}"></canvas>
         </div>
         <div id="pieChartContainer" style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
-            <canvas id="${pieChartId}" width="400" height="400" style="width: 400px; height: 400px;"></canvas>
+            <canvas id="${pieChartId}" width="300" height="300"></canvas> <!-- 修改寬高 -->
         </div>
     `;
 
@@ -4296,6 +4296,10 @@ function createPieChart(data, chartId, options = {}) {
         balanceSheetChartInstances[chartId].destroy();
     }
 
+    // 設置 canvas 屬性（渲染大小）
+    canvas.width = 300; // 設置為與 HTML 一致的大小
+    canvas.height = 300;
+
     // 確保數據按日期排序（升序，最舊日期在前）
     const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -4346,7 +4350,8 @@ function createPieChart(data, chartId, options = {}) {
             ]
         },
         options: {
-            responsive: true,
+            responsive: false, // 禁用自適應
+            maintainAspectRatio: false, // 禁用默認寬高比
             plugins: {
                 legend: {
                     position: 'top'
