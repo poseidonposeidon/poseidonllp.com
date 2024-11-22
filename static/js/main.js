@@ -2791,11 +2791,11 @@ function drawChart(labels, dataSets, type) {
         });
 
         const colors = [
-            'rgba(75, 192, 192, 1)',
-            'rgba(255, 99, 132, 1)',
-            'rgba(54, 162, 235, 1)',
-            'rgba(255, 206, 86, 1)',
-            'rgba(153, 102, 255, 1)'
+            'rgba(102, 187, 106, 1)', // 青綠色
+            'rgba(255, 241, 118, 1)', // 黃色
+            'rgba(41, 182, 246, 1)', // 藍色
+            'rgba(255, 138, 101, 1)', // 橙紅色
+            'rgba(179, 157, 219, 1)'  // 紫色
         ];
 
         return {
@@ -2819,8 +2819,8 @@ function drawChart(labels, dataSets, type) {
         type: chartType,
         data: chartData,
         options: {
-            responsive: true,             // 開啟響應式
-            maintainAspectRatio: false,   // 可調整的寬高比，讓高度可以固定
+            responsive: true,
+            maintainAspectRatio: false,
             aspectRatio: 2,
             scales: {
                 x: {
@@ -2831,7 +2831,7 @@ function drawChart(labels, dataSets, type) {
                 y: {
                     beginAtZero: false,
                     ticks: {
-                        callback: function(value) {
+                        callback: function (value) {
                             if (type === 'stockPrice') {
                                 return '$' + value.toFixed(2);
                             } else if (type === 'peRatio') {
@@ -2845,7 +2845,7 @@ function drawChart(labels, dataSets, type) {
             plugins: {
                 tooltip: {
                     callbacks: {
-                        label: function(tooltipItem) {
+                        label: function (tooltipItem) {
                             const rawValue = tooltipItem.raw;
                             if (rawValue !== null) {
                                 if (type === 'stockPrice') return '$' + rawValue.toFixed(2);
