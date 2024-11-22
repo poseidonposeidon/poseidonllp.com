@@ -3601,37 +3601,37 @@ function createOperatingChart(data, chartId) {
                 {
                     label: 'Revenue',
                     data: validData.map(entry => entry.revenue),
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(120, 190, 180, 1)', // 柔和的青色
+                    backgroundColor: 'rgba(120, 190, 180, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Cost of Revenue',
                     data: validData.map(entry => entry.costOfRevenue),
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(130, 145, 210, 1)', // 柔和的藍紫色
+                    backgroundColor: 'rgba(130, 145, 210, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Expenses',
                     data: validData.map(entry => entry.operatingExpenses),
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(210, 175, 140, 1)', // 柔和的米黃色
+                    backgroundColor: 'rgba(210, 175, 140, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Income',
                     data: validData.map(entry => entry.operatingIncome),
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                    borderColor: 'rgba(215, 140, 130, 1)', // 柔和的紅色
+                    backgroundColor: 'rgba(215, 140, 130, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Growth Rate',
                     data: validData.map(entry => entry.growthRate),
                     type: 'line',
-                    borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                    borderColor: 'rgba(200, 170, 100, 1)', // 柔和的金色
+                    backgroundColor: 'rgba(200, 170, 100, 0.6)', // 半透明
                     yAxisID: 'y1'
                 }
             ]
@@ -3690,32 +3690,32 @@ function createIncomeStatementChart(data, chartId) {
                     type: 'bar',
                     label: 'EPS',
                     data: validData.map(entry => entry.eps),
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(200, 140, 130, 1)', // 柔和的紅色
+                    backgroundColor: 'rgba(200, 140, 130, 0.2)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     type: 'line',
                     label: 'Gross Profit Ratio',
                     data: validData.map(entry => entry.grossProfitRatio * 100),
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(120, 190, 180, 1)', // 柔和的青色
+                    backgroundColor: 'rgba(120, 190, 180, 0.6)', // 半透明
                     yAxisID: 'y1'
                 },
                 {
                     type: 'line',
                     label: 'Operating Income Ratio',
                     data: validData.map(entry => entry.operatingIncomeRatio * 100),
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(130, 145, 210, 1)', // 柔和的藍紫色
+                    backgroundColor: 'rgba(130, 145, 210, 0.6)', // 半透明
                     yAxisID: 'y1'
                 },
                 {
                     type: 'line',
                     label: 'Net Income Ratio',
                     data: validData.map(entry => entry.netIncomeRatio * 100),
-                    borderColor: 'rgba(255, 159, 64, 1)',
-                    backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                    borderColor: 'rgba(210, 175, 140, 1)', // 柔和的米黃色
+                    backgroundColor: 'rgba(210, 175, 140, 0.6)', // 半透明
                     yAxisID: 'y1'
                 }
             ]
@@ -3782,7 +3782,7 @@ function displayPEBandChart(peData, chartId) {
             datasets: [{
                 label: 'P/E Ratio',
                 data: peRatios,
-                borderColor: 'rgba(75, 192, 192, 1)',
+                borderColor: 'rgba(120, 160, 200, 1)', // 柔和的淡藍色
                 fill: false,
             }]
         },
@@ -3792,7 +3792,7 @@ function displayPEBandChart(peData, chartId) {
                     type: 'time',
                     time: {
                         unit: 'year',
-                        tooltipFormat: 'yyyy-MM-dd',  // 使用小寫 'yyyy'
+                        tooltipFormat: 'yyyy-MM-dd',
                     },
                     title: {
                         display: true,
