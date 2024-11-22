@@ -4146,8 +4146,8 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
             <canvas id="${chartId}"></canvas>
         </div>
         <div id="pieChartContainer" style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
-            <canvas id="${pieChartId}" style="width: 400px; height: 400px;"></canvas>
-         </div>
+            <canvas id="${pieChartId}" width="400" height="400" style="width: 400px; height: 400px;"></canvas>
+        </div>
     `;
 
     // 創建條形圖表
@@ -4280,8 +4280,8 @@ function createCombinedBalanceSheetChart(data, chartId) {
         }
     });
 }
-///
-function createPieChart(data, chartId) {
+
+function createPieChart(data, chartId, options = {}) {
     const canvas = document.getElementById(chartId);
 
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
@@ -4297,7 +4297,7 @@ function createPieChart(data, chartId) {
     }
 
     // 確保數據按日期排序（升序，最舊日期在前）
-    const sortedData = data.sort((a, b) => new Date(a.date) - new Date(b.date));
+    const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
 
     // 提取最新數據（升序排列後，最後一個數據為最新）
     const latestData = sortedData[sortedData.length - 1];
@@ -4306,26 +4306,41 @@ function createPieChart(data, chartId) {
         return;
     }
 
-    const { totalAssets, totalLiabilities, totalEquity } = latestData;
+    // 檢查是否包含必要的數據欄位
+    const { totalAssets = 0, totalLiabilities = 0, totalEquity = 0 } = latestData;
+    if (totalAssets === 0 && totalLiabilities === 0 && totalEquity === 0) {
+        console.error('Invalid data for the pie chart.');
+        return;
+    }
 
+    // 設置圖表默認選項
+    const defaultOptions = {
+        labels: ['Total Assets', 'Total Liabilities', 'Total Equity'],
+        colors: [
+            'rgba(75, 192, 192, 0.6)', // Assets
+            'rgba(153, 102, 255, 0.6)', // Liabilities
+            'rgba(54, 162, 235, 0.6)' // Equity
+        ],
+        borderColors: [
+            'rgba(75, 192, 192, 1)',
+            'rgba(153, 102, 255, 1)',
+            'rgba(54, 162, 235, 1)'
+        ]
+    };
+
+    const chartOptions = { ...defaultOptions, ...options };
+
+    // 創建圖表
     balanceSheetChartInstances[chartId] = new Chart(ctx, {
         type: 'pie',
         data: {
-            labels: ['Total Assets', 'Total Liabilities', 'Total Equity'],
+            labels: chartOptions.labels,
             datasets: [
                 {
                     label: 'Balance Sheet Composition',
                     data: [totalAssets, totalLiabilities, totalEquity],
-                    backgroundColor: [
-                        'rgba(75, 192, 192, 0.6)', // Assets
-                        'rgba(153, 102, 255, 0.6)', // Liabilities
-                        'rgba(54, 162, 235, 0.6)' // Equity
-                    ],
-                    borderColor: [
-                        'rgba(75, 192, 192, 1)',
-                        'rgba(153, 102, 255, 1)',
-                        'rgba(54, 162, 235, 1)'
-                    ],
+                    backgroundColor: chartOptions.colors,
+                    borderColor: chartOptions.borderColors,
                     borderWidth: 1
                 }
             ]
