@@ -3689,32 +3689,32 @@ function createIncomeStatementChart(data, chartId) {
                     type: 'bar',
                     label: 'EPS',
                     data: validData.map(entry => entry.eps),
-                    borderColor: 'rgba(200, 140, 130, 1)', // 柔和的紅色
-                    backgroundColor: 'rgba(200, 140, 130, 0.2)', // 半透明
+                    borderColor: 'rgba(255, 183, 77, 1)', // 柔和橙紅色
+                    backgroundColor: 'rgba(255, 183, 77, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     type: 'line',
                     label: 'Gross Profit Ratio',
                     data: validData.map(entry => entry.grossProfitRatio * 100),
-                    borderColor: 'rgba(120, 190, 180, 1)', // 柔和的青色
-                    backgroundColor: 'rgba(120, 190, 180, 0.6)', // 半透明
+                    borderColor: 'rgba(102, 187, 255, 1)', // 柔和青藍色
+                    backgroundColor: 'rgba(102, 187, 255, 0.6)', // 半透明
                     yAxisID: 'y1'
                 },
                 {
                     type: 'line',
                     label: 'Operating Income Ratio',
                     data: validData.map(entry => entry.operatingIncomeRatio * 100),
-                    borderColor: 'rgba(130, 145, 210, 1)', // 柔和的藍紫色
-                    backgroundColor: 'rgba(130, 145, 210, 0.6)', // 半透明
+                    borderColor: 'rgba(159, 168, 218, 1)', // 柔和紫色
+                    backgroundColor: 'rgba(159, 168, 218, 0.6)', // 半透明
                     yAxisID: 'y1'
                 },
                 {
                     type: 'line',
                     label: 'Net Income Ratio',
                     data: validData.map(entry => entry.netIncomeRatio * 100),
-                    borderColor: 'rgba(210, 175, 140, 1)', // 柔和的米黃色
-                    backgroundColor: 'rgba(210, 175, 140, 0.6)', // 半透明
+                    borderColor: 'rgba(129, 199, 132, 1)', // 柔和綠色
+                    backgroundColor: 'rgba(129, 199, 132, 0.6)', // 半透明
                     yAxisID: 'y1'
                 }
             ]
