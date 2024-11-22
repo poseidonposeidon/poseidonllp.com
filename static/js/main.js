@@ -4760,30 +4760,30 @@ function createCashflowChart(data, chartId) {
                 {
                     label: 'Operating Cash Flow',
                     data: data.map(entry => entry.operatingCashFlow),
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(102, 187, 106, 1)', // 柔和青綠色
+                    backgroundColor: 'rgba(102, 187, 106, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Capital Expenditure',
                     data: data.map(entry => entry.capitalExpenditure),
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(255, 241, 118, 1)', // 柔和黃色
+                    backgroundColor: 'rgba(255, 241, 118, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Free Cash Flow',
                     data: data.map(entry => entry.freeCashFlow),
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(41, 182, 246, 1)', // 柔和藍色
+                    backgroundColor: 'rgba(41, 182, 246, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Capex to Operating Cash Flow',
                     data: data.map(entry => entry.capexToOperatingCashFlowValue), // 使用數值數據
                     type: 'line',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 183, 77, 1)', // 柔和橙色
+                    backgroundColor: 'rgba(255, 183, 77, 0.2)', // 半透明
                     yAxisID: 'y1'
                 }
             ]
