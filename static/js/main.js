@@ -4145,7 +4145,7 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
         <div id="chartContainer" style="margin-top: 20px;">
             <canvas id="${chartId}"></canvas>
         </div>
-        <div id="pieChartContainer" style="margin-top: 20px;text-align: center;">
+        <div id="pieChartContainer" style="margin-top: 20px;text-align: center;width: 200px; height: 200px;">
             <canvas id="${pieChartId}" style="width: 200px; height: 200px;"></canvas>
         </div>
     `;
