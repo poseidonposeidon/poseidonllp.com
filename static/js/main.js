@@ -4219,30 +4219,30 @@ function createCombinedBalanceSheetChart(data, chartId) {
                 {
                     label: 'Total Assets',
                     data: data.map(entry => entry.totalAssets),
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(100, 181, 246, 1)', // 柔和的藍色
+                    backgroundColor: 'rgba(100, 181, 246, 0.6)',
                     yAxisID: 'y'
                 },
                 {
                     label: 'Total Liabilities',
                     data: data.map(entry => entry.totalLiabilities),
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(255, 171, 64, 1)', // 柔和的橙色
+                    backgroundColor: 'rgba(255, 171, 64, 0.6)',
                     yAxisID: 'y'
                 },
                 {
                     label: 'Total Equity',
                     data: data.map(entry => entry.totalEquity),
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(129, 199, 132, 1)', // 柔和的綠色
+                    backgroundColor: 'rgba(129, 199, 132, 0.6)',
                     yAxisID: 'y'
                 },
                 {
                     label: 'Debt to Asset Rate',
-                    data: data.map(entry => entry.debtToAssetRateValue), // 使用數值數據
+                    data: data.map(entry => entry.debtToAssetRateValue),
                     type: 'line',
-                    borderColor: 'rgba(255, 99, 132, 1)',
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(239, 83, 80, 1)', // 柔和的紅色
+                    backgroundColor: 'rgba(239, 83, 80, 0.2)',
                     yAxisID: 'y1'
                 }
             ]
@@ -4297,38 +4297,36 @@ function createPieChart(data, chartId, options = {}) {
     }
 
     // 設置 canvas 屬性（渲染大小）
-    canvas.width = 600; // 設置為與 HTML 一致的大小
+    canvas.width = 600;
     canvas.height = 600;
 
     // 確保數據按日期排序（升序，最舊日期在前）
     const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 提取最新數據（升序排列後，最後一個數據為最新）
+    // 提取最新數據
     const latestData = sortedData[sortedData.length - 1];
     if (!latestData) {
         console.error('No data available for the pie chart.');
         return;
     }
 
-    // 檢查是否包含必要的數據欄位
     const { totalAssets = 0, totalLiabilities = 0, totalEquity = 0 } = latestData;
     if (totalAssets === 0 && totalLiabilities === 0 && totalEquity === 0) {
         console.error('Invalid data for the pie chart.');
         return;
     }
 
-    // 設置圖表默認選項
     const defaultOptions = {
         labels: ['Total Assets', 'Total Liabilities', 'Total Equity'],
         colors: [
-            'rgba(75, 192, 192, 0.6)', // Assets
-            'rgba(153, 102, 255, 0.6)', // Liabilities
-            'rgba(54, 162, 235, 0.6)' // Equity
+            'rgba(100, 181, 246, 0.6)', // Assets - 柔和的藍色
+            'rgba(255, 171, 64, 0.6)', // Liabilities - 柔和的橙色
+            'rgba(129, 199, 132, 0.6)' // Equity - 柔和的綠色
         ],
         borderColors: [
-            'rgba(75, 192, 192, 1)',
-            'rgba(153, 102, 255, 1)',
-            'rgba(54, 162, 235, 1)'
+            'rgba(100, 181, 246, 1)',
+            'rgba(255, 171, 64, 1)',
+            'rgba(129, 199, 132, 1)'
         ]
     };
 
@@ -4350,8 +4348,8 @@ function createPieChart(data, chartId, options = {}) {
             ]
         },
         options: {
-            responsive: false, // 禁用自適應
-            maintainAspectRatio: false, // 禁用默認寬高比
+            responsive: false,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     position: 'top'
