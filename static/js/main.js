@@ -3708,32 +3708,40 @@ function createIncomeStatementChart(data, chartId) {
                     type: 'bar',
                     label: 'EPS',
                     data: validData.map(entry => entry.eps),
-                    borderColor: 'rgba(255, 140, 0, 1)', // 橙色
-                    backgroundColor: 'rgba(255, 140, 0, 0.6)', // 半透明
+                    borderColor: 'rgba(0, 51, 102, 1)', // 深藍 (#003366)
+                    backgroundColor: 'rgba(0, 51, 102, 0.6)', // 半透明深藍
                     yAxisID: 'y'
                 },
                 {
                     type: 'line',
                     label: 'Gross Profit Ratio',
                     data: validData.map(entry => entry.grossProfitRatio * 100),
-                    borderColor: 'rgba(0, 206, 209, 1)', // 淺藍綠
-                    backgroundColor: 'rgba(0, 206, 209, 0.3)', // 半透明
+                    borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
+                    backgroundColor: 'rgba(102, 204, 204, 0.3)', // 半透明藍綠色
                     yAxisID: 'y1'
                 },
                 {
                     type: 'line',
                     label: 'Operating Income Ratio',
                     data: validData.map(entry => entry.operatingIncomeRatio * 100),
-                    borderColor: 'rgba(138, 43, 226, 1)', // 螢光紫色
-                    backgroundColor: 'rgba(138, 43, 226, 0.3)', // 半透明
+                    borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
+                    backgroundColor: 'rgba(153, 204, 255, 0.3)', // 半透明淺藍色
                     yAxisID: 'y1'
                 },
                 {
                     type: 'line',
                     label: 'Net Income Ratio',
                     data: validData.map(entry => entry.netIncomeRatio * 100),
-                    borderColor: 'rgba(255, 215, 0, 1)', // 金黃色
-                    backgroundColor: 'rgba(255, 215, 0, 0.3)', // 半透明
+                    borderColor: 'rgba(232, 232, 232, 1)', // 淺灰色 (#E8E8E8)
+                    backgroundColor: 'rgba(232, 232, 232, 0.3)', // 半透明淺灰色
+                    yAxisID: 'y1'
+                },
+                {
+                    type: 'line',
+                    label: 'Growth Rate',
+                    data: validData.map(entry => entry.growthRate),
+                    borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
+                    backgroundColor: 'rgba(255, 153, 0, 0.3)', // 半透明橙色
                     yAxisID: 'y1'
                 }
             ]
@@ -3783,8 +3791,8 @@ function createIncomeStatementChart(data, chartId) {
                     },
                     backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
                     titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(30, 144, 255, 1)', // 深藍字體
-                    borderColor: 'rgba(30, 144, 255, 1)', // 深藍邊框
+                    bodyColor: 'rgba(0, 51, 102, 1)', // 深藍字體 (#003366)
+                    borderColor: 'rgba(0, 51, 102, 1)', // 深藍邊框 (#003366)
                     borderWidth: 1
                 }
             }
