@@ -2791,11 +2791,12 @@ function drawChart(labels, dataSets, type) {
         });
 
         const colors = [
-            'rgba(102, 187, 106, 1)', // 青綠色
-            'rgba(255, 241, 118, 1)', // 黃色
-            'rgba(41, 182, 246, 1)', // 藍色
-            'rgba(255, 138, 101, 1)', // 橙紅色
-            'rgba(179, 157, 219, 1)'  // 紫色
+            'rgba(255, 140, 0, 1)',    // 橙色 (Orange)
+            'rgba(0, 206, 209, 1)',    // 淺藍綠 (DarkTurquoise)
+            'rgba(138, 43, 226, 1)',   // 螢光紫色 (BlueViolet)
+            'rgba(255, 215, 0, 1)',    // 金黃色 (Gold)
+            'rgba(30, 144, 255, 1)',   // 深藍 (DodgerBlue)
+            'rgba(0, 255, 127, 1)'     // 螢光綠 (SpringGreen)
         ];
 
         return {
