@@ -3601,29 +3601,29 @@ function createOperatingChart(data, chartId) {
                 {
                     label: 'Revenue',
                     data: validData.map(entry => entry.revenue),
-                    borderColor: 'rgba(102, 205, 170, 1)', // 柔和綠色
-                    backgroundColor: 'rgba(102, 205, 170, 0.6)', // 半透明
+                    borderColor: 'rgba(0, 255, 127, 1)', // 螢光綠
+                    backgroundColor: 'rgba(0, 255, 127, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Cost of Revenue',
                     data: validData.map(entry => entry.costOfRevenue),
-                    borderColor: 'rgba(135, 206, 250, 1)', // 淡藍色
-                    backgroundColor: 'rgba(135, 206, 250, 0.6)', // 半透明
+                    borderColor: 'rgba(30, 144, 255, 1)', // 螢光藍
+                    backgroundColor: 'rgba(30, 144, 255, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Expenses',
                     data: validData.map(entry => entry.operatingExpenses),
-                    borderColor: 'rgba(255, 165, 79, 1)', // 柔和橙色
-                    backgroundColor: 'rgba(255, 165, 79, 0.6)', // 半透明
+                    borderColor: 'rgba(255, 140, 0, 1)', // 橙色
+                    backgroundColor: 'rgba(255, 140, 0, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     label: 'Operating Income',
                     data: validData.map(entry => entry.operatingIncome),
-                    borderColor: 'rgba(240, 128, 128, 1)', // 溫暖紅色
-                    backgroundColor: 'rgba(240, 128, 128, 0.6)', // 半透明
+                    borderColor: 'rgba(255, 20, 147, 1)', // 螢光粉紅
+                    backgroundColor: 'rgba(255, 20, 147, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
@@ -3664,6 +3664,24 @@ function createOperatingChart(data, chartId) {
                     grid: {
                         drawOnChartArea: false
                     }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            const value = tooltipItem.raw;
+                            if (value !== null) {
+                                return tooltipItem.dataset.label === 'Growth Rate'
+                                    ? value.toFixed(2) + '%'
+                                    : value.toLocaleString();
+                            }
+                            return 'No data';
+                        }
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
+                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
+                    bodyColor: 'rgba(30, 144, 255, 1)' // 螢光藍字體
                 }
             }
         }
