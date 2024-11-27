@@ -3708,32 +3708,32 @@ function createIncomeStatementChart(data, chartId) {
                     type: 'bar',
                     label: 'EPS',
                     data: validData.map(entry => entry.eps),
-                    borderColor: 'rgba(0, 255, 127, 1)', // 螢光綠
-                    backgroundColor: 'rgba(0, 255, 127, 0.6)', // 半透明
+                    borderColor: 'rgba(255, 140, 0, 1)', // 橙色
+                    backgroundColor: 'rgba(255, 140, 0, 0.6)', // 半透明
                     yAxisID: 'y'
                 },
                 {
                     type: 'line',
                     label: 'Gross Profit Ratio',
                     data: validData.map(entry => entry.grossProfitRatio * 100),
-                    borderColor: 'rgba(30, 144, 255, 1)', // 螢光藍
-                    backgroundColor: 'rgba(30, 144, 255, 0.3)', // 半透明
+                    borderColor: 'rgba(0, 206, 209, 1)', // 淺藍綠
+                    backgroundColor: 'rgba(0, 206, 209, 0.3)', // 半透明
                     yAxisID: 'y1'
                 },
                 {
                     type: 'line',
                     label: 'Operating Income Ratio',
                     data: validData.map(entry => entry.operatingIncomeRatio * 100),
-                    borderColor: 'rgba(255, 140, 0, 1)', // 螢光橙
-                    backgroundColor: 'rgba(255, 140, 0, 0.3)', // 半透明
+                    borderColor: 'rgba(138, 43, 226, 1)', // 螢光紫色
+                    backgroundColor: 'rgba(138, 43, 226, 0.3)', // 半透明
                     yAxisID: 'y1'
                 },
                 {
                     type: 'line',
                     label: 'Net Income Ratio',
                     data: validData.map(entry => entry.netIncomeRatio * 100),
-                    borderColor: 'rgba(255, 20, 147, 1)', // 螢光粉紅
-                    backgroundColor: 'rgba(255, 20, 147, 0.3)', // 半透明
+                    borderColor: 'rgba(255, 215, 0, 1)', // 金黃色
+                    backgroundColor: 'rgba(255, 215, 0, 0.3)', // 半透明
                     yAxisID: 'y1'
                 }
             ]
@@ -3781,10 +3781,10 @@ function createIncomeStatementChart(data, chartId) {
                             return 'No data';
                         }
                     },
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深色背景
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
                     titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(255, 255, 255, 1)', // 螢光藍字體
-                    borderColor: 'rgba(255, 255, 255, 1)', // 螢光藍邊框
+                    bodyColor: 'rgba(30, 144, 255, 1)', // 深藍字體
+                    borderColor: 'rgba(30, 144, 255, 1)', // 深藍邊框
                     borderWidth: 1
                 }
             }
