@@ -3783,8 +3783,8 @@ function createIncomeStatementChart(data, chartId) {
                     },
                     backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深色背景
                     titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(0, 255, 255, 1)', // 螢光藍字體
-                    borderColor: 'rgba(30, 144, 255, 0.8)', // 螢光藍邊框
+                    bodyColor: 'rgba(255, 255, 255, 1)', // 螢光藍字體
+                    borderColor: 'rgba(255, 255, 255, 1)', // 螢光藍邊框
                     borderWidth: 1
                 }
             }
