@@ -3709,7 +3709,7 @@ function createIncomeStatementChart(data, chartId) {
                     label: 'EPS',
                     data: validData.map(entry => entry.eps),
                     borderColor: 'rgb(53,140,234)', // 深藍 (#003366)
-                    backgroundColor: 'rgba(0, 51, 102, 0.6)', // 半透明深藍
+                    backgroundColor: 'rgba(115,176,244,0.6)', // 半透明深藍
                     yAxisID: 'y'
                 },
                 {
