@@ -3708,7 +3708,7 @@ function createIncomeStatementChart(data, chartId) {
                     type: 'bar',
                     label: 'EPS',
                     data: validData.map(entry => entry.eps),
-                    borderColor: 'rgba(0, 51, 102, 1)', // 深藍 (#003366)
+                    borderColor: 'rgb(53,140,234)', // 深藍 (#003366)
                     backgroundColor: 'rgba(0, 51, 102, 0.6)', // 半透明深藍
                     yAxisID: 'y'
                 },
@@ -3791,8 +3791,8 @@ function createIncomeStatementChart(data, chartId) {
                     },
                     backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
                     titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(0, 51, 102, 1)', // 深藍字體 (#003366)
-                    borderColor: 'rgba(0, 51, 102, 1)', // 深藍邊框 (#003366)
+                    bodyColor: 'rgba(255, 255, 255, 1)', // 深藍字體 (#003366)
+                    borderColor: 'rgba(255, 255, 255, 1)', // 深藍邊框 (#003366)
                     borderWidth: 1
                 }
             }
