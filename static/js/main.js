@@ -3693,6 +3693,7 @@ function createOperatingChart(data, chartId) {
     });
 }
 
+
 function createIncomeStatementChart(data, chartId) {
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
