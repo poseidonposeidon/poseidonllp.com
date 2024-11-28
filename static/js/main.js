@@ -3602,7 +3602,7 @@ function createOperatingChart(data, chartId) {
                     label: 'Revenue',
                     data: validData.map(entry => entry.revenue),
                     borderColor: 'rgb(253,206,170)', // 深藍 (#003366)
-                    backgroundColor: 'rgb(225,167,121)', // 半透明深藍
+                    backgroundColor: 'rgb(186,153,130)', // 半透明深藍
                     yAxisID: 'y'
                 },
                 {
