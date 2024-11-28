@@ -3594,44 +3594,47 @@ function createOperatingChart(data, chartId) {
     }
 
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
-        type: 'bar',
         data: {
             labels: validData.map(entry => entry.date),
             datasets: [
                 {
+                    type: 'bar',
                     label: 'Revenue',
                     data: validData.map(entry => entry.revenue),
-                    borderColor: 'rgba(255, 140, 0, 1)', // 橙色
-                    backgroundColor: 'rgba(255, 140, 0, 0.6)', // 半透明
+                    borderColor: 'rgb(253,206,170)', // 深藍 (#003366)
+                    backgroundColor: 'rgb(225,167,121)', // 半透明深藍
                     yAxisID: 'y'
                 },
                 {
+                    type: 'bar',
                     label: 'Cost of Revenue',
                     data: validData.map(entry => entry.costOfRevenue),
-                    borderColor: 'rgba(0, 206, 209, 1)', // 淺藍綠
-                    backgroundColor: 'rgba(0, 206, 209, 0.6)', // 半透明
+                    borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
+                    backgroundColor: 'rgba(102, 204, 204, 0.3)', // 半透明藍綠色
                     yAxisID: 'y'
                 },
                 {
+                    type: 'bar',
                     label: 'Operating Expenses',
                     data: validData.map(entry => entry.operatingExpenses),
-                    borderColor: 'rgba(138, 43, 226, 1)', // 螢光紫色
-                    backgroundColor: 'rgba(138, 43, 226, 0.6)', // 半透明
+                    borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
+                    backgroundColor: 'rgba(153, 204, 255, 0.3)', // 半透明淺藍色
                     yAxisID: 'y'
                 },
                 {
+                    type: 'bar',
                     label: 'Operating Income',
                     data: validData.map(entry => entry.operatingIncome),
-                    borderColor: 'rgba(255, 215, 0, 1)', // 金黃色
-                    backgroundColor: 'rgba(255, 215, 0, 0.6)', // 半透明
+                    borderColor: 'rgba(232, 232, 232, 1)', // 淺灰色 (#E8E8E8)
+                    backgroundColor: 'rgba(232, 232, 232, 0.3)', // 半透明淺灰色
                     yAxisID: 'y'
                 },
                 {
+                    type: 'line',
                     label: 'Growth Rate',
                     data: validData.map(entry => entry.growthRate),
-                    type: 'line',
-                    borderColor: 'rgba(30, 144, 255, 1)', // 深藍
-                    backgroundColor: 'rgba(30, 144, 255, 0.6)', // 半透明
+                    borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
+                    backgroundColor: 'rgba(255, 153, 0, 0.3)', // 半透明橙色
                     yAxisID: 'y1'
                 }
             ]
@@ -3658,7 +3661,7 @@ function createOperatingChart(data, chartId) {
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Growth Rate (%)'
+                        text: 'Percentage (%)'
                     },
                     position: 'right',
                     grid: {
@@ -3672,7 +3675,7 @@ function createOperatingChart(data, chartId) {
                         label: function (tooltipItem) {
                             const value = tooltipItem.raw;
                             if (value !== null) {
-                                return tooltipItem.dataset.label === 'Growth Rate'
+                                return tooltipItem.dataset.label.includes('Rate')
                                     ? value.toFixed(2) + '%'
                                     : value.toLocaleString();
                             }
@@ -3681,7 +3684,9 @@ function createOperatingChart(data, chartId) {
                     },
                     backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
                     titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(255, 255, 255, 1)' // 白色字體
+                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色字體
+                    borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
+                    borderWidth: 1
                 }
             }
         }
@@ -3708,8 +3713,8 @@ function createIncomeStatementChart(data, chartId) {
                     type: 'bar',
                     label: 'EPS',
                     data: validData.map(entry => entry.eps),
-                    borderColor: 'rgb(53,140,234)', // 深藍 (#003366)
-                    backgroundColor: 'rgba(115,176,244,0.6)', // 半透明深藍
+                    borderColor: 'rgb(253,206,170)', // 深藍 (#003366)
+                    backgroundColor: 'rgb(225,167,121)', // 半透明深藍
                     yAxisID: 'y'
                 },
                 {
@@ -4258,37 +4263,39 @@ function createCombinedBalanceSheetChart(data, chartId) {
     }
 
     balanceSheetChartInstances[chartId] = new Chart(ctx, {
-        type: 'bar',
         data: {
             labels: data.map(entry => entry.date),
             datasets: [
                 {
+                    type: 'bar',
                     label: 'Total Assets',
                     data: data.map(entry => entry.totalAssets),
-                    borderColor: 'rgba(100, 181, 246, 1)', // 柔和的藍色
-                    backgroundColor: 'rgba(100, 181, 246, 0.6)',
+                    borderColor: 'rgb(253,206,170)', // 深藍 (#003366)
+                    backgroundColor: 'rgb(225,167,121)', // 半透明深藍
                     yAxisID: 'y'
                 },
                 {
+                    type: 'bar',
                     label: 'Total Liabilities',
                     data: data.map(entry => entry.totalLiabilities),
-                    borderColor: 'rgba(255, 171, 64, 1)', // 柔和的橙色
-                    backgroundColor: 'rgba(255, 171, 64, 0.6)',
+                    borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
+                    backgroundColor: 'rgba(102, 204, 204, 0.3)', // 半透明藍綠色
                     yAxisID: 'y'
                 },
                 {
+                    type: 'bar',
                     label: 'Total Equity',
                     data: data.map(entry => entry.totalEquity),
-                    borderColor: 'rgba(129, 199, 132, 1)', // 柔和的綠色
-                    backgroundColor: 'rgba(129, 199, 132, 0.6)',
+                    borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
+                    backgroundColor: 'rgba(153, 204, 255, 0.3)', // 半透明淺藍色
                     yAxisID: 'y'
                 },
                 {
+                    type: 'line',
                     label: 'Debt to Asset Rate',
                     data: data.map(entry => entry.debtToAssetRateValue),
-                    type: 'line',
-                    borderColor: 'rgba(239, 83, 80, 1)', // 柔和的紅色
-                    backgroundColor: 'rgba(239, 83, 80, 0.2)',
+                    borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
+                    backgroundColor: 'rgba(255, 153, 0, 0.3)', // 半透明橙色
                     yAxisID: 'y1'
                 }
             ]
@@ -4321,6 +4328,26 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     grid: {
                         drawOnChartArea: false
                     }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            const value = tooltipItem.raw;
+                            if (value !== null) {
+                                return tooltipItem.dataset.label.includes('Rate')
+                                    ? value.toFixed(2) + '%'
+                                    : value.toLocaleString();
+                            }
+                            return 'No data';
+                        }
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
+                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
+                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色字體
+                    borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
+                    borderWidth: 1
                 }
             }
         }
@@ -4365,14 +4392,14 @@ function createPieChart(data, chartId, options = {}) {
     const defaultOptions = {
         labels: ['Total Assets', 'Total Liabilities', 'Total Equity'],
         colors: [
-            'rgba(100, 181, 246, 0.6)', // Assets - 柔和的藍色
-            'rgba(255, 171, 64, 0.6)', // Liabilities - 柔和的橙色
-            'rgba(129, 199, 132, 0.6)' // Equity - 柔和的綠色
+            'rgb(253,206,170)', // Total Assets - 深藍 (#003366)
+            'rgba(102, 204, 204, 0.3)', // Total Liabilities - 半透明藍綠
+            'rgba(153, 204, 255, 0.3)'  // Total Equity - 半透明淺藍
         ],
         borderColors: [
-            'rgba(100, 181, 246, 1)',
-            'rgba(255, 171, 64, 1)',
-            'rgba(129, 199, 132, 1)'
+            'rgb(225,167,121)', // Total Assets - 半透明深藍
+            'rgba(102, 204, 204, 1)',  // Total Liabilities - 藍綠色
+            'rgba(153, 204, 255, 1)'   // Total Equity - 淺藍色
         ]
     };
 
@@ -4399,6 +4426,21 @@ function createPieChart(data, chartId, options = {}) {
             plugins: {
                 legend: {
                     position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            const value = tooltipItem.raw;
+                            const total = totalAssets + totalLiabilities + totalEquity;
+                            const percentage = ((value / total) * 100).toFixed(2);
+                            return `${tooltipItem.label}: ${value.toLocaleString()} (${percentage}%)`;
+                        }
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
+                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
+                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色字體
+                    borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
+                    borderWidth: 1
                 }
             }
         }
@@ -4800,37 +4842,39 @@ function createCashflowChart(data, chartId) {
     }
 
     cashflowChartInstances[chartId] = new Chart(ctx, {
-        type: 'bar',
         data: {
             labels: data.map(entry => entry.date),
             datasets: [
                 {
+                    type: 'bar',
                     label: 'Operating Cash Flow',
                     data: data.map(entry => entry.operatingCashFlow),
-                    borderColor: 'rgba(102, 187, 106, 1)', // 柔和青綠色
-                    backgroundColor: 'rgba(102, 187, 106, 0.6)', // 半透明
+                    borderColor: 'rgb(253,206,170)', // 深藍 (#003366)
+                    backgroundColor: 'rgb(225,167,121)', // 半透明深藍
                     yAxisID: 'y'
                 },
                 {
+                    type: 'bar',
                     label: 'Capital Expenditure',
                     data: data.map(entry => entry.capitalExpenditure),
-                    borderColor: 'rgba(255, 241, 118, 1)', // 柔和黃色
-                    backgroundColor: 'rgba(255, 241, 118, 0.6)', // 半透明
+                    borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
+                    backgroundColor: 'rgba(102, 204, 204, 0.3)', // 半透明藍綠色
                     yAxisID: 'y'
                 },
                 {
+                    type: 'bar',
                     label: 'Free Cash Flow',
                     data: data.map(entry => entry.freeCashFlow),
-                    borderColor: 'rgba(41, 182, 246, 1)', // 柔和藍色
-                    backgroundColor: 'rgba(41, 182, 246, 0.6)', // 半透明
+                    borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
+                    backgroundColor: 'rgba(153, 204, 255, 0.3)', // 半透明淺藍色
                     yAxisID: 'y'
                 },
                 {
-                    label: 'Capex to Operating Cash Flow',
-                    data: data.map(entry => entry.capexToOperatingCashFlowValue), // 使用數值數據
                     type: 'line',
-                    borderColor: 'rgba(255, 183, 77, 1)', // 柔和橙色
-                    backgroundColor: 'rgba(255, 183, 77, 0.2)', // 半透明
+                    label: 'Capex to Operating Cash Flow',
+                    data: data.map(entry => entry.capexToOperatingCashFlowValue),
+                    borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
+                    backgroundColor: 'rgba(255, 153, 0, 0.3)', // 半透明橙色
                     yAxisID: 'y1'
                 }
             ]
@@ -4862,6 +4906,26 @@ function createCashflowChart(data, chartId) {
                     grid: {
                         drawOnChartArea: false
                     }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            const value = tooltipItem.raw;
+                            if (value !== null) {
+                                return tooltipItem.dataset.label.includes('Capex to Operating Cash Flow')
+                                    ? value.toFixed(2) + '%'
+                                    : value.toLocaleString();
+                            }
+                            return 'No data';
+                        }
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
+                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
+                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色字體
+                    borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
+                    borderWidth: 1
                 }
             }
         }
