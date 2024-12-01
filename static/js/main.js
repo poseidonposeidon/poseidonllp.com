@@ -4173,48 +4173,44 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
         entry.debtToAssetRateValue = debtToAssetRate * 100;
     });
 
-    let tableHtml = `
-    <div style="display: flex; overflow-x: auto;">
-        <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
-            <table border="1" style="border-collapse: collapse; white-space: nowrap;">
-                ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
-            </table>
-        </div>
-        <div class="scroll-right" style="overflow-x: auto;">
-            <table border="1" style="width: 100%; border-collapse: collapse; white-space: nowrap;">
-                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
-            </table>
-        </div>
-    </div>
-    `;
-
-    // 創建容器結構，並綁定唯一的下載按鈕ID
-    const downloadButtonId = `downloadBtn_${chartId}`;
-    const pieChartId = `${chartId}Pie`;
-    container.innerHTML = `
-        <button id="${downloadButtonId}">Download as Excel</button>
-        <div class="scroll-container-x" id="${chartId}ScrollContainer">
-            <div id="${chartId}Container">
-                ${tableHtml}
+    let tableHtml =
+        <div style="display: flex; overflow-x: auto;">
+            <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
+                <table border="1" style="border-collapse: collapse; white-space: nowrap;">
+                    ${Object.keys(rows).map(key => <tr><th>${rows[key][0]}</th></tr>).join('')}
+                </table>
+            </div>
+            <div class="scroll-right" style="overflow-x: auto;">
+                <table border="1" style="width: 100%; border-collapse: collapse; white-space: nowrap;">
+                    ${Object.keys(rows).map(key => <tr>${rows[key].slice(1).map(value => <td>${value}</td>).join('')}</tr>).join('')}
+                </table>
             </div>
         </div>
-        <div id="chartContainer" style="margin-top: 20px;">
-            <canvas id="${chartId}"></canvas>
+    ;
+
+    // 創建容器結構，並綁定唯一的下載按鈕ID
+    const downloadButtonId = downloadBtn_${chartId};
+    const pieChartId = ${chartId}Pie;
+    container.innerHTML =
+        <button id="${downloadButtonId}">Download as Excel</button>
+    <div class="scroll-container-x" id="${chartId}ScrollContainer">
+        <div id="${chartId}Container">
+            ${tableHtml}
         </div>
-        <div id="pieChartContainer" style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
-            <canvas id="${pieChartId}" width="600" height="600"></canvas> <!-- 修改寬高 -->
-        </div>
-        <div id="percentagePieChartContainer" style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
-            <canvas id="${percentagePieChartId}" width="600" height="600"></canvas>
-        </div>
-    `;
+    </div>
+    <div id="chartContainer" style="margin-top: 20px;">
+        <canvas id="${chartId}"></canvas>
+    </div>
+    <div id="pieChartContainer" style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
+        <canvas id="${pieChartId}" width="600" height="600"></canvas> <!-- 修改寬高 -->
+    </div>
+    ;
 
     // 創建條形圖表
     createCombinedBalanceSheetChart(filteredDataForChart, chartId);
 
     // 創建圓餅圖，僅使用最新數據
     createPieChart(filteredDataForChart, pieChartId);
-    createPercentagePieChart(filteredDataForChart, percentagePieChartId);
 
     // 綁定下載按鈕
     bindDownloadButton_BS(rows, data[0].symbol, downloadButtonId, "Balance Sheet");
@@ -4253,14 +4249,14 @@ function downloadExcel_BS(rows, symbol, sheetName) {
     XLSX.utils.book_append_sheet(wb, ws, sheetName);
 
     // Use the stock symbol to name the file
-    XLSX.writeFile(wb, `${symbol}_${sheetName.toLowerCase().replace(/ /g, '_')}.xlsx`);
+    XLSX.writeFile(wb, ${symbol}_${sheetName.toLowerCase().replace(/ /g, '_')}.xlsx);
 }
 
 function createCombinedBalanceSheetChart(data, chartId) {
     const canvas = document.getElementById(chartId);
 
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
-        console.error(`Canvas element with id ${chartId} not found or is not a canvas element.`);
+        console.error(Canvas element with id ${chartId} not found or is not a canvas element.);
         return;
     }
 
@@ -4455,96 +4451,6 @@ function createPieChart(data, chartId, options = {}) {
         }
     });
 }
-
-function createPercentagePieChart(data, chartId, options = {}) {
-    const canvas = document.getElementById(chartId);
-
-    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
-        console.error(`Canvas element with id ${chartId} not found or is not a canvas element.`);
-        return;
-    }
-
-    const ctx = canvas.getContext('2d');
-
-    // 銷毀現有圖表實例（如果存在）
-    if (balanceSheetChartInstances[chartId]) {
-        balanceSheetChartInstances[chartId].destroy();
-    }
-
-    // 設置 canvas 屬性（渲染大小）
-    canvas.width = 600;
-    canvas.height = 600;
-
-    // 確保數據按日期排序（升序，最舊日期在前）
-    const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    // 提取最新數據
-    const latestData = sortedData[sortedData.length - 1];
-    if (!latestData) {
-        console.error('No data available for the percentage pie chart.');
-        return;
-    }
-
-    const { totalAssets = 0, totalLiabilities = 0, totalEquity = 0 } = latestData;
-
-    // 計算百分比
-    const liabilityToAsset = ((totalLiabilities / totalAssets) * 100).toFixed(2);
-    const equityToAsset = ((totalEquity / totalAssets) * 100).toFixed(2);
-
-    const defaultOptions = {
-        labels: ['Liability/Asset (%)', 'Equity/Asset (%)'],
-        colors: [
-            'rgba(255,99,132,0.8)',  // Liability/Asset
-            'rgba(54,162,235,0.8)'  // Equity/Asset
-        ],
-        borderColors: [
-            'rgb(255,99,132)',  // Liability/Asset
-            'rgb(54,162,235)'   // Equity/Asset
-        ]
-    };
-
-    const chartOptions = { ...defaultOptions, ...options };
-
-    // 創建圖表
-    balanceSheetChartInstances[chartId] = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: chartOptions.labels,
-            datasets: [
-                {
-                    label: 'Percentage Composition',
-                    data: [parseFloat(liabilityToAsset), parseFloat(equityToAsset)],
-                    backgroundColor: chartOptions.colors,
-                    borderColor: chartOptions.borderColors,
-                    borderWidth: 1
-                }
-            ]
-        },
-        options: {
-            responsive: false,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function (tooltipItem) {
-                            const value = tooltipItem.raw;
-                            return `${tooltipItem.label}: ${value.toFixed(2)}%`;
-                        }
-                    },
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
-                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色字體
-                    borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
-                    borderWidth: 1
-                }
-            }
-        }
-    });
-}
-
 
 function formatNumber(value) {
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
