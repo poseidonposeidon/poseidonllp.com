@@ -4204,6 +4204,9 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
         <div id="pieChartContainer" style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
             <canvas id="${pieChartId}" width="600" height="600"></canvas> <!-- 修改寬高 -->
         </div>
+        <div id="percentagePieChartContainer" style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
+            <canvas id="${percentagePieChartId}" width="600" height="600"></canvas>
+        </div>
     `;
 
     // 創建條形圖表
@@ -4211,6 +4214,7 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
 
     // 創建圓餅圖，僅使用最新數據
     createPieChart(filteredDataForChart, pieChartId);
+    createPercentagePieChart(filteredDataForChart, percentagePieChartId);
 
     // 綁定下載按鈕
     bindDownloadButton_BS(rows, data[0].symbol, downloadButtonId, "Balance Sheet");
@@ -4363,6 +4367,99 @@ function createPieChart(data, chartId, options = {}) {
     const canvas = document.getElementById(chartId);
 
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
+        console.error(Canvas element with id ${chartId} not found or is not a canvas element.);
+        return;
+    }
+
+    const ctx = canvas.getContext('2d');
+
+    // 銷毀現有圖表實例（如果存在）
+    if (balanceSheetChartInstances[chartId]) {
+        balanceSheetChartInstances[chartId].destroy();
+    }
+
+    // 設置 canvas 屬性（渲染大小）
+    canvas.width = 600;
+    canvas.height = 600;
+
+    // 確保數據按日期排序（升序，最舊日期在前）
+    const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    // 提取最新數據
+    const latestData = sortedData[sortedData.length - 1];
+    if (!latestData) {
+        console.error('No data available for the pie chart.');
+        return;
+    }
+
+    const { totalAssets = 0, totalLiabilities = 0, totalEquity = 0 } = latestData;
+    if (totalAssets === 0 && totalLiabilities === 0 && totalEquity === 0) {
+        console.error('Invalid data for the pie chart.');
+        return;
+    }
+
+    const defaultOptions = {
+        labels: ['Total Assets', 'Total Liabilities', 'Total Equity'],
+        colors: [
+            'rgb(253,206,170)', // Total Assets - 深藍 (#003366)
+            'rgba(102, 204, 204, 0.3)', // Total Liabilities - 半透明藍綠
+            'rgba(153, 204, 255, 0.3)'  // Total Equity - 半透明淺藍
+        ],
+        borderColors: [
+            'rgb(225,167,121)', // Total Assets - 半透明深藍
+            'rgba(102, 204, 204, 1)',  // Total Liabilities - 藍綠色
+            'rgba(153, 204, 255, 1)'   // Total Equity - 淺藍色
+        ]
+    };
+
+    const chartOptions = { ...defaultOptions, ...options };
+
+    // 創建圖表
+    balanceSheetChartInstances[chartId] = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: chartOptions.labels,
+            datasets: [
+                {
+                    label: 'Balance Sheet Composition',
+                    data: [totalAssets, totalLiabilities, totalEquity],
+                    backgroundColor: chartOptions.colors,
+                    borderColor: chartOptions.borderColors,
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: false,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            const value = tooltipItem.raw;
+                            const total = totalAssets + totalLiabilities + totalEquity;
+                            const percentage = ((value / total) * 100).toFixed(2);
+                            return ${tooltipItem.label}: ${value.toLocaleString()} (${percentage}%);
+                        }
+                    },
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
+                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
+                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色字體
+                    borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
+                    borderWidth: 1
+                }
+            }
+        }
+    });
+}
+
+function createPercentagePieChart(data, chartId, options = {}) {
+    const canvas = document.getElementById(chartId);
+
+    if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
         console.error(`Canvas element with id ${chartId} not found or is not a canvas element.`);
         return;
     }
@@ -4384,39 +4481,23 @@ function createPieChart(data, chartId, options = {}) {
     // 提取最新數據
     const latestData = sortedData[sortedData.length - 1];
     if (!latestData) {
-        console.error('No data available for the chart.');
+        console.error('No data available for the percentage pie chart.');
         return;
     }
 
     const { totalAssets = 0, totalLiabilities = 0, totalEquity = 0 } = latestData;
-    if (totalAssets === 0 && totalLiabilities === 0 && totalEquity === 0) {
-        console.error('Invalid data for the chart.');
-        return;
-    }
 
     // 計算百分比
     const liabilityToAsset = ((totalLiabilities / totalAssets) * 100).toFixed(2);
     const equityToAsset = ((totalEquity / totalAssets) * 100).toFixed(2);
 
     const defaultOptions = {
-        labels: [
-            'Total Assets',
-            'Total Liabilities',
-            'Total Equity',
-            'Liability/Asset (%)',
-            'Equity/Asset (%)'
-        ],
+        labels: ['Liability/Asset (%)', 'Equity/Asset (%)'],
         colors: [
-            'rgba(253,206,170,0.8)', // Total Assets
-            'rgba(102,204,204,0.8)', // Total Liabilities
-            'rgba(153,204,255,0.8)', // Total Equity
             'rgba(255,99,132,0.8)',  // Liability/Asset
-            'rgba(54,162,235,0.8)'   // Equity/Asset
+            'rgba(54,162,235,0.8)'  // Equity/Asset
         ],
         borderColors: [
-            'rgb(225,167,121)', // Total Assets
-            'rgb(102,204,204)', // Total Liabilities
-            'rgb(153,204,255)', // Total Equity
             'rgb(255,99,132)',  // Liability/Asset
             'rgb(54,162,235)'   // Equity/Asset
         ]
@@ -4424,67 +4505,24 @@ function createPieChart(data, chartId, options = {}) {
 
     const chartOptions = { ...defaultOptions, ...options };
 
-    // 數據設置
-    const barData = [totalAssets, totalLiabilities, totalEquity]; // 條形圖數據
-    const lineData = [null, null, null, parseFloat(liabilityToAsset), parseFloat(equityToAsset)]; // 折線圖數據
-
-    // 創建混合圖表
+    // 創建圖表
     balanceSheetChartInstances[chartId] = new Chart(ctx, {
-        type: 'bar',
+        type: 'pie',
         data: {
             labels: chartOptions.labels,
             datasets: [
                 {
-                    type: 'bar',
-                    label: 'Amount',
-                    data: barData,
-                    backgroundColor: chartOptions.colors.slice(0, 3),
-                    borderColor: chartOptions.borderColors.slice(0, 3),
-                    borderWidth: 1,
-                    yAxisID: 'y'
-                },
-                {
-                    type: 'line',
-                    label: 'Percentage',
-                    data: lineData,
-                    borderColor: chartOptions.borderColors.slice(3),
-                    backgroundColor: chartOptions.colors.slice(3),
-                    borderWidth: 2,
-                    tension: 0.4,
-                    yAxisID: 'y1'
+                    label: 'Percentage Composition',
+                    data: [parseFloat(liabilityToAsset), parseFloat(equityToAsset)],
+                    backgroundColor: chartOptions.colors,
+                    borderColor: chartOptions.borderColors,
+                    borderWidth: 1
                 }
             ]
         },
         options: {
-            responsive: true,
+            responsive: false,
             maintainAspectRatio: false,
-            scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Categories'
-                    }
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Amount'
-                    },
-                    position: 'left'
-                },
-                y1: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Percentage (%)'
-                    },
-                    position: 'right',
-                    grid: {
-                        drawOnChartArea: false // 不繪製百分比與金額的重疊網格線
-                    }
-                }
-            },
             plugins: {
                 legend: {
                     position: 'top'
@@ -4493,10 +4531,7 @@ function createPieChart(data, chartId, options = {}) {
                     callbacks: {
                         label: function (tooltipItem) {
                             const value = tooltipItem.raw;
-                            if (tooltipItem.dataset.label === 'Percentage') {
-                                return `${tooltipItem.label}: ${value.toFixed(2)}%`;
-                            }
-                            return `${tooltipItem.label}: ${value.toLocaleString()}`;
+                            return `${tooltipItem.label}: ${value.toFixed(2)}%`;
                         }
                     },
                     backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
@@ -4509,6 +4544,7 @@ function createPieChart(data, chartId, options = {}) {
         }
     });
 }
+
 
 function formatNumber(value) {
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
