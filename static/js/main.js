@@ -4394,25 +4394,44 @@ function createPieChart(data, chartId, options = {}) {
         return;
     }
 
+    // 計算百分比
+    const liabilityToAsset = ((totalLiabilities / totalAssets) * 100).toFixed(2);
+    const equityToAsset = ((totalEquity / totalAssets) * 100).toFixed(2);
+
     const defaultOptions = {
-        labels: ['Total Assets', 'Total Liabilities', 'Total Equity'],
+        labels: [
+            'Total Assets',
+            'Total Liabilities',
+            'Total Equity',
+            'Liability/Asset (%)',
+            'Equity/Asset (%)'
+        ],
         colors: [
-            'rgb(253,206,170)', // Total Assets - 深藍 (#003366)
+            'rgb(253,206,170)', // Total Assets - 深藍
             'rgba(102, 204, 204, 0.3)', // Total Liabilities - 半透明藍綠
-            'rgba(153, 204, 255, 0.3)'  // Total Equity - 半透明淺藍
+            'rgba(153, 204, 255, 0.3)', // Total Equity - 半透明淺藍
+            'rgba(255, 99, 132, 0.3)', // Liability/Asset - 半透明紅
+            'rgba(54, 162, 235, 0.3)' // Equity/Asset - 半透明藍
         ],
         borderColors: [
             'rgb(225,167,121)', // Total Assets - 半透明深藍
-            'rgba(102, 204, 204, 1)',  // Total Liabilities - 藍綠色
-            'rgba(153, 204, 255, 1)'   // Total Equity - 淺藍色
+            'rgba(102, 204, 204, 1)', // Total Liabilities - 藍綠色
+            'rgba(153, 204, 255, 1)', // Total Equity - 淺藍色
+            'rgba(255, 99, 132, 1)', // Liability/Asset - 紅
+            'rgba(54, 162, 235, 1)' // Equity/Asset - 藍
         ]
     };
 
     const chartOptions = { ...defaultOptions, ...options };
 
-    // 計算百分比
-    const liabilityToAsset = ((totalLiabilities / totalAssets) * 100).toFixed(2);
-    const equityToAsset = ((totalEquity / totalAssets) * 100).toFixed(2);
+    // 創建圖表數據，包括百分比項目
+    const chartData = [
+        totalAssets,
+        totalLiabilities,
+        totalEquity,
+        parseFloat(liabilityToAsset),
+        parseFloat(equityToAsset)
+    ];
 
     // 創建圖表
     balanceSheetChartInstances[chartId] = new Chart(ctx, {
@@ -4422,7 +4441,7 @@ function createPieChart(data, chartId, options = {}) {
             datasets: [
                 {
                     label: 'Balance Sheet Composition',
-                    data: [totalAssets, totalLiabilities, totalEquity],
+                    data: chartData,
                     backgroundColor: chartOptions.colors,
                     borderColor: chartOptions.borderColors,
                     borderWidth: 1
@@ -4440,20 +4459,10 @@ function createPieChart(data, chartId, options = {}) {
                     callbacks: {
                         label: function (tooltipItem) {
                             const value = tooltipItem.raw;
-                            const total = totalAssets + totalLiabilities + totalEquity;
-                            const percentage = ((value / total) * 100).toFixed(2);
-
-                            // 顯示詳細信息
-                            const additionalInfo = `
-                                Liability/Asset: ${liabilityToAsset}%
-                                Equity/Asset: ${equityToAsset}%
-                                Asset/Asset: 100%
-                            `;
-
-                            return [
-                                `${tooltipItem.label}: ${value.toLocaleString()} (${percentage}%)`,
-                                additionalInfo
-                            ];
+                            const percentage = tooltipItem.label.includes('Asset')
+                                ? `${value.toFixed(2)}%`
+                                : `${value.toLocaleString()}`;
+                            return `${tooltipItem.label}: ${percentage}`;
                         }
                     },
                     backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
