@@ -4410,6 +4410,10 @@ function createPieChart(data, chartId, options = {}) {
 
     const chartOptions = { ...defaultOptions, ...options };
 
+    // 計算百分比
+    const liabilityToAsset = ((totalLiabilities / totalAssets) * 100).toFixed(2);
+    const equityToAsset = ((totalEquity / totalAssets) * 100).toFixed(2);
+
     // 創建圖表
     balanceSheetChartInstances[chartId] = new Chart(ctx, {
         type: 'pie',
@@ -4438,7 +4442,18 @@ function createPieChart(data, chartId, options = {}) {
                             const value = tooltipItem.raw;
                             const total = totalAssets + totalLiabilities + totalEquity;
                             const percentage = ((value / total) * 100).toFixed(2);
-                            return `${tooltipItem.label}: ${value.toLocaleString()} (${percentage}%)`;
+
+                            // 顯示詳細信息
+                            const additionalInfo = `
+                                Liability/Asset: ${liabilityToAsset}%
+                                Equity/Asset: ${equityToAsset}%
+                                Asset/Asset: 100%
+                            `;
+
+                            return [
+                                `${tooltipItem.label}: ${value.toLocaleString()} (${percentage}%)`,
+                                additionalInfo
+                            ];
                         }
                     },
                     backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
