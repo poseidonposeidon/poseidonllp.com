@@ -3583,16 +3583,21 @@ function updateDisplayedYears(data, container, chartId, operatingChartId, period
 }
 
 function createOperatingChart(data, chartId) {
+    // 排序資料，確保按日期順序排列
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
+    // 過濾掉 growthRate 為 null 的資料
     const validData = data.filter(entry => entry.growthRate !== null);
 
+    // 取得畫布上下文
     const ctx = document.getElementById(chartId).getContext('2d');
 
+    // 如果圖表已經存在，先銷毀，避免重疊
     if (incomeStatementChartInstances[chartId]) {
         incomeStatementChartInstances[chartId].destroy();
     }
 
+    // 創建新的圖表
     incomeStatementChartInstances[chartId] = new Chart(ctx, {
         data: {
             labels: validData.map(entry => entry.date),
@@ -3601,17 +3606,17 @@ function createOperatingChart(data, chartId) {
                     type: 'bar',
                     label: 'Revenue',
                     data: validData.map(entry => entry.revenue),
-                    borderColor: 'rgb(253,206,170,1)', // 深藍 (#003366)
-                    backgroundColor: 'rgb(186,153,130,0.9)', // 半透明深藍
+                    borderColor: 'rgb(253,206,170,1)',
+                    backgroundColor: 'rgb(186,153,130,0.5)', // 半透明
                     yAxisID: 'y',
-                    order: 1 // 確保柱狀圖順序較低
+                    order: 1
                 },
                 {
                     type: 'bar',
                     label: 'Cost of Revenue',
                     data: validData.map(entry => entry.costOfRevenue),
-                    borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
-                    backgroundColor: 'rgba(102, 204, 204, 0.9)', // 半透明藍綠色
+                    borderColor: 'rgba(102, 204, 204, 1)',
+                    backgroundColor: 'rgba(102, 204, 204, 0.5)', // 半透明
                     yAxisID: 'y',
                     order: 1
                 },
@@ -3619,8 +3624,8 @@ function createOperatingChart(data, chartId) {
                     type: 'bar',
                     label: 'Operating Expenses',
                     data: validData.map(entry => entry.operatingExpenses),
-                    borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
-                    backgroundColor: 'rgba(153, 204, 255, 0.9)', // 半透明淺藍色
+                    borderColor: 'rgba(153, 204, 255, 1)',
+                    backgroundColor: 'rgba(153, 204, 255, 0.5)', // 半透明
                     yAxisID: 'y',
                     order: 1
                 },
@@ -3628,8 +3633,8 @@ function createOperatingChart(data, chartId) {
                     type: 'bar',
                     label: 'Operating Income',
                     data: validData.map(entry => entry.operatingIncome),
-                    borderColor: 'rgba(232, 232, 232, 1)', // 淺灰色 (#E8E8E8)
-                    backgroundColor: 'rgba(232, 232, 232, 0.9)', // 半透明淺灰色
+                    borderColor: 'rgba(232, 232, 232, 1)',
+                    backgroundColor: 'rgba(232, 232, 232, 0.5)', // 半透明
                     yAxisID: 'y',
                     order: 1
                 },
@@ -3637,10 +3642,14 @@ function createOperatingChart(data, chartId) {
                     type: 'line',
                     label: 'Growth Rate',
                     data: validData.map(entry => entry.growthRate),
-                    borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
+                    borderColor: 'rgba(255, 153, 0, 1)', // 橙色
                     backgroundColor: 'rgba(255, 153, 0, 0.9)', // 半透明橙色
+                    borderWidth: 3, // 加粗折線
+                    pointRadius: 5, // 增大圓點
+                    pointBackgroundColor: 'rgba(255, 153, 0, 1)', // 鮮明顏色
+                    pointBorderColor: 'rgba(255, 153, 0, 1)',
                     yAxisID: 'y1',
-                    order: 2 // 確保折線圖順序較高
+                    order: 2 // 確保折線圖顯示在柱狀圖上方
                 }
             ]
         },
@@ -3670,7 +3679,7 @@ function createOperatingChart(data, chartId) {
                     },
                     position: 'right',
                     grid: {
-                        drawOnChartArea: false
+                        drawOnChartArea: false // 不在主區域繪製格線
                     }
                 }
             },
@@ -3689,7 +3698,7 @@ function createOperatingChart(data, chartId) {
                     },
                     backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
                     titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色字體
+                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色文字
                     borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
                     borderWidth: 1
                 }
