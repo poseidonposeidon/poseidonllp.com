@@ -4277,7 +4277,9 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     data: data.map(entry => entry.totalAssets),
                     borderColor: 'rgb(253,206,170)', // 深藍 (#003366)
                     backgroundColor: 'rgb(225,167,121)', // 半透明深藍
-                    yAxisID: 'y'
+                    yAxisID: 'y',
+                    barPercentage: 0.8,
+                    categoryPercentage: 0.8
                 },
                 {
                     type: 'bar',
@@ -4285,7 +4287,9 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     data: data.map(entry => entry.totalLiabilities),
                     borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
                     backgroundColor: 'rgba(102, 204, 204, 0.3)', // 半透明藍綠色
-                    yAxisID: 'y'
+                    yAxisID: 'y',
+                    barPercentage: 0.8,
+                    categoryPercentage: 0.8
                 },
                 {
                     type: 'bar',
@@ -4293,7 +4297,9 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     data: data.map(entry => entry.totalEquity),
                     borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
                     backgroundColor: 'rgba(153, 204, 255, 0.3)', // 半透明淺藍色
-                    yAxisID: 'y'
+                    yAxisID: 'y',
+                    barPercentage: 0.8,
+                    categoryPercentage: 0.8
                 },
                 {
                     type: 'line',
@@ -4301,7 +4307,10 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     data: data.map(entry => entry.debtToAssetRateValue),
                     borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
                     backgroundColor: 'rgba(255, 153, 0, 0.3)', // 半透明橙色
-                    yAxisID: 'y1'
+                    yAxisID: 'y1',
+                    tension: 0.3, // 平滑線條
+                    borderWidth: 2,
+                    pointRadius: 3
                 }
             ]
         },
