@@ -4276,7 +4276,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     label: 'Total Assets',
                     data: data.map(entry => entry.totalAssets),
                     borderColor: 'rgb(253,206,170,1)',
-                    backgroundColor: 'rgb(225,167,121,0.3)',
+                    backgroundColor: 'rgb(225,167,121,0.3)', //tw
                     yAxisID: 'y',
                     barPercentage: 0.8,
                     categoryPercentage: 0.8
