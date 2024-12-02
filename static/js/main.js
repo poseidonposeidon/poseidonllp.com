@@ -3607,7 +3607,7 @@ function createOperatingChart(data, chartId) {
                     label: 'Revenue',
                     data: validData.map(entry => entry.revenue),
                     borderColor: 'rgb(253,206,170,1)',
-                    backgroundColor: 'rgb(186,153,130,0.5)', // 半透明
+                    backgroundColor: 'rgb(186,153,130,0.7)', // 半透明
                     yAxisID: 'y',
                     order: 1
                 },
@@ -3616,7 +3616,7 @@ function createOperatingChart(data, chartId) {
                     label: 'Cost of Revenue',
                     data: validData.map(entry => entry.costOfRevenue),
                     borderColor: 'rgba(102, 204, 204, 1)',
-                    backgroundColor: 'rgba(102, 204, 204, 0.5)', // 半透明
+                    backgroundColor: 'rgba(102, 204, 204, 0.7)', // 半透明
                     yAxisID: 'y',
                     order: 1
                 },
@@ -3625,7 +3625,7 @@ function createOperatingChart(data, chartId) {
                     label: 'Operating Expenses',
                     data: validData.map(entry => entry.operatingExpenses),
                     borderColor: 'rgba(153, 204, 255, 1)',
-                    backgroundColor: 'rgba(153, 204, 255, 0.5)', // 半透明
+                    backgroundColor: 'rgba(153, 204, 255, 0.7)', // 半透明
                     yAxisID: 'y',
                     order: 1
                 },
@@ -3634,7 +3634,7 @@ function createOperatingChart(data, chartId) {
                     label: 'Operating Income',
                     data: validData.map(entry => entry.operatingIncome),
                     borderColor: 'rgba(232, 232, 232, 1)',
-                    backgroundColor: 'rgba(232, 232, 232, 0.5)', // 半透明
+                    backgroundColor: 'rgba(232, 232, 232, 0.7)', // 半透明
                     yAxisID: 'y',
                     order: 1
                 },
@@ -3728,7 +3728,7 @@ function createIncomeStatementChart(data, chartId) {
                     label: 'EPS',
                     data: validData.map(entry => entry.eps),
                     borderColor: 'rgb(253,206,170,1)',
-                    backgroundColor: 'rgb(225,167,121,0.9)',
+                    backgroundColor: 'rgb(225,167,121,0.7)',
                     yAxisID: 'y'
                 },
                 {
@@ -3736,7 +3736,7 @@ function createIncomeStatementChart(data, chartId) {
                     label: 'Gross Profit Ratio',
                     data: validData.map(entry => entry.grossProfitRatio * 100),
                     borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
-                    backgroundColor: 'rgba(102, 204, 204, 0.9)', // 半透明藍綠色
+                    backgroundColor: 'rgba(102, 204, 204, 0.7)', // 半透明藍綠色
                     yAxisID: 'y1'
                 },
                 {
@@ -3744,7 +3744,7 @@ function createIncomeStatementChart(data, chartId) {
                     label: 'Operating Income Ratio',
                     data: validData.map(entry => entry.operatingIncomeRatio * 100),
                     borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
-                    backgroundColor: 'rgba(153, 204, 255, 0.9)', // 半透明淺藍色
+                    backgroundColor: 'rgba(153, 204, 255, 0.7)', // 半透明淺藍色
                     yAxisID: 'y1'
                 },
                 {
@@ -3752,7 +3752,7 @@ function createIncomeStatementChart(data, chartId) {
                     label: 'Net Income Ratio',
                     data: validData.map(entry => entry.netIncomeRatio * 100),
                     borderColor: 'rgba(232, 232, 232, 1)', // 淺灰色 (#E8E8E8)
-                    backgroundColor: 'rgba(232, 232, 232, 0.9)', // 半透明淺灰色
+                    backgroundColor: 'rgba(232, 232, 232, 0.7)', // 半透明淺灰色
                     yAxisID: 'y1'
                 },
                 {
