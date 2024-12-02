@@ -4275,8 +4275,8 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     type: 'bar',
                     label: 'Total Assets',
                     data: data.map(entry => entry.totalAssets),
-                    borderColor: 'rgb(253,206,170)', // 深藍 (#003366)
-                    backgroundColor: 'rgb(225,167,121)', // 半透明深藍
+                    borderColor: 'rgb(253,206,170,1)', 
+                    backgroundColor: 'rgb(225,167,121)',
                     yAxisID: 'y',
                     barPercentage: 0.8,
                     categoryPercentage: 0.8
@@ -4308,7 +4308,6 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
                     backgroundColor: 'rgba(255, 153, 0, 0.3)', // 半透明橙色
                     yAxisID: 'y1',
-                    tension: 0.3, // 平滑線條
                     borderWidth: 2,
                     pointRadius: 3
                 }
