@@ -3602,7 +3602,7 @@ function createOperatingChart(data, chartId) {
                     label: 'Revenue',
                     data: validData.map(entry => entry.revenue),
                     borderColor: 'rgb(253,206,170,1)', // 深藍 (#003366)
-                    backgroundColor: 'rgb(186,153,130,0.3)', // 半透明深藍
+                    backgroundColor: 'rgb(186,153,130,0.7)', // 半透明深藍
                     yAxisID: 'y',
                     order: 1 // 確保柱狀圖順序較低
                 },
@@ -3611,7 +3611,7 @@ function createOperatingChart(data, chartId) {
                     label: 'Cost of Revenue',
                     data: validData.map(entry => entry.costOfRevenue),
                     borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
-                    backgroundColor: 'rgba(102, 204, 204, 0.3)', // 半透明藍綠色
+                    backgroundColor: 'rgba(102, 204, 204, 0.7)', // 半透明藍綠色
                     yAxisID: 'y',
                     order: 1
                 },
@@ -3620,7 +3620,7 @@ function createOperatingChart(data, chartId) {
                     label: 'Operating Expenses',
                     data: validData.map(entry => entry.operatingExpenses),
                     borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
-                    backgroundColor: 'rgba(153, 204, 255, 0.3)', // 半透明淺藍色
+                    backgroundColor: 'rgba(153, 204, 255, 0.7)', // 半透明淺藍色
                     yAxisID: 'y',
                     order: 1
                 },
@@ -3629,7 +3629,7 @@ function createOperatingChart(data, chartId) {
                     label: 'Operating Income',
                     data: validData.map(entry => entry.operatingIncome),
                     borderColor: 'rgba(232, 232, 232, 1)', // 淺灰色 (#E8E8E8)
-                    backgroundColor: 'rgba(232, 232, 232, 0.3)', // 半透明淺灰色
+                    backgroundColor: 'rgba(232, 232, 232, 0.7)', // 半透明淺灰色
                     yAxisID: 'y',
                     order: 1
                 },
@@ -3638,7 +3638,7 @@ function createOperatingChart(data, chartId) {
                     label: 'Growth Rate',
                     data: validData.map(entry => entry.growthRate),
                     borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
-                    backgroundColor: 'rgba(255, 153, 0, 0.3)', // 半透明橙色
+                    backgroundColor: 'rgba(255, 153, 0, 0.7)', // 半透明橙色
                     yAxisID: 'y1',
                     order: 2 // 確保折線圖順序較高
                 }
