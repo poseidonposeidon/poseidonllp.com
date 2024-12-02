@@ -3601,8 +3601,8 @@ function createOperatingChart(data, chartId) {
                     type: 'bar',
                     label: 'Revenue',
                     data: validData.map(entry => entry.revenue),
-                    borderColor: 'rgb(253,206,170)', // 深藍 (#003366)
-                    backgroundColor: 'rgb(186,153,130)', // 半透明深藍
+                    borderColor: 'rgb(253,206,170,1)', // 深藍 (#003366)
+                    backgroundColor: 'rgb(186,153,130,0.3)', // 半透明深藍
                     yAxisID: 'y',
                     order: 1 // 確保柱狀圖順序較低
                 },
@@ -3719,7 +3719,7 @@ function createIncomeStatementChart(data, chartId) {
                     label: 'EPS',
                     data: validData.map(entry => entry.eps),
                     borderColor: 'rgb(253,206,170,1)',
-                    backgroundColor: 'rgb(225,167,121,0.3)', 
+                    backgroundColor: 'rgb(225,167,121,0.3)',
                     yAxisID: 'y'
                 },
                 {
@@ -4276,7 +4276,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     label: 'Total Assets',
                     data: data.map(entry => entry.totalAssets),
                     borderColor: 'rgb(253,206,170,1)',
-                    backgroundColor: 'rgb(225,167,121)',
+                    backgroundColor: 'rgb(225,167,121,0.3)',
                     yAxisID: 'y',
                     barPercentage: 0.8,
                     categoryPercentage: 0.8
