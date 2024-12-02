@@ -3718,8 +3718,8 @@ function createIncomeStatementChart(data, chartId) {
                     type: 'bar',
                     label: 'EPS',
                     data: validData.map(entry => entry.eps),
-                    borderColor: 'rgb(253,206,170)', // 深藍 (#003366)
-                    backgroundColor: 'rgb(225,167,121)', // 半透明深藍
+                    borderColor: 'rgb(253,206,170,1)',
+                    backgroundColor: 'rgb(225,167,121,0.3)', 
                     yAxisID: 'y'
                 },
                 {
@@ -4275,7 +4275,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
                     type: 'bar',
                     label: 'Total Assets',
                     data: data.map(entry => entry.totalAssets),
-                    borderColor: 'rgb(253,206,170,1)', 
+                    borderColor: 'rgb(253,206,170,1)',
                     backgroundColor: 'rgb(225,167,121)',
                     yAxisID: 'y',
                     barPercentage: 0.8,
