@@ -4376,7 +4376,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
     });
 }
 
-function createPieChart(data, chartId, options = {}) {
+async function createPieChart(symbol, chartId, options = {}) {
     const canvas = document.getElementById(chartId);
 
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
@@ -4395,78 +4395,89 @@ function createPieChart(data, chartId, options = {}) {
     canvas.width = 600;
     canvas.height = 600;
 
-    // 確保數據按日期排序（升序，最舊日期在前）
-    const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
+    // 使用 financialmodelingprep.com API 獲取數據
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/balance-sheet-statement/${symbol}?limit=1&apikey=${apiKey}`;
 
-    // 提取最新數據
-    const latestData = sortedData[sortedData.length - 1];
-    if (!latestData) {
-        console.error('No data available for the pie chart.');
-        return;
-    }
+    try {
+        const response = await fetch(apiUrl);
+        const data = await response.json();
 
-    const { totalAssets = 0, totalLiabilities = 0, totalEquity = 0 } = latestData;
-    if (totalAssets === 0 && totalLiabilities === 0 && totalEquity === 0) {
-        console.error('Invalid data for the pie chart.');
-        return;
-    }
+        if (!data || data.length === 0) {
+            console.error('No data available for the pie chart.');
+            return;
+        }
 
-    const defaultOptions = {
-        labels: ['Total Assets', 'Total Liabilities', 'Total Equity'],
-        colors: [
-            'rgb(253,206,170)', // Total Assets - 深藍 (#003366)
-            'rgba(102, 204, 204, 0.3)', // Total Liabilities - 半透明藍綠
-            'rgba(153, 204, 255, 0.3)'  // Total Equity - 半透明淺藍
-        ],
-        borderColors: [
-            'rgb(225,167,121)', // Total Assets - 半透明深藍
-            'rgba(102, 204, 204, 1)',  // Total Liabilities - 藍綠色
-            'rgba(153, 204, 255, 1)'   // Total Equity - 淺藍色
-        ]
-    };
+        const latestData = data[0];
+        const { totalAssets = 0, totalLiabilities = 0, totalStockholdersEquity = 0 } = latestData;
 
-    const chartOptions = { ...defaultOptions, ...options };
+        if (totalAssets === 0) {
+            console.error('Invalid data for the pie chart. Total Assets cannot be 0.');
+            return;
+        }
 
-    // 創建圖表
-    balanceSheetChartInstances[chartId] = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: chartOptions.labels,
-            datasets: [
-                {
-                    label: 'Balance Sheet Composition',
-                    data: [totalAssets, totalLiabilities, totalEquity],
-                    backgroundColor: chartOptions.colors,
-                    borderColor: chartOptions.borderColors,
-                    borderWidth: 1
-                }
+        // 計算百分比
+        const liabilityToAssetRatio = ((totalLiabilities / totalAssets) * 100).toFixed(2);
+        const equityToAssetRatio = ((totalStockholdersEquity / totalAssets) * 100).toFixed(2);
+        const assetToAssetRatio = 100; // 固定為 100%
+
+        const defaultOptions = {
+            labels: ['Liabilities/Assets', 'Equity/Assets', 'Assets/Assets'],
+            colors: [
+                'rgb(253,206,170)', // Liabilities/Assets
+                'rgba(102, 204, 204, 0.3)', // Equity/Assets
+                'rgba(153, 204, 255, 0.3)'  // Assets/Assets
+            ],
+            borderColors: [
+                'rgb(225,167,121)', // Liabilities/Assets
+                'rgba(102, 204, 204, 1)',  // Equity/Assets
+                'rgba(153, 204, 255, 1)'   // Assets/Assets
             ]
-        },
-        options: {
-            responsive: false,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'top'
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function (tooltipItem) {
-                            const value = tooltipItem.raw;
-                            const total = totalAssets + totalLiabilities + totalEquity;
-                            const percentage = ((value / total) * 100).toFixed(2);
-                            return `${tooltipItem.label}: ${value.toLocaleString()} (${percentage}%)`;
-                        }
+        };
+
+        const chartOptions = { ...defaultOptions, ...options };
+
+        // 創建圖表
+        balanceSheetChartInstances[chartId] = new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: chartOptions.labels,
+                datasets: [
+                    {
+                        label: 'Balance Sheet Ratios',
+                        data: [liabilityToAssetRatio, equityToAssetRatio, assetToAssetRatio],
+                        backgroundColor: chartOptions.colors,
+                        borderColor: chartOptions.borderColors,
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                responsive: false,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'top'
                     },
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
-                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色字體
-                    borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
-                    borderWidth: 1
+                    tooltip: {
+                        callbacks: {
+                            label: function (tooltipItem) {
+                                const value = tooltipItem.raw;
+                                return `${tooltipItem.label}: ${value}%`;
+                            }
+                        },
+                        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                        titleColor: 'rgba(255, 255, 255, 1)',
+                        bodyColor: 'rgba(255, 255, 255, 1)',
+                        borderColor: 'rgba(255, 255, 255, 1)',
+                        borderWidth: 1
+                    }
                 }
             }
-        }
-    });
+        });
+    } catch (error) {
+        console.error('Error fetching data from financialmodelingprep.com:', error);
+    }
 }
 
 function formatNumber(value) {
