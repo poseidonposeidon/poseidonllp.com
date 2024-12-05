@@ -3091,7 +3091,6 @@ function displayCompanyPrice(data, container) {
 
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
-
 let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
 let peBandChartInstances = {};
@@ -3144,11 +3143,7 @@ async function fetchTWIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period ,yearRange);
-
-    // const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
-    // const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
-    // fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartTW');
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period ,yearRange)
 }
 
 function fetchEUIncomeStatement() {
@@ -3165,9 +3160,6 @@ function fetchEUIncomeStatement() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period ,yearRange);
 
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartEU');
 }
 
 function fetchKRIncomeStatement() {
@@ -3183,10 +3175,6 @@ function fetchKRIncomeStatement() {
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period ,yearRange);
-
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartKR');
 }
 
 function fetchHKIncomeStatement() {
@@ -3203,9 +3191,6 @@ function fetchHKIncomeStatement() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period ,yearRange);
 
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartHK');
 }
 
 function fetchCNIncomeStatement() {
@@ -3222,59 +3207,59 @@ function fetchCNIncomeStatement() {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
 
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartCN');
 }
 
 function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
+    // 使用 Promise.all 獲取價格與 EPS 數據
     Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
         .then(responses => Promise.all(responses.map(response => response.json())))
         .then(([priceData, epsData]) => {
-            console.log("Price Data (Expected 10 years):", priceData);
-            console.log("EPS Data (Expected 10 years of quarterly data):", epsData);
-
             if (priceData.historical && Array.isArray(epsData)) {
+                // 確保數據的時間範圍
                 const peData = calculatePEData(priceData.historical, epsData);
                 if (peData && peData.length > 0) {
                     displayPEBandChart(peData, chartId);
                 } else {
-                    console.error("No P/E data available.");
+                    console.error("No P/E data available for the given range.");
                 }
             } else {
                 console.error("Invalid data from price or EPS API");
             }
         })
         .catch(error => {
-            console.error('Error fetching PE Band data:', error);
+            console.error("Error fetching PE Band data:", error);
         });
 }
 
 function calculatePEData(priceData, epsData) {
-    const peData = priceData.map(priceEntry => {
-        const date = priceEntry.date;
-        const priceDate = new Date(date);
+    const tenYearsAgo = new Date();
+    tenYearsAgo.setFullYear(tenYearsAgo.getFullYear() - 10); // 設置為10年前
 
-        // 尋找過去四季的 EPS 數據，將其累加起來
-        const cumulativeEPS = epsData.reduce((acc, epsEntry) => {
-            const epsDate = new Date(epsEntry.date);
-            if (epsDate <= priceDate && acc.count < 4) {
-                acc.total += epsEntry.eps;
-                acc.count += 1;
+    const peData = priceData
+        .filter(priceEntry => new Date(priceEntry.date) >= tenYearsAgo) // 只保留10年內的數據
+        .map(priceEntry => {
+            const priceDate = new Date(priceEntry.date);
+
+            // 找出過去四季的 EPS，並累加
+            const cumulativeEPS = epsData.reduce((acc, epsEntry) => {
+                const epsDate = new Date(epsEntry.date);
+                if (epsDate <= priceDate && acc.count < 4) {
+                    acc.total += epsEntry.eps;
+                    acc.count += 1;
+                }
+                return acc;
+            }, { total: 0, count: 0 }).total;
+
+            // 確保 EPS 有數據，計算 P/E 比率
+            if (cumulativeEPS > 0) {
+                return {
+                    date: priceEntry.date,
+                    peRatio: parseFloat((priceEntry.close / cumulativeEPS).toFixed(2))
+                };
             }
-            return acc;
-        }, { total: 0, count: 0 }).total;
-
-        // 確保有對應的 EPS 數據，並計算本益比
-        if (cumulativeEPS > 0) {
-            const peRatio = priceEntry.close / cumulativeEPS;
-            return {
-                date: date,
-                peRatio: peRatio,
-            };
-        }
-        return null;
-    }).filter(entry => entry !== null); // 過濾掉沒有對應 EPS 的數據
+            return null;
+        })
+        .filter(entry => entry !== null); // 過濾無效數據
 
     return peData;
 }
@@ -3546,7 +3531,7 @@ function bindDownloadButton(rows, symbol, buttonId) {
         }
     }, 100);  // 延遲執行以確保 DOM 已完全更新
 }
-// 下载 Excel 文件的函数
+
 function downloadExcel(rows, symbol) {
     // Check if rows is defined and not empty
     if (!rows || Object.keys(rows).length === 0) {
@@ -3822,7 +3807,6 @@ function createIncomeStatementChart(data, chartId) {
 function displayPEBandChart(peData, chartId) {
     const canvas = document.getElementById(chartId);
 
-    // 檢查 canvas 是否已正確生成
     if (!canvas) {
         console.error(`Canvas with ID ${chartId} not found.`);
         return;
@@ -3830,50 +3814,59 @@ function displayPEBandChart(peData, chartId) {
 
     const ctx = canvas.getContext('2d');
 
-    // 確保將日期轉換為 Date 對象
-    const dates = peData.map(entry => new Date(entry.date));
-    const peRatios = peData.map(entry => entry.peRatio);
-
-    // 檢查是否已有先前的圖表實例
+    // 清除現有圖表實例，避免重複
     if (peBandChartInstances[chartId]) {
         peBandChartInstances[chartId].destroy();
     }
 
-    // 創建新的圖表實例
+    // 繪製新的圖表
     peBandChartInstances[chartId] = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: dates,
+            labels: peData.map(entry => new Date(entry.date).toLocaleDateString('en-US')),
             datasets: [{
                 label: 'P/E Ratio',
-                data: peRatios,
-                borderColor: 'rgba(120, 160, 200, 1)', // 柔和的淡藍色
+                data: peData.map(entry => entry.peRatio),
+                borderColor: 'rgba(120, 160, 200, 1)', // 柔和的藍色
                 fill: false,
+                tension: 0.4 // 增加平滑度
             }]
         },
         options: {
+            responsive: true,
             scales: {
                 x: {
                     type: 'time',
                     time: {
                         unit: 'year',
-                        tooltipFormat: 'yyyy-MM-dd',
+                        tooltipFormat: 'yyyy-MM-dd'
                     },
                     title: {
                         display: true,
-                        text: 'Date',
-                    },
+                        text: 'Date'
+                    }
                 },
                 y: {
                     title: {
                         display: true,
-                        text: 'P/E Ratio',
-                    },
-                },
+                        text: 'P/E Ratio'
+                    }
+                }
             },
-        },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: tooltipItem => {
+                            const value = tooltipItem.raw;
+                            return value ? `P/E: ${value.toFixed(2)}` : 'No data';
+                        }
+                    }
+                }
+            }
+        }
     });
 }
+
 
 function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
