@@ -3123,12 +3123,14 @@ function fetchJPIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period , yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period, yearRange);
 
     // 請求本益比河流圖的資料
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
     const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartJP'); // 傳入對應的 chartId
+
+    // 直接傳入正確的 ID
+    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartJP');
 }
 
 async function fetchTWIncomeStatement() {
@@ -3209,7 +3211,16 @@ function fetchCNIncomeStatement() {
 
 }
 
+let fetchedPEDataCache = {}; // 全局緩存數據
+
 function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
+    const cacheKey = `${priceApiUrl}_${epsApiUrl}`;
+    if (fetchedPEDataCache[cacheKey]) {
+        // 使用緩存數據
+        displayPEBandChart(fetchedPEDataCache[cacheKey], chartId);
+        return;
+    }
+
     // 使用 Promise.all 獲取價格與 EPS 數據
     Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
         .then(responses => Promise.all(responses.map(response => response.json())))
@@ -3218,6 +3229,7 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
                 // 確保數據的時間範圍
                 const peData = calculatePEData(priceData.historical, epsData);
                 if (peData && peData.length > 0) {
+                    fetchedPEDataCache[cacheKey] = peData; // 存入緩存
                     displayPEBandChart(peData, chartId);
                 } else {
                     console.error("No P/E data available for the given range.");
@@ -3866,7 +3878,6 @@ function displayPEBandChart(peData, chartId) {
         }
     });
 }
-
 
 function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
