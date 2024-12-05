@@ -3211,36 +3211,39 @@ function fetchCNIncomeStatement() {
 
 }
 
-let fetchedPEDataCache = {}; // 全局緩存數據
+let fetchedPEDataCache = {}; // 緩存全局數據
 
-function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
+async function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
     const cacheKey = `${priceApiUrl}_${epsApiUrl}`;
+
     if (fetchedPEDataCache[cacheKey]) {
-        // 使用緩存數據
         displayPEBandChart(fetchedPEDataCache[cacheKey], chartId);
         return;
     }
 
-    // 使用 Promise.all 獲取價格與 EPS 數據
-    Promise.all([fetch(priceApiUrl), fetch(epsApiUrl)])
-        .then(responses => Promise.all(responses.map(response => response.json())))
-        .then(([priceData, epsData]) => {
-            if (priceData.historical && Array.isArray(epsData)) {
-                // 確保數據的時間範圍
-                const peData = calculatePEData(priceData.historical, epsData);
-                if (peData && peData.length > 0) {
-                    fetchedPEDataCache[cacheKey] = peData; // 存入緩存
-                    displayPEBandChart(peData, chartId);
-                } else {
-                    console.error("No P/E data available for the given range.");
-                }
-            } else {
-                console.error("Invalid data from price or EPS API");
-            }
-        })
-        .catch(error => {
-            console.error("Error fetching PE Band data:", error);
-        });
+    try {
+        const [stockPriceData, epsData] = await Promise.all([
+            fetch(priceApiUrl).then(res => res.json()),
+            fetch(epsApiUrl).then(res => res.json())
+        ]);
+
+        if (!stockPriceData.historical || !Array.isArray(epsData)) {
+            console.error("Invalid data received for P/E calculation.");
+            return;
+        }
+
+        const peData = calculatePEData(stockPriceData.historical, epsData);
+
+        if (peData && peData.length > 0) {
+            fetchedPEDataCache[cacheKey] = peData;
+            displayPEBandChart(peData, chartId);
+        } else {
+            console.warn("No P/E data available for this symbol.");
+        }
+
+    } catch (error) {
+        console.error("Error fetching PE Band data:", error);
+    }
 }
 
 function calculatePEData(priceData, epsData) {
@@ -3826,12 +3829,17 @@ function displayPEBandChart(peData, chartId) {
 
     const ctx = canvas.getContext('2d');
 
-    // 清除現有圖表實例，避免重複
+    // 清除現有圖表，避免重複渲染
     if (peBandChartInstances[chartId]) {
         peBandChartInstances[chartId].destroy();
     }
 
-    // 繪製新的圖表
+    // 檢查數據是否有效
+    if (!peData || peData.length === 0) {
+        console.warn("No data available for PE Band chart.");
+        return;
+    }
+
     peBandChartInstances[chartId] = new Chart(ctx, {
         type: 'line',
         data: {
@@ -3839,9 +3847,10 @@ function displayPEBandChart(peData, chartId) {
             datasets: [{
                 label: 'P/E Ratio',
                 data: peData.map(entry => entry.peRatio),
-                borderColor: 'rgba(120, 160, 200, 1)', // 柔和的藍色
-                fill: false,
-                tension: 0.4 // 增加平滑度
+                borderColor: 'rgba(120, 160, 200, 1)', // 藍色
+                backgroundColor: 'rgba(120, 160, 200, 0.2)', // 半透明藍色
+                fill: true,
+                tension: 0.4 // 平滑線條
             }]
         },
         options: {
