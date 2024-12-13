@@ -2676,21 +2676,19 @@ async function fetchOperatingIncomeData(stockSymbol, apiKey) {
     }
 }
 
-async function displayChart(type) {
-    const stockInputs = [
-        'stock1-tw',
-        'stock2-tw',
-        'stock3-tw',
-        'stock4-tw',
-        'stock5-tw'
-    ];
+async function displayChart(type, sectionId = 'compare-tw') {
+    // 根據 sectionId 確定輸入框的 ID 前綴
+    const inputPrefix = sectionId === 'compare-tw' ? 'stock-tw' : 'stock';
+    const stockInputs = Array.from(document.querySelectorAll(`input[id^="${inputPrefix}"]`));
 
+    // 收集用戶輸入的股票代碼
     const stocks = stockInputs
-        .map(id => document.getElementById(id).value.trim())
-        .filter(stock => stock);  // 過濾空的股票輸入
+        .map(input => input.value.trim())
+        .filter(stock => stock); // 過濾掉空輸入
 
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const loadingElement = document.getElementById('loading');
+    const chartId = sectionId === 'compare-tw' ? 'grossMarginChart' : 'globalChart';
 
     if (stocks.length === 0) {
         alert('Please enter at least one stock symbol.');
@@ -2705,75 +2703,26 @@ async function displayChart(type) {
             stocks.map(stock => fetchStockWithExchangeSuffix(stock, apiKey))
         );
 
-        // 檢查是否有未成功獲取的股票代碼
-        if (fullStockSymbols.includes(null)) {
-            alert('Unable to determine stock exchange for one or more symbols.');
+        // 找到未成功匹配的股票代碼
+        const unmatchedStocks = stocks.filter((_, index) => fullStockSymbols[index] === null);
+        if (unmatchedStocks.length > 0) {
+            alert(`Unable to determine stock exchange for the following symbols: ${unmatchedStocks.join(', ')}`);
+        }
+
+        // 過濾掉無效的股票代碼
+        const validStockSymbols = fullStockSymbols.filter(symbol => symbol !== null);
+
+        if (validStockSymbols.length === 0) {
+            alert('No valid stock symbols to process.');
             return;
         }
 
-        // 加載所有數據並處理
+        // 加載數據並處理
         const dataSets = [];
         const labels = [];
 
-        for (let i = 0; i < fullStockSymbols.length; i++) {
-            const fullStockSymbol = fullStockSymbols[i];
-            let data;
-
-            switch (type) {
-                case 'peRatio':
-                    data = await fetchPERatioData(fullStockSymbol, apiKey);
-                    break;
-                case 'grossMargin':
-                case 'operatingMargin':
-                case 'netProfitMargin':
-                    data = await fetchMarginData(fullStockSymbol, apiKey, type);
-                    break;
-                case 'eps':
-                    data = await fetchEPSData(fullStockSymbol, apiKey);
-                    break;
-                case 'roe':
-                    data = await fetchROEData(fullStockSymbol, apiKey);
-                    break;
-                case 'operatingMarginGrowthRate':
-                    data = await fetchOperatingMarginGrowthRate(fullStockSymbol, apiKey);
-                    break;
-                case 'stockPrice':
-                    data = await fetchStockPriceData(fullStockSymbol, apiKey);
-                    break;
-                case 'revenueGrowthRate':
-                    data = await fetchRevenueGrowthRate(fullStockSymbol, apiKey);
-                    break;
-                case 'externalROE':
-                    data = await fetchExternalROEData(fullStockSymbol, apiKey);
-                    break;
-                case 'quarterlyRevenueGrowthRate':
-                    data = await fetchQuarterlyRevenueGrowthRate(fullStockSymbol, apiKey);
-                    break;
-                case 'grossMarginYoY':
-                    data = await fetchGrossMarginYoY(fullStockSymbol, apiKey);
-                    break;
-                case 'operatingMarginYoY':
-                    data = await fetchOperatingMarginYoY(fullStockSymbol, apiKey);
-                    break;
-                case 'netProfitYoY':
-                    data = await fetchNetProfitYoY(fullStockSymbol, apiKey);
-                    break;
-                case 'revenue':
-                    data = await fetchRevenueData(fullStockSymbol, apiKey);
-                    break;
-                case 'costOfRevenue':
-                    data = await fetchCostOfRevenueData(fullStockSymbol, apiKey);
-                    break;
-                case 'operatingExpenses':
-                    data = await fetchOperatingExpensesData(fullStockSymbol, apiKey);
-                    break;
-                case 'operatingIncome':
-                    data = await fetchOperatingIncomeData(fullStockSymbol, apiKey);
-                    break;
-                default:
-                    throw new Error('Invalid chart type');
-            }
-
+        for (const fullStockSymbol of validStockSymbols) {
+            const data = await fetchDataByType(fullStockSymbol, apiKey, type);
             if (!data || data.length === 0) {
                 console.warn(`No data found for ${fullStockSymbol}`);
                 continue;
@@ -2788,7 +2737,7 @@ async function displayChart(type) {
             return;
         }
 
-        drawChart(labels, dataSets, type);
+        drawChart(labels, dataSets, type, chartId);
 
     } catch (error) {
         console.error('Error fetching data:', error);
@@ -2798,13 +2747,55 @@ async function displayChart(type) {
     }
 }
 
-function drawChart(labels, dataSets, type) {
-    const ctx = document.getElementById('grossMarginChart').getContext('2d');
+async function fetchDataByType(stockSymbol, apiKey, type) {
+    switch (type) {
+        case 'peRatio':
+            return await fetchPERatioData(stockSymbol, apiKey);
+        case 'grossMargin':
+        case 'operatingMargin':
+        case 'netProfitMargin':
+            return await fetchMarginData(stockSymbol, apiKey, type);
+        case 'eps':
+            return await fetchEPSData(stockSymbol, apiKey);
+        case 'roe':
+            return await fetchROEData(stockSymbol, apiKey);
+        case 'operatingMarginGrowthRate':
+            return await fetchOperatingMarginGrowthRate(stockSymbol, apiKey);
+        case 'stockPrice':
+            return await fetchStockPriceData(stockSymbol, apiKey);
+        case 'revenueGrowthRate':
+            return await fetchRevenueGrowthRate(stockSymbol, apiKey);
+        case 'externalROE':
+            return await fetchExternalROEData(stockSymbol, apiKey);
+        case 'quarterlyRevenueGrowthRate':
+            return await fetchQuarterlyRevenueGrowthRate(stockSymbol, apiKey);
+        case 'grossMarginYoY':
+            return await fetchGrossMarginYoY(stockSymbol, apiKey);
+        case 'operatingMarginYoY':
+            return await fetchOperatingMarginYoY(stockSymbol, apiKey);
+        case 'netProfitYoY':
+            return await fetchNetProfitYoY(stockSymbol, apiKey);
+        case 'revenue':
+            return await fetchRevenueData(stockSymbol, apiKey);
+        case 'costOfRevenue':
+            return await fetchCostOfRevenueData(stockSymbol, apiKey);
+        case 'operatingExpenses':
+            return await fetchOperatingExpensesData(stockSymbol, apiKey);
+        case 'operatingIncome':
+            return await fetchOperatingIncomeData(stockSymbol, apiKey);
+        default:
+            throw new Error('Invalid chart type');
+    }
+}
+
+function drawChart(labels, dataSets, type, chartId = 'grossMarginChart') {
+    const ctx = document.getElementById(chartId).getContext('2d');
 
     if (chartInstance) {
         chartInstance.destroy();
     }
 
+    // 獲取所有日期並排序
     const allDates = [...new Set(dataSets.flatMap(data => data.map(item => item.date.split('T')[0])))].sort((a, b) => new Date(a) - new Date(b));
 
     console.log('All Dates:', allDates);
@@ -2815,23 +2806,23 @@ function drawChart(labels, dataSets, type) {
             if (!entry) return null;
 
             switch (type) {
-                case 'grossMarginYoY': return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
-                case 'operatingMarginYoY': return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
-                case 'netProfitYoY': return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
-                case 'eps': return entry.eps !== undefined ? entry.eps : null;
-                case 'revenue': return entry.revenue !== undefined ? entry.revenue : null;
-                case 'costOfRevenue': return entry.revenue !== undefined ? entry.revenue : null;
-                case 'operatingExpenses': return entry.revenue !== undefined ? entry.revenue : null;
-                case 'grossMargin': return entry.margin !== undefined ? entry.margin : null;
-                case 'operatingMargin': return entry.margin !== undefined ? entry.margin : null;
-                case 'netProfitMargin': return entry.margin !== undefined ? entry.margin : null;
-                case 'roe': return entry.margin !== undefined ? entry.margin : null;
-                case 'externalROE': return entry.margin !== undefined ? entry.margin : null;
-                case 'revenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
-                case 'quarterlyRevenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
-                case 'operatingIncome': return entry.operatingIncome !== undefined ? entry.operatingIncome : null;
-                case 'stockPrice': return entry.price !== undefined ? entry.price : null;
-                case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
+                case 'grossMarginYoY': return entry.grossProfitYoY ?? null;
+                case 'operatingMarginYoY': return entry.operatingMarginYoY ?? null;
+                case 'netProfitYoY': return entry.netProfitYoY ?? null;
+                case 'eps': return entry.eps ?? null;
+                case 'revenue': return entry.revenue ?? null;
+                case 'costOfRevenue': return entry.revenue ?? null;
+                case 'operatingExpenses': return entry.revenue ?? null;
+                case 'grossMargin': return entry.margin ?? null;
+                case 'operatingMargin': return entry.margin ?? null;
+                case 'netProfitMargin': return entry.margin ?? null;
+                case 'roe': return entry.margin ?? null;
+                case 'externalROE': return entry.margin ?? null;
+                case 'revenueGrowthRate': return entry.margin ?? null;
+                case 'quarterlyRevenueGrowthRate': return entry.margin ?? null;
+                case 'operatingIncome': return entry.operatingIncome ?? null;
+                case 'stockPrice': return entry.price ?? null;
+                case 'peRatio': return entry.peRatio ?? null;
                 default: return null;
             }
         });
@@ -2855,7 +2846,7 @@ function drawChart(labels, dataSets, type) {
         };
     });
 
-    const chartType = (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome') ? 'bar' : 'line';
+    const chartType = ['eps', 'revenue', 'costOfRevenue', 'operatingExpenses', 'operatingIncome'].includes(type) ? 'bar' : 'line';
 
     const chartData = {
         labels: allDates,
@@ -2884,7 +2875,8 @@ function drawChart(labels, dataSets, type) {
                             } else if (type === 'peRatio') {
                                 return value.toFixed(2);
                             }
-                            return type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome' ? value.toLocaleString() : value.toFixed(2) + '%';
+                            return ['eps', 'revenue', 'costOfRevenue', 'operatingExpenses', 'operatingIncome'].includes(type)
+                                ? value.toLocaleString() : value.toFixed(2) + '%';
                         }
                     }
                 }
