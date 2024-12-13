@@ -1133,11 +1133,57 @@ function loadCompareSection(sectionId) {
                 <canvas id="grossMarginChart" style="width: 100%; height: 400px;"></canvas>
                 <!-- Comparison results will be displayed here -->
             </div>
+        `,
+        'compare-multi': `
+            <h2>Compare Global Stocks</h2>
+            <div class="info-input">
+                <label for="stock1">Stock 1:</label>
+                <input type="text" id="stock1" placeholder="e.g., 2330 or AAPL">
+                
+                <label for="stock2">Stock 2:</label>            
+                <input type="text" id="stock2" placeholder="e.g., 2317 or TSLA">
+                
+                <label for="stock3">Stock 3:</label>
+                <input type="text" id="stock3" placeholder="e.g., 2881 or GOOG">
+                
+                <label for="stock4">Stock 4:</label>
+                <input type="text" id="stock4" placeholder="e.g., 1301 or MSFT">
+                
+                <label for="stock5">Stock 5:</label>
+                <input type="text" id="stock5" placeholder="e.g., 1101 or AMZN">
+            </div>
+            
+            <!-- Chart Options -->
+            <div class="chart-links">
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('global-financials')">Financial Report</span>
+                    <div class="submenu" id="global-financials">
+                        <a href="#" onclick="displayChart('stockPrice')">Stock Price</a>
+                        <a href="#" onclick="displayChart('eps')">EPS</a>
+                        <a href="#" onclick="displayChart('revenue')">Revenue</a>
+                    </div>
+                </div>
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('global-profitability')">Profitability</span>
+                    <div class="submenu" id="global-profitability">
+                        <a href="#" onclick="displayChart('grossMargin')">Gross Margin</a>
+                        <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a>
+                    </div>
+                </div>
+            </div>
+
+            <div id="loading" style="display: none; text-align: center;">
+                <p>Loading... Please wait.</p>
+            </div>
+
+            <div id="comparisonResultContainer-global">
+                <canvas id="globalChart" style="width: 100%; height: 400px;"></canvas>
+            </div>
         `
     };
 
     const compareDiv = document.getElementById('compare');
-    const sectionContainer = document.getElementById('section-container-compare-tw');
+    const sectionContainer = document.getElementById(`section-container-${sectionId}`);
 
     if (sectionContainer) {
         // Load content
@@ -2861,6 +2907,43 @@ function drawChart(labels, dataSets, type) {
         }
     });
 }
+
+async function fetchAllSymbols(apiKey) {
+    const apiUrl = `https://financialmodelingprep.com/api/v3/stock/list?apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching all symbols:', error);
+        return [];
+    }
+}
+
+async function createSymbolMap(apiKey) {
+    const allSymbols = await fetchAllSymbols(apiKey);
+    const symbolMap = new Map();
+    allSymbols.forEach(item => {
+        const baseSymbol = item.symbol.split('.')[0];
+        symbolMap.set(baseSymbol.toUpperCase(), item.symbol);
+    });
+    return symbolMap;
+}
+
+async function getFullStockSymbol(userInput, apiKey, symbolMap) {
+    const upperInput = userInput.trim().toUpperCase();
+    if (symbolMap.has(upperInput)) {
+        return symbolMap.get(upperInput);
+    } else {
+        console.warn(`Symbol ${upperInput} not found in the symbol map.`);
+        return null;
+    }
+}
+
+
 //////////////////////////////Profile//////////////////////////////////////////////
 
 function fetchCompanyProfile(stockSymbol) {
