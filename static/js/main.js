@@ -2,29 +2,31 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 
+// 股票和產業的映射
 const industryStocks = {
-    "半導體": ["2330.TW", "2303.TW", "2308.TW"], // 台積電、聯電、日月光
-    "IC 設計": ["2454.TW", "3034.TW", "3437.TW"], // 聯發科、聯詠、新唐
-    "電腦及周邊設備": ["2357.TW", "2377.TW", "2360.TW"], // 華碩、微星、致茂
-    "網通設備": ["2345.TW", "2419.TW", "6285.TW"], // 智邦、中磊、啟碁
-    "記憶體": ["2344.TW", "3006.TW", "3474.TW"], // 華邦電、晶豪科、群聯
-    "載板": ["3037.TW", "8046.TW", "3189.TW"], // 欣興、南電、晶豪科
-    "太陽能": ["6244.TW", "3576.TW", "3691.TW"], // 茂迪、元晶、綠能
-    "鋼鐵": ["2002.TW", "2027.TW", "2014.TW"], // 中鋼、大成鋼、中鴻
-    "金融保險": ["2882.TW", "2881.TW", "2891.TW"], // 國泰金、富邦金、中信金
-    "汽車零組件": ["2201.TW", "1522.TW", "2231.TW"], // 裕隆、堤維西、為升
-    "電子零組件": ["2382.TW", "2392.TW", "2327.TW"], // 廣達、正崴、國巨
-    "電動車相關": ["2308.TW", "6533.TW", "5227.TW"], // 鴻海、晶碩、台半
-    "光學鏡頭": ["3406.TW", "3231.TW", "6209.TW"], // 玉晶光、緯創、今國光
-    "塑料及化工": ["1301.TW", "1303.TW", "1314.TW"], // 台塑、南亞、台聚
-    "醫療設備": ["4105.TW", "4123.TW", "9919.TW"], // 東洋、晟德、康聯
-    "食品飲料": ["1216.TW", "1227.TW", "2912.TW"], // 統一、台糖、全家
-    "航運物流": ["2603.TW", "2609.TW", "2615.TW"], // 長榮、陽明、萬海
-    "能源相關": ["2601.TW", "6505.TW", "1605.TW"], // 中鋼構、台塑化、華新
-    "電商及零售": ["2642.TW", "2923.TW", "2915.TW"], // 藍天、鼎泰豐、潤泰全
-    "科技服務": ["3026.TW", "6147.TW", "6438.TW"] // 和碩、譜瑞-KY、迅得
+    "半導體": ["2330.TW", "2303.TW", "2308.TW"],
+    "IC 設計": ["2454.TW", "3034.TW", "3437.TW"],
+    "電腦及周邊設備": ["2357.TW", "2377.TW", "2360.TW"],
+    "網通設備": ["2345.TW", "2419.TW", "6285.TW"],
+    "記憶體": ["2344.TW", "3006.TW", "3474.TW"],
+    "載板": ["3037.TW", "8046.TW", "3189.TW"],
+    "太陽能": ["6244.TW", "3576.TW", "3691.TW"],
+    "鋼鐵": ["2002.TW", "2027.TW", "2014.TW"],
+    "金融保險": ["2882.TW", "2881.TW", "2891.TW"],
+    "汽車零組件": ["2201.TW", "1522.TW", "2231.TW"],
+    "電子零組件": ["2382.TW", "2392.TW", "2327.TW"],
+    "電動車相關": ["2308.TW", "6533.TW", "5227.TW"],
+    "光學鏡頭": ["3406.TW", "3231.TW", "6209.TW"],
+    "塑料及化工": ["1301.TW", "1303.TW", "1314.TW"],
+    "醫療設備": ["4105.TW", "4123.TW", "9919.TW"],
+    "食品飲料": ["1216.TW", "1227.TW", "2912.TW"],
+    "航運物流": ["2603.TW", "2609.TW", "2615.TW"],
+    "能源相關": ["2601.TW", "6505.TW", "1605.TW"],
+    "電商及零售": ["2642.TW", "2923.TW", "2915.TW"],
+    "科技服務": ["3026.TW", "6147.TW", "6438.TW"]
 };
 
+// 獲取單一股票的數據
 async function fetchStockData(stockSymbol) {
     try {
         const response = await fetch(`${BASE_URL}quote/${stockSymbol}?apikey=${API_KEY}`);
@@ -32,13 +34,14 @@ async function fetchStockData(stockSymbol) {
             throw new Error(`Error fetching data for ${stockSymbol}`);
         }
         const data = await response.json();
-        return data[0]; // 假設 API 返回的是一個股票數據的陣列
+        return data[0];
     } catch (error) {
         console.error("Error fetching stock data:", error);
         return null;
     }
 }
 
+// 計算每個產業的漲跌幅
 async function calculateIndustryPerformance() {
     const industryPerformance = {};
 
@@ -61,6 +64,12 @@ async function calculateIndustryPerformance() {
     return industryPerformance;
 }
 
+// 根據漲幅設定顏色
+function getColorByPerformance(performance) {
+    return performance >= 0 ? "#f28b82" : "#81c995";
+}
+
+// 載入產業數據並渲染
 async function loadIndustryData() {
     const industryGrid = document.getElementById("industryGrid");
     industryGrid.innerHTML = "<p>Loading...</p>";
@@ -80,65 +89,11 @@ async function loadIndustryData() {
         .join("");
 }
 
-async function fetchTaiwanStocks() {
-    try {
-        const response = await fetch(`${BASE_URL}stock-screener?exchange=TW&apikey=${API_KEY}`);
-        if (!response.ok) {
-            throw new Error("Error fetching Taiwan stock data");
-        }
-        return await response.json(); // 返回台股的股票清單
-    } catch (error) {
-        console.error("Error fetching Taiwan stocks:", error);
-        return [];
-    }
-}
+// 頁面加載後初始化
+document.addEventListener("DOMContentLoaded", () => {
+    loadIndustryData();
+});
 
-async function calculateSectorPerformance() {
-    const stocks = await fetchTaiwanStocks();
-    const sectorPerformance = {};
-
-    // 按 sector 分組並計算漲幅
-    stocks.forEach(stock => {
-        const sector = stock.sector || "其他";
-        const change = stock.changesPercentage
-            ? parseFloat(stock.changesPercentage.replace("%", ""))
-            : 0;
-
-        if (!sectorPerformance[sector]) {
-            sectorPerformance[sector] = { totalChange: 0, count: 0 };
-        }
-
-        sectorPerformance[sector].totalChange += change;
-        sectorPerformance[sector].count++;
-    });
-
-    // 計算每個產業的平均漲幅
-    for (const sector in sectorPerformance) {
-        const { totalChange, count } = sectorPerformance[sector];
-        sectorPerformance[sector] = count > 0 ? totalChange / count : 0;
-    }
-
-    return sectorPerformance;
-}
-
-async function loadIndustryData() {
-    const industryGrid = document.getElementById("industryGrid");
-    industryGrid.innerHTML = "<p>Loading...</p>";
-
-    const performanceData = await calculateSectorPerformance();
-
-    industryGrid.innerHTML = Object.entries(performanceData)
-        .map(([sector, performance]) => {
-            const color = getColorByPerformance(performance);
-            return `
-                <div class="industry-item" style="background-color: ${color};">
-                    <span>${sector}</span>
-                    <strong>${performance.toFixed(2)}%</strong>
-                </div>
-            `;
-        })
-        .join("");
-}
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
 
