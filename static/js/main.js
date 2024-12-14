@@ -1,5 +1,7 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
+let currentTimeframe = "1d"; // 默認時間範圍
+
 const industryStocks = {
     "半導體": ["2330.TW", "2303.TW", "2308.TW", "2317.TW", "2360.TW"],
     "IC 設計": ["2454.TW", "3034.TW", "3437.TW", "2379.TW", "3532.TW"],
@@ -22,60 +24,66 @@ const industryStocks = {
     "電商及零售": ["2642.TW", "2923.TW", "2915.TW", "2913.TW", "2910.TW"],
     "科技服務": ["3026.TW", "6147.TWO", "6438.TWO", "3583.TW", "3682.TWO"]
 };
-// 獲取多隻股票的數據
-async function fetchStockDataBatch(stockSymbols) {
-    const symbolsString = stockSymbols.join(",");
-    const url = `${BASE_URL}quote/${symbolsString}?apikey=${API_KEY}`;
-    console.log("Fetching data from URL:", url);
+
+// 獲取單一股票的歷史數據並計算指定時間段的變化百分比
+async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
+    const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
+    console.log(`Fetching historical data for ${stockSymbol} with timeframe: ${timeframe}`);
 
     try {
         const response = await fetch(url);
-
         if (!response.ok) {
-            throw new Error(`Error fetching data for ${symbolsString}`);
+            throw new Error(`Error fetching historical data for ${stockSymbol}`);
         }
 
         const data = await response.json();
-        console.log("API Response Data:", data);
+        const historicalPrices = data.historical;
 
-        // 過濾有效的數據
-        return data.filter(stock => stock && stock.symbol && stock.changesPercentage);
+        if (!historicalPrices || historicalPrices.length === 0) {
+            console.warn(`No historical data for ${stockSymbol}`);
+            return 0;
+        }
+
+        const latestClose = historicalPrices[0].close;
+        const targetDate = new Date();
+
+        // 設定時間段
+        if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
+        else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
+        else if (timeframe === "ytd") targetDate.setMonth(0); // 年初
+        else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
+
+        const targetClose = historicalPrices.find(item => new Date(item.date) <= targetDate)?.close;
+
+        if (!targetClose) {
+            console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
+            return 0;
+        }
+
+        // 計算百分比變化
+        return ((latestClose - targetClose) / targetClose) * 100;
     } catch (error) {
-        console.error("Error fetching stock data:", error);
-        return [];
+        console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
+        return 0;
     }
 }
 
-function updateTimeframe(button) {
-    // 更新當前時間範圍
-    currentTimeframe = button.getAttribute("data-timeframe");
-
-    // 高亮選中的按鈕
-    document.querySelectorAll(".time-filters button").forEach(btn => btn.classList.remove("active"));
-    button.classList.add("active");
-
-    // 重新加載數據
-    loadIndustryData();
-}
-// 計算產業漲跌幅
+// 計算每個產業的漲跌幅
 async function calculateIndustryPerformance() {
     const industryPerformance = {};
 
     for (const [industry, stocks] of Object.entries(industryStocks)) {
-        const stockDataList = await fetchStockDataBatch(stocks);
-
         let totalChange = 0;
         let count = 0;
 
-        stockDataList.forEach(stockData => {
-            const percentage = parseFloat(stockData.changesPercentage);
-            if (!isNaN(percentage)) {
-                totalChange += percentage;
+        for (const stock of stocks) {
+            const change = await fetchHistoricalPercentageChange(stock, currentTimeframe);
+            if (!isNaN(change)) {
+                totalChange += change;
                 count++;
             }
-        });
+        }
 
-        // 計算平均漲跌幅
         industryPerformance[industry] = count > 0 ? totalChange / count : 0;
     }
 
@@ -113,10 +121,21 @@ async function loadIndustryData() {
     }
 }
 
-// 頁面加載後初始化
+// 更新時間範圍並重新加載數據
+function updateTimeframe(button) {
+    currentTimeframe = button.getAttribute("data-timeframe");
+
+    document.querySelectorAll(".time-filters button").forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+
+    loadIndustryData();
+}
+
+// 初始化頁面
 document.addEventListener("DOMContentLoaded", () => {
     loadIndustryData();
 });
+
 
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
