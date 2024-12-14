@@ -2699,14 +2699,12 @@ async function fetchOperatingIncomeData(stockSymbol, apiKey) {
 }
 
 async function displayChart(type) {
-    const stockInputs = [
-        'stock1-tw',
-        'stock2-tw',
-        'stock3-tw',
-        'stock4-tw',
-        'stock5-tw'
-        // 'stock1'
-    ];
+    const sectionContainer = document.querySelector('#section-container-compare-tw');
+    const isCompareTW = sectionContainer.innerHTML.includes('compare-tw');
+
+    const stockInputs = isCompareTW
+        ? ['stock1-tw', 'stock2-tw', 'stock3-tw', 'stock4-tw', 'stock5-tw']
+        : ['stock1', 'stock2', 'stock3', 'stock4', 'stock5'];
 
     const stocks = stockInputs
         .map(id => document.getElementById(id).value.trim())
