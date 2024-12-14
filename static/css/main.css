@@ -1018,11 +1018,13 @@ button:not(.info-input button):hover {
     color: #999999;
 }
 
-/* 滾動樣式（若產業數量過多） */
+/* 更新 industry-grid 样式 */
 .industry-grid {
-    max-height: 600px;
-    overflow-y: auto;
-    padding-right: 10px; /* 留出空間避免滾動條遮住內容 */
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 列布局 */
+    gap: 20px; /* 產業項目間的間距 */
+    margin: 20px auto; /* 中心化 */
+    padding: 10px;
 }
 
 /* 選中的產業樣式 */
