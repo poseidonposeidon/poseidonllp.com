@@ -2704,8 +2704,8 @@ async function displayChart(type) {
         'stock2-tw',
         'stock3-tw',
         'stock4-tw',
-        'stock5-tw',
-        'stock1'
+        'stock5-tw'
+        // 'stock1'
     ];
 
     const stocks = stockInputs
