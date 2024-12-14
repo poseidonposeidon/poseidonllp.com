@@ -2707,16 +2707,19 @@ async function displayChart(type) {
         : ['stock1', 'stock2', 'stock3', 'stock4', 'stock5'];
 
     const stocks = stockInputs
-        .map(id => document.getElementById(id).value.trim())
+        .map(id => {
+            const input = document.getElementById(id);
+            return input ? input.value.trim() : null;
+        })
         .filter(stock => stock);  // 過濾空的股票輸入
-
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const loadingElement = document.getElementById('loading');
 
     if (stocks.length === 0) {
         alert('Please enter at least one stock symbol.');
         return;
     }
+
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const loadingElement = document.getElementById('loading');
 
     try {
         loadingElement.style.display = 'block';
