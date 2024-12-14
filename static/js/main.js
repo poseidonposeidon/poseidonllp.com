@@ -27,17 +27,17 @@ const industryStocks = {
 };
 
 // 獲取單一股票的數據
-async function fetchStockData(stockSymbol) {
+async function fetchStockDataBatch(stockSymbols) {
     try {
-        const response = await fetch(`${BASE_URL}quote/${stockSymbol}?apikey=${API_KEY}`);
+        const symbolsString = stockSymbols.join(",");
+        const response = await fetch(`${BASE_URL}quote/${symbolsString}?apikey=${API_KEY}`);
         if (!response.ok) {
-            throw new Error(`Error fetching data for ${stockSymbol}`);
+            throw new Error(`Error fetching data for ${symbolsString}`);
         }
-        const data = await response.json();
-        return data[0];
+        return await response.json(); // 返回包含多個股票數據的陣列
     } catch (error) {
         console.error("Error fetching stock data:", error);
-        return null;
+        return [];
     }
 }
 
@@ -46,16 +46,17 @@ async function calculateIndustryPerformance() {
     const industryPerformance = {};
 
     for (const [industry, stocks] of Object.entries(industryStocks)) {
+        const stockDataList = await fetchStockDataBatch(stocks);
+
         let totalChange = 0;
         let count = 0;
 
-        for (const stock of stocks) {
-            const stockData = await fetchStockData(stock);
+        stockDataList.forEach(stockData => {
             if (stockData && stockData.changesPercentage) {
                 totalChange += parseFloat(stockData.changesPercentage.replace("%", ""));
                 count++;
             }
-        }
+        });
 
         // 計算平均漲幅
         industryPerformance[industry] = count > 0 ? totalChange / count : 0;
@@ -70,7 +71,7 @@ function getColorByPerformance(performance) {
 }
 
 // 載入產業數據並渲染
-async function loadIndustryData() {
+async function loadIndustryData(timeframe = "1d") {
     const industryGrid = document.getElementById("industryGrid");
     industryGrid.innerHTML = "<p>Loading...</p>";
 
