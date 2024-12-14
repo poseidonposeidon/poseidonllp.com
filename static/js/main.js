@@ -10,9 +10,11 @@ async function fetchStockDataBatch(stockSymbols, retries = 3) {
     try {
         const response = await fetch(`${BASE_URL}quote/${symbolsString}?apikey=${API_KEY}`);
         if (!response.ok) {
-            throw new Error(`Error fetching data for ${symbolsString}`);
+            throw new Error(`Error fetching data for ${symbolsString}: ${response.statusText}`);
         }
-        return await response.json();
+        const data = await response.json();
+        console.log("Fetched data:", data); // 日誌檢查返回數據
+        return data;
     } catch (error) {
         console.error("Error fetching stock data:", error);
         if (retries > 0) {
@@ -26,8 +28,15 @@ async function fetchStockDataBatch(stockSymbols, retries = 3) {
 // 計算產業漲跌幅
 async function calculateIndustryPerformance() {
     const industryPerformance = {};
-    for (const [industry, stocks] of Object.entries(industryStocks)) {
+
+    await Promise.all(Object.entries(industryStocks).map(async ([industry, stocks]) => {
         const stockDataList = await fetchStockDataBatch(stocks);
+
+        if (!stockDataList || stockDataList.length === 0) {
+            console.warn(`No data fetched for industry: ${industry}`);
+            industryPerformance[industry] = 0;
+            return;
+        }
 
         let totalChange = 0;
         let count = 0;
@@ -43,34 +52,45 @@ async function calculateIndustryPerformance() {
         });
 
         industryPerformance[industry] = count > 0 ? totalChange / count : 0;
-    }
+    }));
+
     console.log("Industry performance:", industryPerformance);
     return industryPerformance;
 }
 
 // 渲染產業數據
-async function loadIndustryData() {
+async function loadIndustryData(timeframe = "1d") {
     const industryGrid = document.getElementById("industryGrid");
-    industryGrid.innerHTML = "<p>Loading...</p>";
-
-    const performanceData = await calculateIndustryPerformance();
-
-    if (!performanceData || Object.keys(performanceData).length === 0) {
-        industryGrid.innerHTML = "<p>Failed to load industry data. Please try again later.</p>";
+    if (!industryGrid) {
+        console.error("Element with id 'industryGrid' not found.");
         return;
     }
 
-    industryGrid.innerHTML = Object.entries(performanceData)
-        .map(([industry, performance]) => {
-            const color = getColorByPerformance(performance);
-            return `
-                <div class="industry-item" style="background-color: ${color};">
-                    <span>${industry}</span>
-                    <strong>${performance.toFixed(2)}%</strong>
-                </div>
-            `;
-        })
-        .join("");
+    industryGrid.innerHTML = "<p>Loading...</p>";
+
+    try {
+        const performanceData = await calculateIndustryPerformance();
+
+        if (!performanceData || Object.keys(performanceData).length === 0) {
+            industryGrid.innerHTML = "<p>No data available. Please check API or try again later.</p>";
+            return;
+        }
+
+        industryGrid.innerHTML = Object.entries(performanceData)
+            .map(([industry, performance]) => {
+                const color = getColorByPerformance(performance);
+                return `
+                    <div class="industry-item" style="background-color: ${color};">
+                        <span>${industry}</span>
+                        <strong>${performance.toFixed(2)}%</strong>
+                    </div>
+                `;
+            })
+            .join("");
+    } catch (error) {
+        console.error("Error loading industry data:", error);
+        industryGrid.innerHTML = "<p>Failed to load industry data. Please try again later.</p>";
+    }
 }
 
 // 初始化
