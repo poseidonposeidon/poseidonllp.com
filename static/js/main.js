@@ -26,54 +26,49 @@ const industryStocks = {
 };
 
 // 獲取單一股票的歷史數據並計算指定時間段的變化百分比
-async function fetchHistoricalPercentageChangeBatch(stockSymbols, timeframe) {
-    const symbolsString = stockSymbols.join(",");
-    const url = `${BASE_URL}historical-price-full/${symbolsString}?apikey=${API_KEY}`;
-    console.log(`Fetching historical data for ${symbolsString} with timeframe: ${timeframe}`);
+async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
+    const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
+    console.log(`Fetching historical data for ${stockSymbol} with timeframe: ${timeframe}`);
 
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Error fetching historical data for ${symbolsString}`);
+            throw new Error(`Error fetching historical data for ${stockSymbol}`);
         }
 
         const data = await response.json();
-        const results = {};
+        const historicalPrices = data.historical;
 
-        stockSymbols.forEach(stockSymbol => {
-            const historicalPrices = data[stockSymbol]?.historical;
+        if (!historicalPrices || historicalPrices.length === 0) {
+            console.warn(`No historical data for ${stockSymbol}`);
+            return 0;
+        }
 
-            if (!historicalPrices || historicalPrices.length === 0) {
-                console.warn(`No historical data for ${stockSymbol}`);
-                results[stockSymbol] = 0;
-                return;
-            }
+        const latestClose = historicalPrices[0].close;
+        const targetDate = new Date();
 
-            const latestClose = historicalPrices[0].close;
-            const targetDate = new Date();
+        // 設定時間段
+        if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
+        else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
+        else if (timeframe === "ytd") targetDate.setMonth(0); // 年初
+        else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
 
-            // 設定時間段
-            if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
-            else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
-            else if (timeframe === "ytd") targetDate.setMonth(0); // 年初
-            else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
+        // 找到最接近目標日期的收盤價
+        const targetClose = historicalPrices.find(item => {
+            const itemDate = new Date(item.date);
+            return itemDate <= targetDate;
+        })?.close;
 
-            const targetClose = historicalPrices.find(item => new Date(item.date) <= targetDate)?.close;
+        if (!targetClose) {
+            console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
+            return 0;
+        }
 
-            if (!targetClose) {
-                console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
-                results[stockSymbol] = 0;
-                return;
-            }
-
-            // 計算百分比變化
-            results[stockSymbol] = ((latestClose - targetClose) / targetClose) * 100;
-        });
-
-        return results;
+        // 計算百分比變化
+        return ((latestClose - targetClose) / targetClose) * 100;
     } catch (error) {
-        console.error(`Error fetching historical percentage change for batch:`, error);
-        return {};
+        console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
+        return 0;
     }
 }
 
@@ -82,17 +77,16 @@ async function calculateIndustryPerformance() {
     const industryPerformance = {};
 
     for (const [industry, stocks] of Object.entries(industryStocks)) {
-        const stockChanges = await fetchHistoricalPercentageChangeBatch(stocks, currentTimeframe);
-
         let totalChange = 0;
         let count = 0;
 
-        Object.values(stockChanges).forEach(change => {
+        for (const stock of stocks) {
+            const change = await fetchHistoricalPercentageChange(stock, currentTimeframe);
             if (!isNaN(change)) {
                 totalChange += change;
                 count++;
             }
-        });
+        }
 
         // 計算平均漲跌幅
         industryPerformance[industry] = count > 0 ? totalChange / count : 0;
