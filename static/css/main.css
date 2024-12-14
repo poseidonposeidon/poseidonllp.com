@@ -634,10 +634,10 @@ button:not(.info-input button):hover {
     background-color: #121212;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start; /* 避免內容過度居中 */
     align-items: center;
-    height: 100vh;
-    gap: 50px;
+    gap: 30px; /* 控制內部元素間距 */
+    padding: 20px; /* 增加內邊距，避免貼邊 */
 }
 
 #trend_notification_app {
@@ -967,29 +967,22 @@ button:not(.info-input button):hover {
     color: #fff;
 }
 
-/* 產業表格樣式 */
-.industry-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 10px;
-}
 
 /* 單個產業樣式 */
 .industry-item {
-    background-color: #2c2c2c;
-    color: #e0e0e0;
+    background-color: #1e1e1e;
     border-radius: 8px;
-    padding: 15px;
+    padding: 20px;
     text-align: center;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    color: white;
+    font-size: 14px;
     transition: transform 0.3s ease, background-color 0.3s ease;
-    cursor: pointer;
 }
 
 .industry-item span {
-    font-size: 18px;
     display: block;
-    margin-bottom: 8px;
+    font-weight: bold;
+    margin-bottom: 5px;
 }
 
 .industry-item strong {
@@ -1021,10 +1014,12 @@ button:not(.info-input button):hover {
 /* 更新 industry-grid 样式 */
 .industry-grid {
     display: grid;
-    grid-template-columns: repeat(4, 1fr); /* 4 列布局 */
-    gap: 20px; /* 產業項目間的間距 */
-    margin: 20px auto; /* 中心化 */
-    padding: 10px;
+    grid-template-columns: repeat(4, 1fr); /* 每行顯示 4 列 */
+    gap: 20px; /* 控制每個格子間的距離 */
+    width: 100%; /* 滿寬佈局 */
+    max-width: 1200px; /* 限制最大寬度 */
+    margin: 0 auto; /* 保持居中對齊 */
+    padding: 10px; /* 增加內邊距 */
 }
 
 /* 選中的產業樣式 */
