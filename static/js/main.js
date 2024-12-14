@@ -26,45 +26,54 @@ const industryStocks = {
 };
 
 // 獲取單一股票的歷史數據並計算指定時間段的變化百分比
-async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
-    const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
-    console.log(`Fetching historical data for ${stockSymbol} with timeframe: ${timeframe}`);
+async function fetchHistoricalPercentageChangeBatch(stockSymbols, timeframe) {
+    const symbolsString = stockSymbols.join(",");
+    const url = `${BASE_URL}historical-price-full/${symbolsString}?apikey=${API_KEY}`;
+    console.log(`Fetching historical data for ${symbolsString} with timeframe: ${timeframe}`);
 
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Error fetching historical data for ${stockSymbol}`);
+            throw new Error(`Error fetching historical data for ${symbolsString}`);
         }
 
         const data = await response.json();
-        const historicalPrices = data.historical;
+        const results = {};
 
-        if (!historicalPrices || historicalPrices.length === 0) {
-            console.warn(`No historical data for ${stockSymbol}`);
-            return 0;
-        }
+        stockSymbols.forEach(stockSymbol => {
+            const historicalPrices = data[stockSymbol]?.historical;
 
-        const latestClose = historicalPrices[0].close;
-        const targetDate = new Date();
+            if (!historicalPrices || historicalPrices.length === 0) {
+                console.warn(`No historical data for ${stockSymbol}`);
+                results[stockSymbol] = 0;
+                return;
+            }
 
-        // 設定時間段
-        if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
-        else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
-        else if (timeframe === "ytd") targetDate.setMonth(0); // 年初
-        else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
+            const latestClose = historicalPrices[0].close;
+            const targetDate = new Date();
 
-        const targetClose = historicalPrices.find(item => new Date(item.date) <= targetDate)?.close;
+            // 設定時間段
+            if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
+            else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
+            else if (timeframe === "ytd") targetDate.setMonth(0); // 年初
+            else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
 
-        if (!targetClose) {
-            console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
-            return 0;
-        }
+            const targetClose = historicalPrices.find(item => new Date(item.date) <= targetDate)?.close;
 
-        // 計算百分比變化
-        return ((latestClose - targetClose) / targetClose) * 100;
+            if (!targetClose) {
+                console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
+                results[stockSymbol] = 0;
+                return;
+            }
+
+            // 計算百分比變化
+            results[stockSymbol] = ((latestClose - targetClose) / targetClose) * 100;
+        });
+
+        return results;
     } catch (error) {
-        console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
-        return 0;
+        console.error(`Error fetching historical percentage change for batch:`, error);
+        return {};
     }
 }
 
@@ -73,17 +82,19 @@ async function calculateIndustryPerformance() {
     const industryPerformance = {};
 
     for (const [industry, stocks] of Object.entries(industryStocks)) {
+        const stockChanges = await fetchHistoricalPercentageChangeBatch(stocks, currentTimeframe);
+
         let totalChange = 0;
         let count = 0;
 
-        for (const stock of stocks) {
-            const change = await fetchHistoricalPercentageChange(stock, currentTimeframe);
+        Object.values(stockChanges).forEach(change => {
             if (!isNaN(change)) {
                 totalChange += change;
                 count++;
             }
-        }
+        });
 
+        // 計算平均漲跌幅
         industryPerformance[industry] = count > 0 ? totalChange / count : 0;
     }
 
@@ -125,9 +136,11 @@ async function loadIndustryData() {
 function updateTimeframe(button) {
     currentTimeframe = button.getAttribute("data-timeframe");
 
+    // 更新按鈕樣式
     document.querySelectorAll(".time-filters button").forEach(btn => btn.classList.remove("active"));
     button.classList.add("active");
 
+    // 加載數據
     loadIndustryData();
 }
 
