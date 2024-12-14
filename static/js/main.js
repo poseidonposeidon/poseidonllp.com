@@ -1067,6 +1067,8 @@ function loadAIBoxSection(sectionId) {
     }
 }
 
+let currentSectionId = null; // 用於記錄當前顯示的 sectionId
+
 function loadCompareSection(sectionId) {
     const sections = {
         'compare-tw': `
@@ -1088,7 +1090,6 @@ function loadCompareSection(sectionId) {
                 <input type="text" id="stock5-tw" placeholder="e.g., 1101">
             </div>
             
-            <!-- 新增切換圖表的功能 -->
             <div class="chart-links">
                 <div class="category">
                     <span class="title" onclick="toggleMenu('financials')">Financial Report</span>
@@ -1102,7 +1103,6 @@ function loadCompareSection(sectionId) {
                         <a href="#" onclick="displayChart('peRatio')">P/E Ratio</a>
                     </div>
                 </div>
-            
                 <div class="category">
                     <span class="title" onclick="toggleMenu('profitability')">Profitability</span>
                     <div class="submenu" id="profitability">
@@ -1113,25 +1113,29 @@ function loadCompareSection(sectionId) {
                         <a href="#" onclick="displayChart('externalROE')">External ROE</a>
                     </div>
                 </div>
-            
-                <div class="category">
-                    <span class="title" onclick="toggleMenu('growth')">Growth</span>
-                    <div class="submenu" id="growth">
-                        <a href="#" onclick="displayChart('quarterlyRevenueGrowthRate')">Revenue YoY</a>
-                        <a href="#" onclick="displayChart('grossMarginYoY')">Gross Margin YoY</a>
-                        <a href="#" onclick="displayChart('operatingMarginYoY')">Operating Margin YoY</a>
-                        <a href="#" onclick="displayChart('netProfitYoY')">Net Profit YoY</a>
-                    </div>
-                </div>
-            </div>
-
-            <div id="loading" style="display: none; text-align: center;">
-                <p>Loading... Please wait.</p>
             </div>
 
             <div id="comparisonResultContainer-tw">
                 <canvas id="grossMarginChart" style="width: 100%; height: 400px;"></canvas>
-                <!-- Comparison results will be displayed here -->
+            </div>
+        `,
+        'compare-multi': `
+            <h2>Compare Global Stocks</h2>
+            <div class="info-input">
+                <label for="stock1">Stock 1:</label>
+                <input type="text" id="stock1" placeholder="e.g., 2330 or AAPL">
+                
+                <label for="stock2">Stock 2:</label>
+                <input type="text" id="stock2" placeholder="e.g., 2317 or TSLA">
+                
+                <label for="stock3">Stock 3:</label>
+                <input type="text" id="stock3" placeholder="e.g., 2881 or GOOG">
+                
+                <label for="stock4">Stock 4:</label>
+                <input type="text" id="stock4" placeholder="e.g., 1301 or MSFT">
+                
+                <label for="stock5">Stock 5:</label>
+                <input type="text" id="stock5" placeholder="e.g., 1101 or AMZN">
             </div>
         `
     };
@@ -1140,28 +1144,31 @@ function loadCompareSection(sectionId) {
     const sectionContainer = document.getElementById('section-container-compare-tw');
 
     if (sectionContainer) {
-        // Load content
-        sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
-
-        // Toggle the section
-        if (compareDiv.classList.contains('active')) {
-            // Closing the section
+        // 如果選擇同一個 section，則關閉
+        if (currentSectionId === sectionId) {
+            currentSectionId = null; // 清空當前 section
             compareDiv.classList.remove('active');
             setTimeout(() => {
                 compareDiv.style.display = 'none';
             }, 500);
-        } else {
-            // Opening the section
-            compareDiv.style.display = 'block';
-            // Force a reflow before adding the 'active' class
-            void compareDiv.offsetWidth;
-            compareDiv.classList.add('active');
+            return;
         }
 
-        // Toggle the overlay
+        // 更新當前的 sectionId
+        currentSectionId = sectionId;
+
+        // 更新內容
+        sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+
+        // 顯示新內容
+        compareDiv.style.display = 'block';
+        void compareDiv.offsetWidth; // 強制 reflow
+        compareDiv.classList.add('active');
+
+        // 顯示 overlay
         const overlay = document.querySelector('.overlay');
-        overlay.classList.toggle('active');
-        document.body.classList.toggle('modal-open');
+        overlay.classList.add('active');
+        document.body.classList.add('modal-open');
     } else {
         console.error("Compare section not found");
     }
