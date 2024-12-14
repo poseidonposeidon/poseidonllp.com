@@ -7,18 +7,24 @@ const industryStocks = { /*...你的股票代碼映射...*/ };
 // 獲取批量股票數據
 async function fetchStockDataBatch(stockSymbols, retries = 3) {
     const symbolsString = stockSymbols.join(",");
+    const url = `${BASE_URL}quote/${symbolsString}?apikey=${API_KEY}`;
+    console.log("Fetching data from URL:", url); // 日誌檢查 API URL
+
     try {
-        const response = await fetch(`${BASE_URL}quote/${symbolsString}?apikey=${API_KEY}`);
+        const response = await fetch(url);
+
         if (!response.ok) {
-            throw new Error(`Error fetching data for ${symbolsString}: ${response.statusText}`);
+            console.error(`API response not OK. Status: ${response.status}, Text: ${response.statusText}`);
+            throw new Error(`Error fetching data for ${symbolsString}`);
         }
+
         const data = await response.json();
-        console.log("Fetched data:", data); // 日誌檢查返回數據
+        console.log("API Response Data:", data); // 檢查返回的數據
         return data;
     } catch (error) {
-        console.error("Error fetching stock data:", error);
+        console.error("Error fetching stock data:", error.message);
         if (retries > 0) {
-            console.log("Retrying fetch for:", stockSymbols);
+            console.log("Retrying fetch...");
             return fetchStockDataBatch(stockSymbols, retries - 1);
         }
         return [];
@@ -29,13 +35,15 @@ async function fetchStockDataBatch(stockSymbols, retries = 3) {
 async function calculateIndustryPerformance() {
     const industryPerformance = {};
 
-    await Promise.all(Object.entries(industryStocks).map(async ([industry, stocks]) => {
+    for (const [industry, stocks] of Object.entries(industryStocks)) {
+        console.log(`Fetching data for industry: ${industry}, Stocks: ${stocks}`);
+
         const stockDataList = await fetchStockDataBatch(stocks);
 
         if (!stockDataList || stockDataList.length === 0) {
             console.warn(`No data fetched for industry: ${industry}`);
-            industryPerformance[industry] = 0;
-            return;
+            industryPerformance[industry] = 0; // 返回 0，避免頁面報錯
+            continue;
         }
 
         let totalChange = 0;
@@ -44,6 +52,7 @@ async function calculateIndustryPerformance() {
         stockDataList.forEach(stockData => {
             if (stockData && stockData.changesPercentage) {
                 const percentage = parseFloat(stockData.changesPercentage.replace("%", ""));
+                console.log(`Stock: ${stockData.symbol}, Change: ${percentage}`);
                 if (!isNaN(percentage)) {
                     totalChange += percentage;
                     count++;
@@ -52,9 +61,9 @@ async function calculateIndustryPerformance() {
         });
 
         industryPerformance[industry] = count > 0 ? totalChange / count : 0;
-    }));
+    }
 
-    console.log("Industry performance:", industryPerformance);
+    console.log("Calculated Industry Performance:", industryPerformance); // 確認最終數據
     return industryPerformance;
 }
 
