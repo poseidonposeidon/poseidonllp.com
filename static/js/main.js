@@ -1090,6 +1090,7 @@ function loadCompareSection(sectionId) {
                 <input type="text" id="stock5-tw" placeholder="e.g., 1101">
             </div>
             
+            <!-- 新增切換圖表的功能 -->
             <div class="chart-links">
                 <div class="category">
                     <span class="title" onclick="toggleMenu('financials')">Financial Report</span>
@@ -1103,6 +1104,7 @@ function loadCompareSection(sectionId) {
                         <a href="#" onclick="displayChart('peRatio')">P/E Ratio</a>
                     </div>
                 </div>
+            
                 <div class="category">
                     <span class="title" onclick="toggleMenu('profitability')">Profitability</span>
                     <div class="submenu" id="profitability">
@@ -1113,6 +1115,20 @@ function loadCompareSection(sectionId) {
                         <a href="#" onclick="displayChart('externalROE')">External ROE</a>
                     </div>
                 </div>
+            
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('growth')">Growth</span>
+                    <div class="submenu" id="growth">
+                        <a href="#" onclick="displayChart('quarterlyRevenueGrowthRate')">Revenue YoY</a>
+                        <a href="#" onclick="displayChart('grossMarginYoY')">Gross Margin YoY</a>
+                        <a href="#" onclick="displayChart('operatingMarginYoY')">Operating Margin YoY</a>
+                        <a href="#" onclick="displayChart('netProfitYoY')">Net Profit YoY</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="loading" style="display: none; text-align: center;">
+                <p>Loading... Please wait.</p>
             </div>
 
             <div id="comparisonResultContainer-tw">
@@ -1136,6 +1152,51 @@ function loadCompareSection(sectionId) {
                 
                 <label for="stock5">Stock 5:</label>
                 <input type="text" id="stock5" placeholder="e.g., 1101 or AMZN">
+            </div>
+            
+            <!-- 新增切換圖表的功能 -->
+            <div class="chart-links">
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('financials')">Financial Report</span>
+                    <div class="submenu" id="financials">
+                        <a href="#" onclick="displayChart('stockPrice')">Stock Price</a>
+                        <a href="#" onclick="displayChart('eps')">EPS</a>
+                        <a href="#" onclick="displayChart('revenue')">Revenue</a>
+                        <a href="#" onclick="displayChart('costOfRevenue')">Cost of Revenue</a>
+                        <a href="#" onclick="displayChart('operatingExpenses')">Operating Expenses</a>
+                        <a href="#" onclick="displayChart('operatingIncome')">Operating Income</a>
+                        <a href="#" onclick="displayChart('peRatio')">P/E Ratio</a>
+                    </div>
+                </div>
+            
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('profitability')">Profitability</span>
+                    <div class="submenu" id="profitability">
+                        <a href="#" onclick="displayChart('grossMargin')">Gross Margin</a>
+                        <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a>
+                        <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a>
+                        <a href="#" onclick="displayChart('roe')">Return of Equity</a>
+                        <a href="#" onclick="displayChart('externalROE')">External ROE</a>
+                    </div>
+                </div>
+            
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('growth')">Growth</span>
+                    <div class="submenu" id="growth">
+                        <a href="#" onclick="displayChart('quarterlyRevenueGrowthRate')">Revenue YoY</a>
+                        <a href="#" onclick="displayChart('grossMarginYoY')">Gross Margin YoY</a>
+                        <a href="#" onclick="displayChart('operatingMarginYoY')">Operating Margin YoY</a>
+                        <a href="#" onclick="displayChart('netProfitYoY')">Net Profit YoY</a>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="loading" style="display: none; text-align: center;">
+                <p>Loading... Please wait.</p>
+            </div>
+
+            <div id="comparisonResultContainer-tw">
+                <canvas id="grossMarginChart" style="width: 100%; height: 400px;"></canvas>
             </div>
         `
     };
