@@ -2224,6 +2224,26 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
     }
 }
 
+async function fetchStockWithExchangeSuffixGlobal(stockCode, apiKey) {
+    const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockCode}&apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(searchUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+
+        // 假設全球股票需要更複雜的交易所處理邏輯
+        const match = data.find(item => item.symbol.includes(stockCode));
+        return match ? match.symbol : null;
+    } catch (error) {
+        console.error('Error fetching global stock exchange:', error);
+        return null;
+    }
+}
+
 async function fetchMarginData(stockSymbol, apiKey, type) {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=40&apikey=${apiKey}`;
 
@@ -2723,9 +2743,14 @@ async function displayChart(type) {
     try {
         loadingElement.style.display = 'block';
 
+        // 動態選擇對應的 fetch 函式
+        const fetchStockSuffixFunction = isCompareTW
+            ? fetchStockWithExchangeSuffix
+            : fetchStockWithExchangeSuffixGlobal;
+
         // 使用 Promise.all 獲取每支股票的完整代碼
         const fullStockSymbols = await Promise.all(
-            stocks.map(stock => fetchStockWithExchangeSuffix(stock, apiKey))
+            stocks.map(stock => fetchStockSuffixFunction(stock, apiKey))
         );
 
         // 檢查是否有未成功獲取的股票代碼
