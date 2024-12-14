@@ -1139,20 +1139,21 @@ function loadCompareSection(sectionId) {
             <h2>Compare Global Stocks</h2>
             <div class="info-input">
                 <label for="stock1">Stock 1:</label>
-                <input type="text" id="stock1" placeholder="e.g., 2330 or AAPL">
-                
+                <input type="text" id="stock1" placeholder="e.g., 2330 or AAPL" oninput="formatInput(this)">
+            
                 <label for="stock2">Stock 2:</label>
-                <input type="text" id="stock2" placeholder="e.g., 2317 or TSLA">
-                
+                <input type="text" id="stock2" placeholder="e.g., 2317 or TSLA" oninput="formatInput(this)">
+            
                 <label for="stock3">Stock 3:</label>
-                <input type="text" id="stock3" placeholder="e.g., 2881 or GOOG">
-                
+                <input type="text" id="stock3" placeholder="e.g., 2881 or GOOG" oninput="formatInput(this)">
+            
                 <label for="stock4">Stock 4:</label>
-                <input type="text" id="stock4" placeholder="e.g., 1301 or MSFT">
-                
+                <input type="text" id="stock4" placeholder="e.g., 1301 or MSFT" oninput="formatInput(this)">
+            
                 <label for="stock5">Stock 5:</label>
-                <input type="text" id="stock5" placeholder="e.g., 1101 or AMZN">
+                <input type="text" id="stock5" placeholder="e.g., 1101 or AMZN" oninput="formatInput(this)">
             </div>
+
             
             <!-- 新增切換圖表的功能 -->
             <div class="chart-links">
