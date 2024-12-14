@@ -1257,8 +1257,6 @@ function toggleMenu(menuId) {
     }
 }
 
-
-
 const baseUrl = 'https://api.poseidonllp.com';
 
 function sendMessage() {
