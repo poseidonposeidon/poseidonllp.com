@@ -331,108 +331,18 @@
 
         <!-- 時間篩選 -->
         <div class="time-filters">
-            <button class="active">1天</button>
-            <button>1月</button>
-            <button>3月</button>
-            <button>YTD</button>
-            <button>1年</button>
+            <button class="active" onclick="loadIndustryData('1d')">1天</button>
+            <button onclick="loadIndustryData('1m')">1月</button>
+            <button onclick="loadIndustryData('3m')">3月</button>
+            <button onclick="loadIndustryData('ytd')">YTD</button>
+            <button onclick="loadIndustryData('1y')">1年</button>
         </div>
 
-        <!-- 產業展示 -->
-        <div class="industry-grid">
-            <!-- 第一排 -->
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>半導體</span>
-                <strong>+0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>IC 設計</span>
-                <strong>+0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>電腦及周邊設備</span>
-                <strong>+0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>網通設備</span>
-                <strong>+0.00%</strong>
-            </div>
-
-            <!-- 第二排 -->
-            <div class="industry-item" style="background-color: #81c995;">
-                <span>記憶體</span>
-                <strong>-0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #81c995;">
-                <span>載板</span>
-                <strong>-0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #81c995;">
-                <span>太陽能</span>
-                <strong>-0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #81c995;">
-                <span>鋼鐵</span>
-                <strong>-0.00%</strong>
-            </div>
-
-            <!-- 第三排 -->
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>金融保險</span>
-                <strong>+0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>汽車零組件</span>
-                <strong>+0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>電子零組件</span>
-                <strong>+0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>電動車相關</span>
-                <strong>+0.00%</strong>
-            </div>
-
-            <!-- 第四排 -->
-            <div class="industry-item" style="background-color: #81c995;">
-                <span>光學鏡頭</span>
-                <strong>-0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #81c995;">
-                <span>塑料及化工</span>
-                <strong>-0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #81c995;">
-                <span>醫療設備</span>
-                <strong>-0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #81c995;">
-                <span>食品飲料</span>
-                <strong>-0.00%</strong>
-            </div>
-
-            <!-- 第五排 -->
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>航運物流</span>
-                <strong>+0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>能源相關</span>
-                <strong>+0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>電商及零售</span>
-                <strong>+0.00%</strong>
-            </div>
-            <div class="industry-item" style="background-color: #f28b82;">
-                <span>科技服務</span>
-                <strong>+0.00%</strong>
-            </div>
-        </div>
+        <!-- 動態產業展示 -->
+        <div class="industry-grid" id="industryGrid"></div>
     </div>
-
 </div>
+
 
 <script src="/static/js/main.js"></script>
 

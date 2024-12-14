@@ -1,3 +1,56 @@
+//////////////
+const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
+const BASE_URL = "https://financialmodelingprep.com/api/v3/";
+
+const industries = [
+    "半導體", "IC 設計", "電腦及周邊設備", "網通設備",
+    "記憶體", "載板", "太陽能", "鋼鐵",
+    "金融保險", "汽車零組件", "電子零組件", "電動車相關",
+    "光學鏡頭", "塑料及化工", "醫療設備", "食品飲料",
+    "航運物流", "能源相關", "電商及零售", "科技服務"
+];
+
+async function fetchIndustryData() {
+    try {
+        // 假設 API 提供類似 "sectors-performance" 的數據接口
+        const response = await fetch(`${BASE_URL}sectors-performance?apikey=${API_KEY}`);
+        if (!response.ok) {
+            throw new Error("Network response was not ok");
+        }
+        const data = await response.json();
+        return data.sectorPerformance;
+    } catch (error) {
+        console.error("Error fetching industry data:", error);
+        return [];
+    }
+}
+
+function getColorByPerformance(performance) {
+    return performance >= 0 ? "#f28b82" : "#81c995"; // 漲幅為紅，跌幅為綠
+}
+
+async function loadIndustryData(timeframe = "1d") {
+    // 清空現有的數據
+    const industryGrid = document.getElementById("industryGrid");
+    industryGrid.innerHTML = "<p>Loading...</p>";
+
+    // 獲取數據
+    const industryData = await fetchIndustryData();
+
+    // 處理數據並生成動態內容
+    industryGrid.innerHTML = industries
+        .map((industry, index) => {
+            const performance = industryData[index]?.[timeframe] || 0;
+            const color = getColorByPerformance(performance);
+            return `
+                <div class="industry-item" style="background-color: ${color};">
+                    <span>${industry}</span>
+                    <strong>${performance.toFixed(2)}%</strong>
+                </div>
+            `;
+        })
+        .join("");
+}
 
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
