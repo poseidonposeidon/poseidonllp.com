@@ -1068,6 +1068,10 @@ function loadAIBoxSection(sectionId) {
 }
 
 let currentSectionId = null; // 用於記錄當前顯示的 sectionId
+function formatInput(input) {
+    // 僅允許數字和字母，並將字母轉為大寫
+    input.value = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+}
 
 function loadCompareSection(sectionId) {
     const sections = {
@@ -1253,10 +1257,7 @@ function toggleMenu(menuId) {
     }
 }
 
-function formatInput(input) {
-    // 僅允許數字和字母，並將字母轉為大寫
-    input.value = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-}
+
 
 const baseUrl = 'https://api.poseidonllp.com';
 
