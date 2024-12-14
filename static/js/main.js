@@ -2699,8 +2699,7 @@ async function fetchOperatingIncomeData(stockSymbol, apiKey) {
 }
 
 async function displayChart(type) {
-    const sectionContainer = document.querySelector('#section-container-compare-tw');
-    const isCompareTW = sectionContainer.innerHTML.includes('compare-tw');
+    const isCompareTW = currentSectionId === 'compare-tw';
 
     const stockInputs = isCompareTW
         ? ['stock1-tw', 'stock2-tw', 'stock3-tw', 'stock4-tw', 'stock5-tw']
