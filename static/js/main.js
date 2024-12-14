@@ -22,8 +22,6 @@ const industryStocks = {
     "電商及零售": ["2642.TW", "2923.TW", "2915.TW", "2913.TW", "2910.TW"],
     "科技服務": ["3026.TW", "6147.TWO", "6438.TWO", "3583.TW", "3682.TWO"]
 };
-
-
 // 獲取多隻股票的數據
 async function fetchStockDataBatch(stockSymbols) {
     const symbolsString = stockSymbols.join(",");
@@ -48,6 +46,17 @@ async function fetchStockDataBatch(stockSymbols) {
     }
 }
 
+function updateTimeframe(button) {
+    // 更新當前時間範圍
+    currentTimeframe = button.getAttribute("data-timeframe");
+
+    // 高亮選中的按鈕
+    document.querySelectorAll(".time-filters button").forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+
+    // 重新加載數據
+    loadIndustryData();
+}
 // 計算產業漲跌幅
 async function calculateIndustryPerformance() {
     const industryPerformance = {};
