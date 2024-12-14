@@ -2,45 +2,73 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 
-const industries = [
-    "半導體", "IC 設計", "電腦及周邊設備", "網通設備",
-    "記憶體", "載板", "太陽能", "鋼鐵",
-    "金融保險", "汽車零組件", "電子零組件", "電動車相關",
-    "光學鏡頭", "塑料及化工", "醫療設備", "食品飲料",
-    "航運物流", "能源相關", "電商及零售", "科技服務"
-];
+const industryStocks = {
+    "半導體": ["2330.TW", "2303.TW", "2308.TW"], // 台積電、聯電、日月光
+    "IC 設計": ["2454.TW", "3034.TW", "3437.TW"], // 聯發科、聯詠、新唐
+    "電腦及周邊設備": ["2357.TW", "2377.TW", "2360.TW"], // 華碩、微星、致茂
+    "網通設備": ["2345.TW", "2419.TW", "6285.TW"], // 智邦、中磊、啟碁
+    "記憶體": ["2344.TW", "3006.TW", "3474.TW"], // 華邦電、晶豪科、群聯
+    "載板": ["3037.TW", "8046.TW", "3189.TW"], // 欣興、南電、晶豪科
+    "太陽能": ["6244.TW", "3576.TW", "3691.TW"], // 茂迪、元晶、綠能
+    "鋼鐵": ["2002.TW", "2027.TW", "2014.TW"], // 中鋼、大成鋼、中鴻
+    "金融保險": ["2882.TW", "2881.TW", "2891.TW"], // 國泰金、富邦金、中信金
+    "汽車零組件": ["2201.TW", "1522.TW", "2231.TW"], // 裕隆、堤維西、為升
+    "電子零組件": ["2382.TW", "2392.TW", "2327.TW"], // 廣達、正崴、國巨
+    "電動車相關": ["2308.TW", "6533.TW", "5227.TW"], // 鴻海、晶碩、台半
+    "光學鏡頭": ["3406.TW", "3231.TW", "6209.TW"], // 玉晶光、緯創、今國光
+    "塑料及化工": ["1301.TW", "1303.TW", "1314.TW"], // 台塑、南亞、台聚
+    "醫療設備": ["4105.TW", "4123.TW", "9919.TW"], // 東洋、晟德、康聯
+    "食品飲料": ["1216.TW", "1227.TW", "2912.TW"], // 統一、台糖、全家
+    "航運物流": ["2603.TW", "2609.TW", "2615.TW"], // 長榮、陽明、萬海
+    "能源相關": ["2601.TW", "6505.TW", "1605.TW"], // 中鋼構、台塑化、華新
+    "電商及零售": ["2642.TW", "2923.TW", "2915.TW"], // 藍天、鼎泰豐、潤泰全
+    "科技服務": ["3026.TW", "6147.TW", "6438.TW"] // 和碩、譜瑞-KY、迅得
+};
 
-async function fetchIndustryData() {
+async function fetchStockData(stockSymbol) {
     try {
-        // 假設 API 提供類似 "sectors-performance" 的數據接口
-        const response = await fetch(`${BASE_URL}sectors-performance?apikey=${API_KEY}`);
+        const response = await fetch(`${BASE_URL}quote/${stockSymbol}?apikey=${API_KEY}`);
         if (!response.ok) {
-            throw new Error("Network response was not ok");
+            throw new Error(`Error fetching data for ${stockSymbol}`);
         }
         const data = await response.json();
-        return data.sectorPerformance;
+        return data[0]; // 假設 API 返回的是一個股票數據的陣列
     } catch (error) {
-        console.error("Error fetching industry data:", error);
-        return [];
+        console.error("Error fetching stock data:", error);
+        return null;
     }
 }
 
-function getColorByPerformance(performance) {
-    return performance >= 0 ? "#f28b82" : "#81c995"; // 漲幅為紅，跌幅為綠
+async function calculateIndustryPerformance() {
+    const industryPerformance = {};
+
+    for (const [industry, stocks] of Object.entries(industryStocks)) {
+        let totalChange = 0;
+        let count = 0;
+
+        for (const stock of stocks) {
+            const stockData = await fetchStockData(stock);
+            if (stockData && stockData.changesPercentage) {
+                totalChange += parseFloat(stockData.changesPercentage.replace("%", ""));
+                count++;
+            }
+        }
+
+        // 計算平均漲幅
+        industryPerformance[industry] = count > 0 ? totalChange / count : 0;
+    }
+
+    return industryPerformance;
 }
 
-async function loadIndustryData(timeframe = "1d") {
-    // 清空現有的數據
+async function loadIndustryData() {
     const industryGrid = document.getElementById("industryGrid");
     industryGrid.innerHTML = "<p>Loading...</p>";
 
-    // 獲取數據
-    const industryData = await fetchIndustryData();
+    const performanceData = await calculateIndustryPerformance();
 
-    // 處理數據並生成動態內容
-    industryGrid.innerHTML = industries
-        .map((industry, index) => {
-            const performance = industryData[index]?.[timeframe] || 0;
+    industryGrid.innerHTML = Object.entries(performanceData)
+        .map(([industry, performance]) => {
             const color = getColorByPerformance(performance);
             return `
                 <div class="industry-item" style="background-color: ${color};">
@@ -52,6 +80,65 @@ async function loadIndustryData(timeframe = "1d") {
         .join("");
 }
 
+async function fetchTaiwanStocks() {
+    try {
+        const response = await fetch(`${BASE_URL}stock-screener?exchange=TW&apikey=${API_KEY}`);
+        if (!response.ok) {
+            throw new Error("Error fetching Taiwan stock data");
+        }
+        return await response.json(); // 返回台股的股票清單
+    } catch (error) {
+        console.error("Error fetching Taiwan stocks:", error);
+        return [];
+    }
+}
+
+async function calculateSectorPerformance() {
+    const stocks = await fetchTaiwanStocks();
+    const sectorPerformance = {};
+
+    // 按 sector 分組並計算漲幅
+    stocks.forEach(stock => {
+        const sector = stock.sector || "其他";
+        const change = stock.changesPercentage
+            ? parseFloat(stock.changesPercentage.replace("%", ""))
+            : 0;
+
+        if (!sectorPerformance[sector]) {
+            sectorPerformance[sector] = { totalChange: 0, count: 0 };
+        }
+
+        sectorPerformance[sector].totalChange += change;
+        sectorPerformance[sector].count++;
+    });
+
+    // 計算每個產業的平均漲幅
+    for (const sector in sectorPerformance) {
+        const { totalChange, count } = sectorPerformance[sector];
+        sectorPerformance[sector] = count > 0 ? totalChange / count : 0;
+    }
+
+    return sectorPerformance;
+}
+
+async function loadIndustryData() {
+    const industryGrid = document.getElementById("industryGrid");
+    industryGrid.innerHTML = "<p>Loading...</p>";
+
+    const performanceData = await calculateSectorPerformance();
+
+    industryGrid.innerHTML = Object.entries(performanceData)
+        .map(([sector, performance]) => {
+            const color = getColorByPerformance(performance);
+            return `
+                <div class="industry-item" style="background-color: ${color};">
+                    <span>${sector}</span>
+                    <strong>${performance.toFixed(2)}%</strong>
+                </div>
+            `;
+        })
+        .join("");
+}
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
 
