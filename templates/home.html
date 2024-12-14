@@ -331,12 +331,13 @@
 
         <!-- 時間篩選 -->
         <div class="time-filters">
-            <button class="active" onclick="loadIndustryData('1d')">1天</button>
-            <button onclick="loadIndustryData('1m')">1月</button>
-            <button onclick="loadIndustryData('3m')">3月</button>
-            <button onclick="loadIndustryData('ytd')">YTD</button>
-            <button onclick="loadIndustryData('1y')">1年</button>
+            <button class="active" data-timeframe="1d" onclick="updateTimeframe(this)">1天</button>
+            <button data-timeframe="1m" onclick="updateTimeframe(this)">1月</button>
+            <button data-timeframe="3m" onclick="updateTimeframe(this)">3月</button>
+            <button data-timeframe="ytd" onclick="updateTimeframe(this)">YTD</button>
+            <button data-timeframe="1y" onclick="updateTimeframe(this)">1年</button>
         </div>
+
 
         <!-- 動態產業展示 -->
         <div class="industry-grid" id="industryGrid"></div>

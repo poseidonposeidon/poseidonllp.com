@@ -1,110 +1,114 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 
+let currentTimeframe = "1d"; // 預設為1天
+
 // 股票和產業的映射
 const industryStocks = {
-    "半導體": ["2330.TW", "2303.TW", "2308.TW"],
-    "IC 設計": ["2454.TW", "3034.TW", "3437.TW"],
-    "電腦及周邊設備": ["2357.TW", "2377.TW", "2360.TW"],
-    "網通設備": ["2345.TW", "2419.TW", "6285.TW"],
-    "記憶體": ["2344.TW", "3006.TW", "3474.TW"],
-    "載板": ["3037.TW", "8046.TW", "3189.TW"],
-    "太陽能": ["6244.TW", "3576.TW", "3691.TW"],
-    "鋼鐵": ["2002.TW", "2027.TW", "2014.TW"],
-    "金融保險": ["2882.TW", "2881.TW", "2891.TW"],
-    "汽車零組件": ["2201.TW", "1522.TW", "2231.TW"],
-    "電子零組件": ["2382.TW", "2392.TW", "2327.TW"],
-    "電動車相關": ["2308.TW", "6533.TW", "5227.TW"],
-    "光學鏡頭": ["3406.TW", "3231.TW", "6209.TW"],
-    "塑料及化工": ["1301.TW", "1303.TW", "1314.TW"],
-    "醫療設備": ["4105.TW", "4123.TW", "9919.TW"],
-    "食品飲料": ["1216.TW", "1227.TW", "2912.TW"],
-    "航運物流": ["2603.TW", "2609.TW", "2615.TW"],
-    "能源相關": ["2601.TW", "6505.TW", "1605.TW"],
-    "電商及零售": ["2642.TW", "2923.TW", "2915.TW"],
-    "科技服務": ["3026.TW", "6147.TW", "6438.TW"]
+    "半導體": ["2330.TW"],
+    "IC 設計": ["2454.TW"],
+    "電腦及周邊設備": ["2357.TW"],
+    "網通設備": ["2345.TW"],
+    "記憶體": ["2344.TW"],
+    "載板": ["3037.TW"],
+    "太陽能": ["6244.TW"],
+    "鋼鐵": ["2002.TW"],
+    "金融保險": ["2882.TW"],
+    "汽車零組件": ["2201.TW"],
+    "電子零組件": ["2382.TW"],
+    "電動車相關": ["2308.TW"],
+    "光學鏡頭": ["3406.TW"],
+    "塑料及化工": ["1301.TW"],
+    "醫療設備": ["4105.TW"],
+    "食品飲料": ["1216.TW"],
+    "航運物流": ["2603.TW"],
+    "能源相關": ["2601.TW"],
+    "電商及零售": ["2642.TW"],
+    "科技服務": ["3026.TW"]
 };
 
-// 獲取批量股票數據
-async function fetchStockDataBatch(stockSymbols, retries = 3) {
-    const symbolsString = stockSymbols.join(",");
-    const url = `${BASE_URL}quote/${symbolsString}?apikey=${API_KEY}`;
-    console.log("Fetching data from URL:", url); // 日誌檢查 API URL
+// 更新所選時間範圍
+function updateTimeframe(button) {
+    // 更新當前時間範圍
+    currentTimeframe = button.getAttribute("data-timeframe");
+
+    // 高亮選中的按鈕
+    document.querySelectorAll(".time-filters button").forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+
+    // 重新加載數據
+    loadIndustryData();
+}
+
+// 獲取單一股票的歷史數據並計算指定時間的變化百分比
+async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
+    const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
+    console.log(`Fetching historical data for ${stockSymbol} with timeframe: ${timeframe}`);
 
     try {
         const response = await fetch(url);
-
         if (!response.ok) {
-            console.error(`API response not OK. Status: ${response.status}, Text: ${response.statusText}`);
-            throw new Error(`Error fetching data for ${symbolsString}`);
+            throw new Error(`Error fetching historical data for ${stockSymbol}`);
         }
 
         const data = await response.json();
-        console.log("API Response Data:", data); // 檢查返回的數據
-        return data;
-    } catch (error) {
-        console.error("Error fetching stock data:", error.message);
-        if (retries > 0) {
-            console.log("Retrying fetch...");
-            return fetchStockDataBatch(stockSymbols, retries - 1);
+        const historicalPrices = data.historical;
+
+        if (!historicalPrices || historicalPrices.length === 0) {
+            console.warn(`No historical data for ${stockSymbol}`);
+            return 0;
         }
-        return [];
+
+        // 找到最新和指定時間的價格
+        const latestClose = historicalPrices[0].close;
+        const targetDate = new Date();
+        if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
+        else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
+        else if (timeframe === "ytd") targetDate.setMonth(0); // 年初
+        else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
+
+        const targetClose = historicalPrices.find(item => new Date(item.date) <= targetDate)?.close;
+
+        if (!targetClose) {
+            console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
+            return 0;
+        }
+
+        // 計算百分比變化
+        const percentageChange = ((latestClose - targetClose) / targetClose) * 100;
+        return percentageChange;
+    } catch (error) {
+        console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
+        return 0;
     }
 }
 
-// 計算產業漲跌幅
+// 計算每個產業的漲跌幅
 async function calculateIndustryPerformance() {
     const industryPerformance = {};
 
     for (const [industry, stocks] of Object.entries(industryStocks)) {
-        console.log(`Fetching data for industry: ${industry}, Stocks: ${stocks}`);
-
-        const stockDataList = await fetchStockDataBatch(stocks);
-
-        if (!stockDataList || stockDataList.length === 0) {
-            console.warn(`No data fetched for industry: ${industry}`);
-            industryPerformance[industry] = 0; // 返回 0，避免頁面報錯
-            continue;
-        }
-
-        let totalChange = 0;
-        let count = 0;
-
-        stockDataList.forEach(stockData => {
-            if (stockData && stockData.changesPercentage) {
-                const percentage = parseFloat(stockData.changesPercentage.replace("%", ""));
-                console.log(`Stock: ${stockData.symbol}, Change: ${percentage}`);
-                if (!isNaN(percentage)) {
-                    totalChange += percentage;
-                    count++;
-                }
-            }
-        });
-
-        industryPerformance[industry] = count > 0 ? totalChange / count : 0;
+        const stockSymbol = stocks[0]; // 每個產業僅計算一支股票
+        const change = await fetchHistoricalPercentageChange(stockSymbol, currentTimeframe);
+        industryPerformance[industry] = change;
     }
 
-    console.log("Calculated Industry Performance:", industryPerformance); // 確認最終數據
+    console.log("Calculated Industry Performance:", industryPerformance);
     return industryPerformance;
 }
 
-// 渲染產業數據
-async function loadIndustryData(timeframe = "1d") {
-    const industryGrid = document.getElementById("industryGrid");
-    if (!industryGrid) {
-        console.error("Element with id 'industryGrid' not found.");
-        return;
-    }
+// 根據漲幅設定顏色
+function getColorByPerformance(performance) {
+    return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色代表上漲，綠色代表下跌
+}
 
+// 載入產業數據並渲染
+async function loadIndustryData() {
+    const industryGrid = document.getElementById("industryGrid");
     industryGrid.innerHTML = "<p>Loading...</p>";
 
     try {
         const performanceData = await calculateIndustryPerformance();
-
-        if (!performanceData || Object.keys(performanceData).length === 0) {
-            industryGrid.innerHTML = "<p>No data available. Please check API or try again later.</p>";
-            return;
-        }
 
         industryGrid.innerHTML = Object.entries(performanceData)
             .map(([industry, performance]) => {
@@ -123,15 +127,11 @@ async function loadIndustryData(timeframe = "1d") {
     }
 }
 
-// 初始化
+// 頁面加載後初始化
 document.addEventListener("DOMContentLoaded", () => {
-    const industryGrid = document.getElementById("industryGrid");
-    if (!industryGrid) {
-        console.error("Element with id 'industryGrid' not found.");
-        return;
-    }
     loadIndustryData();
 });
+
 
 
 //////////////////////////////////////////////////////////////////////////////
