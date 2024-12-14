@@ -911,6 +911,136 @@ button:not(.info-input button):hover {
 }
 
 
+/*////////////////////////////////////////*/
+/* 產業趨勢容器樣式 */
+.market-trend {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px auto;
+    max-width: 1200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* 標題樣式 */
+.market-trend h2 {
+    color: #b0bec5;
+    font-size: 24px;
+    margin-bottom: 10px;
+    text-align: center;
+}
+
+.market-trend p {
+    color: #e0e0e0;
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 時間篩選按鈕樣式 */
+.time-filters {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.time-filters button {
+    background-color: #2c2c2c;
+    color: #b0bec5;
+    border: 1px solid #444;
+    padding: 10px 20px;
+    margin: 0 5px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.time-filters button.active {
+    background-color: #90caf9;
+    color: #121212;
+}
+
+.time-filters button:hover {
+    background-color: #3c3c3c;
+    color: #fff;
+}
+
+/* 產業表格樣式 */
+.industry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+/* 單個產業樣式 */
+.industry-item {
+    background-color: #2c2c2c;
+    color: #e0e0e0;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    cursor: pointer;
+}
+
+.industry-item span {
+    font-size: 18px;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.industry-item strong {
+    font-size: 20px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* 漲幅和跌幅的顏色 */
+.industry-item.positive {
+    background-color: #81c995; /* 漲幅用綠色背景 */
+}
+
+.industry-item.negative {
+    background-color: #f28b82; /* 跌幅用紅色背景 */
+}
+
+.industry-item:hover {
+    transform: scale(1.05);
+    background-color: #3c3c3c;
+}
+
+/* 無數據的產業顯示 */
+.industry-item.no-data {
+    background-color: #616161;
+    color: #999999;
+}
+
+/* 滾動樣式（若產業數量過多） */
+.industry-grid {
+    max-height: 600px;
+    overflow-y: auto;
+    padding-right: 10px; /* 留出空間避免滾動條遮住內容 */
+}
+
+/* 選中的產業樣式 */
+.industry-item.selected {
+    border: 2px solid #90caf9;
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+    .industry-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .time-filters button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
 
 
 
