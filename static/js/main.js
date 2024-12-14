@@ -1068,6 +1068,7 @@ function loadAIBoxSection(sectionId) {
 }
 
 let currentSectionId = null; // 用於記錄當前顯示的 sectionId
+
 function formatInput(input) {
     // 僅允許數字和字母，並將字母轉為大寫
     input.value = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
@@ -2240,7 +2241,15 @@ async function fetchStockWithExchangeSuffixGlobal(stockCode, apiKey) {
 
         const data = await response.json();
 
-        // 假設全球股票需要更複雜的交易所處理邏輯
+        // 判斷輸入是否為台灣股票（純數字）
+        if (/^\d+$/.test(stockCode)) {
+            // 尋找台灣股票代碼
+            const filteredData = data.filter(item => item.symbol.endsWith('.TW') || item.symbol.endsWith('.TWO'));
+            const match = filteredData.find(item => item.symbol.split('.')[0] === stockCode);
+            return match ? match.symbol : `${stockCode}.TW`; // 如果未匹配，預設為 .TW
+        }
+
+        // 處理全球股票代碼的邏輯
         const match = data.find(item => item.symbol.includes(stockCode));
         return match ? match.symbol : null;
     } catch (error) {
