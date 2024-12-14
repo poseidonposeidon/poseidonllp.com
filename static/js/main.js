@@ -1,96 +1,72 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
-
-let currentTimeframe = "1d"; // 預設為1天
-
-// 股票和產業的映射
 const industryStocks = {
-    "半導體": ["2330.TW"],
-    "IC 設計": ["2454.TW"],
-    "電腦及周邊設備": ["2357.TW"],
-    "網通設備": ["2345.TW"],
-    "記憶體": ["2344.TW"],
-    "載板": ["3037.TW"],
-    "太陽能": ["6244.TW"],
-    "鋼鐵": ["2002.TW"],
-    "金融保險": ["2882.TW"],
-    "汽車零組件": ["2201.TW"],
-    "電子零組件": ["2382.TW"],
-    "電動車相關": ["2308.TW"],
-    "光學鏡頭": ["3406.TW"],
-    "塑料及化工": ["1301.TW"],
-    "醫療設備": ["4105.TW"],
-    "食品飲料": ["1216.TW"],
-    "航運物流": ["2603.TW"],
-    "能源相關": ["2601.TW"],
-    "電商及零售": ["2642.TW"],
-    "科技服務": ["3026.TW"]
+    "半導體": ["2330.TW", "2303.TW", "2308.TW", "2317.TW", "2360.TW"],
+    "IC 設計": ["2454.TW", "3034.TW", "3437.TW", "2379.TW", "3532.TW"],
+    "電腦及周邊設備": ["2357.TW", "2377.TW", "2382.TW", "2392.TW", "2324.TW"],
+    "網通設備": ["2345.TW", "2419.TW", "6285.TW", "3023.TW", "2415.TW"],
+    "記憶體": ["2344.TW", "3006.TW", "3474.TW", "2324.TW", "2337.TW"],
+    "載板": ["3037.TW", "8046.TW", "3189.TW", "2368.TW", "6147.TW"],
+    "太陽能": ["6244.TW", "3576.TW", "3691.TW", "6806.TW", "3027.TW"],
+    "鋼鐵": ["2002.TW", "2027.TW", "2014.TW", "2015.TW", "2022.TW"],
+    "金融保險": ["2882.TW", "2881.TW", "2891.TW", "2884.TW", "2883.TW"],
+    "汽車零組件": ["2201.TW", "1522.TW", "2231.TW", "2233.TW", "2204.TW"],
+    "電子零組件": ["2382.TW", "2392.TW", "2327.TW", "2312.TW", "2324.TW"],
+    "電動車相關": ["2308.TW", "6533.TW", "5227.TW", "3026.TW", "2305.TW"],
+    "光學鏡頭": ["3406.TW", "3231.TW", "6209.TW", "2383.TW", "2409.TW"],
+    "塑料及化工": ["1301.TW", "1303.TW", "1314.TW", "1305.TW", "1308.TW"],
+    "醫療設備": ["4105.TW", "4123.TW", "9919.TW", "4114.TW", "4133.TW"],
+    "食品飲料": ["1216.TW", "1227.TW", "2912.TW", "1210.TW", "1203.TW"],
+    "航運物流": ["2603.TW", "2609.TW", "2615.TW", "5608.TW", "2617.TW"],
+    "能源相關": ["2601.TW", "6505.TW", "1605.TW", "1608.TW", "1102.TW"],
+    "電商及零售": ["2642.TW", "2923.TW", "2915.TW", "2913.TW", "2910.TW"],
+    "科技服務": ["3026.TW", "6147.TW", "6438.TW", "3583.TW", "3682.TW"]
 };
 
-// 更新所選時間範圍
-function updateTimeframe(button) {
-    // 更新當前時間範圍
-    currentTimeframe = button.getAttribute("data-timeframe");
-
-    // 高亮選中的按鈕
-    document.querySelectorAll(".time-filters button").forEach(btn => btn.classList.remove("active"));
-    button.classList.add("active");
-
-    // 重新加載數據
-    loadIndustryData();
-}
-
-// 獲取單一股票的歷史數據並計算指定時間的變化百分比
-async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
-    const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
-    console.log(`Fetching historical data for ${stockSymbol} with timeframe: ${timeframe}`);
+// 獲取多隻股票的數據
+async function fetchStockDataBatch(stockSymbols) {
+    const symbolsString = stockSymbols.join(",");
+    const url = `${BASE_URL}quote/${symbolsString}?apikey=${API_KEY}`;
+    console.log("Fetching data from URL:", url);
 
     try {
         const response = await fetch(url);
+
         if (!response.ok) {
-            throw new Error(`Error fetching historical data for ${stockSymbol}`);
+            throw new Error(`Error fetching data for ${symbolsString}`);
         }
 
         const data = await response.json();
-        const historicalPrices = data.historical;
+        console.log("API Response Data:", data);
 
-        if (!historicalPrices || historicalPrices.length === 0) {
-            console.warn(`No historical data for ${stockSymbol}`);
-            return 0;
-        }
-
-        // 找到最新和指定時間的價格
-        const latestClose = historicalPrices[0].close;
-        const targetDate = new Date();
-        if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
-        else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
-        else if (timeframe === "ytd") targetDate.setMonth(0); // 年初
-        else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
-
-        const targetClose = historicalPrices.find(item => new Date(item.date) <= targetDate)?.close;
-
-        if (!targetClose) {
-            console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
-            return 0;
-        }
-
-        // 計算百分比變化
-        const percentageChange = ((latestClose - targetClose) / targetClose) * 100;
-        return percentageChange;
+        // 過濾有效的數據
+        return data.filter(stock => stock && stock.symbol && stock.changesPercentage);
     } catch (error) {
-        console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
-        return 0;
+        console.error("Error fetching stock data:", error);
+        return [];
     }
 }
 
-// 計算每個產業的漲跌幅
+// 計算產業漲跌幅
 async function calculateIndustryPerformance() {
     const industryPerformance = {};
 
     for (const [industry, stocks] of Object.entries(industryStocks)) {
-        const stockSymbol = stocks[0]; // 每個產業僅計算一支股票
-        const change = await fetchHistoricalPercentageChange(stockSymbol, currentTimeframe);
-        industryPerformance[industry] = change;
+        const stockDataList = await fetchStockDataBatch(stocks);
+
+        let totalChange = 0;
+        let count = 0;
+
+        stockDataList.forEach(stockData => {
+            const percentage = parseFloat(stockData.changesPercentage);
+            if (!isNaN(percentage)) {
+                totalChange += percentage;
+                count++;
+            }
+        });
+
+        // 計算平均漲跌幅
+        industryPerformance[industry] = count > 0 ? totalChange / count : 0;
     }
 
     console.log("Calculated Industry Performance:", industryPerformance);
@@ -99,10 +75,10 @@ async function calculateIndustryPerformance() {
 
 // 根據漲幅設定顏色
 function getColorByPerformance(performance) {
-    return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色代表上漲，綠色代表下跌
+    return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
 }
 
-// 載入產業數據並渲染
+// 渲染產業數據
 async function loadIndustryData() {
     const industryGrid = document.getElementById("industryGrid");
     industryGrid.innerHTML = "<p>Loading...</p>";
@@ -131,8 +107,6 @@ async function loadIndustryData() {
 document.addEventListener("DOMContentLoaded", () => {
     loadIndustryData();
 });
-
-
 
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
