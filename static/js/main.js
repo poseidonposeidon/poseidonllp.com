@@ -1144,52 +1144,22 @@ function loadCompareSection(sectionId) {
             <h2>Compare Global Stocks</h2>
             <div class="info-input">
                 <label for="stock1">Stock 1:</label>
-                <input 
-                    type="text" 
-                    id="stock1" 
-                    placeholder="e.g., 2330 or AAPL" 
-                    oninput="handleInput(this, 'suggestion-box-compare-stock1')" 
-                    autocomplete="off">
-                <div id="suggestion-box-compare-stock1" class="suggestion-box-compare"></div>
+                <input type="text" id="stock1" placeholder="e.g., 2330 or AAPL" oninput="formatInput(this)">
             
                 <label for="stock2">Stock 2:</label>
-                <input 
-                    type="text" 
-                    id="stock2" 
-                    placeholder="e.g., 2317 or TSLA" 
-                    oninput="handleInput(this, 'suggestion-box-compare-stock2')" 
-                    autocomplete="off">
-                <div id="suggestion-box-compare-stock2" class="suggestion-box-compare"></div>
+                <input type="text" id="stock2" placeholder="e.g., 2317 or TSLA" oninput="formatInput(this)">
             
                 <label for="stock3">Stock 3:</label>
-                <input 
-                    type="text" 
-                    id="stock3" 
-                    placeholder="e.g., 2881 or GOOG" 
-                    oninput="handleInput(this, 'suggestion-box-compare-stock3')" 
-                    autocomplete="off">
-                <div id="suggestion-box-compare-stock3" class="suggestion-box-compare"></div>
+                <input type="text" id="stock3" placeholder="e.g., 2881 or GOOG" oninput="formatInput(this)">
             
                 <label for="stock4">Stock 4:</label>
-                <input 
-                    type="text" 
-                    id="stock4" 
-                    placeholder="e.g., 1301 or MSFT" 
-                    oninput="handleInput(this, 'suggestion-box-compare-stock4')" 
-                    autocomplete="off">
-                <div id="suggestion-box-compare-stock4" class="suggestion-box-compare"></div>
+                <input type="text" id="stock4" placeholder="e.g., 1301 or MSFT" oninput="formatInput(this)">
             
                 <label for="stock5">Stock 5:</label>
-                <input 
-                    type="text" 
-                    id="stock5" 
-                    placeholder="e.g., 1101 or AMZN" 
-                    oninput="handleInput(this, 'suggestion-box-compare-stock5')" 
-                    autocomplete="off">
-                <div id="suggestion-box-compare-stock5" class="suggestion-box-compare"></div>
+                <input type="text" id="stock5" placeholder="e.g., 1101 or AMZN" oninput="formatInput(this)">
             </div>
 
-
+            
             <!-- 新增切換圖表的功能 -->
             <div class="chart-links">
                 <div class="category">
@@ -2271,60 +2241,22 @@ async function fetchStockWithExchangeSuffixGlobal(stockCode, apiKey) {
 
         const data = await response.json();
 
-        // 過濾結果，包含全球所有匹配的股票代碼
-        const suggestions = data.map(item => ({
-            symbol: item.symbol,
-            exchange: item.exchangeShortName || 'Unknown'
-        }));
-
-        return suggestions;
-    } catch (error) {
-        console.error('Error fetching stock suggestions:', error);
-        return [];
-    }
-}
-
-let debounceTimeout;
-let currentRequestId = 0;
-
-async function handleInput(input, suggestionBoxId) {
-    const query = input.value.trim();
-
-    // 如果輸入為空，清空建議框
-    if (!query) {
-        document.getElementById(suggestionBoxId).innerHTML = '';
-        return;
-    }
-
-    // 使用防抖限制 API 請求頻率
-    clearTimeout(debounceTimeout);
-    debounceTimeout = setTimeout(async () => {
-        const requestId = ++currentRequestId;
-
-        const apiKey = 'your_api_key_here'; // 替換為您的 API 密鑰
-        const suggestions = await fetchStockSuggestions(query, apiKey);
-
-        // 確保只有最新請求的結果被處理
-        if (requestId === currentRequestId) {
-            const suggestionBox = document.getElementById(suggestionBoxId);
-            suggestionBox.innerHTML = suggestions.length > 0
-                ? suggestions
-                    .map(item => `<div onclick="selectSuggestion('${item.symbol}', '${input.id}')">${item.symbol} (${item.exchange})</div>`)
-                    .join('')
-                : '<div class="no-suggestions">No matching stocks</div>';
+        // 判斷輸入是否為台灣股票（純數字）
+        if (/^\d+$/.test(stockCode)) {
+            // 尋找台灣股票代碼
+            const filteredData = data.filter(item => item.symbol.endsWith('.TW') || item.symbol.endsWith('.TWO'));
+            const match = filteredData.find(item => item.symbol.split('.')[0] === stockCode);
+            return match ? match.symbol : `${stockCode}.TW`; // 如果未匹配，預設為 .TW
         }
-    }, 300); // 防抖延遲 300ms
+
+        // 處理全球股票代碼的邏輯
+        const match = data.find(item => item.symbol.includes(stockCode));
+        return match ? match.symbol : null;
+    } catch (error) {
+        console.error('Error fetching global stock exchange:', error);
+        return null;
+    }
 }
-
-function selectSuggestion(value, inputId) {
-    const input = document.getElementById(inputId);
-    input.value = value;
-
-    // 清空建議框
-    const suggestionBox = document.getElementById(`suggestion-box-compare-${inputId}`);
-    suggestionBox.innerHTML = '';
-}
-
 
 async function fetchMarginData(stockSymbol, apiKey, type) {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=40&apikey=${apiKey}`;
