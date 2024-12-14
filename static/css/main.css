@@ -876,7 +876,39 @@ button:not(.info-input button):hover {
     color: #ffffff; /* hover 時字體顏色變白 */
 }
 
+/*//////////////////////////////////////////*/
+.suggestion-box-compare {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    width: calc(100% - 2px); /* 確保寬度與輸入框對齊 */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
 
+/* 建議框中的每一項 */
+.suggestion-box-compare div {
+    padding: 10px 8px;
+    cursor: pointer;
+    font-size: 14px;
+    color: #333;
+}
+
+/* 鼠標懸停時的效果 */
+.suggestion-box-compare div:hover {
+    background-color: #f0f0f0;
+}
+
+/* 無匹配項時的提示 */
+.suggestion-box-compare .no-suggestions {
+    padding: 10px 8px;
+    color: #999;
+    text-align: center;
+    font-style: italic;
+}
 
 
 
