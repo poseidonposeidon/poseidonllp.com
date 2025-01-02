@@ -4,11 +4,6 @@ let currentTimeframe = "2d"; // 默認時間範圍
 
 let currentMarket = "TW"; // 默認市場
 const industryStocksUS = {
-    "Technology": ["AAPL", "MSFT", "GOOGL", "AMZN", "META"],
-    "Automotive": ["TSLA", "GM", "F", "RIVN", "LCID"],
-    "Healthcare": ["JNJ", "PFE", "MRNA", "ABBV", "GILD"],
-    "Finance": ["JPM", "BAC", "C", "WFC", "GS"],
-    "Energy": ["XOM", "CVX", "SLB", "COP", "PSX"],
     "半導體": ["NVDA", "AMD", "TSM", "QCOM", "INTC"],
     "IC 設計": ["AVGO", "TXN", "MRVL", "ON", "ADI"],
     "電腦及周邊設備": ["HPQ", "DELL", "AAPL", "MSFT", "LOGI"],
