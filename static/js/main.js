@@ -42,9 +42,14 @@ function updateMarket(button) {
     document.querySelectorAll(".market-filters button").forEach(btn => btn.classList.remove("active"));
     button.classList.add("active");
 
+    // 更新標題文字
+    const marketTitle = document.getElementById("marketTitle");
+    marketTitle.textContent = currentMarket === "TW" ? "台股市場焦點" : "美股市場焦點";
+
     // 加載數據
     loadIndustryData();
 }
+
 
 // 獲取單一股票的歷史數據並計算指定時間段的變化百分比
 async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
