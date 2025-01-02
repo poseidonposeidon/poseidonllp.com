@@ -3,8 +3,9 @@ const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 let currentTimeframe = "2d"; // 默認時間範圍
 
 let currentMarket = "TW"; // 默認市場
+
 const industryStocksUS = {
-    "半導體": ["NVDA", "AMD", "TSM", "QCOM", "INTC"],
+    "半導體": ["NVDA", "AMD", "TSM", "QCOM", "INTC","DELL"],
     "IC 設計": ["AVGO", "TXN", "MRVL", "ON", "ADI"],
     "電腦及周邊設備": ["HPQ", "DELL", "AAPL", "MSFT", "LOGI"],
     "網通設備": ["CSCO", "JNPR", "ANET", "FFIV", "EXTR"],
