@@ -1,6 +1,6 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
-let currentTimeframe = "1d"; // 默認時間範圍
+let currentTimeframe = "2d"; // 默認時間範圍
 
 const industryStocks = {
     "半導體": ["2330.TW", "2303.TW", "2308.TW", "2317.TW", "2360.TW"],
