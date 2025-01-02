@@ -4,6 +4,11 @@ let currentTimeframe = "2d"; // 默認時間範圍
 
 let currentMarket = "TW"; // 默認市場
 const industryStocksUS = {
+    "Technology": ["AAPL", "MSFT", "GOOGL", "AMZN", "META"],
+    "Automotive": ["TSLA", "GM", "F", "RIVN", "LCID"],
+    "Healthcare": ["JNJ", "PFE", "MRNA", "ABBV", "GILD"],
+    "Finance": ["JPM", "BAC", "C", "WFC", "GS"],
+    "Energy": ["XOM", "CVX", "SLB", "COP", "PSX"],
     "半導體": ["NVDA", "AMD", "TSM", "QCOM", "INTC"],
     "IC 設計": ["AVGO", "TXN", "MRVL", "ON", "ADI"],
     "電腦及周邊設備": ["HPQ", "DELL", "AAPL", "MSFT", "LOGI"],
@@ -25,7 +30,6 @@ const industryStocksUS = {
     "電商及零售": ["AMZN", "EBAY", "WMT", "TGT", "COST"],
     "科技服務": ["CRM", "NOW", "SNOW", "DDOG", "OKTA"]
 };
-
 
 const industryStocks = {
     "半導體": ["2330.TW", "2303.TW", "2308.TW", "2317.TW", "2360.TW"],
@@ -66,63 +70,51 @@ function updateMarket(button) {
     loadIndustryData();
 }
 
-// 獲取單一股票的歷史數據並計算指定時間段的變化百分比
-async function fetchBatchHistoricalPercentageChanges(stockSymbols, timeframe) {
-    const validSymbols = validateStockSymbols(stockSymbols);
-    if (validSymbols.length === 0) {
-        console.warn("No valid stock symbols provided for fetching.");
-        return {};
-    }
 
-    const url = `${BASE_URL}historical-price-full/${validSymbols.join(",")}?apikey=${API_KEY}`;
-    console.log(`Fetching historical data for stocks: ${validSymbols.join(",")} with timeframe: ${timeframe}`);
+// 獲取單一股票的歷史數據並計算指定時間段的變化百分比
+async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
+    const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
+    console.log(`Fetching historical data for ${stockSymbol} with timeframe: ${timeframe}`);
 
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Error fetching historical data for stocks: ${validSymbols.join(",")}`);
+            throw new Error(`Error fetching historical data for ${stockSymbol}`);
         }
 
         const data = await response.json();
-        if (!data || data.length === 0) {
-            console.warn(`No data returned for stocks: ${validSymbols.join(",")}`);
-            return {};
+        const historicalPrices = data.historical;
+
+        if (!historicalPrices || historicalPrices.length === 0) {
+            console.warn(`No historical data for ${stockSymbol}`);
+            return 0;
         }
 
-        const percentageChanges = {};
+        const latestClose = historicalPrices[0].close;
         const targetDate = new Date();
+
+        // 設定時間段
         if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
         else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
-        else if (timeframe === "ytd") targetDate.setMonth(0);
+        else if (timeframe === "ytd") targetDate.setMonth(0); // 年初
         else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
 
-        for (const stockData of Array.isArray(data) ? data : [data]) {
-            if (!stockData || !stockData.historical || stockData.historical.length === 0) {
-                console.warn(`No historical data for ${stockData?.symbol || "undefined"}`);
-                percentageChanges[stockData?.symbol || "undefined"] = 0;
-                continue;
-            }
+        // 找到最接近目標日期的收盤價
+        const targetClose = historicalPrices.find(item => {
+            const itemDate = new Date(item.date);
+            return itemDate <= targetDate;
+        })?.close;
 
-            const historicalPrices = stockData.historical;
-            const latestClose = historicalPrices[0].close;
-            const targetClose = historicalPrices.find(item => {
-                const itemDate = new Date(item.date);
-                return itemDate <= targetDate;
-            })?.close;
-
-            if (!targetClose) {
-                console.warn(`No data for ${stockData.symbol} at target timeframe: ${timeframe}`);
-                percentageChanges[stockData.symbol] = 0;
-                continue;
-            }
-
-            percentageChanges[stockData.symbol] = ((latestClose - targetClose) / targetClose) * 100;
+        if (!targetClose) {
+            console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
+            return 0;
         }
 
-        return percentageChanges;
+        // 計算百分比變化
+        return ((latestClose - targetClose) / targetClose) * 100;
     } catch (error) {
-        console.error(`Error fetching batch historical percentage changes:`, error);
-        return {};
+        console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
+        return 0;
     }
 }
 
@@ -131,11 +123,18 @@ async function calculateIndustryPerformance(industryData) {
     const industryPerformance = {};
 
     for (const [industry, stocks] of Object.entries(industryData)) {
-        const percentageChanges = await fetchBatchHistoricalPercentageChanges(stocks, currentTimeframe);
+        let totalChange = 0;
+        let count = 0;
 
-        const totalChange = Object.values(percentageChanges).reduce((sum, change) => sum + (isNaN(change) ? 0 : change), 0);
-        const count = stocks.length;
+        for (const stock of stocks) {
+            const change = await fetchHistoricalPercentageChange(stock, currentTimeframe);
+            if (!isNaN(change)) {
+                totalChange += change;
+                count++;
+            }
+        }
 
+        // 計算平均漲跌幅
         industryPerformance[industry] = count > 0 ? totalChange / count : 0;
     }
 
