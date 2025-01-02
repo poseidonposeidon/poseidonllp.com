@@ -329,6 +329,12 @@
         <h2>台股市場焦點</h2>
         <p>查看市場漲跌幅最大的概念股和族群有哪些，點擊區塊可查看詳細概念股清單。</p>
 
+        <!-- 市場切換按鈕 -->
+        <div class="market-filters">
+            <button class="active" data-market="TW" onclick="updateMarket(this)">TW</button>
+            <button data-market="US" onclick="updateMarket(this)">US</button>
+        </div>
+
         <!-- 時間篩選 -->
         <div class="time-filters">
             <button class="active" data-timeframe="1d" onclick="updateTimeframe(this)">1天</button>

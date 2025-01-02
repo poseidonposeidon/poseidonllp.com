@@ -2,6 +2,15 @@ const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 let currentTimeframe = "2d"; // 默認時間範圍
 
+let currentMarket = "TW"; // 默認市場
+const industryStocksUS = {
+    "Technology": ["AAPL", "MSFT", "GOOGL", "AMZN", "META"],
+    "Automotive": ["TSLA", "GM", "F", "RIVN", "LCID"],
+    "Healthcare": ["JNJ", "PFE", "MRNA", "ABBV", "GILD"],
+    "Finance": ["JPM", "BAC", "C", "WFC", "GS"],
+    "Energy": ["XOM", "CVX", "SLB", "COP", "PSX"]
+};
+
 const industryStocks = {
     "半導體": ["2330.TW", "2303.TW", "2308.TW", "2317.TW", "2360.TW"],
     "IC 設計": ["2454.TW", "3034.TW", "3437.TW", "2379.TW", "3532.TW"],
@@ -24,6 +33,18 @@ const industryStocks = {
     "電商及零售": ["2642.TW", "2923.TW", "2915.TW", "2913.TW", "2910.TW"],
     "科技服務": ["3026.TW", "6147.TWO", "6438.TW", "3583.TW", "3682.TW"]
 };
+
+// 更新市場切換邏輯
+function updateMarket(button) {
+    currentMarket = button.getAttribute("data-market");
+
+    // 更新按鈕樣式
+    document.querySelectorAll(".market-filters button").forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+
+    // 加載數據
+    loadIndustryData();
+}
 
 // 獲取單一股票的歷史數據並計算指定時間段的變化百分比
 async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
@@ -72,11 +93,11 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
     }
 }
 
-// 計算每個產業的漲跌幅
-async function calculateIndustryPerformance() {
+// 修改計算產業表現邏輯
+async function calculateIndustryPerformance(industryData) {
     const industryPerformance = {};
 
-    for (const [industry, stocks] of Object.entries(industryStocks)) {
+    for (const [industry, stocks] of Object.entries(industryData)) {
         let totalChange = 0;
         let count = 0;
 
@@ -101,13 +122,14 @@ function getColorByPerformance(performance) {
     return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
 }
 
-// 渲染產業數據
+// 修改產業數據選擇邏輯
 async function loadIndustryData() {
     const industryGrid = document.getElementById("industryGrid");
     industryGrid.innerHTML = "<p>Loading...</p>";
 
     try {
-        const performanceData = await calculateIndustryPerformance();
+        const industryData = currentMarket === "TW" ? industryStocks : industryStocksUS;
+        const performanceData = await calculateIndustryPerformance(industryData);
 
         industryGrid.innerHTML = Object.entries(performanceData)
             .map(([industry, performance]) => {
