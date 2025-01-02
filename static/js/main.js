@@ -68,32 +68,42 @@ function updateMarket(button) {
 
 // 獲取單一股票的歷史數據並計算指定時間段的變化百分比
 async function fetchBatchHistoricalPercentageChanges(stockSymbols, timeframe) {
-    const url = `${BASE_URL}historical-price-full/${stockSymbols.join(",")}?apikey=${API_KEY}`;
-    console.log(`Fetching historical data for stocks: ${stockSymbols.join(",")} with timeframe: ${timeframe}`);
+    const validSymbols = validateStockSymbols(stockSymbols);
+    if (validSymbols.length === 0) {
+        console.warn("No valid stock symbols provided for fetching.");
+        return {};
+    }
+
+    const url = `${BASE_URL}historical-price-full/${validSymbols.join(",")}?apikey=${API_KEY}`;
+    console.log(`Fetching historical data for stocks: ${validSymbols.join(",")} with timeframe: ${timeframe}`);
 
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Error fetching historical data for stocks: ${stockSymbols.join(",")}`);
+            throw new Error(`Error fetching historical data for stocks: ${validSymbols.join(",")}`);
         }
 
         const data = await response.json();
-        const percentageChanges = {};
+        if (!data || data.length === 0) {
+            console.warn(`No data returned for stocks: ${validSymbols.join(",")}`);
+            return {};
+        }
 
+        const percentageChanges = {};
         const targetDate = new Date();
         if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
         else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
-        else if (timeframe === "ytd") targetDate.setMonth(0); // 年初
+        else if (timeframe === "ytd") targetDate.setMonth(0);
         else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
 
         for (const stockData of Array.isArray(data) ? data : [data]) {
-            const historicalPrices = stockData.historical;
-            if (!historicalPrices || historicalPrices.length === 0) {
-                console.warn(`No historical data for ${stockData.symbol}`);
-                percentageChanges[stockData.symbol] = 0;
+            if (!stockData || !stockData.historical || stockData.historical.length === 0) {
+                console.warn(`No historical data for ${stockData?.symbol || "undefined"}`);
+                percentageChanges[stockData?.symbol || "undefined"] = 0;
                 continue;
             }
 
+            const historicalPrices = stockData.historical;
             const latestClose = historicalPrices[0].close;
             const targetClose = historicalPrices.find(item => {
                 const itemDate = new Date(item.date);
