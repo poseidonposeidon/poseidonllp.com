@@ -1,6 +1,6 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
-let currentTimeframe = "2d"; // 默認時間範圍
+let currentTimeframe = "1d"; // 默認時間範圍
 
 let currentMarket = "TW"; // 默認市場
 
@@ -80,33 +80,40 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
         const data = await response.json();
         const historicalPrices = data.historical;
 
-        if (!historicalPrices || historicalPrices.length === 0) {
-            console.warn(`No historical data for ${stockSymbol}`);
+        if (!historicalPrices || historicalPrices.length < 2) {
+            console.warn(`Insufficient historical data for ${stockSymbol}`);
             return 0;
         }
 
-        const latestClose = historicalPrices[0].close;
-        const targetDate = new Date();
+        let latestClose = historicalPrices[0].close;
+        let previousClose;
 
-        // 設定時間段
-        if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
-        else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
-        else if (timeframe === "ytd") targetDate.setMonth(0); // 年初
-        else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
+        // 特殊處理 1d 時間範圍
+        if (timeframe === "1d") {
+            previousClose = historicalPrices[1].close; // 使用前一天的收盤價
+        } else {
+            const targetDate = new Date();
 
-        // 找到最接近目標日期的收盤價
-        const targetClose = historicalPrices.find(item => {
-            const itemDate = new Date(item.date);
-            return itemDate <= targetDate;
-        })?.close;
+            // 設定其他時間範圍的目標日期
+            if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
+            else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
+            else if (timeframe === "ytd") targetDate.setMonth(0);
+            else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
 
-        if (!targetClose) {
+            // 找到最接近目標日期的收盤價
+            previousClose = historicalPrices.find(item => {
+                const itemDate = new Date(item.date);
+                return itemDate <= targetDate;
+            })?.close;
+        }
+
+        if (!previousClose) {
             console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
             return 0;
         }
 
         // 計算百分比變化
-        return ((latestClose - targetClose) / targetClose) * 100;
+        return ((latestClose - previousClose) / previousClose) * 100;
     } catch (error) {
         console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
         return 0;
