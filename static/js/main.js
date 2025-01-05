@@ -59,11 +59,18 @@ function updateMarket(button) {
 
     // 更新標題文字
     const marketTitle = document.getElementById("marketTitle");
-    marketTitle.textContent = currentMarket === "TW" ? "台股市場焦點" : "美股市場焦點";
+    if (currentMarket === "TW") {
+        marketTitle.textContent = "台股市場焦點";
+    } else if (currentMarket === "US") {
+        marketTitle.textContent = "美股市場焦點";
+    } else if (currentMarket === "JP") {
+        marketTitle.textContent = "日股市場焦點";
+    }
 
     // 加載數據
     loadIndustryData();
 }
+
 
 // 獲取單一股票的歷史數據並計算指定時間段的變化百分比
 async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
@@ -162,7 +169,15 @@ async function loadIndustryData() {
     `;
 
     try {
-        const industryData = currentMarket === "TW" ? industryStocks : industryStocksUS;
+        let industryData;
+        if (currentMarket === "TW") {
+            industryData = industryStocks;
+        } else if (currentMarket === "US") {
+            industryData = industryStocksUS;
+        } else if (currentMarket === "JP") {
+            industryData = industryStocksJP;
+        }
+
         const performanceData = await calculateIndustryPerformance(industryData);
 
         industryGrid.innerHTML = Object.entries(performanceData)
@@ -181,6 +196,7 @@ async function loadIndustryData() {
         industryGrid.innerHTML = "<p>Failed to load industry data. Please try again later.</p>";
     }
 }
+
 
 // 更新時間範圍並重新加載數據
 function updateTimeframe(button) {
