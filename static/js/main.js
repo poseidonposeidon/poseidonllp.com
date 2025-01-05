@@ -94,7 +94,6 @@ function updateMarket(button) {
     loadIndustryData();
 }
 
-
 // 獲取單一股票的歷史數據並計算指定時間段的變化百分比
 async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
     const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
@@ -117,27 +116,22 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
         let latestClose = historicalPrices[0].close;
         let previousClose;
 
-        // 特殊處理 ytd 的時間範圍
         if (timeframe === "ytd") {
             const targetDate = new Date(new Date().getFullYear(), 0, 1); // 當年 1 月 1 日
             previousClose = historicalPrices
-                .filter(item => new Date(item.date) <= targetDate) // 只保留目標日期之前的數據
-                .sort((a, b) => new Date(b.date) - new Date(a.date)) // 按日期降序排序
-                .find(item => item.close)?.close; // 取最近的收盤價
+                .filter(item => new Date(item.date) >= targetDate) // 取目標日期之後的數據
+                .sort((a, b) => new Date(a.date) - new Date(b.date)) // 升序排序
+                .find(item => item.close)?.close; // 取最接近的收盤價
 
             if (!previousClose) {
-                // 如果仍找不到，取最早的可用收盤價
                 previousClose = historicalPrices[historicalPrices.length - 1]?.close;
             }
         } else {
             const targetDate = new Date();
-
-            // 設定其他時間範圍的目標日期
             if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
             else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
             else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
 
-            // 找到最接近目標日期的收盤價
             previousClose = historicalPrices.find(item => {
                 const itemDate = new Date(item.date);
                 return itemDate <= targetDate;
@@ -149,7 +143,6 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
             return 0;
         }
 
-        // 計算百分比變化
         return ((latestClose - previousClose) / previousClose) * 100;
     } catch (error) {
         console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
