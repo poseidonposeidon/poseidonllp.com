@@ -147,7 +147,7 @@ function getColorByPerformance(performance) {
 // 修改產業數據選擇邏輯
 async function loadIndustryData() {
     const industryGrid = document.getElementById("industryGrid");
-    industryGrid.innerHTML = "<p>Loading...</p>";
+    industryGrid.innerHTML = "<p style='text-align: center'>Loading...</p>";
 
     try {
         const industryData = currentMarket === "TW" ? industryStocks : industryStocksUS;
