@@ -26,8 +26,6 @@ const industryStocksJP = {
     "科技服務": ["4689.T", "4755.T", "6098.T", "3773.T", "4812.T"]
 };
 
-
-
 const industryStocksUS = {
     "半導體": ["NVDA", "AMD", "TSM", "QCOM", "INTC","DELL"],
     "IC 設計": ["AVGO", "TXN", "MRVL", "ON", "ADI"],
@@ -121,15 +119,15 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
 
         // 特殊處理 ytd 的時間範圍
         if (timeframe === "ytd") {
-            const targetDate = new Date(new Date().getFullYear(), 0, 1); // 設為當年 1 月 1 日
-            previousClose = historicalPrices.find(item => {
-                const itemDate = new Date(item.date);
-                return itemDate <= targetDate; // 找到最接近 1 月 1 日的交易日
-            })?.close;
+            const targetDate = new Date(new Date().getFullYear(), 0, 1); // 當年 1 月 1 日
+            previousClose = historicalPrices
+                .filter(item => new Date(item.date) <= targetDate) // 只保留目標日期之前的數據
+                .sort((a, b) => new Date(b.date) - new Date(a.date)) // 按日期降序排序
+                .find(item => item.close)?.close; // 取最近的收盤價
 
-            // 如果找不到 1 月 1 日的交易日，嘗試使用下一個可用日期
             if (!previousClose) {
-                previousClose = historicalPrices[historicalPrices.length - 1]?.close; // 最早的收盤價
+                // 如果仍找不到，取最早的可用收盤價
+                previousClose = historicalPrices[historicalPrices.length - 1]?.close;
             }
         } else {
             const targetDate = new Date();
