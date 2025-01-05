@@ -149,7 +149,7 @@ async function loadIndustryData() {
     const industryGrid = document.getElementById("industryGrid");
     industryGrid.innerHTML = `
         <div style="align-items: center;">
-            <p style="font-size: 18px; color: #555;">Loading...</p>
+            <p style="align-items: center;">Loading...</p>
         </div>
     `;
 
