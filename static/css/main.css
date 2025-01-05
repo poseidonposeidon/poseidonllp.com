@@ -912,186 +912,149 @@ button:not(.info-input button):hover {
 
 
 /*////////////////////////////////////////*/
+/* 產業趨勢容器樣式 */
+.market-trend {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px auto;
+    max-width: 1200px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
 
-
-
-/*!* 產業趨勢容器樣式 *!*/
-/*.market-trend {*/
-/*    background-color: #1e1e1e;*/
-/*    color: #e0e0e0;*/
-/*    padding: 20px;*/
-/*    border-radius: 8px;*/
-/*    margin: 20px auto;*/
-/*    max-width: 1200px;*/
-/*    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);*/
-/*}*/
-
-/*!* 標題樣式 *!*/
-/*.market-trend h2 {*/
-/*    color: #b0bec5;*/
-/*    font-size: 24px;*/
-/*    margin-bottom: 10px;*/
-/*    text-align: center;*/
-/*}*/
-
-/*.market-trend p {*/
-/*    color: #e0e0e0;*/
-/*    font-size: 16px;*/
-/*    margin-bottom: 20px;*/
-/*    text-align: center;*/
-/*}*/
-
-/*!* 時間篩選按鈕樣式 *!*/
-/*.time-filters {*/
-/*    display: flex;*/
-/*    justify-content: center;*/
-/*    margin-bottom: 20px;*/
-/*}*/
-
-/*.time-filters button {*/
-/*    background-color: #2c2c2c;*/
-/*    color: #b0bec5;*/
-/*    border: 1px solid #444;*/
-/*    padding: 10px 20px;*/
-/*    margin: 0 5px;*/
-/*    border-radius: 5px;*/
-/*    cursor: pointer;*/
-/*    font-size: 14px;*/
-/*    transition: background-color 0.3s ease, color 0.3s ease;*/
-/*}*/
-
-/*.time-filters button.active {*/
-/*    background-color: #90caf9;*/
-/*    color: #121212;*/
-/*}*/
-
-/*.time-filters button:hover {*/
-/*    background-color: #3c3c3c;*/
-/*    color: #fff;*/
-/*}*/
-
-/*!* 單個產業樣式 *!*/
-/*.industry-item {*/
-/*    background-color: #1e1e1e;*/
-/*    border-radius: 8px;*/
-/*    padding: 20px;*/
-/*    text-align: center;*/
-/*    color: white;*/
-/*    font-size: 14px;*/
-/*    transition: transform 0.3s ease, background-color 0.3s ease;*/
-/*}*/
-
-/*.industry-item span {*/
-/*    display: block;*/
-/*    font-weight: bold;*/
-/*    margin-bottom: 5px;*/
-/*}*/
-
-/*.industry-item strong {*/
-/*    font-size: 20px;*/
-/*    color: #ffffff;*/
-/*    font-weight: bold;*/
-/*}*/
-
-/*!* 漲幅和跌幅的顏色 *!*/
-/*.industry-item.positive {*/
-/*    background-color: #81c995; !* 漲幅用綠色背景 *!*/
-/*}*/
-
-/*.industry-item.negative {*/
-/*    background-color: #f28b82; !* 跌幅用紅色背景 *!*/
-/*}*/
-
-/*.industry-item:hover {*/
-/*    transform: scale(1.05);*/
-/*    background-color: #3c3c3c;*/
-/*}*/
-
-/*!* 無數據的產業顯示 *!*/
-/*.industry-item.no-data {*/
-/*    background-color: #616161;*/
-/*    color: #999999;*/
-/*}*/
-
-/*!* 更新 industry-grid 样式 *!*/
-/*.industry-grid {*/
-/*    display: grid;*/
-/*    grid-template-columns: repeat(4, 1fr); !* 每行顯示 4 列 *!*/
-/*    gap: 20px; !* 控制每個格子間的距離 *!*/
-/*    width: 100%; !* 滿寬佈局 *!*/
-/*    max-width: 1200px; !* 限制最大寬度 *!*/
-/*    margin: 0 auto; !* 保持居中對齊 *!*/
-/*    padding: 10px; !* 增加內邊距 *!*/
-/*}*/
-
-/*!* 選中的產業樣式 *!*/
-/*.industry-item.selected {*/
-/*    border: 2px solid #90caf9;*/
-/*}*/
-
-/*!* 響應式調整 *!*/
-/*@media (max-width: 768px) {*/
-/*    .industry-grid {*/
-/*        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));*/
-/*    }*/
-
-/*    .time-filters button {*/
-/*        padding: 8px 12px;*/
-/*        font-size: 12px;*/
-/*    }*/
-/*}*/
-
-
-/*.market-filters {*/
-/*    display: flex;*/
-/*    justify-content: center; !* 水平置中 *!*/
-/*    margin-bottom: 20px; !* 與下方內容間距 *!*/
-/*}*/
-
-/*.market-filters button {*/
-/*    margin: 0 5px; !* 每個按鈕之間的間距 *!*/
-/*    padding: 10px 20px; !* 增加按鈕大小 *!*/
-/*    font-size: 16px; !* 提高字體大小 *!*/
-/*    cursor: pointer; !* 添加手型游標效果 *!*/
-/*}*/
-
-/*.market-filters button.active {*/
-/*    background-color: #4caf50; !* 當前選中按鈕的背景顏色 *!*/
-/*    color: #fff; !* 按鈕文字顏色 *!*/
-/*}*/
-
+/* 標題樣式 */
 .market-trend h2 {
-    text-align: center;
-    color: #333;
-}
-.market-filters, .time-filters {
-    margin: 10px 0;
+    color: #b0bec5;
+    font-size: 24px;
+    margin-bottom: 10px;
     text-align: center;
 }
-.market-filters button, .time-filters button {
-    margin: 5px;
+
+.market-trend p {
+    color: #e0e0e0;
+    font-size: 16px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+/* 時間篩選按鈕樣式 */
+.time-filters {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.time-filters button {
+    background-color: #2c2c2c;
+    color: #b0bec5;
+    border: 1px solid #444;
     padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    background-color: #ddd;
+    margin: 0 5px;
     border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
-.market-filters button.active, .time-filters button.active {
-    background-color: #007bff;
+
+.time-filters button.active {
+    background-color: #90caf9;
+    color: #121212;
+}
+
+.time-filters button:hover {
+    background-color: #3c3c3c;
     color: #fff;
 }
+
+/* 單個產業樣式 */
+.industry-item {
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    color: white;
+    font-size: 14px;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.industry-item span {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.industry-item strong {
+    font-size: 20px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+/* 漲幅和跌幅的顏色 */
+.industry-item.positive {
+    background-color: #81c995; /* 漲幅用綠色背景 */
+}
+
+.industry-item.negative {
+    background-color: #f28b82; /* 跌幅用紅色背景 */
+}
+
+.industry-item:hover {
+    transform: scale(1.05);
+    background-color: #3c3c3c;
+}
+
+/* 無數據的產業顯示 */
+.industry-item.no-data {
+    background-color: #616161;
+    color: #999999;
+}
+
+/* 更新 industry-grid 样式 */
 .industry-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-    gap: 10px;
-    margin-top: 20px;
+    grid-template-columns: repeat(4, 1fr); /* 每行顯示 4 列 */
+    gap: 20px; /* 控制每個格子間的距離 */
+    width: 100%; /* 滿寬佈局 */
+    max-width: 1200px; /* 限制最大寬度 */
+    margin: 0 auto; /* 保持居中對齊 */
+    padding: 10px; /* 增加內邊距 */
 }
-.industry-item {
-    padding: 15px;
-    text-align: center;
-    border-radius: 8px;
-    color: #fff;
-    font-weight: bold;
+
+/* 選中的產業樣式 */
+.industry-item.selected {
+    border: 2px solid #90caf9;
+}
+
+/* 響應式調整 */
+@media (max-width: 768px) {
+    .industry-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .time-filters button {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+}
+
+
+.market-filters {
+    display: flex;
+    justify-content: center; /* 水平置中 */
+    margin-bottom: 20px; /* 與下方內容間距 */
+}
+
+.market-filters button {
+    margin: 0 5px; /* 每個按鈕之間的間距 */
+    padding: 10px 20px; /* 增加按鈕大小 */
+    font-size: 16px; /* 提高字體大小 */
+    cursor: pointer; /* 添加手型游標效果 */
+}
+
+.market-filters button.active {
+    background-color: #4caf50; /* 當前選中按鈕的背景顏色 */
+    color: #fff; /* 按鈕文字顏色 */
 }
 
 
