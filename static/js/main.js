@@ -87,16 +87,24 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
         let latestClose = historicalPrices[0].close;
         let previousClose;
 
-        // 特殊處理 1d 時間範圍
-        if (timeframe === "1d") {
-            previousClose = historicalPrices[1].close; // 使用前一天的收盤價
+        // 特殊處理 ytd 的時間範圍
+        if (timeframe === "ytd") {
+            const targetDate = new Date(new Date().getFullYear(), 0, 1); // 設為當年 1 月 1 日
+            previousClose = historicalPrices.find(item => {
+                const itemDate = new Date(item.date);
+                return itemDate <= targetDate; // 找到最接近 1 月 1 日的交易日
+            })?.close;
+
+            // 如果找不到 1 月 1 日的交易日，嘗試使用下一個可用日期
+            if (!previousClose) {
+                previousClose = historicalPrices[historicalPrices.length - 1]?.close; // 最早的收盤價
+            }
         } else {
             const targetDate = new Date();
 
             // 設定其他時間範圍的目標日期
             if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
             else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
-            else if (timeframe === "ytd") targetDate.setMonth(0);
             else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
 
             // 找到最接近目標日期的收盤價
