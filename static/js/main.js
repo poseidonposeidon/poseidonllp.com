@@ -66,64 +66,70 @@ function updateMarket(button) {
 }
 
 // 獲取單一股票的歷史數據並計算指定時間段的變化百分比
-async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
-    const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
-    console.log(`Fetching historical data for ${stockSymbol} with timeframe: ${timeframe}`);
+async function fetchHistoricalPercentageChange(stockSymbols, timeframe) {
+    if (!Array.isArray(stockSymbols)) {
+        stockSymbols = [stockSymbols]; // 如果是單隻股票，轉為陣列
+    }
+
+    const url = `${BASE_URL}historical-price-full-batch?apikey=${API_KEY}&symbols=${stockSymbols.join(',')}`;
+    console.log(`Fetching batch historical data for: ${stockSymbols.join(',')} with timeframe: ${timeframe}`);
 
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Error fetching historical data for ${stockSymbol}`);
+            throw new Error(`Error fetching batch historical data for: ${stockSymbols.join(',')}`);
         }
 
         const data = await response.json();
-        const historicalPrices = data.historical;
+        const results = stockSymbols.map(symbol => {
+            const historicalPrices = data[symbol]?.historical || [];
 
-        if (!historicalPrices || historicalPrices.length < 2) {
-            console.warn(`Insufficient historical data for ${stockSymbol}`);
-            return 0;
-        }
-
-        let latestClose = historicalPrices[0].close;
-        let previousClose;
-
-        // 特殊處理 ytd 的時間範圍
-        if (timeframe === "ytd") {
-            const targetDate = new Date(new Date().getFullYear(), 0, 1); // 設為當年 1 月 1 日
-            previousClose = historicalPrices.find(item => {
-                const itemDate = new Date(item.date);
-                return itemDate <= targetDate; // 找到最接近 1 月 1 日的交易日
-            })?.close;
-
-            // 如果找不到 1 月 1 日的交易日，嘗試使用下一個可用日期
-            if (!previousClose) {
-                previousClose = historicalPrices[historicalPrices.length - 1]?.close; // 最早的收盤價
+            if (historicalPrices.length < 2) {
+                console.warn(`Insufficient historical data for ${symbol}`);
+                return { symbol, change: 0 };
             }
-        } else {
-            const targetDate = new Date();
 
-            // 設定其他時間範圍的目標日期
-            if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
-            else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
-            else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
+            let latestClose = historicalPrices[0].close;
+            let previousClose;
 
-            // 找到最接近目標日期的收盤價
-            previousClose = historicalPrices.find(item => {
-                const itemDate = new Date(item.date);
-                return itemDate <= targetDate;
-            })?.close;
-        }
+            // 處理 ytd 的時間範圍
+            if (timeframe === "ytd") {
+                const targetDate = new Date(new Date().getFullYear(), 0, 1);
+                previousClose = historicalPrices.find(item => {
+                    const itemDate = new Date(item.date);
+                    return itemDate <= targetDate;
+                })?.close;
 
-        if (!previousClose) {
-            console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
-            return 0;
-        }
+                if (!previousClose) {
+                    previousClose = historicalPrices[historicalPrices.length - 1]?.close;
+                }
+            } else {
+                const targetDate = new Date();
 
-        // 計算百分比變化
-        return ((latestClose - previousClose) / previousClose) * 100;
+                // 設定其他時間範圍的目標日期
+                if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
+                else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
+                else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
+
+                previousClose = historicalPrices.find(item => {
+                    const itemDate = new Date(item.date);
+                    return itemDate <= targetDate;
+                })?.close;
+            }
+
+            if (!previousClose) {
+                console.warn(`No data for ${symbol} at target timeframe: ${timeframe}`);
+                return { symbol, change: 0 };
+            }
+
+            const changePercent = ((latestClose - previousClose) / previousClose) * 100;
+            return { symbol, change: changePercent };
+        });
+
+        return results;
     } catch (error) {
-        console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
-        return 0;
+        console.error(`Error fetching historical percentage change:`, error);
+        return stockSymbols.map(symbol => ({ symbol, change: 0 })); // 預設回傳 0% 變化
     }
 }
 
@@ -131,20 +137,28 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
 async function calculateIndustryPerformance(industryData) {
     const industryPerformance = {};
 
-    for (const [industry, stocks] of Object.entries(industryData)) {
-        // 使用 Promise.all 同時處理多隻股票的數據請求
-        const changes = await Promise.all(
-            stocks.map(stock => fetchHistoricalPercentageChange(stock, currentTimeframe))
-        );
+    try {
+        // 將所有股票代碼整合成一個陣列
+        const allStocks = Object.values(industryData).flat();
 
-        // 過濾有效數據，並計算平均漲跌幅
-        const validChanges = changes.filter(change => !isNaN(change));
-        const totalChange = validChanges.reduce((sum, change) => sum + change, 0);
-        industryPerformance[industry] = validChanges.length > 0 ? totalChange / validChanges.length : 0;
+        // 批量獲取所有股票的變化百分比
+        const batchResults = await fetchHistoricalPercentageChange(allStocks, currentTimeframe);
+
+        // 按產業分類並計算平均變化百分比
+        for (const [industry, stocks] of Object.entries(industryData)) {
+            const relevantStocks = batchResults.filter(result => stocks.includes(result.symbol));
+
+            // 計算該產業的平均變化百分比
+            const totalChange = relevantStocks.reduce((sum, stock) => sum + stock.change, 0);
+            industryPerformance[industry] = relevantStocks.length > 0 ? totalChange / relevantStocks.length : 0;
+        }
+
+        console.log("Calculated Industry Performance (Batch):", industryPerformance);
+        return industryPerformance;
+    } catch (error) {
+        console.error("Error calculating industry performance:", error);
+        return industryPerformance; // 返回空結果
     }
-
-    console.log("Calculated Industry Performance (Parallel):", industryPerformance);
-    return industryPerformance;
 }
 
 // 根據漲幅設定顏色
