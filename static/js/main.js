@@ -66,7 +66,6 @@ function updateMarket(button) {
     loadIndustryData();
 }
 
-
 // 獲取單一股票的歷史數據並計算指定時間段的變化百分比
 async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
     const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
@@ -119,22 +118,18 @@ async function calculateIndustryPerformance(industryData) {
     const industryPerformance = {};
 
     for (const [industry, stocks] of Object.entries(industryData)) {
-        let totalChange = 0;
-        let count = 0;
+        // 使用 Promise.all 同時處理多隻股票的數據請求
+        const changes = await Promise.all(
+            stocks.map(stock => fetchHistoricalPercentageChange(stock, currentTimeframe))
+        );
 
-        for (const stock of stocks) {
-            const change = await fetchHistoricalPercentageChange(stock, currentTimeframe);
-            if (!isNaN(change)) {
-                totalChange += change;
-                count++;
-            }
-        }
-
-        // 計算平均漲跌幅
-        industryPerformance[industry] = count > 0 ? totalChange / count : 0;
+        // 過濾有效數據，並計算平均漲跌幅
+        const validChanges = changes.filter(change => !isNaN(change));
+        const totalChange = validChanges.reduce((sum, change) => sum + change, 0);
+        industryPerformance[industry] = validChanges.length > 0 ? totalChange / validChanges.length : 0;
     }
 
-    console.log("Calculated Industry Performance:", industryPerformance);
+    console.log("Calculated Industry Performance (Parallel):", industryPerformance);
     return industryPerformance;
 }
 
