@@ -148,13 +148,7 @@ function getColorByPerformance(performance) {
 async function loadIndustryData() {
     const industryGrid = document.getElementById("industryGrid");
     industryGrid.innerHTML = `
-        <div style="
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100%; /* 使父容器充滿可用高度 */
-            min-height: 200px; /* 確保有足夠空間進行垂直置中 */
-        ">
+        <div style="align-items: center;">
             <p style="font-size: 18px; color: #555;">Loading...</p>
         </div>
     `;
