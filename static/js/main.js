@@ -126,6 +126,7 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
         }
 
         const data = await response.json();
+        console.log(`Historical data for ${stockSymbol}:`, data); // 檢查 API 回傳數據
         const historicalPrices = data.historical;
 
         if (!historicalPrices || historicalPrices.length < 2) {
@@ -137,15 +138,17 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
         historicalPrices.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         let latestClose = historicalPrices[0].close;
+        console.log(`Latest close price for ${stockSymbol}: ${latestClose}`); // 確認最新價格
         let previousClose;
 
         if (timeframe === "ytd") {
             const targetDate = new Date(new Date().getFullYear(), 0, 1); // 當年 1 月 1 日
             const filteredPrices = historicalPrices.filter(item => new Date(item.date) <= targetDate);
 
+            console.log(`Filtered prices for YTD:`, filteredPrices); // 檢查篩選後的價格
             previousClose = filteredPrices.length
-                ? filteredPrices[filteredPrices.length - 1].close // 最近的有效交易日收盤價
-                : historicalPrices[historicalPrices.length - 1]?.close; // 如果沒有，則取最舊數據
+                ? filteredPrices[filteredPrices.length - 1].close
+                : historicalPrices[historicalPrices.length - 1]?.close;
         } else {
             const targetDate = new Date();
             if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
@@ -160,6 +163,7 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
             return 0;
         }
 
+        console.log(`Previous close price for ${stockSymbol}: ${previousClose}`); // 確認前一價格
         return ((latestClose - previousClose) / previousClose) * 100;
     } catch (error) {
         console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
