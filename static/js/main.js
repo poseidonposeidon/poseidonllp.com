@@ -146,7 +146,7 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
             const filteredPrices = historicalPrices.filter(item => new Date(item.date) <= targetDate);
 
             previousClose = filteredPrices.length
-                ? filteredPrices[filteredPrices.length - 1].close // 取目標日期之前最近的交易日收盤價
+                ? filteredPrices[filteredPrices.length - 1].close // 最近的有效交易日收盤價
                 : historicalPrices[historicalPrices.length - 1]?.close; // 如果沒有，則取最舊數據
         } else {
             const targetDate = new Date();
