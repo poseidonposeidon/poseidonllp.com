@@ -3,6 +3,29 @@ const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 let currentTimeframe = "1m"; // 默認時間範圍
 let currentMarket = "TW"; // 默認市場
 
+const industryStocksEU = {
+    "半導體": ["ASML.AS", "IFX.DE", "STM.PA", "NXPI.AS", "AMD.AS"],
+    "IC 設計": ["DIALOG.DE", "ARM.L", "CYP.DE", "MPWR.AS", "SIL.AS"],
+    "電腦及周邊設備": ["LENOVO.HK", "LOGI.S", "THN.DE", "DELL.AS", "AAPL.AS"],
+    "網通設備": ["ERICB.ST", "NOKIA.HE", "ADVA.DE", "INWT.DE", "UBIQ.ST"],
+    "記憶體": ["WDC.AS", "MU.AS", "INTC.AS", "KIO.DE", "NVDA.AS"],
+    "載板": ["AT&S.VI", "ZWT.AS", "LPE.DE", "MLM.AS", "UCT.DE"],
+    "太陽能": ["SMA.DE", "ENR.PA", "SLR.L", "FSLR.AS", "CSIQ.AS"],
+    "鋼鐵": ["MT.AS", "TKR.DE", "VOE.VI", "KCO.DE", "CLF.AS"],
+    "金融保險": ["INGA.AS", "DBK.DE", "HSBA.L", "SAN.MC", "CSGN.S"],
+    "汽車零組件": ["VOW3.DE", "BMW.DE", "DAI.DE", "RNO.PA", "STLA.MI"],
+    "電子零組件": ["IFX.DE", "TEL.AS", "APH.AS", "AMS.S", "LOGI.S"],
+    "電動車相關": ["TSLA.AS", "NIO.AS", "XPENG.AS", "BYD.AS", "RIVN.AS"],
+    "光學鏡頭": ["LITE.AS", "COHR.AS", "ZEISS.DE", "OPT.DE", "KEYS.AS"],
+    "塑料及化工": ["BASF.DE", "COV.DE", "EVK.DE", "ARK.DE", "PPG.AS"],
+    "醫療設備": ["SYK.AS", "MDT.AS", "BSX.AS", "FME.DE", "ZBH.AS"],
+    "食品飲料": ["NESN.S", "ABI.BR", "DANO.PA", "HEIA.AS", "ULVR.L"],
+    "航運物流": ["DPW.DE", "CMA.CA", "KUE.S", "DFDS.CO", "NCLH.AS"],
+    "能源相關": ["RDSA.AS", "BP.L", "TOTAL.PA", "REP.MC", "VLO.AS"],
+    "電商及零售": ["AMZN.AS", "ZAL.DE", "ASOS.L", "ABF.L", "WMT.AS"],
+    "科技服務": ["SAP.DE", "ADBE.AS", "ORCL.AS", "CRM.AS", "IBM.AS"]
+};
+
 const industryStocksJP = {
     "半導體": ["8035.T", "6758.T", "6723.T", "7731.T", "6702.T"],
     "IC 設計": ["6645.T", "6727.T", "6770.T", "6753.T", "6845.T"],
@@ -76,11 +99,9 @@ const industryStocks = {
 function updateMarket(button) {
     currentMarket = button.getAttribute("data-market");
 
-    // 更新按鈕樣式
     document.querySelectorAll(".market-filters button").forEach(btn => btn.classList.remove("active"));
     button.classList.add("active");
 
-    // 更新標題文字
     const marketTitle = document.getElementById("marketTitle");
     if (currentMarket === "TW") {
         marketTitle.textContent = "台股市場焦點";
@@ -88,9 +109,10 @@ function updateMarket(button) {
         marketTitle.textContent = "美股市場焦點";
     } else if (currentMarket === "JP") {
         marketTitle.textContent = "日股市場焦點";
+    } else if (currentMarket === "EU") {
+        marketTitle.textContent = "歐股市場焦點";
     }
 
-    // 加載數據
     loadIndustryData();
 }
 
@@ -192,6 +214,8 @@ async function loadIndustryData() {
             industryData = industryStocksUS;
         } else if (currentMarket === "JP") {
             industryData = industryStocksJP;
+        } else if (currentMarket === "EU") {
+            industryData = industryStocksEU;
         }
 
         const performanceData = await calculateIndustryPerformance(industryData);
@@ -212,7 +236,6 @@ async function loadIndustryData() {
         industryGrid.innerHTML = "<p>Failed to load industry data. Please try again later.</p>";
     }
 }
-
 
 // 更新時間範圍並重新加載數據
 function updateTimeframe(button) {
