@@ -1,255 +1,5 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
-let currentTimeframe = "1m"; // 默認時間範圍
-let currentMarket = "TW"; // 默認市場
-
-const industryStocksEU = {
-    "半導體": ["ASML.AS", "IFX.DE", "STM.PA", "NXPI", "ON"],
-    "IC 設計": ["DLG.DE", "ARM.L", "STM.PA", "NXPI", "ON"],
-    "電腦及周邊設備": ["0992.HK", "LOGN.SW", "DELL", "HPQ", "AAPL"],
-    "網通設備": ["ERIC-B.ST", "NOKIA.HE", "ADV.DE", "INFN", "UI"],
-    "記憶體": ["MU", "WDC", "005930.KS", "000660.KS", "6502.T"],
-    "載板": ["AUS.VI", "4062.T", "6967.T", "8046.TW", "3037.TW"],
-    "太陽能": ["S92.DE", "ENEL.MI", "SEDG", "FSLR", "CSIQ"],
-    "鋼鐵": ["MT.AS", "TKA.DE", "VOE.VI", "SSAB-A.ST", "OUT1V.HE"],
-    "金融保險": ["INGA.AS", "DBK.DE", "HSBA.L", "SAN.MC", "CSGN.SW"],
-    "汽車零組件": ["VOW3.DE", "BMW.DE", "DAI.DE", "RNO.PA", "STLA.MI"],
-    "電子零組件": ["AMS.SW", "LOGN.SW", "STM.PA", "NXPI", "ON"],
-    "電動車相關": ["VOW3.DE", "BMW.DE", "DAI.DE", "RNO.PA", "STLA.MI"],
-    "光學鏡頭": ["ZEISS.DE", "OPT.DE", "KEYS.AS", "COHR.AS", "LITE.AS"],
-    "塑料及化工": ["BASF.DE", "COV.DE", "EVK.DE", "ARK.DE", "PPG.AS"],
-    "醫療設備": ["SYK.AS", "MDT.AS", "BSX.AS", "FME.DE", "ZBH.AS"],
-    "食品飲料": ["NESN.S", "ABI.BR", "DANO.PA", "HEIA.AS", "ULVR.L"],
-    "航運物流": ["DPW.DE", "CMA.CA", "KUE.S", "DFDS.CO", "NCLH.AS"],
-    "能源相關": ["RDSA.AS", "BP.L", "TOTAL.PA", "REP.MC", "VLO.AS"],
-    "電商及零售": ["ZAL.DE", "ASOS.L", "ABF.L", "WMT.AS", "AMZN.AS"],
-    "科技服務": ["SAP.DE", "ADBE.AS", "ORCL.AS", "CRM.AS", "IBM.AS"]
-};
-const industryStocksJP = {
-    "半導體": ["8035.T", "4063.T", "6501.T", "6724.T", "7735.T"],
-    "IC 設計": ["6758.T", "6702.T", "6752.T", "6723.T", "6762.T"],
-    "電腦及周邊設備": ["6701.T", "6752.T", "6954.T", "7731.T", "7751.T"],
-    "網通設備": ["6702.T", "6754.T", "6773.T", "6981.T", "6944.T"],
-    "記憶體": ["6502.T", "6503.T", "6701.T", "6724.T", "6758.T"],
-    "載板": ["6954.T", "7731.T", "7751.T", "8035.T", "4063.T"],
-    "太陽能": ["9501.T", "9502.T", "9503.T", "9513.T", "9511.T"],
-    "鋼鐵": ["5401.T", "5406.T", "5405.T", "5411.T", "5413.T"],
-    "金融保險": ["8306.T", "8316.T", "8411.T", "8604.T", "8766.T"],
-    "汽車零組件": ["7203.T", "7267.T", "7201.T", "7270.T", "7269.T"],
-    "電子零組件": ["6758.T", "6702.T", "6752.T", "6723.T", "6762.T"],
-    "電動車相關": ["7203.T", "7267.T", "7201.T", "7270.T", "7269.T"],
-    "光學鏡頭": ["7731.T", "7751.T", "7741.T", "7747.T", "7701.T"],
-    "塑料及化工": ["4005.T", "4205.T", "4188.T", "4045.T", "4118.T"],
-    "醫療設備": ["7751.T", "4543.T", "7702.T", "7747.T", "4568.T"],
-    "食品飲料": ["2914.T", "2502.T", "2503.T", "2602.T", "2587.T"],
-    "航運物流": ["9101.T", "9107.T", "9104.T", "9064.T", "9303.T"],
-    "能源相關": ["5020.T", "5009.T", "5019.T", "5021.T", "5122.T"],
-    "電商及零售": ["9983.T", "3092.T", "3086.T", "3038.T", "7518.T"],
-    "科技服務": ["4689.T", "4755.T", "6098.T", "3773.T", "4812.T"]
-};
-
-const industryStocksUS = {
-    "半導體": ["NVDA", "AMD", "TSM", "QCOM", "INTC","DELL"],
-    "IC 設計": ["AVGO", "TXN", "MRVL", "ON", "ADI"],
-    "電腦及周邊設備": ["HPQ", "DELL", "AAPL", "MSFT", "LOGI"],
-    "網通設備": ["CSCO", "JNPR", "ANET", "FFIV", "EXTR"],
-    "記憶體": ["MU", "WDC", "STX", "INTC", "NVDA"],
-    "載板": ["CCMP", "KLIC", "LRCX", "AMAT", "UCTT"],
-    "太陽能": ["ENPH", "SEDG", "FSLR", "CSIQ", "RUN"],
-    "鋼鐵": ["X", "NUE", "STLD", "CMC", "CLF"],
-    "金融保險": ["JPM", "BAC", "C", "WFC", "GS"],
-    "汽車零組件": ["BWA", "LEA", "DLPH", "GM", "F"],
-    "電子零組件": ["TEL", "APH", "JBL", "GLW", "AVT"],
-    "電動車相關": ["TSLA", "RIVN", "LCID", "NIO", "XPEV"],
-    "光學鏡頭": ["LITE", "COHR", "IIVI", "VIAV", "KEYS"],
-    "塑料及化工": ["DOW", "LYB", "EMN", "PPG", "SHW"],
-    "醫療設備": ["ISRG", "MDT", "SYK", "BSX", "ZBH"],
-    "食品飲料": ["KO", "PEP", "MDLZ", "KHC", "COST"],
-    "航運物流": ["UPS", "FDX", "XPO", "CHRW", "JBHT"],
-    "能源相關": ["XOM", "CVX", "SLB", "COP", "PSX"],
-    "電商及零售": ["AMZN", "EBAY", "WMT", "TGT", "COST"],
-    "科技服務": ["CRM", "NOW", "SNOW", "DDOG", "OKTA"]
-};
-
-const industryStocks = {
-    "半導體": ["2330.TW", "2303.TW", "2308.TW", "2317.TW", "2360.TW"],
-    "IC 設計": ["2454.TW", "3034.TW", "3437.TW", "2379.TW", "3532.TW"],
-    "電腦及周邊設備": ["2357.TW", "2377.TW", "2382.TW", "2392.TW", "2324.TW"],
-    "網通設備": ["2345.TW", "2419.TW", "6285.TW", "3023.TW", "2415.TW"],
-    "記憶體": ["2344.TW", "3006.TW", "3474.TWO", "2324.TW", "2337.TW"],
-    "載板": ["3037.TW", "8046.TW", "3189.TW", "2368.TW", "6147.TWO"],
-    "太陽能": ["6244.TWO", "3576.TW", "3691.TWO", "6806.TW", "3027.TW"],
-    "鋼鐵": ["2002.TW", "2027.TW", "2014.TW", "2015.TW", "2022.TW"],
-    "金融保險": ["2882.TW", "2881.TW", "2891.TW", "2884.TW", "2883.TW"],
-    "汽車零組件": ["2201.TW", "1522.TW", "2231.TW", "2233.TW", "2204.TW"],
-    "電子零組件": ["2382.TW", "2392.TW", "2327.TW", "2312.TW", "2324.TW"],
-    "電動車相關": ["2308.TW", "6533.TW", "5227.TWO", "3026.TW", "2305.TW"],
-    "光學鏡頭": ["3406.TW", "3231.TW", "6209.TW", "2383.TW", "2409.TW"],
-    "塑料及化工": ["1301.TW", "1303.TW", "1314.TW", "1305.TW", "1308.TW"],
-    "醫療設備": ["4105.TWO", "4123.TWO", "9919.TW", "4114.TWO", "4133.TW"],
-    "食品飲料": ["1216.TW", "1227.TW", "2912.TW", "1210.TW", "1203.TW"],
-    "航運物流": ["2603.TW", "2609.TW", "2615.TW", "5608.TW", "2617.TW"],
-    "能源相關": ["2601.TW", "6505.TW", "1605.TW", "1608.TW", "1102.TW"],
-    "電商及零售": ["2642.TW", "2923.TW", "2915.TW", "2913.TW", "2910.TW"],
-    "科技服務": ["3026.TW", "6147.TWO", "6438.TW", "3583.TW", "3682.TW"]
-};
-
-// 更新市場切換邏輯
-function updateMarket(button) {
-    currentMarket = button.getAttribute("data-market");
-
-    document.querySelectorAll(".market-filters button").forEach(btn => btn.classList.remove("active"));
-    button.classList.add("active");
-
-    const marketTitle = document.getElementById("marketTitle");
-    if (currentMarket === "TW") {
-        marketTitle.textContent = "台股市場焦點";
-    } else if (currentMarket === "US") {
-        marketTitle.textContent = "美股市場焦點";
-    } else if (currentMarket === "JP") {
-        marketTitle.textContent = "日股市場焦點";
-    } else if (currentMarket === "EU") {
-        marketTitle.textContent = "歐股市場焦點";
-    }
-
-    loadIndustryData();
-}
-
-// 獲取單一股票的歷史數據並計算指定時間段的變化百分比
-async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
-    const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
-    console.log(`Fetching historical data for ${stockSymbol} with timeframe: ${timeframe}`);
-
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Error fetching historical data for ${stockSymbol}`);
-        }
-
-        const data = await response.json();
-        const historicalPrices = data.historical;
-
-        if (!historicalPrices || historicalPrices.length < 2) {
-            console.warn(`Insufficient historical data for ${stockSymbol}`);
-            return 0;
-        }
-
-        // 確保數據按日期降序排列
-        historicalPrices.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-        let latestClose = historicalPrices[0].close;
-        let previousClose;
-
-        if (timeframe === "ytd") {
-            const targetDate = new Date(new Date().getFullYear(), 0, 1); // 當年 1 月 1 日
-            const filteredPrices = historicalPrices.filter(item => new Date(item.date) <= targetDate);
-
-            previousClose = filteredPrices.length
-                ? filteredPrices[filteredPrices.length - 1].close // 最近的有效交易日收盤價
-                : historicalPrices[historicalPrices.length - 1]?.close; // 如果沒有，則取最舊數據
-        } else {
-            const targetDate = new Date();
-            if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
-            else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
-            else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
-
-            previousClose = historicalPrices.find(item => new Date(item.date) <= targetDate)?.close;
-        }
-
-        if (!previousClose) {
-            console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
-            return 0;
-        }
-
-        return ((latestClose - previousClose) / previousClose) * 100;
-    } catch (error) {
-        console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
-        return 0;
-    }
-}
-
-// 修改計算產業表現邏輯
-async function calculateIndustryPerformance(industryData) {
-    const industryPerformance = {};
-
-    for (const [industry, stocks] of Object.entries(industryData)) {
-        // 使用 Promise.all 同時處理多隻股票的數據請求
-        const changes = await Promise.all(
-            stocks.map(stock => fetchHistoricalPercentageChange(stock, currentTimeframe))
-        );
-
-        // 過濾有效數據，並計算平均漲跌幅
-        const validChanges = changes.filter(change => !isNaN(change));
-        const totalChange = validChanges.reduce((sum, change) => sum + change, 0);
-        industryPerformance[industry] = validChanges.length > 0 ? totalChange / validChanges.length : 0;
-    }
-
-    console.log("Calculated Industry Performance (Parallel):", industryPerformance);
-    return industryPerformance;
-}
-
-// 根據漲幅設定顏色
-function getColorByPerformance(performance) {
-    return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
-}
-
-// 修改產業數據選擇邏輯
-async function loadIndustryData() {
-    const industryGrid = document.getElementById("industryGrid");
-    industryGrid.innerHTML = `
-        <div style="align-items: center;">
-            <p style="align-items: center;">Loading...</p>
-        </div>
-    `;
-
-    try {
-        let industryData;
-        if (currentMarket === "TW") {
-            industryData = industryStocks;
-        } else if (currentMarket === "US") {
-            industryData = industryStocksUS;
-        } else if (currentMarket === "JP") {
-            industryData = industryStocksJP;
-        } else if (currentMarket === "EU") {
-            industryData = industryStocksEU;
-        }
-
-        const performanceData = await calculateIndustryPerformance(industryData);
-
-        industryGrid.innerHTML = Object.entries(performanceData)
-            .map(([industry, performance]) => {
-                const color = getColorByPerformance(performance);
-                const stocks = industryData[industry].join(", ");   // 產業對應的股票代碼
-                return `
-                    <div class="industry-item" style="background-color: ${color};" data-stocks="${stocks}">
-                        <span>${industry}</span>
-                        <strong>${performance.toFixed(2)}%</strong>
-                    </div>
-                `;
-            })
-            .join("");
-    } catch (error) {
-        console.error("Error loading industry data:", error);
-        industryGrid.innerHTML = "<p>Failed to load industry data. Please try again later.</p>";
-    }
-}
-
-// 更新時間範圍並重新加載數據
-function updateTimeframe(button) {
-    currentTimeframe = button.getAttribute("data-timeframe");
-
-    // 更新按鈕樣式
-    document.querySelectorAll(".time-filters button").forEach(btn => btn.classList.remove("active"));
-    button.classList.add("active");
-
-    // 加載數據
-    loadIndustryData();
-}
-
-// 初始化頁面
-document.addEventListener("DOMContentLoaded", () => {
-    loadIndustryData();
-});
 
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
@@ -1674,8 +1424,257 @@ function loadExplore(sectionId) {
     const sectionContainer = document.getElementById('aiBoxSectionContainer');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
+//////////////////////////市場焦點/////////////////////////////////////////////
+let currentTimeframe = "1m"; // 默認時間範圍
+let currentMarket = "TW"; // 默認市場
 
+const industryStocksEU = {
+    "半導體": ["ASML.AS", "IFX.DE", "STM.PA", "NXPI", "ON"],
+    "IC 設計": ["DLG.DE", "ARM.L", "STM.PA", "NXPI", "ON"],
+    "電腦及周邊設備": ["0992.HK", "LOGN.SW", "DELL", "HPQ", "AAPL"],
+    "網通設備": ["ERIC-B.ST", "NOKIA.HE", "ADV.DE", "INFN", "UI"],
+    "記憶體": ["MU", "WDC", "005930.KS", "000660.KS", "6502.T"],
+    "載板": ["AUS.VI", "4062.T", "6967.T", "8046.TW", "3037.TW"],
+    "太陽能": ["S92.DE", "ENEL.MI", "SEDG", "FSLR", "CSIQ"],
+    "鋼鐵": ["MT.AS", "TKA.DE", "VOE.VI", "SSAB-A.ST", "OUT1V.HE"],
+    "金融保險": ["INGA.AS", "DBK.DE", "HSBA.L", "SAN.MC", "CSGN.SW"],
+    "汽車零組件": ["VOW3.DE", "BMW.DE", "DAI.DE", "RNO.PA", "STLA.MI"],
+    "電子零組件": ["AMS.SW", "LOGN.SW", "STM.PA", "NXPI", "ON"],
+    "電動車相關": ["VOW3.DE", "BMW.DE", "DAI.DE", "RNO.PA", "STLA.MI"],
+    "光學鏡頭": ["ZEISS.DE", "OPT.DE", "KEYS.AS", "COHR.AS", "LITE.AS"],
+    "塑料及化工": ["BASF.DE", "COV.DE", "EVK.DE", "ARK.DE", "PPG.AS"],
+    "醫療設備": ["SYK.AS", "MDT.AS", "BSX.AS", "FME.DE", "ZBH.AS"],
+    "食品飲料": ["NESN.S", "ABI.BR", "DANO.PA", "HEIA.AS", "ULVR.L"],
+    "航運物流": ["DPW.DE", "CMA.CA", "KUE.S", "DFDS.CO", "NCLH.AS"],
+    "能源相關": ["RDSA.AS", "BP.L", "TOTAL.PA", "REP.MC", "VLO.AS"],
+    "電商及零售": ["ZAL.DE", "ASOS.L", "ABF.L", "WMT.AS", "AMZN.AS"],
+    "科技服務": ["SAP.DE", "ADBE.AS", "ORCL.AS", "CRM.AS", "IBM.AS"]
+};
+const industryStocksJP = {
+    "半導體": ["8035.T", "4063.T", "6501.T", "6724.T", "7735.T"],
+    "IC 設計": ["6758.T", "6702.T", "6752.T", "6723.T", "6762.T"],
+    "電腦及周邊設備": ["6701.T", "6752.T", "6954.T", "7731.T", "7751.T"],
+    "網通設備": ["6702.T", "6754.T", "6773.T", "6981.T", "6944.T"],
+    "記憶體": ["6502.T", "6503.T", "6701.T", "6724.T", "6758.T"],
+    "載板": ["6954.T", "7731.T", "7751.T", "8035.T", "4063.T"],
+    "太陽能": ["9501.T", "9502.T", "9503.T", "9513.T", "9511.T"],
+    "鋼鐵": ["5401.T", "5406.T", "5405.T", "5411.T", "5413.T"],
+    "金融保險": ["8306.T", "8316.T", "8411.T", "8604.T", "8766.T"],
+    "汽車零組件": ["7203.T", "7267.T", "7201.T", "7270.T", "7269.T"],
+    "電子零組件": ["6758.T", "6702.T", "6752.T", "6723.T", "6762.T"],
+    "電動車相關": ["7203.T", "7267.T", "7201.T", "7270.T", "7269.T"],
+    "光學鏡頭": ["7731.T", "7751.T", "7741.T", "7747.T", "7701.T"],
+    "塑料及化工": ["4005.T", "4205.T", "4188.T", "4045.T", "4118.T"],
+    "醫療設備": ["7751.T", "4543.T", "7702.T", "7747.T", "4568.T"],
+    "食品飲料": ["2914.T", "2502.T", "2503.T", "2602.T", "2587.T"],
+    "航運物流": ["9101.T", "9107.T", "9104.T", "9064.T", "9303.T"],
+    "能源相關": ["5020.T", "5009.T", "5019.T", "5021.T", "5122.T"],
+    "電商及零售": ["9983.T", "3092.T", "3086.T", "3038.T", "7518.T"],
+    "科技服務": ["4689.T", "4755.T", "6098.T", "3773.T", "4812.T"]
+};
 
+const industryStocksUS = {
+    "半導體": ["NVDA", "AMD", "TSM", "QCOM", "INTC","DELL"],
+    "IC 設計": ["AVGO", "TXN", "MRVL", "ON", "ADI"],
+    "電腦及周邊設備": ["HPQ", "DELL", "AAPL", "MSFT", "LOGI"],
+    "網通設備": ["CSCO", "JNPR", "ANET", "FFIV", "EXTR"],
+    "記憶體": ["MU", "WDC", "STX", "INTC", "NVDA"],
+    "載板": ["CCMP", "KLIC", "LRCX", "AMAT", "UCTT"],
+    "太陽能": ["ENPH", "SEDG", "FSLR", "CSIQ", "RUN"],
+    "鋼鐵": ["X", "NUE", "STLD", "CMC", "CLF"],
+    "金融保險": ["JPM", "BAC", "C", "WFC", "GS"],
+    "汽車零組件": ["BWA", "LEA", "DLPH", "GM", "F"],
+    "電子零組件": ["TEL", "APH", "JBL", "GLW", "AVT"],
+    "電動車相關": ["TSLA", "RIVN", "LCID", "NIO", "XPEV"],
+    "光學鏡頭": ["LITE", "COHR", "IIVI", "VIAV", "KEYS"],
+    "塑料及化工": ["DOW", "LYB", "EMN", "PPG", "SHW"],
+    "醫療設備": ["ISRG", "MDT", "SYK", "BSX", "ZBH"],
+    "食品飲料": ["KO", "PEP", "MDLZ", "KHC", "COST"],
+    "航運物流": ["UPS", "FDX", "XPO", "CHRW", "JBHT"],
+    "能源相關": ["XOM", "CVX", "SLB", "COP", "PSX"],
+    "電商及零售": ["AMZN", "EBAY", "WMT", "TGT", "COST"],
+    "科技服務": ["CRM", "NOW", "SNOW", "DDOG", "OKTA"]
+};
+
+const industryStocks = {
+    "半導體": ["2330.TW", "2303.TW", "2308.TW", "2317.TW", "2360.TW"],
+    "IC 設計": ["2454.TW", "3034.TW", "3437.TW", "2379.TW", "3532.TW"],
+    "電腦及周邊設備": ["2357.TW", "2377.TW", "2382.TW", "2392.TW", "2324.TW"],
+    "網通設備": ["2345.TW", "2419.TW", "6285.TW", "3023.TW", "2415.TW"],
+    "記憶體": ["2344.TW", "3006.TW", "3474.TWO", "2324.TW", "2337.TW"],
+    "載板": ["3037.TW", "8046.TW", "3189.TW", "2368.TW", "6147.TWO"],
+    "太陽能": ["6244.TWO", "3576.TW", "3691.TWO", "6806.TW", "3027.TW"],
+    "鋼鐵": ["2002.TW", "2027.TW", "2014.TW", "2015.TW", "2022.TW"],
+    "金融保險": ["2882.TW", "2881.TW", "2891.TW", "2884.TW", "2883.TW"],
+    "汽車零組件": ["2201.TW", "1522.TW", "2231.TW", "2233.TW", "2204.TW"],
+    "電子零組件": ["2382.TW", "2392.TW", "2327.TW", "2312.TW", "2324.TW"],
+    "電動車相關": ["2308.TW", "6533.TW", "5227.TWO", "3026.TW", "2305.TW"],
+    "光學鏡頭": ["3406.TW", "3231.TW", "6209.TW", "2383.TW", "2409.TW"],
+    "塑料及化工": ["1301.TW", "1303.TW", "1314.TW", "1305.TW", "1308.TW"],
+    "醫療設備": ["4105.TWO", "4123.TWO", "9919.TW", "4114.TWO", "4133.TW"],
+    "食品飲料": ["1216.TW", "1227.TW", "2912.TW", "1210.TW", "1203.TW"],
+    "航運物流": ["2603.TW", "2609.TW", "2615.TW", "5608.TW", "2617.TW"],
+    "能源相關": ["2601.TW", "6505.TW", "1605.TW", "1608.TW", "1102.TW"],
+    "電商及零售": ["2642.TW", "2923.TW", "2915.TW", "2913.TW", "2910.TW"],
+    "科技服務": ["3026.TW", "6147.TWO", "6438.TW", "3583.TW", "3682.TW"]
+};
+
+// 更新市場切換邏輯
+function updateMarket(button) {
+    currentMarket = button.getAttribute("data-market");
+
+    document.querySelectorAll(".market-filters button").forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+
+    const marketTitle = document.getElementById("marketTitle");
+    if (currentMarket === "TW") {
+        marketTitle.textContent = "台股市場焦點";
+    } else if (currentMarket === "US") {
+        marketTitle.textContent = "美股市場焦點";
+    } else if (currentMarket === "JP") {
+        marketTitle.textContent = "日股市場焦點";
+    } else if (currentMarket === "EU") {
+        marketTitle.textContent = "歐股市場焦點";
+    }
+
+    loadIndustryData();
+}
+
+// 獲取單一股票的歷史數據並計算指定時間段的變化百分比
+async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
+    const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
+    console.log(`Fetching historical data for ${stockSymbol} with timeframe: ${timeframe}`);
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Error fetching historical data for ${stockSymbol}`);
+        }
+
+        const data = await response.json();
+        const historicalPrices = data.historical;
+
+        if (!historicalPrices || historicalPrices.length < 2) {
+            console.warn(`Insufficient historical data for ${stockSymbol}`);
+            return 0;
+        }
+
+        // 確保數據按日期降序排列
+        historicalPrices.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        let latestClose = historicalPrices[0].close;
+        let previousClose;
+
+        if (timeframe === "ytd") {
+            const targetDate = new Date(new Date().getFullYear(), 0, 1); // 當年 1 月 1 日
+            const filteredPrices = historicalPrices.filter(item => new Date(item.date) <= targetDate);
+
+            previousClose = filteredPrices.length
+                ? filteredPrices[filteredPrices.length - 1].close // 最近的有效交易日收盤價
+                : historicalPrices[historicalPrices.length - 1]?.close; // 如果沒有，則取最舊數據
+        } else {
+            const targetDate = new Date();
+            if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
+            else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
+            else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
+
+            previousClose = historicalPrices.find(item => new Date(item.date) <= targetDate)?.close;
+        }
+
+        if (!previousClose) {
+            console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
+            return 0;
+        }
+
+        return ((latestClose - previousClose) / previousClose) * 100;
+    } catch (error) {
+        console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
+        return 0;
+    }
+}
+
+// 修改計算產業表現邏輯
+async function calculateIndustryPerformance(industryData) {
+    const industryPerformance = {};
+
+    for (const [industry, stocks] of Object.entries(industryData)) {
+        // 使用 Promise.all 同時處理多隻股票的數據請求
+        const changes = await Promise.all(
+            stocks.map(stock => fetchHistoricalPercentageChange(stock, currentTimeframe))
+        );
+
+        // 過濾有效數據，並計算平均漲跌幅
+        const validChanges = changes.filter(change => !isNaN(change));
+        const totalChange = validChanges.reduce((sum, change) => sum + change, 0);
+        industryPerformance[industry] = validChanges.length > 0 ? totalChange / validChanges.length : 0;
+    }
+
+    console.log("Calculated Industry Performance (Parallel):", industryPerformance);
+    return industryPerformance;
+}
+
+// 根據漲幅設定顏色
+function getColorByPerformance(performance) {
+    return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
+}
+
+// 修改產業數據選擇邏輯
+async function loadIndustryData() {
+    const industryGrid = document.getElementById("industryGrid");
+    industryGrid.innerHTML = `
+        <div style="align-items: center;">
+            <p style="align-items: center;">Loading...</p>
+        </div>
+    `;
+
+    try {
+        let industryData;
+        if (currentMarket === "TW") {
+            industryData = industryStocks;
+        } else if (currentMarket === "US") {
+            industryData = industryStocksUS;
+        } else if (currentMarket === "JP") {
+            industryData = industryStocksJP;
+        } else if (currentMarket === "EU") {
+            industryData = industryStocksEU;
+        }
+
+        const performanceData = await calculateIndustryPerformance(industryData);
+
+        industryGrid.innerHTML = Object.entries(performanceData)
+            .map(([industry, performance]) => {
+                const color = getColorByPerformance(performance);
+                const stocks = industryData[industry].join(", ");   // 產業對應的股票代碼
+                return `
+                    <div class="industry-item" style="background-color: ${color};" data-stocks="${stocks}">
+                        <span>${industry}</span>
+                        <strong>${performance.toFixed(2)}%</strong>
+                    </div>
+                `;
+            })
+            .join("");
+    } catch (error) {
+        console.error("Error loading industry data:", error);
+        industryGrid.innerHTML = "<p>Failed to load industry data. Please try again later.</p>";
+    }
+}
+
+// 更新時間範圍並重新加載數據
+function updateTimeframe(button) {
+    currentTimeframe = button.getAttribute("data-timeframe");
+
+    // 更新按鈕樣式
+    document.querySelectorAll(".time-filters button").forEach(btn => btn.classList.remove("active"));
+    button.classList.add("active");
+
+    // 加載數據
+    loadIndustryData();
+}
+
+// 初始化頁面
+document.addEventListener("DOMContentLoaded", () => {
+    loadIndustryData();
+});
 
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
