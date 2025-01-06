@@ -25,7 +25,6 @@ const industryStocksEU = {
     "電商及零售": ["ZAL.DE", "ASOS.L", "ABF.L", "WMT.AS", "AMZN.AS"],
     "科技服務": ["SAP.DE", "ADBE.AS", "ORCL.AS", "CRM.AS", "IBM.AS"]
 };
-
 const industryStocksJP = {
     "半導體": ["8035.T", "4063.T", "6501.T", "6724.T", "7735.T"],
     "IC 設計": ["6758.T", "6702.T", "6752.T", "6723.T", "6762.T"],
@@ -218,10 +217,11 @@ async function loadIndustryData() {
         const performanceData = await calculateIndustryPerformance(industryData);
 
         industryGrid.innerHTML = Object.entries(performanceData)
-            .map(([industry, performance]) => {
+            .map(([industry, performance], index) => {
+                const stocks = Object.values(industryData)[index];
                 const color = getColorByPerformance(performance);
                 return `
-                    <div class="industry-item" style="background-color: ${color};">
+                    <div class="industry-item" style="background-color: ${color};" title="Stocks: ${stocks.join(', ')}">
                         <span>${industry}</span>
                         <strong>${performance.toFixed(2)}%</strong>
                     </div>
