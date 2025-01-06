@@ -135,29 +135,26 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
             return 0;
         }
 
+        // 確保數據按日期降序排列
+        historicalPrices.sort((a, b) => new Date(b.date) - new Date(a.date));
+
         let latestClose = historicalPrices[0].close;
         let previousClose;
 
         if (timeframe === "ytd") {
             const targetDate = new Date(new Date().getFullYear(), 0, 1); // 當年 1 月 1 日
-            previousClose = historicalPrices
-                .filter(item => new Date(item.date) >= targetDate) // 取目標日期之後的數據
-                .sort((a, b) => new Date(a.date) - new Date(b.date)) // 升序排序
-                .find(item => item.close)?.close; // 取最接近的收盤價
+            const filteredPrices = historicalPrices.filter(item => new Date(item.date) <= targetDate);
 
-            if (!previousClose) {
-                previousClose = historicalPrices[historicalPrices.length - 1]?.close;
-            }
+            previousClose = filteredPrices.length
+                ? filteredPrices[filteredPrices.length - 1].close // 取目標日期之前最近的交易日收盤價
+                : historicalPrices[historicalPrices.length - 1]?.close; // 如果沒有，則取最舊數據
         } else {
             const targetDate = new Date();
             if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
             else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
             else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
 
-            previousClose = historicalPrices.find(item => {
-                const itemDate = new Date(item.date);
-                return itemDate <= targetDate;
-            })?.close;
+            previousClose = historicalPrices.find(item => new Date(item.date) <= targetDate)?.close;
         }
 
         if (!previousClose) {
