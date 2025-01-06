@@ -3,6 +3,7 @@ const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 let currentTimeframe = "1m"; // 默認時間範圍
 let currentMarket = "TW"; // 默認市場
 
+//各國產業
 const industryStocksEU = {
     "半導體": ["ASML.AS", "IFX.DE", "STM.PA", "NXPI", "ON"],
     "IC 設計": ["DLG.DE", "ARM.L", "STM.PA", "NXPI", "ON"],
@@ -47,7 +48,6 @@ const industryStocksJP = {
     "電商及零售": ["9983.T", "3092.T", "3086.T", "3038.T", "7518.T"],
     "科技服務": ["4689.T", "4755.T", "6098.T", "3773.T", "4812.T"]
 };
-
 const industryStocksUS = {
     "半導體": ["NVDA", "AMD", "TSM", "QCOM", "INTC","DELL"],
     "IC 設計": ["AVGO", "TXN", "MRVL", "ON", "ADI"],
@@ -70,7 +70,6 @@ const industryStocksUS = {
     "電商及零售": ["AMZN", "EBAY", "WMT", "TGT", "COST"],
     "科技服務": ["CRM", "NOW", "SNOW", "DDOG", "OKTA"]
 };
-
 const industryStocks = {
     "半導體": ["2330.TW", "2303.TW", "2308.TW", "2317.TW", "2360.TW"],
     "IC 設計": ["2454.TW", "3034.TW", "3437.TW", "2379.TW", "3532.TW"],
@@ -193,6 +192,29 @@ function getColorByPerformance(performance) {
     return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
 }
 
+//測試
+async function fetchTopCompaniesByMarketCap(industry, market = "TW") {
+    const url = `${BASE_URL}stock-screener?sector=${encodeURIComponent(industry)}&exchange=${market}&apikey=${API_KEY}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Error fetching data for industry: ${industry}`);
+        }
+        const data = await response.json();
+
+        // 按市值排序並取前五名
+        const topCompanies = data
+            .sort((a, b) => b.marketCap - a.marketCap)
+            .slice(0, 5)
+            .map(company => company.symbol);
+
+        return topCompanies;
+    } catch (error) {
+        console.error(`Error fetching top companies for ${industry}:`, error);
+        return [];
+    }
+}
+
 // 修改產業數據選擇邏輯
 async function loadIndustryData() {
     const industryGrid = document.getElementById("industryGrid");
@@ -203,15 +225,18 @@ async function loadIndustryData() {
     `;
 
     try {
-        let industryData;
+        let industryData = {};
         if (currentMarket === "TW") {
-            industryData = industryStocks;
-        } else if (currentMarket === "US") {
-            industryData = industryStocksUS;
-        } else if (currentMarket === "JP") {
-            industryData = industryStocksJP;
-        } else if (currentMarket === "EU") {
-            industryData = industryStocksEU;
+            const industries = ["半導體", "IC 設計", "電腦及周邊設備", "網通設備", "記憶體"]; // 可擴展
+            for (const industry of industries) {
+                const topCompanies = await fetchTopCompaniesByMarketCap(industry, "TW");
+                industryData[industry] = topCompanies;
+            }
+        } else {
+            // 其他市場的靜態資料
+            industryData = currentMarket === "US" ? industryStocksUS :
+                currentMarket === "JP" ? industryStocksJP :
+                    industryStocksEU;
         }
 
         const performanceData = await calculateIndustryPerformance(industryData);
@@ -219,9 +244,8 @@ async function loadIndustryData() {
         industryGrid.innerHTML = Object.entries(performanceData)
             .map(([industry, performance]) => {
                 const color = getColorByPerformance(performance);
-                const stocks = industryData[industry].join(", ");   // 產業對應的股票代碼
                 return `
-                    <div class="industry-item" style="background-color: ${color};" data-stocks="${stocks}">
+                    <div class="industry-item" style="background-color: ${color};" data-stocks="${industryData[industry].join(", ")}">
                         <span>${industry}</span>
                         <strong>${performance.toFixed(2)}%</strong>
                     </div>
