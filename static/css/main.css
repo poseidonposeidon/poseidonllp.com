@@ -1073,3 +1073,101 @@ button:not(.info-input button):hover {
 }
 
 
+
+
+
+/*test*/
+/* 基本樣式 */
+#market {
+    display: none; /* 預設隱藏 */
+    background-color: #1e1e1e; /* 背景顏色 */
+    color: #e0e0e0; /* 文字顏色 */
+    padding: 20px; /* 內邊距 */
+    border-radius: 8px; /* 圓角 */
+    margin: 20px auto; /* 上下間距，水平置中 */
+    max-width: 1200px; /* 最大寬度 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 陰影效果 */
+    overflow: hidden; /* 隱藏溢出內容 */
+    transition: all 0.5s ease; /* 添加過渡效果 */
+}
+
+/* 展開時的樣式 */
+#market.active {
+    display: block; /* 展開顯示 */
+    max-height: 100%; /* 最大高度，允許內容完全顯示 */
+    opacity: 1; /* 完全不透明 */
+}
+
+/* 內容容器樣式 */
+#market .content {
+    max-height: 400px; /* 限制內容高度 */
+    overflow-y: auto; /* 垂直滾動條 */
+    padding: 10px;
+}
+
+/* 標題樣式 */
+#market h2 {
+    font-size: 24px; /* 增大標題字體 */
+    color: #b0bec5; /* 標題顏色 */
+    text-align: center; /* 置中對齊 */
+    margin-bottom: 15px; /* 與下方內容的間距 */
+}
+
+/* 段落樣式 */
+#market p {
+    font-size: 16px; /* 文字大小 */
+    color: #e0e0e0; /* 文字顏色 */
+    text-align: center; /* 文字置中 */
+    margin-bottom: 20px;
+}
+
+/* 時間篩選按鈕樣式 */
+#market .time-filters button {
+    background-color: #2c2c2c;
+    color: #b0bec5;
+    border: 1px solid #444;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin: 0 5px;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+#market .time-filters button.active {
+    background-color: #90caf9;
+    color: #121212;
+}
+
+/* 動態產業展示 */
+#market .industry-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); /* 自適應列數 */
+    gap: 20px; /* 格子間距 */
+    padding: 10px;
+}
+
+#market .industry-item {
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    padding: 15px;
+    text-align: center;
+    color: white;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+#market .industry-item span {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+#market .industry-item strong {
+    font-size: 20px;
+    color: #ffffff;
+    font-weight: bold;
+}
+
+#market .industry-item:hover {
+    transform: scale(1.05);
+    background-color: #3c3c3c;
+}
