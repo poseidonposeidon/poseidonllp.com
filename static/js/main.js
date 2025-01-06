@@ -4,25 +4,25 @@ let currentTimeframe = "1m"; // 默認時間範圍
 let currentMarket = "TW"; // 默認市場
 
 const industryStocksEU = {
-    "半導體": ["ASML.AS", "IFX.DE", "STM.PA", "NXPI.AS", "AMD.AS"],
-    "IC 設計": ["DIALOG.DE", "ARM.L", "CYP.DE", "MPWR.AS", "SIL.AS"],
-    "電腦及周邊設備": ["LENOVO.HK", "LOGI.S", "THN.DE", "DELL.AS", "AAPL.AS"],
-    "網通設備": ["ERICB.ST", "NOKIA.HE", "ADVA.DE", "INWT.DE", "UBIQ.ST"],
-    "記憶體": ["WDC.AS", "MU.AS", "INTC.AS", "KIO.DE", "NVDA.AS"],
-    "載板": ["AT&S.VI", "ZWT.AS", "LPE.DE", "MLM.AS", "UCT.DE"],
-    "太陽能": ["SMA.DE", "ENR.PA", "SLR.L", "FSLR.AS", "CSIQ.AS"],
-    "鋼鐵": ["MT.AS", "TKR.DE", "VOE.VI", "KCO.DE", "CLF.AS"],
-    "金融保險": ["INGA.AS", "DBK.DE", "HSBA.L", "SAN.MC", "CSGN.S"],
+    "半導體": ["ASML.AS", "IFX.DE", "STM.PA", "NXPI", "ON"],
+    "IC 設計": ["DLG.DE", "ARM.L", "STM.PA", "NXPI", "ON"],
+    "電腦及周邊設備": ["0992.HK", "LOGN.SW", "DELL", "HPQ", "AAPL"],
+    "網通設備": ["ERIC-B.ST", "NOKIA.HE", "ADV.DE", "INFN", "UI"],
+    "記憶體": ["MU", "WDC", "005930.KS", "000660.KS", "6502.T"],
+    "載板": ["AUS.VI", "4062.T", "6967.T", "8046.TW", "3037.TW"],
+    "太陽能": ["S92.DE", "ENEL.MI", "SEDG", "FSLR", "CSIQ"],
+    "鋼鐵": ["MT.AS", "TKA.DE", "VOE.VI", "SSAB-A.ST", "OUT1V.HE"],
+    "金融保險": ["INGA.AS", "DBK.DE", "HSBA.L", "SAN.MC", "CSGN.SW"],
     "汽車零組件": ["VOW3.DE", "BMW.DE", "DAI.DE", "RNO.PA", "STLA.MI"],
-    "電子零組件": ["IFX.DE", "TEL.AS", "APH.AS", "AMS.S", "LOGI.S"],
-    "電動車相關": ["TSLA.AS", "NIO.AS", "XPENG.AS", "BYD.AS", "RIVN.AS"],
-    "光學鏡頭": ["LITE.AS", "COHR.AS", "ZEISS.DE", "OPT.DE", "KEYS.AS"],
+    "電子零組件": ["AMS.SW", "LOGN.SW", "STM.PA", "NXPI", "ON"],
+    "電動車相關": ["VOW3.DE", "BMW.DE", "DAI.DE", "RNO.PA", "STLA.MI"],
+    "光學鏡頭": ["ZEISS.DE", "OPT.DE", "KEYS.AS", "COHR.AS", "LITE.AS"],
     "塑料及化工": ["BASF.DE", "COV.DE", "EVK.DE", "ARK.DE", "PPG.AS"],
     "醫療設備": ["SYK.AS", "MDT.AS", "BSX.AS", "FME.DE", "ZBH.AS"],
     "食品飲料": ["NESN.S", "ABI.BR", "DANO.PA", "HEIA.AS", "ULVR.L"],
     "航運物流": ["DPW.DE", "CMA.CA", "KUE.S", "DFDS.CO", "NCLH.AS"],
     "能源相關": ["RDSA.AS", "BP.L", "TOTAL.PA", "REP.MC", "VLO.AS"],
-    "電商及零售": ["AMZN.AS", "ZAL.DE", "ASOS.L", "ABF.L", "WMT.AS"],
+    "電商及零售": ["ZAL.DE", "ASOS.L", "ABF.L", "WMT.AS", "AMZN.AS"],
     "科技服務": ["SAP.DE", "ADBE.AS", "ORCL.AS", "CRM.AS", "IBM.AS"]
 };
 
