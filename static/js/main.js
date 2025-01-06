@@ -198,20 +198,27 @@ function getColorByPerformance(performance) {
 
 //測試
 async function fetchTopCompaniesByMarketCap(industry, market = "TW") {
+    // 修正 sector 和 exchange 的參數，確保與 API 要求匹配
     const url = `${BASE_URL}stock-screener?sector=${encodeURIComponent(industry)}&exchange=${market}&apikey=${API_KEY}`;
+    console.log(`Fetching top companies for ${industry} in ${market}...`);
+
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Error fetching data for industry: ${industry}`);
+            throw new Error(`Error fetching data for industry: ${industry} in market: ${market}`);
         }
+
         const data = await response.json();
+        console.log(`Raw data for ${industry}:`, data); // Debug API 回傳資料
 
-        // 按市值排序並取前五名
+        // 檢查回傳資料中是否有 marketCap，並排序篩選
         const topCompanies = data
-            .sort((a, b) => b.marketCap - a.marketCap)
-            .slice(0, 5)
-            .map(company => company.symbol);
+            .filter(company => company.marketCap) // 過濾沒有市值的資料
+            .sort((a, b) => b.marketCap - a.marketCap) // 按市值降序排序
+            .slice(0, 5) // 取前五名
+            .map(company => company.symbol); // 只取股票代碼
 
+        console.log(`Top companies for ${industry}:`, topCompanies);
         return topCompanies;
     } catch (error) {
         console.error(`Error fetching top companies for ${industry}:`, error);
@@ -231,17 +238,35 @@ async function loadIndustryData() {
     try {
         let industryData = {};
         if (currentMarket === "TW") {
-            const industries = ["半導體", "IC 設計", "電腦及周邊設備", "網通設備", "記憶體"]; // 可擴展
+            const industries = ["半導體", "IC 設計", "電腦及周邊設備", "網通設備", "記憶體"]; // 需要的產業列表
             for (const industry of industries) {
                 const topCompanies = await fetchTopCompaniesByMarketCap(industry, "TW");
                 industryData[industry] = topCompanies;
             }
-        } else {
-            // 其他市場的靜態資料
-            industryData = currentMarket === "US" ? industryStocksUS :
-                currentMarket === "JP" ? industryStocksJP :
-                    industryStocksEU;
+        } else if (currentMarket === "US") {
+            // 動態更新美股資料
+            const industries = ["半導體", "IC 設計", "電腦及周邊設備", "網通設備", "記憶體"];
+            for (const industry of industries) {
+                const topCompanies = await fetchTopCompaniesByMarketCap(industry, "US");
+                industryData[industry] = topCompanies;
+            }
+        } else if (currentMarket === "JP") {
+            // 動態更新日股資料
+            const industries = ["半導體", "IC 設計", "電腦及周邊設備", "網通設備", "記憶體"];
+            for (const industry of industries) {
+                const topCompanies = await fetchTopCompaniesByMarketCap(industry, "JP");
+                industryData[industry] = topCompanies;
+            }
+        } else if (currentMarket === "EU") {
+            // 動態更新歐股資料
+            const industries = ["半導體", "IC 設計", "電腦及周邊設備", "網通設備", "記憶體"];
+            for (const industry of industries) {
+                const topCompanies = await fetchTopCompaniesByMarketCap(industry, "EU");
+                industryData[industry] = topCompanies;
+            }
         }
+
+        console.log("Updated Industry Data:", industryData); // Debug 更新後的資料
 
         const performanceData = await calculateIndustryPerformance(industryData);
 
