@@ -1079,23 +1079,25 @@ button:not(.info-input button):hover {
 /*test*/
 /* 基本樣式 */
 #market {
-    display: none; /* 預設隱藏 */
-    background-color: #1e1e1e; /* 背景顏色 */
-    color: #e0e0e0; /* 文字顏色 */
-    padding: 20px; /* 內邊距 */
-    border-radius: 8px; /* 圓角 */
-    margin: 20px auto; /* 上下間距，水平置中 */
-    max-width: 1200px; /* 最大寬度 */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* 陰影效果 */
-    overflow: hidden; /* 隱藏溢出內容 */
-    transition: all 0.5s ease; /* 添加過渡效果 */
+    position: fixed; /* 固定位置 */
+    top: 50px; /* 距離頁面頂部的距離，可依需求調整 */
+    left: 50%; /* 水平居中 */
+    transform: translateX(-50%); /* 修正水平居中 */
+    background-color: #1e1e1e; /* 背景色，保持與其他區塊一致 */
+    z-index: 9999; /* 設置較高的 z-index，確保位於最上層 */
+    padding: 20px;
+    border-radius: 8px;
+    width: 80%; /* 可依需求調整寬度 */
+    max-height: 80vh; /* 限制最大高度，避免超出視窗 */
+    overflow-y: auto; /* 啟用垂直滾動 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3); /* 增加陰影效果 */
+    opacity: 0; /* 預設透明，方便展開動畫 */
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
 }
 
-/* 展開時的樣式 */
 #market.active {
-    display: block; /* 展開顯示 */
-    max-height: 100%; /* 最大高度，允許內容完全顯示 */
-    opacity: 1; /* 完全不透明 */
+    opacity: 1; /* 展開時設為不透明 */
+    transform: translate(-50%, 0); /* 展開時微調位置 */
 }
 
 /* 內容容器樣式 */
