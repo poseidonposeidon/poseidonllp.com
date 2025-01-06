@@ -943,6 +943,7 @@ button:not(.info-input button):hover {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
+    background-color: #2c2c2c;
 }
 
 .time-filters button {
@@ -1034,6 +1035,7 @@ button:not(.info-input button):hover {
     max-width: 1200px; /* 限制最大寬度 */
     margin: 0 auto; /* 保持居中對齊 */
     padding: 10px; /* 增加內邊距 */
+    background-color: #2c2c2c;
 }
 
 /* 選中的產業樣式 */
@@ -1058,6 +1060,7 @@ button:not(.info-input button):hover {
     display: flex;
     justify-content: center; /* 水平置中 */
     margin-bottom: 20px; /* 與下方內容間距 */
+    background-color: #2c2c2c;
 }
 
 .market-filters button {
@@ -1125,7 +1128,7 @@ button:not(.info-input button):hover {
 
 /* 時間篩選按鈕樣式 */
 #explore-section .time-filters button {
-    background-color: #1e1e1e;
+    background-color: #2c2c2c;
     color: #b0bec5;
     border: 1px solid #444;
     padding: 10px 15px;
@@ -1171,5 +1174,5 @@ button:not(.info-input button):hover {
 
 #explore-section .industry-item:hover {
     transform: scale(1.05);
-    background-color: #1e1e1e;
+    background-color: #2c2c2c;
 }
