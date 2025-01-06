@@ -1672,9 +1672,9 @@ function updateTimeframe(button) {
 }
 
 // 初始化頁面
-document.addEventListener("DOMContentLoaded", () => {
-    loadIndustryData();
-});
+// document.addEventListener("DOMContentLoaded", () => {
+//     loadIndustryData();
+// });
 
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
