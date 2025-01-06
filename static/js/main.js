@@ -3,7 +3,6 @@ const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 let currentTimeframe = "1m"; // 默認時間範圍
 let currentMarket = "TW"; // 默認市場
 
-//各國產業
 const industryStocksEU = {
     "半導體": ["ASML.AS", "IFX.DE", "STM.PA", "NXPI", "ON"],
     "IC 設計": ["DLG.DE", "ARM.L", "STM.PA", "NXPI", "ON"],
@@ -48,6 +47,7 @@ const industryStocksJP = {
     "電商及零售": ["9983.T", "3092.T", "3086.T", "3038.T", "7518.T"],
     "科技服務": ["4689.T", "4755.T", "6098.T", "3773.T", "4812.T"]
 };
+
 const industryStocksUS = {
     "半導體": ["NVDA", "AMD", "TSM", "QCOM", "INTC","DELL"],
     "IC 設計": ["AVGO", "TXN", "MRVL", "ON", "ADI"],
@@ -70,6 +70,7 @@ const industryStocksUS = {
     "電商及零售": ["AMZN", "EBAY", "WMT", "TGT", "COST"],
     "科技服務": ["CRM", "NOW", "SNOW", "DDOG", "OKTA"]
 };
+
 const industryStocks = {
     "半導體": ["2330.TW", "2303.TW", "2308.TW", "2317.TW", "2360.TW"],
     "IC 設計": ["2454.TW", "3034.TW", "3437.TW", "2379.TW", "3532.TW"],
@@ -126,7 +127,6 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
         }
 
         const data = await response.json();
-        console.log(`Historical data for ${stockSymbol}:`, data); // 檢查 API 回傳數據
         const historicalPrices = data.historical;
 
         if (!historicalPrices || historicalPrices.length < 2) {
@@ -138,17 +138,15 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
         historicalPrices.sort((a, b) => new Date(b.date) - new Date(a.date));
 
         let latestClose = historicalPrices[0].close;
-        console.log(`Latest close price for ${stockSymbol}: ${latestClose}`); // 確認最新價格
         let previousClose;
 
         if (timeframe === "ytd") {
             const targetDate = new Date(new Date().getFullYear(), 0, 1); // 當年 1 月 1 日
             const filteredPrices = historicalPrices.filter(item => new Date(item.date) <= targetDate);
 
-            console.log(`Filtered prices for YTD:`, filteredPrices); // 檢查篩選後的價格
             previousClose = filteredPrices.length
-                ? filteredPrices[filteredPrices.length - 1].close
-                : historicalPrices[historicalPrices.length - 1]?.close;
+                ? filteredPrices[filteredPrices.length - 1].close // 最近的有效交易日收盤價
+                : historicalPrices[historicalPrices.length - 1]?.close; // 如果沒有，則取最舊數據
         } else {
             const targetDate = new Date();
             if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
@@ -163,7 +161,6 @@ async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
             return 0;
         }
 
-        console.log(`Previous close price for ${stockSymbol}: ${previousClose}`); // 確認前一價格
         return ((latestClose - previousClose) / previousClose) * 100;
     } catch (error) {
         console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
@@ -196,36 +193,6 @@ function getColorByPerformance(performance) {
     return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
 }
 
-//測試
-async function fetchTopCompaniesByMarketCap(industry, market = "TW") {
-    // 修正 sector 和 exchange 的參數，確保與 API 要求匹配
-    const url = `${BASE_URL}stock-screener?sector=${encodeURIComponent(industry)}&exchange=${market}&apikey=${API_KEY}`;
-    console.log(`Fetching top companies for ${industry} in ${market}...`);
-
-    try {
-        const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Error fetching data for industry: ${industry} in market: ${market}`);
-        }
-
-        const data = await response.json();
-        console.log(`Raw data for ${industry}:`, data); // Debug API 回傳資料
-
-        // 檢查回傳資料中是否有 marketCap，並排序篩選
-        const topCompanies = data
-            .filter(company => company.marketCap) // 過濾沒有市值的資料
-            .sort((a, b) => b.marketCap - a.marketCap) // 按市值降序排序
-            .slice(0, 5) // 取前五名
-            .map(company => company.symbol); // 只取股票代碼
-
-        console.log(`Top companies for ${industry}:`, topCompanies);
-        return topCompanies;
-    } catch (error) {
-        console.error(`Error fetching top companies for ${industry}:`, error);
-        return [];
-    }
-}
-
 // 修改產業數據選擇邏輯
 async function loadIndustryData() {
     const industryGrid = document.getElementById("industryGrid");
@@ -236,45 +203,25 @@ async function loadIndustryData() {
     `;
 
     try {
-        let industryData = {};
+        let industryData;
         if (currentMarket === "TW") {
-            const industries = ["半導體", "IC 設計", "電腦及周邊設備", "網通設備", "記憶體"]; // 需要的產業列表
-            for (const industry of industries) {
-                const topCompanies = await fetchTopCompaniesByMarketCap(industry, "TW");
-                industryData[industry] = topCompanies;
-            }
+            industryData = industryStocks;
         } else if (currentMarket === "US") {
-            // 動態更新美股資料
-            const industries = ["半導體", "IC 設計", "電腦及周邊設備", "網通設備", "記憶體"];
-            for (const industry of industries) {
-                const topCompanies = await fetchTopCompaniesByMarketCap(industry, "US");
-                industryData[industry] = topCompanies;
-            }
+            industryData = industryStocksUS;
         } else if (currentMarket === "JP") {
-            // 動態更新日股資料
-            const industries = ["半導體", "IC 設計", "電腦及周邊設備", "網通設備", "記憶體"];
-            for (const industry of industries) {
-                const topCompanies = await fetchTopCompaniesByMarketCap(industry, "JP");
-                industryData[industry] = topCompanies;
-            }
+            industryData = industryStocksJP;
         } else if (currentMarket === "EU") {
-            // 動態更新歐股資料
-            const industries = ["半導體", "IC 設計", "電腦及周邊設備", "網通設備", "記憶體"];
-            for (const industry of industries) {
-                const topCompanies = await fetchTopCompaniesByMarketCap(industry, "EU");
-                industryData[industry] = topCompanies;
-            }
+            industryData = industryStocksEU;
         }
-
-        console.log("Updated Industry Data:", industryData); // Debug 更新後的資料
 
         const performanceData = await calculateIndustryPerformance(industryData);
 
         industryGrid.innerHTML = Object.entries(performanceData)
             .map(([industry, performance]) => {
                 const color = getColorByPerformance(performance);
+                const stocks = industryData[industry].join(", ");   // 產業對應的股票代碼
                 return `
-                    <div class="industry-item" style="background-color: ${color};" data-stocks="${industryData[industry].join(", ")}">
+                    <div class="industry-item" style="background-color: ${color};" data-stocks="${stocks}">
                         <span>${industry}</span>
                         <strong>${performance.toFixed(2)}%</strong>
                     </div>
