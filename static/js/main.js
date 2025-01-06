@@ -1675,7 +1675,7 @@ function updateTimeframe(button) {
 // document.addEventListener("DOMContentLoaded", () => {
 //     loadIndustryData();
 // });
-
+//
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
