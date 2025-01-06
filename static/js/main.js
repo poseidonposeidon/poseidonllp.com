@@ -217,11 +217,11 @@ async function loadIndustryData() {
         const performanceData = await calculateIndustryPerformance(industryData);
 
         industryGrid.innerHTML = Object.entries(performanceData)
-            .map(([industry, performance], index) => {
-                const stocks = Object.values(industryData)[index];
+            .map(([industry, performance]) => {
                 const color = getColorByPerformance(performance);
+                const stocks = industryData[industry].join(", ");   // 產業對應的股票代碼
                 return `
-                    <div class="industry-item" style="background-color: ${color};" title="Stocks: ${stocks.join(', ')}">
+                    <div class="industry-item" style="background-color: ${color};" data-stocks="${stocks}">
                         <span>${industry}</span>
                         <strong>${performance.toFixed(2)}%</strong>
                     </div>
