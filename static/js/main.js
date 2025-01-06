@@ -1643,6 +1643,40 @@ function parseMarkdown(markdown) {
         .replace(/\n/g, '<br>'); // 保留換行結構
 }
 
+function loadExplore(sectionId) {
+    const sections = {
+        'market': `
+            <div class="section" id="market">
+                <h2 id="marketTitle">台股市場焦點</h2>
+                <p>查看市場漲跌幅最大的概念股和族群有哪些，點擊區塊可查看詳細概念股清單。</p>
+
+                <!-- 市場切換按鈕 -->
+                <div class="market-filters">
+                    <button class="active" data-market="TW" onclick="updateMarket(this)">TW</button>
+                    <button data-market="US" onclick="updateMarket(this)">US</button>
+                    <button data-market="JP" onclick="updateMarket(this)">JP</button>
+                    <button data-market="EU" onclick="updateMarket(this)">EU</button>
+                </div>
+
+                <!-- 時間篩選 -->
+                <div class="time-filters">
+                    <button class="active" data-timeframe="1m" onclick="updateTimeframe(this)">1月</button>
+                    <button data-timeframe="3m" onclick="updateTimeframe(this)">3月</button>
+                    <button data-timeframe="ytd" onclick="updateTimeframe(this)">YTD</button>
+                    <button data-timeframe="1y" onclick="updateTimeframe(this)">1年</button>
+                </div>
+
+                <!-- 動態產業展示 -->
+                <div class="industry-grid" id="industryGrid"></div>
+            </div>`
+    };
+
+    const sectionContainer = document.getElementById('aiBoxSectionContainer');
+    sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+}
+
+
+
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
