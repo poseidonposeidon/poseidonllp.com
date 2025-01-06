@@ -1421,7 +1421,7 @@ function loadExplore(sectionId) {
             </div>`
     };
 
-    const sectionContainer = document.getElementById('aiBoxSectionContainer');
+    const sectionContainer = document.getElementById('marketContainer');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
 }
 //////////////////////////市場焦點/////////////////////////////////////////////
