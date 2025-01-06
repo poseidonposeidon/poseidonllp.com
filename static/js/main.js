@@ -25,7 +25,7 @@ function toggleSection(event, sectionId) {
     }
 
     const overlay = document.querySelector('.overlay');
-    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)');
+    const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare):not(#explore-section)');
 
     if (activeSection && activeSection === section) {
         // 如果當前 activeSection 是被點擊的 section，那麼應該隱藏它
@@ -102,7 +102,7 @@ document.addEventListener('click', (event) => {
     activeSection = null;
     document.querySelector('.overlay').classList.remove('active');
     document.body.classList.remove('modal-open');
-    document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare)').forEach(el => el.classList.remove('blur-background'));
+    document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare):not(#explore-section)').forEach(el => el.classList.remove('blur-background'));
 });
 
 document.addEventListener('DOMContentLoaded', () => {
