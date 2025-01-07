@@ -37,8 +37,10 @@ function displayNews(newsList) {
         const newsItem = document.createElement('div');
         newsItem.classList.add('news-item');
 
+        const imageUrl = news.image || 'placeholder.jpg'; // 如果沒有圖片，使用預設圖片
+
         newsItem.innerHTML = `
-            <img src="${news.image}" alt="${news.title}" class="news-image">
+            <img src="${imageUrl}" alt="${news.title}" class="news-image">
             <div class="news-content">
                 <h3>${news.title}</h3>
                 <p>${news.text}</p>
