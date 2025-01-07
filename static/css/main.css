@@ -1207,13 +1207,15 @@ button:not(.info-input button):hover {
     margin-bottom: 20px;
     border-bottom: 1px solid #ddd;
     padding-bottom: 10px;
+    align-items: center;
 }
 
 .news-image {
-    width: 120px;
-    height: 80px;
+    width: 150px; /* 調整圖片寬度 */
+    height: auto; /* 確保圖片比例不失真 */
     object-fit: cover;
     border-radius: 5px;
+
 }
 
 .news-content {
