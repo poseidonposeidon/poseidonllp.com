@@ -1183,68 +1183,68 @@ button:not(.info-input button):hover {
 
 
 /*測試*/
-.news-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-    padding: 20px;
-    background-color: #2c2c2c;
-    border-radius: 10px;
-    max-width: 1200px;
-    margin: 20px auto;
-}
+/*.news-container {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    align-items: center;*/
+/*    gap: 20px;*/
+/*    padding: 20px;*/
+/*    background-color: #2c2c2c;*/
+/*    border-radius: 10px;*/
+/*    max-width: 1200px;*/
+/*    margin: 20px auto;*/
+/*}*/
 
-.news-item {
-    background-color: #1e1e1e;
-    padding: 20px;
-    border-radius: 10px;
-    width: 100%;
-    color: #e0e0e0;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-}
+/*.news-item {*/
+/*    background-color: #1e1e1e;*/
+/*    padding: 20px;*/
+/*    border-radius: 10px;*/
+/*    width: 100%;*/
+/*    color: #e0e0e0;*/
+/*    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);*/
+/*}*/
 
-.news-item h3 {
-    color: #90caf9;
-    margin-bottom: 10px;
-}
+/*.news-item h3 {*/
+/*    color: #90caf9;*/
+/*    margin-bottom: 10px;*/
+/*}*/
 
-.news-item p {
-    margin: 5px 0;
-}
+/*.news-item p {*/
+/*    margin: 5px 0;*/
+/*}*/
 
-.news-item a {
-    color: #90caf9;
-    text-decoration: none;
-    transition: color 0.3s ease;
-}
+/*.news-item a {*/
+/*    color: #90caf9;*/
+/*    text-decoration: none;*/
+/*    transition: color 0.3s ease;*/
+/*}*/
 
-.news-item a:hover {
-    color: #ffffff;
-}
+/*.news-item a:hover {*/
+/*    color: #ffffff;*/
+/*}*/
 
-.filter-section {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-    margin-bottom: 20px;
-}
+/*.filter-section {*/
+/*    display: flex;*/
+/*    justify-content: center;*/
+/*    gap: 15px;*/
+/*    margin-bottom: 20px;*/
+/*}*/
 
-.filter-section button {
-    padding: 10px 15px;
-    background-color: #121212;
-    color: #b0bec5;
-    border: 1px solid #444;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+/*.filter-section button {*/
+/*    padding: 10px 15px;*/
+/*    background-color: #121212;*/
+/*    color: #b0bec5;*/
+/*    border: 1px solid #444;*/
+/*    border-radius: 5px;*/
+/*    cursor: pointer;*/
+/*    transition: background-color 0.3s ease;*/
+/*}*/
 
-.filter-section button:hover {
-    background-color: #3c3c3c;
-}
+/*.filter-section button:hover {*/
+/*    background-color: #3c3c3c;*/
+/*}*/
 
-.filter-section button.active {
-    background-color: #90caf9;
-    color: #121212;
-}
+/*.filter-section button.active {*/
+/*    background-color: #90caf9;*/
+/*    color: #121212;*/
+/*}*/
