@@ -1,6 +1,53 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
-const BASE_URL = "https://financialmodelingprep.com/api/v3/";
+const BASE_URL = "https://financialmodelingprep.com/api/v3/stock_news?tickers=AAPL,GOOGL,AMZN&limit=50&apikey=";
+const newsContainer = document.getElementById("news-container");
+const filterButtons = document.querySelectorAll(".filter-section button");
 
+async function fetchNews() {
+    try {
+        const response = await fetch(`${BASE_URL}${API_KEY}`);
+        const data = await response.json();
+        displayNews(data);
+    } catch (error) {
+        console.error("Error fetching news:", error);
+        newsContainer.innerHTML = `<p>Error fetching news. Please try again later.</p>`;
+    }
+}
+
+function displayNews(newsData, category = "all") {
+    newsContainer.innerHTML = ""; // Clear existing content
+    const filteredNews = category === "all"
+        ? newsData
+        : newsData.filter(item => item.symbol.includes(category.toUpperCase()));
+
+    filteredNews.forEach(news => {
+        const newsItem = document.createElement("div");
+        newsItem.classList.add("news-item");
+        newsItem.innerHTML = `
+                    <h3>${news.title}</h3>
+                    <p>${news.publishedDate}</p>
+                    <p>${news.symbol}</p>
+                    <p>${news.text}</p>
+                    <a href="${news.url}" target="_blank">Read more</a>
+                `;
+        newsContainer.appendChild(newsItem);
+    });
+}
+
+filterButtons.forEach(button => {
+    button.addEventListener("click", () => {
+        filterButtons.forEach(btn => btn.classList.remove("active"));
+        button.classList.add("active");
+        const category = button.getAttribute("data-category");
+        fetchNews().then(news => displayNews(news, category));
+    });
+});
+
+// Initial fetch and display
+fetchNews();
+////////////////////////////////////////NEWS///////////////////////////////////
+const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
+const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
 

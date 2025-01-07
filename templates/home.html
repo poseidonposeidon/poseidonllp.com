@@ -335,6 +335,17 @@
 <div class="overlay"></div>
 <!--/////////////////////////////////body資料/////////////////////////////////-->
 <div class="body-container">
+    <div class="filter-section">
+        <button data-category="all" class="active">All</button>
+        <button data-category="tech">Tech</button>
+        <button data-category="finance">Finance</button>
+        <button data-category="healthcare">Healthcare</button>
+    </div>
+    <div class="news-container" id="news-container">
+        <!-- News articles will be dynamically inserted here -->
+    </div>
+</div>
+
 <!--    <div class="market-trend">-->
 <!--        <h2 id="marketTitle">台股市場焦點</h2>-->
 <!--        <p>查看市場漲跌幅最大的概念股和族群有哪些，點擊區塊可查看詳細概念股清單。</p>-->
@@ -359,9 +370,6 @@
 <!--        &lt;!&ndash; 動態產業展示 &ndash;&gt;-->
 <!--        <div class="industry-grid" id="industryGrid"></div>-->
 <!--    </div>-->
-</div>
-
-
 <script src="/static/js/main.js"></script>
 
 </body>
