@@ -1,6 +1,6 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
-//////
+//////News////
 // 獲取股票新聞函數
 async function fetchStockNews(category = 'all') {
     const url = `${BASE_URL}stock_news?apikey=${API_KEY}`;
@@ -16,7 +16,6 @@ async function fetchStockNews(category = 'all') {
         return [];
     }
 }
-
 // 根據類別篩選新聞
 function filterNewsByCategory(newsData, category) {
     if (category === 'all') {
@@ -24,7 +23,6 @@ function filterNewsByCategory(newsData, category) {
     }
     return newsData.filter(news => news.sector?.toLowerCase() === category.toLowerCase());
 }
-
 // 顯示新聞
 function displayNews(newsList) {
     const newsContainer = document.getElementById('news-container');
@@ -40,16 +38,18 @@ function displayNews(newsList) {
         newsItem.classList.add('news-item');
 
         newsItem.innerHTML = `
-            <h3>${news.title}</h3>
-            <p>${news.text}</p>
-            <a href="${news.url}" target="_blank">Read more</a>
-            <span>${new Date(news.publishedDate).toLocaleString()}</span>
+            <img src="${news.image}" alt="${news.title}" class="news-image">
+            <div class="news-content">
+                <h3>${news.title}</h3>
+                <p>${news.text}</p>
+                <a href="${news.url}" target="_blank">Read more</a>
+                <span>${new Date(news.publishedDate).toLocaleString()}</span>
+            </div>
         `;
 
         newsContainer.appendChild(newsItem);
     });
 }
-
 // 初始化函數
 async function initNewsSection() {
     const filterButtons = document.querySelectorAll('.filter-section button');
@@ -67,7 +67,6 @@ async function initNewsSection() {
         });
     });
 }
-
 // 頁面加載時初始化
 window.addEventListener('DOMContentLoaded', initNewsSection);
 //////////////////////////////////////////////////////////////////////////////

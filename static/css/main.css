@@ -1204,6 +1204,13 @@ button:not(.info-input button):hover {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
+.news-image {
+    width: 120px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
 .news-item h3 {
     color: #90caf9;
     margin-bottom: 10px;
