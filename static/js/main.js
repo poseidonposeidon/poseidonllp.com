@@ -1,11 +1,11 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
-const BASE_URL = "https://financialmodelingprep.com/api/v3/stock_news?tickers=AAPL,GOOGL,AMZN&limit=50&apikey=";
+const BASE_URL_N = "https://financialmodelingprep.com/api/v3/stock_news?tickers=AAPL,GOOGL,AMZN&limit=50&apikey=";
 const newsContainer = document.getElementById("news-container");
 const filterButtons = document.querySelectorAll(".filter-section button");
 
 async function fetchNews() {
     try {
-        const response = await fetch(`${BASE_URL}${API_KEY}`);
+        const response = await fetch(`${BASE_URL_N}${API_KEY}`);
         const data = await response.json();
         displayNews(data);
     } catch (error) {
@@ -46,7 +46,7 @@ filterButtons.forEach(button => {
 // Initial fetch and display
 fetchNews();
 ////////////////////////////////////////NEWS///////////////////////////////////
-const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
+// const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
