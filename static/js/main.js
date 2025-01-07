@@ -1,6 +1,75 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
+//////
+// 獲取股票新聞函數
+async function fetchStockNews(category = 'all') {
+    const url = `${BASE_URL}stock_news?apikey=${API_KEY}`;
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`Error fetching news: ${response.status}`);
+        }
+        const data = await response.json();
+        return filterNewsByCategory(data, category);
+    } catch (error) {
+        console.error("Error fetching stock news:", error);
+        return [];
+    }
+}
 
+// 根據類別篩選新聞
+function filterNewsByCategory(newsData, category) {
+    if (category === 'all') {
+        return newsData;
+    }
+    return newsData.filter(news => news.sector?.toLowerCase() === category.toLowerCase());
+}
+
+// 顯示新聞
+function displayNews(newsList) {
+    const newsContainer = document.getElementById('news-container');
+    newsContainer.innerHTML = '';
+
+    if (newsList.length === 0) {
+        newsContainer.innerHTML = '<p>No news available for the selected category.</p>';
+        return;
+    }
+
+    newsList.forEach(news => {
+        const newsItem = document.createElement('div');
+        newsItem.classList.add('news-item');
+
+        newsItem.innerHTML = `
+            <h3>${news.title}</h3>
+            <p>${news.text}</p>
+            <a href="${news.url}" target="_blank">Read more</a>
+            <span>${new Date(news.publishedDate).toLocaleString()}</span>
+        `;
+
+        newsContainer.appendChild(newsItem);
+    });
+}
+
+// 初始化函數
+async function initNewsSection() {
+    const filterButtons = document.querySelectorAll('.filter-section button');
+    let newsList = await fetchStockNews('all');
+    displayNews(newsList);
+
+    filterButtons.forEach(button => {
+        button.addEventListener('click', async () => {
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            button.classList.add('active');
+
+            const category = button.getAttribute('data-category');
+            newsList = await fetchStockNews(category);
+            displayNews(newsList);
+        });
+    });
+}
+
+// 頁面加載時初始化
+window.addEventListener('DOMContentLoaded', initNewsSection);
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
 
@@ -1668,7 +1737,7 @@ function updateTimeframe(button) {
     // 加載數據
     loadIndustryData();
 }
-
+//////////////////////////////////////////////////////////////////////
 // 初始化頁面
 // document.addEventListener("DOMContentLoaded", () => {
 //     loadIndustryData();
