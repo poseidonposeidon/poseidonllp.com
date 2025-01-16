@@ -3,23 +3,18 @@ const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 //////News////
 // 獲取股票新聞函數
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
-
-async function fetchStockNews(category = 'all', page = 1, pageSize = NEWS_PER_PAGE) {
-    const offset = (page - 1) * pageSize;
-    const url = `${BASE_URL}stock_news?apikey=${API_KEY}&limit=${pageSize}&offset=${offset}`;
+async function fetchStockNews(category = 'all') {
+    const url = `${BASE_URL}stock_news?apikey=${API_KEY}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Error fetching news: ${response.status}`);
         }
         const data = await response.json();
-        return {
-            news: filterNewsByCategory(data, category), // 篩選分類
-            total: data.length || 0, // 總新聞數量（假設 API 不返回 total）
-        };
+        return filterNewsByCategory(data, category);
     } catch (error) {
         console.error("Error fetching stock news:", error);
-        return { news: [], total: 0 };
+        return [];
     }
 }
 
