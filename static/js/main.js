@@ -13,10 +13,13 @@ async function fetchStockNews(category = 'all', page = 1, pageSize = 10) {
             throw new Error(`Error fetching news: ${response.status}`);
         }
         const data = await response.json();
-        return filterNewsByCategory(data, category);
+        return {
+            news: filterNewsByCategory(data.news, category), // 假設返回包含 news 和 total 屬性
+            total: data.total || 0, // 總數量
+        };
     } catch (error) {
         console.error("Error fetching stock news:", error);
-        return [];
+        return { news: [], total: 0 };
     }
 }
 
@@ -189,9 +192,9 @@ function generatePagination(newsList, currentPage, totalPages) {
             button.classList.add('active');
         }
         button.addEventListener('click', async () => {
-            const updatedNews = await fetchStockNews('all', i, NEWS_PER_PAGE);
-            displayNews(updatedNews, i);
-            generatePagination(updatedNews, i, totalPages);
+            const { news, total } = await fetchStockNews('all', i, NEWS_PER_PAGE);
+            displayNews(news, i);
+            generatePagination(news, i, Math.ceil(total / NEWS_PER_PAGE));
         });
         paginationContainer.appendChild(button);
     }
@@ -200,9 +203,9 @@ function generatePagination(newsList, currentPage, totalPages) {
 // 初始化函數
 async function initNewsSection() {
     const filterButtons = document.querySelectorAll('.filter-section button');
-    let newsList = await fetchStockNews('all');
-    displayNews(newsList, 1); // 預設顯示第 1 頁
-    generatePagination(newsList, 1);
+    const { news, total } = await fetchStockNews('all', 1, NEWS_PER_PAGE);
+    displayNews(news, 1);
+    generatePagination(news, 1, Math.ceil(total / NEWS_PER_PAGE));
 
     filterButtons.forEach(button => {
         button.addEventListener('click', async () => {
@@ -210,9 +213,9 @@ async function initNewsSection() {
             button.classList.add('active');
 
             const category = button.getAttribute('data-category');
-            newsList = await fetchStockNews(category);
-            displayNews(newsList, 1); // 顯示新類別的第 1 頁
-            generatePagination(newsList, 1);
+            const { news, total } = await fetchStockNews(category, 1, NEWS_PER_PAGE);
+            displayNews(news, 1);
+            generatePagination(news, 1, Math.ceil(total / NEWS_PER_PAGE));
         });
     });
 }
