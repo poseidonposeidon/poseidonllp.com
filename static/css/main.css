@@ -1280,4 +1280,5 @@ button:not(.info-input button):hover {
 .pagination-button.active {
     background-color: #666; /* 當前頁面按鈕樣式 */
     color: #fff;
+    margin: 0 5px;
 }
