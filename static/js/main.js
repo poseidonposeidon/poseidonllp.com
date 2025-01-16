@@ -7,7 +7,7 @@ const NEWS_PER_PAGE = 10; // 每頁新聞數量
 
 async function fetchStockNews(category = 'all', page = 1, pageSize = 10) {
     const offset = (page - 1) * pageSize;
-    const url = `${BASE_URL}news?apikey=${API_KEY}&limit=${pageSize}&offset=${offset}`;
+    const url = `${BASE_URL}stock_news?apikey=${API_KEY}&limit=${pageSize}&offset=${offset}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
