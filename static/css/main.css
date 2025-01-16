@@ -1291,22 +1291,6 @@ button:not(.info-input button):hover {
     margin: 0 5px;
 }
 
-.stock-input {
-    width: 300px;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #444;
-    background-color: #121212;
-    color: #b0bec5;
-    margin-bottom: 10px;
-    outline: none;
-    text-transform: uppercase; /* 顯示大寫 */
-}
-
-.stock-input:focus {
-    border-color: #90caf9;
-    background-color: #1e1e1e;
-}
 
 .input-helper-text {
     color: #b0bec5;
@@ -1342,15 +1326,35 @@ button:not(.info-input button):hover {
 }
 
 .stock-input-new {
-    width: 100%;
+    width: 300px;
     padding: 10px;
     border-radius: 5px;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
+    border: 1px solid #444;
+    background-color: #121212;
+    color: #b0bec5;
+    margin-bottom: 10px;
+    outline: none;
+    text-transform: uppercase; /* 顯示大寫 */
 }
 
 .stock-input-new:focus {
     border-color: #90caf9;
-    outline: none;
-    background-color: #ffffff;
+    background-color: #1e1e1e;
 }
+
+/*.stock-input {*/
+/*    width: 300px;*/
+/*    padding: 10px;*/
+/*    border-radius: 5px;*/
+/*    border: 1px solid #444;*/
+/*    background-color: #121212;*/
+/*    color: #b0bec5;*/
+/*    margin-bottom: 10px;*/
+/*    outline: none;*/
+/*    text-transform: uppercase; !* 顯示大寫 *!*/
+/*}*/
+
+/*.stock-input:focus {*/
+/*    border-color: #90caf9;*/
+/*    background-color: #1e1e1e;*/
+/*}*/
