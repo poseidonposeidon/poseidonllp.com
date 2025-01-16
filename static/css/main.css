@@ -1314,3 +1314,43 @@ button:not(.info-input button):hover {
     margin-top: -10px;
     margin-bottom: 10px;
 }
+
+.suggestions-container-new {
+    position: absolute;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    max-height: 200px;
+    overflow-y: auto;
+    z-index: 1000;
+    width: 300px; /* 建議框寬度與輸入框一致 */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.suggestions-container-new div {
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.suggestions-container-new div:hover {
+    background-color: #f0f0f0;
+}
+
+.suggestions-container-new.hidden {
+    display: none;
+}
+
+.stock-input-new {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+
+.stock-input-new:focus {
+    border-color: #90caf9;
+    outline: none;
+    background-color: #ffffff;
+}

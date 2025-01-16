@@ -2332,41 +2332,20 @@ function showNoSuggestions(container) {
 }
 
 // 清空建議列表
-function clearSuggestions(container = null) {
+function clearSuggestions(container) {
     if (!container) {
-        // 根據不同的 input id 對應不同的建議框容器
+        // 嘗試動態查找與當前輸入框相關的建議框
         const inputId = document.activeElement.id;
-        switch (inputId) {
-            case 'stockSymbol':
-                container = document.getElementById('suggestions');
-                break;
-            case 'jpStockSymbol':
-                container = document.getElementById('suggestionsJP');
-                break;
-            case 'twStockSymbol':
-                container = document.getElementById('suggestionsTW');
-                break;
-            case 'euStockSymbol':
-                container = document.getElementById('suggestionsEU');
-                break;
-            case 'krStockSymbol':
-                container = document.getElementById('suggestionsKR');
-                break;
-            case 'hkStockSymbol':
-                container = document.getElementById('suggestionsHK');
-                break;
-            case 'cnStockSymbol':
-                container = document.getElementById('suggestionsCN');
-                break;
-            default:
-                console.error('未知的輸入框 id');
-                return;
-        }
+        const suggestionId = `suggestions${inputId.replace('Symbol', '').toUpperCase()}`;
+        container = document.getElementById(suggestionId);
     }
 
-    // 清空內容並隱藏建議框
-    container.innerHTML = '';
-    container.classList.remove('active');
+    if (container) {
+        container.innerHTML = '';
+        container.classList.remove('active');
+    } else {
+        console.error('未找到對應的建議容器');
+    }
 }
 
 // 美股
@@ -2409,10 +2388,10 @@ function displaySuggestions(suggestions, suggestionsContainer, inputId) {
         suggestions.forEach(symbol => {
             const suggestionDiv = document.createElement('div');
             suggestionDiv.textContent = symbol;
-            suggestionDiv.addEventListener('click', () => {
-                event.stopPropagation();
+            suggestionDiv.addEventListener('click', (event) => {
+                event.stopPropagation(); // 阻止事件冒泡
                 document.getElementById(inputId).value = symbol;
-                clearSuggestions(suggestionsContainer); // 清除當前的建議框
+                clearSuggestions(suggestionsContainer); // 清除建議框
             });
             suggestionsContainer.appendChild(suggestionDiv);
         });
