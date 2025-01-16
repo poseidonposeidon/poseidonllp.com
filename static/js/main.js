@@ -6,17 +6,17 @@ const NEWS_PER_PAGE = 10; // 每頁新聞數量
 
 async function fetchStockNews(category = 'all', page = 1, pageSize = 10) {
     const offset = (page - 1) * pageSize;
-    const url = `${BASE_URL}stock_news?apikey=${API_KEY}&limit=${pageSize}&offset=${offset}`;
+    const url = `${BASE_URL}news?apikey=${API_KEY}&limit=${pageSize}&offset=${offset}`; // 改用新的端點
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Error fetching news: ${response.status}`);
         }
         const data = await response.json();
-        console.log("API Response:", data); // 測試 API 返回的數據
+        console.log("API Response:", data); // 查看 API 返回的數據結構
         return {
-            news: filterNewsByCategory(data.news, category),
-            total: data.total || 0,
+            news: filterNewsByCategory(data, category), // 假設 API 返回的是一個數組
+            total: data.length || 0, // 假設無總數信息，直接用數據長度
         };
     } catch (error) {
         console.error("Error fetching stock news:", error);
@@ -151,6 +151,11 @@ function displayNews(newsList, currentPage = 1) {
     const newsContainer = document.getElementById('news-container');
     newsContainer.innerHTML = '';
 
+    if (!Array.isArray(newsList)) {
+        newsContainer.innerHTML = '<p>Error: Invalid news data.</p>';
+        return;
+    }
+
     const startIndex = (currentPage - 1) * NEWS_PER_PAGE;
     const endIndex = startIndex + NEWS_PER_PAGE;
     const paginatedNews = newsList.slice(startIndex, endIndex);
@@ -164,7 +169,7 @@ function displayNews(newsList, currentPage = 1) {
         const newsItem = document.createElement('div');
         newsItem.classList.add('news-item');
 
-        const imageUrl = news.image || 'placeholder.jpg'; // 如果沒有圖片，使用預設圖片
+        const imageUrl = news.image || 'placeholder.jpg';
 
         newsItem.innerHTML = `
             <img src="${imageUrl}" alt="${news.title}" class="news-image">
