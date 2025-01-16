@@ -130,6 +130,10 @@ function initSearchInput() {
     stockInput.addEventListener('keyup', handleStockSearch);
 }
 
+document.getElementById('stock-input').addEventListener('input', function (event) {
+    event.target.value = event.target.value.toUpperCase(); // 轉換為大寫
+});
+
 // 頁面加載時初始化
 window.addEventListener('DOMContentLoaded', () => {
     initNewsSection();

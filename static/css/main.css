@@ -1300,6 +1300,7 @@ button:not(.info-input button):hover {
     color: #b0bec5;
     margin-bottom: 10px;
     outline: none;
+    text-transform: uppercase; /* 顯示大寫 */
 }
 
 .stock-input:focus {
