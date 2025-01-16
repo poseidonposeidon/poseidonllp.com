@@ -1266,3 +1266,18 @@ button:not(.info-input button):hover {
     background-color: #90caf9;
     color: #121212;
 }
+
+.pagination-button {
+    margin: 0 5px; /* 左右間距 */
+    padding: 5px 10px; /* 增加按鈕內部間距以改善外觀 */
+    border: 1px solid #ccc;
+    border-radius: 5px; /* 可選：讓按鈕看起來更美觀 */
+    background-color: #333; /* 按需設置背景色 */
+    color: white;
+    cursor: pointer;
+}
+
+.pagination-button.active {
+    background-color: #666; /* 當前頁面按鈕樣式 */
+    color: #fff;
+}

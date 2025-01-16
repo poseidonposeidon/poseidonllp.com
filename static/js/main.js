@@ -74,6 +74,11 @@ function generatePagination(newsList, currentPage) {
         if (i === currentPage) {
             button.classList.add('active');
         }
+
+        // 添加內聯樣式的空隙
+        button.style.margin = '0 5px';
+        button.style.padding = '5px 10px'; // 可選：美化按鈕外觀
+
         button.addEventListener('click', () => {
             displayNews(newsList, i);
             generatePagination(newsList, i);
@@ -81,6 +86,7 @@ function generatePagination(newsList, currentPage) {
         paginationContainer.appendChild(button);
     }
 }
+
 
 // 初始化函數
 async function initNewsSection() {
