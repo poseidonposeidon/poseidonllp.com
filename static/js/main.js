@@ -13,9 +13,10 @@ async function fetchStockNews(category = 'all', page = 1, pageSize = 10) {
             throw new Error(`Error fetching news: ${response.status}`);
         }
         const data = await response.json();
+        console.log("API Response:", data); // 測試 API 返回的數據
         return {
-            news: filterNewsByCategory(data.news, category), // 假設返回包含 news 和 total 屬性
-            total: data.total || 0, // 總數量
+            news: filterNewsByCategory(data.news, category),
+            total: data.total || 0,
         };
     } catch (error) {
         console.error("Error fetching stock news:", error);
@@ -184,14 +185,21 @@ function generatePagination(newsList, currentPage, totalPages) {
     const paginationContainer = document.getElementById('pagination-container');
     paginationContainer.innerHTML = '';
 
+    if (!totalPages || totalPages <= 0) {
+        console.error("Error: No pages to generate.");
+        paginationContainer.innerHTML = '<p>No pages available</p>';
+        return;
+    }
+
     for (let i = 1; i <= totalPages; i++) {
         const button = document.createElement('button');
-        button.textContent = i;
+        button.textContent = i; // 確保顯示數字
         button.classList.add('pagination-button');
         if (i === currentPage) {
             button.classList.add('active');
         }
         button.addEventListener('click', async () => {
+            console.log(`Page ${i} clicked`);
             const { news, total } = await fetchStockNews('all', i, NEWS_PER_PAGE);
             displayNews(news, i);
             generatePagination(news, i, Math.ceil(total / NEWS_PER_PAGE));
@@ -204,8 +212,9 @@ function generatePagination(newsList, currentPage, totalPages) {
 async function initNewsSection() {
     const filterButtons = document.querySelectorAll('.filter-section button');
     const { news, total } = await fetchStockNews('all', 1, NEWS_PER_PAGE);
+    const totalPages = Math.ceil(total / NEWS_PER_PAGE); // 計算總頁數
     displayNews(news, 1);
-    generatePagination(news, 1, Math.ceil(total / NEWS_PER_PAGE));
+    generatePagination(news, 1, totalPages);
 
     filterButtons.forEach(button => {
         button.addEventListener('click', async () => {
@@ -214,8 +223,9 @@ async function initNewsSection() {
 
             const category = button.getAttribute('data-category');
             const { news, total } = await fetchStockNews(category, 1, NEWS_PER_PAGE);
+            const totalPages = Math.ceil(total / NEWS_PER_PAGE); // 更新總頁數
             displayNews(news, 1);
-            generatePagination(news, 1, Math.ceil(total / NEWS_PER_PAGE));
+            generatePagination(news, 1, totalPages);
         });
     });
 }
