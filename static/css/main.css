@@ -1250,6 +1250,12 @@ button:not(.info-input button):hover {
 
 }
 
+.filter-section h1{
+    
+    background-color: #121212;
+
+}
+
 .filter-section button {
     padding: 10px 15px;
     background-color: #121212;
