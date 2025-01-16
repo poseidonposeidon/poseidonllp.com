@@ -3,15 +3,19 @@ const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 //////News////
 // 獲取股票新聞函數
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
-async function fetchStockNews(category = 'all') {
-    const url = `${BASE_URL}stock_news?apikey=${API_KEY}`;
+
+async function fetchStockNews(category = 'all', symbol = '') {
+    let url = `${BASE_URL}stock_news?apikey=${API_KEY}`;
+    if (symbol) {
+        url += `&symbol=${symbol}`; // 如果有股票代號，添加到查詢參數
+    }
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Error fetching news: ${response.status}`);
         }
         const data = await response.json();
-        return filterNewsByCategory(data, category);
+        return category === 'all' ? data : filterNewsByCategory(data, category);
     } catch (error) {
         console.error("Error fetching stock news:", error);
         return [];
@@ -87,7 +91,6 @@ function generatePagination(newsList, currentPage) {
     }
 }
 
-
 // 初始化函數
 async function initNewsSection() {
     const filterButtons = document.querySelectorAll('.filter-section button');
@@ -108,9 +111,30 @@ async function initNewsSection() {
     });
 }
 
-// 頁面加載時初始化
-window.addEventListener('DOMContentLoaded', initNewsSection);
+async function handleStockSearch(event) {
+    if (event.key === 'Enter') {
+        const input = event.target.value.trim().toUpperCase(); // 獲取輸入值，轉為大寫
+        if (!input) {
+            alert('Please enter a valid stock symbol');
+            return;
+        }
+        const newsList = await fetchStockNews('all', input); // 根據股票代號查詢新聞
+        displayNews(newsList, 1); // 顯示查詢結果
+        generatePagination(newsList, 1); // 更新分頁
+    }
+}
 
+// 初始化輸入框監聽
+function initSearchInput() {
+    const stockInput = document.getElementById('stock-input');
+    stockInput.addEventListener('keyup', handleStockSearch);
+}
+
+// 頁面加載時初始化
+window.addEventListener('DOMContentLoaded', () => {
+    initNewsSection();
+    initSearchInput(); // 初始化輸入框功能
+});
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
 
