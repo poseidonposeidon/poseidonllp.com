@@ -3,18 +3,23 @@ const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 //////News////
 // 獲取股票新聞函數
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
-async function fetchStockNews(category = 'all') {
-    const url = `${BASE_URL}stock_news?apikey=${API_KEY}`;
+
+async function fetchStockNews(category = 'all', page = 1, pageSize = NEWS_PER_PAGE) {
+    const offset = (page - 1) * pageSize;
+    const url = `${BASE_URL}stock_news?apikey=${API_KEY}&limit=${pageSize}&offset=${offset}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Error fetching news: ${response.status}`);
         }
         const data = await response.json();
-        return filterNewsByCategory(data, category);
+        return {
+            news: filterNewsByCategory(data, category), // 篩選分類
+            total: data.length || 0, // 總新聞數量（假設 API 不返回 total）
+        };
     } catch (error) {
         console.error("Error fetching stock news:", error);
-        return [];
+        return { news: [], total: 0 };
     }
 }
 
@@ -143,21 +148,20 @@ function filterNewsByCategory(newsData, category) {
 // 顯示新聞
 function displayNews(newsList, currentPage = 1) {
     const newsContainer = document.getElementById('news-container');
-    newsContainer.innerHTML = '';
+    newsContainer.innerHTML = ''; // 清空舊的新聞
+
+    if (!Array.isArray(newsList) || newsList.length === 0) {
+        newsContainer.innerHTML = '<p>No news available for the selected category.</p>';
+        return;
+    }
 
     const startIndex = (currentPage - 1) * NEWS_PER_PAGE;
     const endIndex = startIndex + NEWS_PER_PAGE;
     const paginatedNews = newsList.slice(startIndex, endIndex);
 
-    if (paginatedNews.length === 0) {
-        newsContainer.innerHTML = '<p>No news available for the selected category.</p>';
-        return;
-    }
-
     paginatedNews.forEach(news => {
         const newsItem = document.createElement('div');
         newsItem.classList.add('news-item');
-
         const imageUrl = news.image || 'placeholder.jpg'; // 如果沒有圖片，使用預設圖片
 
         newsItem.innerHTML = `
@@ -173,13 +177,10 @@ function displayNews(newsList, currentPage = 1) {
         newsContainer.appendChild(newsItem);
     });
 }
-
 // 生成分頁按鈕
-function generatePagination(newsList, currentPage) {
+function generatePagination(newsList, currentPage, totalPages) {
     const paginationContainer = document.getElementById('pagination-container');
-    paginationContainer.innerHTML = '';
-
-    const totalPages = Math.ceil(newsList.length / NEWS_PER_PAGE);
+    paginationContainer.innerHTML = ''; // 清空舊的按鈕
 
     for (let i = 1; i <= totalPages; i++) {
         const button = document.createElement('button');
@@ -188,14 +189,14 @@ function generatePagination(newsList, currentPage) {
         if (i === currentPage) {
             button.classList.add('active');
         }
-        button.addEventListener('click', () => {
-            displayNews(newsList, i);
-            generatePagination(newsList, i);
+        button.addEventListener('click', async () => {
+            const { news } = await fetchStockNews('all', i, NEWS_PER_PAGE);
+            displayNews(news, i);
+            generatePagination(news, i, totalPages);
         });
         paginationContainer.appendChild(button);
     }
 }
-
 // 初始化函數
 async function initNewsSection() {
     const filterButtons = document.querySelectorAll('.filter-section button');
