@@ -2385,7 +2385,7 @@ document.getElementById('stockSymbol').addEventListener('input', debounce(async 
     }
 }, 100));
 
-document.getElementById('stock-input-new').addEventListener('input', debounce(async function () {
+document.getElementById('stock-input').addEventListener('input', debounce(async function () {
     const stockSymbol = this.value.trim().toUpperCase(); // 獲取輸入並轉為大寫
     const suggestionsContainer = document.getElementById('suggestions-new'); // 建議框容器
 

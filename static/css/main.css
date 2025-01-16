@@ -1325,24 +1325,7 @@ button:not(.info-input button):hover {
     display: none;
 }
 
-.stock-input-new {
-    width: 300px;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #444;
-    background-color: #121212;
-    color: #b0bec5;
-    margin-bottom: 10px;
-    outline: none;
-    text-transform: uppercase; /* 顯示大寫 */
-}
-
-.stock-input-new:focus {
-    border-color: #90caf9;
-    background-color: #1e1e1e;
-}
-
-/*.stock-input {*/
+/*.stock-input-new {*/
 /*    width: 300px;*/
 /*    padding: 10px;*/
 /*    border-radius: 5px;*/
@@ -1354,7 +1337,24 @@ button:not(.info-input button):hover {
 /*    text-transform: uppercase; !* 顯示大寫 *!*/
 /*}*/
 
-/*.stock-input:focus {*/
+/*.stock-input-new:focus {*/
 /*    border-color: #90caf9;*/
 /*    background-color: #1e1e1e;*/
 /*}*/
+
+.stock-input {
+    width: 300px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background-color: #121212;
+    color: #b0bec5;
+    margin-bottom: 10px;
+    outline: none;
+    text-transform: uppercase; /* 顯示大寫 */
+}
+
+.stock-input:focus {
+    border-color: #90caf9;
+    background-color: #1e1e1e;
+}
