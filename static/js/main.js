@@ -1,26 +1,20 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 //////News////
-
 // 獲取股票新聞函數
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
-
-async function fetchStockNews(category = 'all', page = 1, pageSize = 10) {
-    const offset = (page - 1) * pageSize;
-    const url = `${BASE_URL}stock_news?apikey=${API_KEY}&limit=${pageSize}&offset=${offset}`;
+async function fetchStockNews(category = 'all') {
+    const url = `${BASE_URL}stock_news?apikey=${API_KEY}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Error fetching news: ${response.status}`);
         }
         const data = await response.json();
-        return {
-            news: filterNewsByCategory(data, category),
-            total: data.totalResults || data.length || 0, // 假設 API 返回 `totalResults`
-        };
+        return filterNewsByCategory(data, category);
     } catch (error) {
         console.error("Error fetching stock news:", error);
-        return { news: [], total: 0 };
+        return [];
     }
 }
 
@@ -149,21 +143,22 @@ function filterNewsByCategory(newsData, category) {
 // 顯示新聞
 function displayNews(newsList, currentPage = 1) {
     const newsContainer = document.getElementById('news-container');
-    newsContainer.innerHTML = ''; // 清空舊的新聞
-
-    if (!Array.isArray(newsList) || newsList.length === 0) {
-        newsContainer.innerHTML = '<p>No news available for the selected category.</p>';
-        return;
-    }
+    newsContainer.innerHTML = '';
 
     const startIndex = (currentPage - 1) * NEWS_PER_PAGE;
     const endIndex = startIndex + NEWS_PER_PAGE;
     const paginatedNews = newsList.slice(startIndex, endIndex);
 
+    if (paginatedNews.length === 0) {
+        newsContainer.innerHTML = '<p>No news available for the selected category.</p>';
+        return;
+    }
+
     paginatedNews.forEach(news => {
         const newsItem = document.createElement('div');
         newsItem.classList.add('news-item');
-        const imageUrl = news.image || 'placeholder.jpg';
+
+        const imageUrl = news.image || 'placeholder.jpg'; // 如果沒有圖片，使用預設圖片
 
         newsItem.innerHTML = `
             <img src="${imageUrl}" alt="${news.title}" class="news-image">
@@ -180,14 +175,11 @@ function displayNews(newsList, currentPage = 1) {
 }
 
 // 生成分頁按鈕
-function generatePagination(newsList, currentPage, totalPages) {
+function generatePagination(newsList, currentPage) {
     const paginationContainer = document.getElementById('pagination-container');
-    paginationContainer.innerHTML = ''; // 清空舊的按鈕
+    paginationContainer.innerHTML = '';
 
-    if (!totalPages || totalPages <= 0) {
-        paginationContainer.innerHTML = '<p>No pages available</p>';
-        return;
-    }
+    const totalPages = Math.ceil(newsList.length / NEWS_PER_PAGE);
 
     for (let i = 1; i <= totalPages; i++) {
         const button = document.createElement('button');
@@ -196,10 +188,9 @@ function generatePagination(newsList, currentPage, totalPages) {
         if (i === currentPage) {
             button.classList.add('active');
         }
-        button.addEventListener('click', async () => {
-            const { news, total } = await fetchStockNews('all', i, NEWS_PER_PAGE);
-            displayNews(news, i);
-            generatePagination(news, i, Math.ceil(total / NEWS_PER_PAGE));
+        button.addEventListener('click', () => {
+            displayNews(newsList, i);
+            generatePagination(newsList, i);
         });
         paginationContainer.appendChild(button);
     }
@@ -208,32 +199,25 @@ function generatePagination(newsList, currentPage, totalPages) {
 // 初始化函數
 async function initNewsSection() {
     const filterButtons = document.querySelectorAll('.filter-section button');
-    // 預設加載第一頁新聞
-    const { news, total } = await fetchStockNews('all', 1, NEWS_PER_PAGE);
-    const totalPages = Math.ceil(total / NEWS_PER_PAGE); // 確保計算總頁數
+    let newsList = await fetchStockNews('all');
+    displayNews(newsList, 1); // 預設顯示第 1 頁
+    generatePagination(newsList, 1);
 
-    // 顯示新聞與分頁
-    displayNews(news, 1);
-    generatePagination(news, 1, totalPages);
-
-    // 篩選按鈕的事件監聽
     filterButtons.forEach(button => {
         button.addEventListener('click', async () => {
             filterButtons.forEach(btn => btn.classList.remove('active'));
             button.classList.add('active');
 
             const category = button.getAttribute('data-category');
-            const { news, total } = await fetchStockNews(category, 1, NEWS_PER_PAGE);
-            const totalPages = Math.ceil(total / NEWS_PER_PAGE); // 確保分頁更新
-            displayNews(news, 1);
-            generatePagination(news, 1, totalPages);
+            newsList = await fetchStockNews(category);
+            displayNews(newsList, 1); // 顯示新類別的第 1 頁
+            generatePagination(newsList, 1);
         });
     });
 }
 
-// 確保初始載入正確執行
+// 頁面加載時初始化
 window.addEventListener('DOMContentLoaded', initNewsSection);
-
 
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
