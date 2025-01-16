@@ -3,8 +3,10 @@ const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 //////News////
 // 獲取股票新聞函數
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
-async function fetchStockNews(category = 'all') {
-    const url = `${BASE_URL}stock_news?apikey=${API_KEY}`;
+
+async function fetchStockNews(category = 'all', page = 1, pageSize = 10) {
+    const offset = (page - 1) * pageSize;
+    const url = `${BASE_URL}stock_news?apikey=${API_KEY}&limit=${pageSize}&offset=${offset}`;
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -175,11 +177,9 @@ function displayNews(newsList, currentPage = 1) {
 }
 
 // 生成分頁按鈕
-function generatePagination(newsList, currentPage) {
+function generatePagination(newsList, currentPage, totalPages) {
     const paginationContainer = document.getElementById('pagination-container');
     paginationContainer.innerHTML = '';
-
-    const totalPages = Math.ceil(newsList.length / NEWS_PER_PAGE);
 
     for (let i = 1; i <= totalPages; i++) {
         const button = document.createElement('button');
@@ -188,9 +188,10 @@ function generatePagination(newsList, currentPage) {
         if (i === currentPage) {
             button.classList.add('active');
         }
-        button.addEventListener('click', () => {
-            displayNews(newsList, i);
-            generatePagination(newsList, i);
+        button.addEventListener('click', async () => {
+            const updatedNews = await fetchStockNews('all', i, NEWS_PER_PAGE);
+            displayNews(updatedNews, i);
+            generatePagination(updatedNews, i, totalPages);
         });
         paginationContainer.appendChild(button);
     }
