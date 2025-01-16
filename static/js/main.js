@@ -18,145 +18,32 @@ async function fetchStockNews(category = 'all') {
     }
 }
 
-const symbolCategoryMap = {
-    // 科技 (Tech)
-    AAPL: "tech", // Apple
-    MSFT: "tech", // Microsoft
-    GOOGL: "tech", // Alphabet (Google)
-    AMZN: "tech", // Amazon
-    NVDA: "tech", // Nvidia
-    TSLA: "tech", // Tesla
-    META: "tech", // Meta Platforms (Facebook)
-    ORCL: "tech", // Oracle
-    CRM: "tech", // Salesforce
-    INTC: "tech", // Intel
-    ADOBE: "tech", // Adobe
-    AMD: "tech", // Advanced Micro Devices
-    IBM: "tech", // IBM
-    QCOM: "tech", // Qualcomm
-    SHOP: "tech", // Shopify
-    PYPL: "tech", // PayPal
-    ZM: "tech", // Zoom Video
-    ASML: "tech", // ASML Holding
-    SNAP: "tech", // Snap Inc.
-    SQ: "tech", // Block Inc. (Square)
-
-    // 金融 (Finance)
-    JPM: "finance", // JPMorgan Chase
-    BAC: "finance", // Bank of America
-    WFC: "finance", // Wells Fargo
-    C: "finance", // Citigroup
-    GS: "finance", // Goldman Sachs
-    MS: "finance", // Morgan Stanley
-    USB: "finance", // U.S. Bancorp
-    TD: "finance", // Toronto-Dominion Bank
-    AXP: "finance", // American Express
-    V: "finance", // Visa
-    MA: "finance", // Mastercard
-    BK: "finance", // Bank of New York Mellon
-    SCHW: "finance", // Charles Schwab
-    HSBC: "finance", // HSBC Holdings
-    BCS: "finance", // Barclays
-    DB: "finance", // Deutsche Bank
-    AMTD: "finance", // TD Ameritrade
-    SQ: "finance", // Block Inc. (Square)
-    COIN: "finance", // Coinbase
-    BLK: "finance", // BlackRock
-
-    // 醫療保健 (Healthcare)
-    JNJ: "healthcare", // Johnson & Johnson
-    PFE: "healthcare", // Pfizer
-    MRK: "healthcare", // Merck
-    ABBV: "healthcare", // AbbVie
-    UNH: "healthcare", // UnitedHealth Group
-    CVS: "healthcare", // CVS Health
-    ABT: "healthcare", // Abbott Laboratories
-    BMY: "healthcare", // Bristol-Myers Squibb
-    MDT: "healthcare", // Medtronic
-    AMGN: "healthcare", // Amgen
-    BIIB: "healthcare", // Biogen
-    LLY: "healthcare", // Eli Lilly
-    ZBH: "healthcare", // Zimmer Biomet
-    ALC: "healthcare", // Alcon
-    HCA: "healthcare", // HCA Healthcare
-    SYK: "healthcare", // Stryker Corporation
-    DHR: "healthcare", // Danaher Corporation
-    ISRG: "healthcare", // Intuitive Surgical
-    REGN: "healthcare", // Regeneron Pharmaceuticals
-    GILD: "healthcare", // Gilead Sciences
-
-    // 能源 (Energy)
-    XOM: "energy", // ExxonMobil
-    CVX: "energy", // Chevron
-    BP: "energy", // BP
-    RDSA: "energy", // Royal Dutch Shell
-    TOT: "energy", // TotalEnergies
-    COP: "energy", // ConocoPhillips
-    EOG: "energy", // EOG Resources
-    SLB: "energy", // Schlumberger
-    HAL: "energy", // Halliburton
-    DVN: "energy", // Devon Energy
-    OXY: "energy", // Occidental Petroleum
-    PSX: "energy", // Phillips 66
-    MPC: "energy", // Marathon Petroleum
-    LNG: "energy", // Cheniere Energy
-    EQT: "energy", // EQT Corporation
-    FSLR: "energy", // First Solar
-    ENB: "energy", // Enbridge
-    PXD: "energy", // Pioneer Natural Resources
-    COG: "energy", // Cabot Oil & Gas
-    VLO: "energy", // Valero Energy
-
-    // 消費品 (Consumer Goods)
-    PG: "consumer_goods", // Procter & Gamble
-    KO: "consumer_goods", // Coca-Cola
-    PEP: "consumer_goods", // PepsiCo
-    UL: "consumer_goods", // Unilever
-    PM: "consumer_goods", // Philip Morris International
-    MO: "consumer_goods", // Altria Group
-    CL: "consumer_goods", // Colgate-Palmolive
-    KMB: "consumer_goods", // Kimberly-Clark
-    HSY: "consumer_goods", // Hershey
-    K: "consumer_goods", // Kellogg
-    TSN: "consumer_goods", // Tyson Foods
-    GIS: "consumer_goods", // General Mills
-    EL: "consumer_goods", // Estée Lauder
-    NKE: "consumer_goods", // Nike
-    SBUX: "consumer_goods", // Starbucks
-    MCD: "consumer_goods", // McDonald's
-    YUM: "consumer_goods", // Yum! Brands
-    WMT: "consumer_goods", // Walmart
-    TGT: "consumer_goods", // Target
-    COST: "consumer_goods" // Costco
-};
-
 // 根據類別篩選新聞
 function filterNewsByCategory(newsData, category) {
-    if (category === "all") {
+    if (category === 'all') {
         return newsData;
     }
-    return newsData.filter(news =>
-        symbolCategoryMap[news.symbol]?.toLowerCase() === category.toLowerCase()
-    );
+    return newsData.filter(news => news.sector?.toLowerCase() === category.toLowerCase());
 }
 
 // 顯示新聞
 function displayNews(newsList, currentPage = 1) {
     const newsContainer = document.getElementById('news-container');
-    newsContainer.innerHTML = ''; // 清空舊的新聞
-
-    if (!Array.isArray(newsList) || newsList.length === 0) {
-        newsContainer.innerHTML = '<p>No news available for the selected category.</p>';
-        return;
-    }
+    newsContainer.innerHTML = '';
 
     const startIndex = (currentPage - 1) * NEWS_PER_PAGE;
     const endIndex = startIndex + NEWS_PER_PAGE;
     const paginatedNews = newsList.slice(startIndex, endIndex);
 
+    if (paginatedNews.length === 0) {
+        newsContainer.innerHTML = '<p>No news available for the selected category.</p>';
+        return;
+    }
+
     paginatedNews.forEach(news => {
         const newsItem = document.createElement('div');
         newsItem.classList.add('news-item');
+
         const imageUrl = news.image || 'placeholder.jpg'; // 如果沒有圖片，使用預設圖片
 
         newsItem.innerHTML = `
@@ -172,10 +59,13 @@ function displayNews(newsList, currentPage = 1) {
         newsContainer.appendChild(newsItem);
     });
 }
+
 // 生成分頁按鈕
-function generatePagination(newsList, currentPage, totalPages) {
+function generatePagination(newsList, currentPage) {
     const paginationContainer = document.getElementById('pagination-container');
-    paginationContainer.innerHTML = ''; // 清空舊的按鈕
+    paginationContainer.innerHTML = '';
+
+    const totalPages = Math.ceil(newsList.length / NEWS_PER_PAGE);
 
     for (let i = 1; i <= totalPages; i++) {
         const button = document.createElement('button');
@@ -184,14 +74,14 @@ function generatePagination(newsList, currentPage, totalPages) {
         if (i === currentPage) {
             button.classList.add('active');
         }
-        button.addEventListener('click', async () => {
-            const { news } = await fetchStockNews('all', i, NEWS_PER_PAGE);
-            displayNews(news, i);
-            generatePagination(news, i, totalPages);
+        button.addEventListener('click', () => {
+            displayNews(newsList, i);
+            generatePagination(newsList, i);
         });
         paginationContainer.appendChild(button);
     }
 }
+
 // 初始化函數
 async function initNewsSection() {
     const filterButtons = document.querySelectorAll('.filter-section button');
