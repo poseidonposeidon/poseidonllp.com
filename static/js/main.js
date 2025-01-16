@@ -2385,21 +2385,6 @@ document.getElementById('stockSymbol').addEventListener('input', debounce(async 
     }
 }, 100));
 
-// document.getElementById('stock-input').addEventListener('input', debounce(async function () {
-//     const stockSymbol = this.value.trim().toUpperCase(); // 獲取輸入並轉為大寫
-//     const suggestionsContainer = document.getElementById('suggestions-new'); // 建議框容器
-//
-//     if (stockSymbol.length > 0) {
-//         showLoadingSuggestions(suggestionsContainer); // 顯示載入中狀態
-//         const stockData = await fetchStockSuggestions(stockSymbol); // 獲取推薦數據
-//         if (this.value.trim().toUpperCase() === stockSymbol) {
-//             displaySuggestions(stockData, suggestionsContainer, 'stock-input-new'); // 顯示建議
-//         }
-//     } else {
-//         clearSuggestions(suggestionsContainer); // 清空建議框
-//     }
-// }, 100));
-
 async function fetchStockSuggestions(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
