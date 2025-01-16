@@ -2,6 +2,7 @@ const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 //////News////
 // 獲取股票新聞函數
+const NEWS_PER_PAGE = 10; // 每頁新聞數量
 async function fetchStockNews(category = 'all') {
     const url = `${BASE_URL}stock_news?apikey=${API_KEY}`;
     try {
@@ -16,6 +17,7 @@ async function fetchStockNews(category = 'all') {
         return [];
     }
 }
+
 // 根據類別篩選新聞
 function filterNewsByCategory(newsData, category) {
     if (category === 'all') {
@@ -23,17 +25,22 @@ function filterNewsByCategory(newsData, category) {
     }
     return newsData.filter(news => news.sector?.toLowerCase() === category.toLowerCase());
 }
+
 // 顯示新聞
-function displayNews(newsList) {
+function displayNews(newsList, currentPage = 1) {
     const newsContainer = document.getElementById('news-container');
     newsContainer.innerHTML = '';
 
-    if (newsList.length === 0) {
+    const startIndex = (currentPage - 1) * NEWS_PER_PAGE;
+    const endIndex = startIndex + NEWS_PER_PAGE;
+    const paginatedNews = newsList.slice(startIndex, endIndex);
+
+    if (paginatedNews.length === 0) {
         newsContainer.innerHTML = '<p>No news available for the selected category.</p>';
         return;
     }
 
-    newsList.forEach(news => {
+    paginatedNews.forEach(news => {
         const newsItem = document.createElement('div');
         newsItem.classList.add('news-item');
 
@@ -52,11 +59,35 @@ function displayNews(newsList) {
         newsContainer.appendChild(newsItem);
     });
 }
+
+// 生成分頁按鈕
+function generatePagination(newsList, currentPage) {
+    const paginationContainer = document.getElementById('pagination-container');
+    paginationContainer.innerHTML = '';
+
+    const totalPages = Math.ceil(newsList.length / NEWS_PER_PAGE);
+
+    for (let i = 1; i <= totalPages; i++) {
+        const button = document.createElement('button');
+        button.textContent = i;
+        button.classList.add('pagination-button');
+        if (i === currentPage) {
+            button.classList.add('active');
+        }
+        button.addEventListener('click', () => {
+            displayNews(newsList, i);
+            generatePagination(newsList, i);
+        });
+        paginationContainer.appendChild(button);
+    }
+}
+
 // 初始化函數
 async function initNewsSection() {
     const filterButtons = document.querySelectorAll('.filter-section button');
     let newsList = await fetchStockNews('all');
-    displayNews(newsList);
+    displayNews(newsList, 1); // 預設顯示第 1 頁
+    generatePagination(newsList, 1);
 
     filterButtons.forEach(button => {
         button.addEventListener('click', async () => {
@@ -65,12 +96,15 @@ async function initNewsSection() {
 
             const category = button.getAttribute('data-category');
             newsList = await fetchStockNews(category);
-            displayNews(newsList);
+            displayNews(newsList, 1); // 顯示新類別的第 1 頁
+            generatePagination(newsList, 1);
         });
     });
 }
+
 // 頁面加載時初始化
 window.addEventListener('DOMContentLoaded', initNewsSection);
+
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
 
