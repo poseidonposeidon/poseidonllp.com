@@ -2358,6 +2358,9 @@ function clearSuggestions(container = null) {
             case 'cnStockSymbol':
                 container = document.getElementById('suggestionsCN');
                 break;
+            case 'stock-input':
+                container = document.getElementById('suggestions-container');
+                break;
             default:
                 console.error('未知的輸入框 id');
                 return;
