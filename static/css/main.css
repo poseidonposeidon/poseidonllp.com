@@ -1247,7 +1247,7 @@ button:not(.info-input button):hover {
     gap: 15px;
     margin-bottom: 20px;
     background-color: #121212;
-
+    position: relative;
 }
 
 .filter-section h1{
@@ -1293,14 +1293,16 @@ button:not(.info-input button):hover {
 
 
 .suggestions-container {
-    position: absolute;
+    position: absolute; /* 絕對定位 */
+    top: calc(100% + 5px); /* 緊貼輸入框底部，並增加 5px 的間距 */
+    left: 0; /* 與輸入框左邊對齊 */
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 5px;
     max-height: 200px;
     overflow-y: auto;
     z-index: 1000;
-    width: 300px; /* 容器寬度 */
+    width: 100%; /* 跟隸屬的輸入框寬度一致 */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     display: none; /* 默認隱藏 */
 }
@@ -1327,7 +1329,7 @@ button:not(.info-input button):hover {
 }
 
 .stock-input {
-    width: 300px;
+    width: 100%;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #444;
