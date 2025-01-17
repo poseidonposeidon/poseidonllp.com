@@ -1292,14 +1292,7 @@ button:not(.info-input button):hover {
 }
 
 
-.input-helper-text {
-    color: #b0bec5;
-    font-size: 0.9em;
-    margin-top: -10px;
-    margin-bottom: 10px;
-}
-
-.suggestions-container-new {
+.suggestions-container {
     position: absolute;
     background-color: #fff;
     border: 1px solid #ddd;
@@ -1307,40 +1300,31 @@ button:not(.info-input button):hover {
     max-height: 200px;
     overflow-y: auto;
     z-index: 1000;
-    width: 300px; /* 建議框寬度與輸入框一致 */
+    width: 300px; /* 容器寬度 */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    display: none; /* 默認隱藏 */
 }
 
-.suggestions-container-new div {
+.suggestions-container div {
     padding: 10px;
     cursor: pointer;
     transition: background-color 0.3s ease;
 }
 
-.suggestions-container-new div:hover {
+.suggestions-container div:hover {
     background-color: #f0f0f0;
 }
 
-.suggestions-container-new.hidden {
-    display: none;
+.suggestions-container.active {
+    display: block;
 }
 
-/*.stock-input-new {*/
-/*    width: 300px;*/
-/*    padding: 10px;*/
-/*    border-radius: 5px;*/
-/*    border: 1px solid #444;*/
-/*    background-color: #121212;*/
-/*    color: #b0bec5;*/
-/*    margin-bottom: 10px;*/
-/*    outline: none;*/
-/*    text-transform: uppercase; !* 顯示大寫 *!*/
-/*}*/
-
-/*.stock-input-new:focus {*/
-/*    border-color: #90caf9;*/
-/*    background-color: #1e1e1e;*/
-/*}*/
+.input-helper-text {
+    color: #b0bec5;
+    font-size: 0.9em;
+    margin-top: -10px;
+    margin-bottom: 10px;
+}
 
 .stock-input {
     width: 300px;

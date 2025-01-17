@@ -2369,39 +2369,6 @@ function clearSuggestions(container = null) {
     container.classList.remove('active');
 }
 
-// 美股
-document.getElementById('stockSymbol').addEventListener('input', debounce(async function() {
-    const stockSymbol = this.value.trim().toUpperCase();
-    const suggestionsContainer = document.getElementById('suggestions');
-
-    if (stockSymbol.length > 0) {
-        showLoadingSuggestions(suggestionsContainer);
-        const stockData = await fetchStockSuggestions(stockSymbol);
-        if (this.value.trim().toUpperCase() === stockSymbol) {
-            displaySuggestions(stockData, suggestionsContainer, 'stockSymbol');
-        }
-    } else {
-        clearSuggestions(suggestionsContainer);
-    }
-}, 100));
-
-async function fetchStockSuggestions(stockSymbol) {
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
-    try {
-        const response = await fetch(apiUrl);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        const filteredData = data.filter(stock => stock.currency === 'USD');
-        return filteredData.map(stock => stock.symbol);
-    } catch (error) {
-        console.error('Error fetching stock data:', error);
-        return [];
-    }
-}
-
 // 通用的顯示建議列表函數
 function displaySuggestions(suggestions, suggestionsContainer, inputId) {
     suggestionsContainer.innerHTML = '';
@@ -2419,6 +2386,55 @@ function displaySuggestions(suggestions, suggestionsContainer, inputId) {
         suggestionsContainer.classList.add('active');
     } else {
         showNoSuggestions(suggestionsContainer);
+    }
+}
+
+// 美股
+document.getElementById('stockSymbol').addEventListener('input', debounce(async function() {
+    const stockSymbol = this.value.trim().toUpperCase();
+    const suggestionsContainer = document.getElementById('suggestions');
+
+    if (stockSymbol.length > 0) {
+        showLoadingSuggestions(suggestionsContainer);
+        const stockData = await fetchStockSuggestions(stockSymbol);
+        if (this.value.trim().toUpperCase() === stockSymbol) {
+            displaySuggestions(stockData, suggestionsContainer, 'stockSymbol');
+        }
+    } else {
+        clearSuggestions(suggestionsContainer);
+    }
+}, 100));
+
+document.getElementById('stock-input').addEventListener('input', debounce(async function () {
+    const query = this.value.trim().toUpperCase(); // 獲取輸入值並轉為大寫
+    const suggestionsContainer = document.getElementById('suggestions-container'); // 獲取建議框容器
+
+    if (query.length > 0) {
+        suggestionsContainer.innerHTML = '<div>Loading...</div>'; // 顯示 "Loading..."
+        suggestionsContainer.classList.add('active');
+        const suggestions = await fetchStockSuggestions(query); // 獲取建議數據
+        if (this.value.trim().toUpperCase() === query) {
+            displaySuggestions(suggestions, suggestionsContainer, 'stock-input'); // 顯示建議
+        }
+    } else {
+        clearSuggestions(suggestionsContainer); // 如果輸入框為空，清空建議
+    }
+}, 300));
+
+async function fetchStockSuggestions(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
+    try {
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        const filteredData = data.filter(stock => stock.currency === 'USD');
+        return filteredData.map(stock => stock.symbol);
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
     }
 }
 
