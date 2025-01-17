@@ -386,9 +386,20 @@
     });
     document.getElementById('stock-input').addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
-            clearSuggestions();
+            // 獲取建議框容器
+            const suggestionsContainer = document.getElementById('suggestions-container');
+            // 執行清空建議框的操作
+            clearSuggestions(suggestionsContainer);
         }
     });
+
+    // 清空建議框的函數
+    function clearSuggestions(container) {
+        if (container) {
+            container.innerHTML = ''; // 清空建議框內容
+            container.classList.remove('active'); // 移除 active 類別以隱藏建議框
+        }
+    }
 
 </script>
 
