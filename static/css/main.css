@@ -1299,10 +1299,10 @@ button:not(.info-input button):hover {
     background-color: #fff;
     border: 1px solid #ddd;
     border-radius: 5px;
-    max-height: 200px;
+    max-height: 145px;
     overflow-y: auto;
     z-index: 1000;
-    width: 100%; /* 跟隸屬的輸入框寬度一致 */
+    width: 95%; /* 跟隸屬的輸入框寬度一致 */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     display: none; /* 默認隱藏 */
 }
