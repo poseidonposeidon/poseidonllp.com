@@ -1251,9 +1251,9 @@ button:not(.info-input button):hover {
 }
 
 .filter-section h1{
-
     background-color: #121212;
-
+    white-space: nowrap; /* 禁止換行 */
+    overflow: hidden; /* 防止超出邊界 */
 }
 
 .filter-section button {
@@ -1329,7 +1329,7 @@ button:not(.info-input button):hover {
 }
 
 .stock-input {
-    width: 80%;
+    width: 100%;
     padding: 10px;
     border-radius: 5px;
     border: 1px solid #444;
