@@ -386,8 +386,7 @@
     });
     document.getElementById('stock-input').addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
-            const suggestionsContainer = document.getElementById('suggestions-container'); // 指定建議框
-            clearSuggestions(suggestionsContainer); // 按下 Enter 時執行 clearSuggestions()
+            clearSuggestions();
         }
     });
 
