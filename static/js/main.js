@@ -118,7 +118,6 @@ async function handleStockSearch(event) {
             alert('Please enter a valid stock symbol');
             return;
         }
-        clearSuggestions(suggestionsContainer)
         const newsList = await fetchStockNews('all', input); // 根據股票代號查詢新聞
         displayNews(newsList, 1); // 顯示查詢結果
         generatePagination(newsList, 1); // 更新分頁
