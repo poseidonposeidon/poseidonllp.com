@@ -2333,32 +2333,42 @@ function showNoSuggestions(container) {
 // 清空建議列表
 function clearSuggestions(container = null) {
     if (!container) {
+        // 根據不同的 input id 對應不同的建議框容器
         const inputId = document.activeElement.id;
-        const suggestionsMap = {
-            stockSymbol: 'suggestions',
-            jpStockSymbol: 'suggestionsJP',
-            twStockSymbol: 'suggestionsTW',
-            euStockSymbol: 'suggestionsEU',
-            krStockSymbol: 'suggestionsKR',
-            hkStockSymbol: 'suggestionsHK',
-            cnStockSymbol: 'suggestionsCN',
-            stock-input: 'suggestions-container'
-    };
-
-        const containerId = suggestionsMap[inputId];
-        if (containerId) {
-            container = document.getElementById(containerId);
-        } else {
-            console.error('未知的輸入框 id');
-            return;
+        switch (inputId) {
+            case 'stockSymbol':
+                container = document.getElementById('suggestions');
+                break;
+            case 'jpStockSymbol':
+                container = document.getElementById('suggestionsJP');
+                break;
+            case 'twStockSymbol':
+                container = document.getElementById('suggestionsTW');
+                break;
+            case 'euStockSymbol':
+                container = document.getElementById('suggestionsEU');
+                break;
+            case 'krStockSymbol':
+                container = document.getElementById('suggestionsKR');
+                break;
+            case 'hkStockSymbol':
+                container = document.getElementById('suggestionsHK');
+                break;
+            case 'cnStockSymbol':
+                container = document.getElementById('suggestionsCN');
+                break;
+            case 'stock-input':
+                container = document.getElementById('suggestions-container');
+                break;
+            default:
+                console.error('未知的輸入框 id');
+                return;
         }
     }
 
     // 清空內容並隱藏建議框
-    if (container) {
-        container.innerHTML = '';
-        container.classList.remove('active');
-    }
+    container.innerHTML = '';
+    container.classList.remove('active');
 }
 
 // 通用的顯示建議列表函數
