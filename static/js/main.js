@@ -1381,7 +1381,9 @@ function loadCompareSection(sectionId) {
     };
 
     const compareDiv = document.getElementById('compare');
-    const sectionContainer = document.getElementById('section-container-compare-tw');
+    const sectionContainerId = `section-container-${sectionId}`;
+    const sectionContainer = document.getElementById(sectionContainerId);
+    // const sectionContainer = document.getElementById('section-container-compare-tw');
 
     if (sectionContainer) {
         // 如果選擇同一個 section，則關閉
