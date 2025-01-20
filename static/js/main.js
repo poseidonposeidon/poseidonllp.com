@@ -1374,7 +1374,7 @@ function loadCompareSection(sectionId) {
                 <p>Loading... Please wait.</p>
             </div>
 
-            <div id="comparisonResultContainer-tw">
+            <div id="comparisonResultContainer-gg">
                 <canvas id="grossMarginChart" style="width: 100%; height: 400px;"></canvas>
             </div>
         `
