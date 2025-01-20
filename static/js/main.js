@@ -1595,6 +1595,7 @@ const industryStocksEU = {
     "電商及零售": ["ZAL.DE", "ASOS.L", "ABF.L", "WMT.AS", "AMZN.AS"],
     "科技服務": ["SAP.DE", "ADBE.AS", "ORCL.AS", "CRM.AS", "IBM.AS"]
 };
+
 const industryStocksJP = {
     "半導體": ["8035.T", "4063.T", "6501.T", "6724.T", "7735.T"],
     "IC 設計": ["6758.T", "6702.T", "6752.T", "6723.T", "6762.T"],
@@ -1619,27 +1620,28 @@ const industryStocksJP = {
 };
 
 const industryStocksUS = {
-    "半導體": ["NVDA", "AMD", "TSM", "QCOM", "INTC","DELL"],
-    "IC 設計": ["AVGO", "TXN", "MRVL", "ON", "ADI"],
-    "電腦及周邊設備": ["HPQ", "DELL", "AAPL", "MSFT", "LOGI"],
-    "網通設備": ["CSCO", "JNPR", "ANET", "FFIV", "EXTR"],
-    "記憶體": ["MU", "WDC", "STX", "INTC", "NVDA"],
-    "載板": ["CCMP", "KLIC", "LRCX", "AMAT", "UCTT"],
-    "太陽能": ["ENPH", "SEDG", "FSLR", "CSIQ", "RUN"],
-    "鋼鐵": ["X", "NUE", "STLD", "CMC", "CLF"],
-    "金融保險": ["JPM", "BAC", "C", "WFC", "GS"],
-    "汽車零組件": ["BWA", "LEA", "DLPH", "GM", "F"],
-    "電子零組件": ["TEL", "APH", "JBL", "GLW", "AVT"],
-    "電動車相關": ["TSLA", "RIVN", "LCID", "NIO", "XPEV"],
-    "光學鏡頭": ["LITE", "COHR", "IIVI", "VIAV", "KEYS"],
-    "塑料及化工": ["DOW", "LYB", "EMN", "PPG", "SHW"],
-    "醫療設備": ["ISRG", "MDT", "SYK", "BSX", "ZBH"],
-    "食品飲料": ["KO", "PEP", "MDLZ", "KHC", "COST"],
-    "航運物流": ["UPS", "FDX", "XPO", "CHRW", "JBHT"],
-    "能源相關": ["XOM", "CVX", "SLB", "COP", "PSX"],
-    "電商及零售": ["AMZN", "EBAY", "WMT", "TGT", "COST"],
-    "科技服務": ["CRM", "NOW", "SNOW", "DDOG", "OKTA"]
+    "半導體": ["NVDA", "AMD", "TSM", "QCOM", "INTC", "DELL", "ASML", "TXN", "MRVL", "LRCX"],
+    "IC 設計": ["AVGO", "TXN", "MRVL", "ON", "ADI", "MPWR", "SWKS", "MCHP", "NXPI", "SLAB"],
+    "電腦及周邊設備": ["HPQ", "DELL", "AAPL", "MSFT", "LOGI", "IBM", "HPE", "LENOVO", "ASUS", "ACER"],
+    "網通設備": ["CSCO", "JNPR", "ANET", "FFIV", "EXTR", "NOK", "ERIC", "HPE", "UBNT", "VIAVI"],
+    "記憶體": ["MU", "WDC", "STX", "INTC", "NVDA", "SKHYNIX", "SAMSUNG", "KIOXIA", "SIMO", "NANYA"],
+    "載板": ["CCMP", "KLIC", "LRCX", "AMAT", "UCTT", "TOKYO", "ASM", "MKSI", "DAIFUKU", "HERMLE"],
+    "太陽能": ["ENPH", "SEDG", "FSLR", "CSIQ", "RUN", "JKS", "SPWR", "VSLR", "MAXN", "SHLS"],
+    "鋼鐵": ["X", "NUE", "STLD", "CMC", "CLF", "MT", "RS", "TMST", "PKX", "TATASTEEL"],
+    "金融保險": ["JPM", "BAC", "C", "WFC", "GS", "MS", "USB", "PNC", "AXP", "BLK"],
+    "汽車零組件": ["BWA", "LEA", "DLPH", "GM", "F", "TSLA", "STLA", "TM", "HMC", "RACE"],
+    "電子零組件": ["TEL", "APH", "JBL", "GLW", "AVT", "QRVO", "MMSI", "TDY", "TTMI", "ADI"],
+    "電動車相關": ["TSLA", "RIVN", "LCID", "NIO", "XPEV", "BYDDF", "FSR", "KNDI", "POLA", "F"],
+    "光學鏡頭": ["LITE", "COHR", "IIVI", "VIAV", "KEYS", "AAXN", "AMS", "HOLX", "CREE", "ZBRA"],
+    "塑料及化工": ["DOW", "LYB", "EMN", "PPG", "SHW", "HUN", "CE", "FMC", "AVNT", "RPM"],
+    "醫療設備": ["ISRG", "MDT", "SYK", "BSX", "ZBH", "ALGN", "TFX", "HRC", "PEN", "EW"],
+    "食品飲料": ["KO", "PEP", "MDLZ", "KHC", "COST", "GIS", "SYY", "HSY", "K", "TSN"],
+    "航運物流": ["UPS", "FDX", "XPO", "CHRW", "JBHT", "ZTO", "DPW", "SATS", "FWRD", "MATX"],
+    "能源相關": ["XOM", "CVX", "SLB", "COP", "PSX", "HAL", "OXY", "EOG", "ENB", "MRO"],
+    "電商及零售": ["AMZN", "EBAY", "WMT", "TGT", "COST", "SHOP", "MELI", "JD", "PDD", "BABA"],
+    "科技服務": ["CRM", "NOW", "SNOW", "DDOG", "OKTA", "ZS", "MDB", "PANW", "TWLO", "NET"]
 };
+
 
 const industryStocks = {
     "半導體": ["2330.TW", "2303.TW", "2308.TW", "2317.TW", "2360.TW"],
