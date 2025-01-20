@@ -1385,6 +1385,11 @@ function loadCompareSection(sectionId) {
     const sectionContainer = document.getElementById(sectionContainerId);
     // const sectionContainer = document.getElementById('section-container-compare-tw');
 
+    if (!sectionContainer) {
+        console.error(`Compare section not found for ID: ${sectionContainerId}`);
+        return; // 防止后续操作
+    }
+
     if (sectionContainer) {
         // 如果選擇同一個 section，則關閉
         if (currentSectionId === sectionId) {
