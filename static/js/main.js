@@ -2748,6 +2748,27 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
     }
 }
 
+async function fetchStockWithExchangeSuffixUS(stockCode, apiKey) {
+    const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockCode.toUpperCase()}&apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(searchUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+
+        // 尋找完全匹配的美股代碼
+        const match = data.find(item => item.symbol === stockCode.toUpperCase());
+        return match ? match.symbol : null;
+    } catch (error) {
+        console.error('Error fetching US stock exchange:', error);
+        return null;
+    }
+}
+
+
 async function fetchStockWithExchangeSuffixGlobal(stockCode, apiKey) {
     const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockCode}&apikey=${apiKey}`;
 
@@ -3280,10 +3301,10 @@ async function displayChart(type) {
 
         // 動態選擇對應的 fetch 函式
         const fetchStockSuffixFunction = isCompareTW
-            ? fetchStockWithExchangeSuffix // 台股需要處理 .TW/.TWO
+            ? fetchStockWithExchangeSuffix // 台股處理 .TW/.TWO
             : isCompareUS
-                ? async (stock) => stock.toUpperCase() // 美股轉大寫，直接返回輸入值
-                : fetchStockWithExchangeSuffixGlobal; // 其他情況走全球邏輯
+                ? fetchStockWithExchangeSuffixUS // 美股特定處理
+                : fetchStockWithExchangeSuffixGlobal; // 全球邏輯
 
         // 使用 Promise.all 獲取每支股票的完整代碼
         const fullStockSymbols = await Promise.all(
