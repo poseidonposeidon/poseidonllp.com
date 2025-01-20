@@ -3279,8 +3279,11 @@ async function displayChart(type) {
 
         // 動態選擇對應的 fetch 函式
         const fetchStockSuffixFunction = isCompareTW
-            ? fetchStockWithExchangeSuffix
-            : fetchStockWithExchangeSuffixGlobal;
+            ? fetchStockWithExchangeSuffix // 台股需要處理 .TW/.TWO
+            : isCompareUS
+            ? async (stock) => stock // 美股直接返回輸入值
+            : fetchStockWithExchangeSuffixGlobal; // 其他情況走全球邏輯
+
 
         // 使用 Promise.all 獲取每支股票的完整代碼
         const fullStockSymbols = await Promise.all(
