@@ -1352,7 +1352,7 @@ function loadCompareSection(sectionId) {
             </div>
             
             <div id="comparisonResultContainer-tw">
-                <canvas id="profitMarginChart" style="width: 100%; height: 400px;"></canvas>
+                <canvas id="grossMarginChart" style="width: 100%; height: 400px;"></canvas>
             </div>
         `,
         'compare-multi': `
