@@ -1545,7 +1545,7 @@ function loadExplore(sectionId) {
         'market': `
             <div class="section" id="market">
                 <h2 id="marketTitle">台股市場焦點</h2>
-                <p>查看市場漲跌幅最大的概念股和族群有哪些，點擊區塊可查看詳細概念股清單。</p>
+                <p>市場焦點基於各產業前10大公司的漲跌幅平均值計算，點擊區塊可查看完整概念股清單，快速掌握市場趨勢。</p>
                 <div class="market-filters">
                     <button class="active" data-market="TW" onclick="updateMarket(this)">TW</button>
                     <button data-market="US" onclick="updateMarket(this)">US</button>
