@@ -1374,16 +1374,14 @@ function loadCompareSection(sectionId) {
                 <p>Loading... Please wait.</p>
             </div>
 
-            <div id="comparisonResultContainer-gg">
+            <div id="comparisonResultContainer-tw">
                 <canvas id="grossMarginChart" style="width: 100%; height: 400px;"></canvas>
             </div>
         `
     };
 
     const compareDiv = document.getElementById('compare');
-    const sectionContainerId = `section-container-${sectionId}`;
-    const sectionContainer = document.getElementById(sectionContainerId);
-    // const sectionContainer = document.getElementById('section-container-compare-tw');
+    const sectionContainer = document.getElementById('section-container-compare-tw');
 
     if (!sectionContainer) {
         console.error(`Compare section not found for ID: ${sectionContainerId}`);
