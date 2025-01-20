@@ -1355,6 +1355,69 @@ function loadCompareSection(sectionId) {
                 <canvas id="grossMarginChart" style="width: 100%; height: 400px;"></canvas>
             </div>
         `,
+        'compare-eu': `
+            <h2>Compare EU Stocks</h2>
+            <div class="info-input">
+                <label for="stock1-eu">Enter Stock 1 :</label>
+                <input type="text" id="stock1-eu" placeholder="e.g., SAP.DE" oninput="this.value = this.value.toUpperCase();">
+                
+                <label for="stock2-eu">Enter Stock 2 :</label>
+                <input type="text" id="stock2-eu" placeholder="e.g., ADS.DE" oninput="this.value = this.value.toUpperCase();">
+                
+                <label for="stock3-eu">Enter Stock 3 :</label>
+                <input type="text" id="stock3-eu" placeholder="e.g., AIR.PA" oninput="this.value = this.value.toUpperCase();">
+                
+                <label for="stock4-eu">Enter Stock 4 :</label>
+                <input type="text" id="stock4-eu" placeholder="e.g., OR.PA" oninput="this.value = this.value.toUpperCase();">
+                
+                <label for="stock5-eu">Enter Stock 5 :</label>
+                <input type="text" id="stock5-eu" placeholder="e.g., DAI.DE" oninput="this.value = this.value.toUpperCase();">
+            </div>
+        
+            <div class="chart-links">
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('financials')">Financial Report</span>
+                    <div class="submenu" id="financials">
+                        <a href="#" onclick="displayChart('stockPrice')">Stock Price</a>
+                        <a href="#" onclick="displayChart('eps')">EPS</a>
+                        <a href="#" onclick="displayChart('revenue')">Revenue</a>
+                        <a href="#" onclick="displayChart('costOfRevenue')">Cost of Revenue</a>
+                        <a href="#" onclick="displayChart('operatingExpenses')">Operating Expenses</a>
+                        <a href="#" onclick="displayChart('operatingIncome')">Operating Income</a>
+                        <a href="#" onclick="displayChart('peRatio')">P/E Ratio</a>
+                    </div>
+                </div>
+            
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('profitability')">Profitability</span>
+                    <div class="submenu" id="profitability">
+                        <a href="#" onclick="displayChart('grossMargin')">Gross Margin</a>
+                        <a href="#" onclick="displayChart('operatingMargin')">Operating Margin</a>
+                        <a href="#" onclick="displayChart('netProfitMargin')">Net Profit Margin</a>
+                        <a href="#" onclick="displayChart('roe')">Return of Equity</a>
+                        <a href="#" onclick="displayChart('externalROE')">External ROE</a>
+                    </div>
+                </div>
+            
+                <div class="category">
+                    <span class="title" onclick="toggleMenu('growth')">Growth</span>
+                    <div class="submenu" id="growth">
+                        <a href="#" onclick="displayChart('quarterlyRevenueGrowthRate')">Revenue YoY</a>
+                        <a href="#" onclick="displayChart('grossMarginYoY')">Gross Margin YoY</a>
+                        <a href="#" onclick="displayChart('operatingMarginYoY')">Operating Margin YoY</a>
+                        <a href="#" onclick="displayChart('netProfitYoY')">Net Profit YoY</a>
+                    </div>
+                </div>
+            </div>
+        
+            <div id="loading" style="display: none; text-align: center;">
+                <p>Loading... Please wait.</p>
+            </div>
+        
+            <div id="comparisonResultContainer-tw">
+                <canvas id="grossMarginChart" style="width: 100%; height: 400px;"></canvas>
+            </div>
+        `,
         'compare-multi': `
             <h2>Compare Global Stocks</h2>
             <div class="info-input">
@@ -2804,6 +2867,32 @@ async function fetchStockWithExchangeSuffixGlobal(stockCode, apiKey) {
     }
 }
 
+async function fetchStockWithExchangeSuffixEU(stockCode, apiKey) {
+    const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockCode}&apikey=${apiKey}`;
+
+    try {
+        const response = await fetch(searchUrl);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+
+        const data = await response.json();
+
+        // 歐股的交易所標識示例：.EU（假設 Financial Modeling Prep 使用類似標識）
+        const filteredData = data.filter(item => item.symbol.endsWith('.EU') || item.exchange.includes('EURONEXT'));
+
+        // 嘗試精確匹配輸入的股票代碼
+        const match = filteredData.find(item => item.symbol.split('.')[0] === stockCode);
+
+        // 返回匹配的完整代碼，若無匹配則返回 null
+        return match ? match.symbol : null;
+    } catch (error) {
+        console.error('Error fetching European stock exchange:', error);
+        return null;
+    }
+}
+
+
 async function fetchMarginData(stockSymbol, apiKey, type) {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=40&apikey=${apiKey}`;
 
@@ -3281,11 +3370,14 @@ async function fetchOperatingIncomeData(stockSymbol, apiKey) {
 async function displayChart(type) {
     const isCompareTW = currentSectionId === 'compare-tw';
     const isCompareUS = currentSectionId === 'compare-us';
+    const isCompareEU = currentSectionId === 'compare-eu';
 
     const stockInputs = isCompareTW
         ? ['stock1-tw', 'stock2-tw', 'stock3-tw', 'stock4-tw', 'stock5-tw']
         : isCompareUS
             ? ['stock1-us', 'stock2-us', 'stock3-us', 'stock4-us', 'stock5-us']
+        : isCompareEU
+            ? ['stock1-eu', 'stock2-eu', 'stock3-eu', 'stock4-eu', 'stock5-eu']
             : ['stock1', 'stock2', 'stock3', 'stock4', 'stock5'];
 
     const stocks = stockInputs
@@ -3311,8 +3403,10 @@ async function displayChart(type) {
             ? fetchStockWithExchangeSuffix // 台股處理 .TW/.TWO
             : isCompareUS
                 ? fetchStockWithExchangeSuffixUS // 美股特定處理
-                : fetchStockWithExchangeSuffixGlobal; // 全球邏輯
-
+                : isCompareEU
+                    ? fetchStockWithExchangeSuffixEU // 歐股特定處理
+                    : fetchStockWithExchangeSuffixGlobal; // 全球邏輯
+        
         // 使用 Promise.all 獲取每支股票的完整代碼
         const fullStockSymbols = await Promise.all(
             stocks.map(stock => fetchStockSuffixFunction(stock, apiKey))
