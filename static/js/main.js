@@ -3406,7 +3406,7 @@ async function displayChart(type) {
                 : isCompareEU
                     ? fetchStockWithExchangeSuffixEU // 歐股特定處理
                     : fetchStockWithExchangeSuffixGlobal; // 全球邏輯
-        
+
         // 使用 Promise.all 獲取每支股票的完整代碼
         const fullStockSymbols = await Promise.all(
             stocks.map(stock => fetchStockSuffixFunction(stock, apiKey))
