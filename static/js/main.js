@@ -1,5 +1,7 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
+const baseUrl = 'https://api.poseidonllp.com';
+
 //////News////
 // 獲取股票新聞函數
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
@@ -1289,6 +1291,28 @@ function loadCompareSection(sectionId) {
                 <canvas id="grossMarginChart" style="width: 100%; height: 400px;"></canvas>
             </div>
         `,
+        'compare-us': `
+            <h2>Compare US Stocks</h2>
+            <div class="info-input">
+                <label for="stock1-us">Enter Stock 1 :</label>
+                <input type="text" id="stock1-us" placeholder="e.g., AAPL">
+                
+                <label for="stock2-us">Enter Stock 2 :</label>
+                <input type="text" id="stock2-us" placeholder="e.g., TSLA">
+                
+                <label for="stock3-us">Enter Stock 3 :</label>
+                <input type="text" id="stock3-us" placeholder="e.g., MSFT">
+                
+                <label for="stock4-us">Enter Stock 4 :</label>
+                <input type="text" id="stock4-us" placeholder="e.g., AMZN">
+
+                <label for="stock5-us">Enter Stock 5 :</label>
+                <input type="text" id="stock5-us" placeholder="e.g., NVDA">
+            </div>
+            <div id="comparisonResultContainer-us">
+                <canvas id="profitMarginChart" style="width: 100%; height: 400px;"></canvas>
+            </div>
+        `,
         'compare-multi': `
             <h2>Compare Global Stocks</h2>
             <div class="info-input">
@@ -1406,8 +1430,6 @@ function toggleMenu(menuId) {
         category.classList.add('active');
     }
 }
-
-const baseUrl = 'https://api.poseidonllp.com';
 
 function sendMessage() {
     const inputField = document.getElementById('chat-input');
@@ -3183,9 +3205,12 @@ async function fetchOperatingIncomeData(stockSymbol, apiKey) {
 
 async function displayChart(type) {
     const isCompareTW = currentSectionId === 'compare-tw';
+    const isCompareUS = currentSectionId === 'compare-us';
 
     const stockInputs = isCompareTW
         ? ['stock1-tw', 'stock2-tw', 'stock3-tw', 'stock4-tw', 'stock5-tw']
+        : isCompareUS
+        ? ['stock1-us', 'stock2-us', 'stock3-us', 'stock4-us', 'stock5-us']
         : ['stock1', 'stock2', 'stock3', 'stock4', 'stock5'];
 
     const stocks = stockInputs
