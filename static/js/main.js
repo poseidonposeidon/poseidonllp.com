@@ -2750,24 +2750,31 @@ async function fetchStockWithExchangeSuffix(stockCode, apiKey) {
 
 async function fetchStockWithExchangeSuffixUS(stockCode, apiKey) {
     const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockCode.toUpperCase()}&apikey=${apiKey}`;
-
     try {
         const response = await fetch(searchUrl);
         if (!response.ok) {
             throw new Error('Network response was not ok');
         }
-
         const data = await response.json();
+        console.log('API Response:', data); // 確認 API 回傳數據格式
 
-        // 尋找完全匹配的美股代碼
-        const match = data.find(item => item.symbol === stockCode.toUpperCase());
-        return match ? match.symbol : null;
+        // 實現更靈活的匹配邏輯
+        const match = data.find(item =>
+            item.symbol.split('.')[0] === stockCode.toUpperCase() ||
+            item.symbol === stockCode.toUpperCase()
+        );
+
+        if (!match) {
+            console.warn(`No exact match found for ${stockCode}. Returning input symbol.`);
+            return stockCode.toUpperCase(); // 後備選項
+        }
+
+        return match.symbol;
     } catch (error) {
         console.error('Error fetching US stock exchange:', error);
-        return null;
+        return null; // 若發生錯誤，返回 null
     }
 }
-
 
 async function fetchStockWithExchangeSuffixGlobal(stockCode, apiKey) {
     const searchUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockCode}&apikey=${apiKey}`;
@@ -3743,7 +3750,6 @@ function displayCompanyPrice(data, container) {
         <p><strong>Year Low:</strong> $${yearLow}</p>
     `;
 }
-
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
 
