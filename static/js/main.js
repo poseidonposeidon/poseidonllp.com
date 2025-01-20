@@ -134,6 +134,15 @@ document.getElementById('stock-input').addEventListener('input', function (event
     event.target.value = event.target.value.toUpperCase(); // 轉換為大寫
 });
 
+document.getElementById('stock-input').addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        // 獲取建議框容器
+        const suggestionsContainer = document.getElementById('suggestions-container');
+        // 執行清空建議框的操作
+        clearSuggestions();
+    }
+});
+
 // 頁面加載時初始化
 window.addEventListener('DOMContentLoaded', () => {
     initNewsSection();
