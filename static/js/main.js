@@ -3257,15 +3257,15 @@ async function displayChart(type) {
     const stockInputs = isCompareTW
         ? ['stock1-tw', 'stock2-tw', 'stock3-tw', 'stock4-tw', 'stock5-tw']
         : isCompareUS
-        ? ['stock1-us', 'stock2-us', 'stock3-us', 'stock4-us', 'stock5-us']
-        : ['stock1', 'stock2', 'stock3', 'stock4', 'stock5'];
+            ? ['stock1-us', 'stock2-us', 'stock3-us', 'stock4-us', 'stock5-us']
+            : ['stock1', 'stock2', 'stock3', 'stock4', 'stock5'];
 
     const stocks = stockInputs
         .map(id => {
             const input = document.getElementById(id);
             return input ? input.value.trim() : null;
         })
-        .filter(stock => stock);  // 過濾空的股票輸入
+        .filter(stock => stock); // 過濾空的股票輸入
 
     if (stocks.length === 0) {
         alert('Please enter at least one stock symbol.');
@@ -3282,9 +3282,8 @@ async function displayChart(type) {
         const fetchStockSuffixFunction = isCompareTW
             ? fetchStockWithExchangeSuffix // 台股需要處理 .TW/.TWO
             : isCompareUS
-            ? async (stock) => stock // 美股直接返回輸入值
-            : fetchStockWithExchangeSuffixGlobal; // 其他情況走全球邏輯
-
+                ? async (stock) => stock.toUpperCase() // 美股轉大寫，直接返回輸入值
+                : fetchStockWithExchangeSuffixGlobal; // 其他情況走全球邏輯
 
         // 使用 Promise.all 獲取每支股票的完整代碼
         const fullStockSymbols = await Promise.all(
@@ -3366,7 +3365,11 @@ async function displayChart(type) {
             }
 
             dataSets.push(data);
-            labels.push(`${fullStockSymbol} ${type.charAt(0).toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1').trim()}`);
+            labels.push(
+                `${fullStockSymbol} ${type
+                    .charAt(0)
+                    .toUpperCase() + type.slice(1).replace(/([A-Z])/g, ' $1').trim()}`
+            );
         }
 
         if (dataSets.length === 0) {
@@ -3375,7 +3378,6 @@ async function displayChart(type) {
         }
 
         drawChart(labels, dataSets, type);
-
     } catch (error) {
         console.error('Error fetching data:', error);
         alert('There was an error retrieving stock data.');
