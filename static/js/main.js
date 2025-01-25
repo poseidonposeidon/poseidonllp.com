@@ -2878,11 +2878,14 @@ async function fetchStockWithExchangeSuffixEU(stockCode, apiKey) {
 
         const data = await response.json();
 
-        // 歐股的交易所標識示例：.EU（假設 Financial Modeling Prep 使用類似標識）
-        const filteredData = data.filter(item => item.symbol.endsWith('.EU') || item.exchange.includes('EURONEXT'));
+        // 過濾歐股相關數據，確保 item.exchange 存在並進行匹配
+        const filteredData = data.filter(item =>
+            item.symbol.toUpperCase() === stockCode.toUpperCase() || // 精確匹配完整代碼（如 MC.PA）
+            (item.exchange && item.exchange.toLowerCase().includes('euronext')) // 匹配 EURONEXT
+        );
 
         // 嘗試精確匹配輸入的股票代碼
-        const match = filteredData.find(item => item.symbol.split('.')[0] === stockCode);
+        const match = filteredData.find(item => item.symbol.toUpperCase() === stockCode.toUpperCase());
 
         // 返回匹配的完整代碼，若無匹配則返回 null
         return match ? match.symbol : null;
@@ -2891,7 +2894,6 @@ async function fetchStockWithExchangeSuffixEU(stockCode, apiKey) {
         return null;
     }
 }
-
 
 async function fetchMarginData(stockSymbol, apiKey, type) {
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=quarterly&limit=40&apikey=${apiKey}`;
