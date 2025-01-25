@@ -3519,7 +3519,7 @@ function drawChart(labels, dataSets, type) {
 
     const allDates = [...new Set(dataSets.flatMap(data => data.map(item => item.date.split('T')[0])))].sort((a, b) => new Date(a) - new Date(b));
 
-    console.log('All Dates:', allDates);
+    // console.log('All Dates:', allDates);
 
     const formattedDataSets = dataSets.map((data, index) => {
         const formattedData = allDates.map(date => {
