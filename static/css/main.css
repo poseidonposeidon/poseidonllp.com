@@ -1347,6 +1347,7 @@ button:not(.info-input button):hover {
 
 
 .suggestions-container-eu {
+    display: none; /* 預設隱藏 */
     position: absolute;
     background-color: white;
     border: 1px solid #ccc;
@@ -1356,6 +1357,10 @@ button:not(.info-input button):hover {
     overflow-y: auto;
     width: calc(100% - 2px); /* 和輸入框寬度一致 */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.suggestions-container-eu.active {
+    display: block; /* 只有當 active 類別存在時顯示 */
 }
 
 .suggestions-container-eu div {

@@ -2621,9 +2621,9 @@ document.getElementById('euStockSymbol').addEventListener('input', debounce(asyn
 }, 100));
 
 document.addEventListener('input', debounce(async function (event) {
-    // 確認事件觸發的元素是歐股輸入框
+    // 確認事件目標是歐股的輸入框
     if (event.target.matches('#stock1-eu, #stock2-eu, #stock3-eu, #stock4-eu, #stock5-eu')) {
-        const stockSymbol = event.target.value.trim().toUpperCase();
+        const stockSymbol = event.target.value.trim().toUpperCase(); // 取得輸入內容
         const suggestionsContainerId = `suggestions-${event.target.id}`;
         const suggestionsContainer = document.getElementById(suggestionsContainerId);
 
@@ -2632,15 +2632,16 @@ document.addEventListener('input', debounce(async function (event) {
             return;
         }
 
+        // 當輸入內容有長度時顯示推薦框，否則隱藏
         if (stockSymbol.length > 0) {
-            showLoadingSuggestions(suggestionsContainer);
+            showLoadingSuggestions(suggestionsContainer); // 顯示"載入中"狀態
             const stockData = await fetchStockSuggestionsEU(stockSymbol);
-            displaySuggestions(stockData, suggestionsContainer, event.target.id);
+            displaySuggestions(stockData, suggestionsContainer, event.target.id); // 顯示推薦內容
         } else {
-            clearSuggestions(suggestionsContainer);
+            clearSuggestions(suggestionsContainer); // 清空並隱藏推薦框
         }
     }
-}, 200)); // 防抖 200 毫秒
+}, 200));
 
 async function fetchStockSuggestionsEU(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
