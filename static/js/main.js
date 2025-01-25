@@ -1357,22 +1357,44 @@ function loadCompareSection(sectionId) {
         `,
         'compare-eu': `
             <h2>Compare EU Stocks</h2>
+<!--            <div class="info-input">-->
+<!--                <label for="stock1-eu">Enter Stock 1 :</label>-->
+<!--                <input type="text" id="stock1-eu" placeholder="e.g., SAP.DE" oninput="this.value = this.value.toUpperCase();">-->
+<!--                -->
+<!--                <label for="stock2-eu">Enter Stock 2 :</label>-->
+<!--                <input type="text" id="stock2-eu" placeholder="e.g., ADS.DE" oninput="this.value = this.value.toUpperCase();">-->
+<!--                -->
+<!--                <label for="stock3-eu">Enter Stock 3 :</label>-->
+<!--                <input type="text" id="stock3-eu" placeholder="e.g., AIR.PA" oninput="this.value = this.value.toUpperCase();">-->
+<!--                -->
+<!--                <label for="stock4-eu">Enter Stock 4 :</label>-->
+<!--                <input type="text" id="stock4-eu" placeholder="e.g., OR.PA" oninput="this.value = this.value.toUpperCase();">-->
+<!--                -->
+<!--                <label for="stock5-eu">Enter Stock 5 :</label>-->
+<!--                <input type="text" id="stock5-eu" placeholder="e.g., DAI.DE" oninput="this.value = this.value.toUpperCase();">-->
+<!--            </div>-->
             <div class="info-input">
                 <label for="stock1-eu">Enter Stock 1 :</label>
                 <input type="text" id="stock1-eu" placeholder="e.g., SAP.DE" oninput="this.value = this.value.toUpperCase();">
-                
+                <div id="suggestions-stock1-eu" class="suggestions-container-eu"></div>
+            
                 <label for="stock2-eu">Enter Stock 2 :</label>
                 <input type="text" id="stock2-eu" placeholder="e.g., ADS.DE" oninput="this.value = this.value.toUpperCase();">
-                
+                <div id="suggestions-stock2-eu" class="suggestions-container-eu"></div>
+            
                 <label for="stock3-eu">Enter Stock 3 :</label>
                 <input type="text" id="stock3-eu" placeholder="e.g., AIR.PA" oninput="this.value = this.value.toUpperCase();">
-                
+                <div id="suggestions-stock3-eu" class="suggestions-container-eu"></div>
+            
                 <label for="stock4-eu">Enter Stock 4 :</label>
                 <input type="text" id="stock4-eu" placeholder="e.g., OR.PA" oninput="this.value = this.value.toUpperCase();">
-                
+                <div id="suggestions-stock4-eu" class="suggestions-container-eu"></div>
+            
                 <label for="stock5-eu">Enter Stock 5 :</label>
                 <input type="text" id="stock5-eu" placeholder="e.g., DAI.DE" oninput="this.value = this.value.toUpperCase();">
+                <div id="suggestions-stock5-eu" class="suggestions-container-eu"></div>
             </div>
+
         
             <div class="chart-links">
                 <div class="category">
@@ -2597,6 +2619,41 @@ document.getElementById('euStockSymbol').addEventListener('input', debounce(asyn
         clearSuggestions(suggestionsContainerEU);
     }
 }, 100));
+
+document.addEventListener('DOMContentLoaded', () => {
+    setupStockInputWithSuggestions('stock1-eu', 'suggestions-stock1-eu');
+    setupStockInputWithSuggestions('stock2-eu', 'suggestions-stock2-eu');
+    setupStockInputWithSuggestions('stock3-eu', 'suggestions-stock3-eu');
+    setupStockInputWithSuggestions('stock4-eu', 'suggestions-stock4-eu');
+    setupStockInputWithSuggestions('stock5-eu', 'suggestions-stock5-eu');
+});
+
+function setupStockInputWithSuggestions(inputId, suggestionsContainerId) {
+    const input = document.getElementById(inputId);
+    const suggestionsContainer = document.getElementById(suggestionsContainerId);
+
+    input.addEventListener(
+        'input',
+        debounce(async function () {
+            const stockSymbol = this.value.trim().toUpperCase();
+
+            if (stockSymbol.length > 0) {
+                showLoadingSuggestions(suggestionsContainer);
+                const stockData = await fetchStockSuggestionsEU(stockSymbol);
+
+                if (this.value.trim().toUpperCase() === stockSymbol) {
+                    displaySuggestions(stockData, suggestionsContainer, inputId);
+                }
+            } else {
+                clearSuggestions(suggestionsContainer);
+            }
+        }, 200) // 延遲 200 毫秒避免頻繁 API 呼叫
+    );
+
+    input.addEventListener('blur', () => {
+        setTimeout(() => clearSuggestions(suggestionsContainer), 200);
+    });
+}
 
 async function fetchStockSuggestionsEU(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';

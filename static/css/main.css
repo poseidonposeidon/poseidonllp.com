@@ -1344,3 +1344,23 @@ button:not(.info-input button):hover {
     border-color: #90caf9;
     background-color: #1e1e1e;
 }
+
+.suggestions-container-eu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    width: calc(100% - 2px); /* 和輸入框寬度一致 */
+}
+
+.suggestions-container-eu div {
+    padding: 8px;
+    cursor: pointer;
+}
+
+.suggestions-container-eu div:hover {
+    background-color: #f0f0f0;
+}
