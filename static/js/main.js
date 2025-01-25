@@ -2620,44 +2620,27 @@ document.getElementById('euStockSymbol').addEventListener('input', debounce(asyn
     }
 }, 100));
 
-document.addEventListener('DOMContentLoaded', () => {
-    // 定義需要監聽的輸入框 ID
-    const inputIds = ['stock1-eu', 'stock2-eu', 'stock3-eu', 'stock4-eu', 'stock5-eu'];
-
-    inputIds.forEach(inputId => {
-        const suggestionsContainerId = `suggestions-${inputId}`;
-        const inputElement = document.getElementById(inputId);
+document.addEventListener('input', debounce(async function (event) {
+    // 確認事件觸發的元素是歐股輸入框
+    if (event.target.matches('#stock1-eu, #stock2-eu, #stock3-eu, #stock4-eu, #stock5-eu')) {
+        const stockSymbol = event.target.value.trim().toUpperCase();
+        const suggestionsContainerId = `suggestions-${event.target.id}`;
         const suggestionsContainer = document.getElementById(suggestionsContainerId);
 
-        if (inputElement && suggestionsContainer) {
-            // 設置輸入事件監聽
-            inputElement.addEventListener(
-                'input',
-                debounce(async function () {
-                    const stockSymbol = this.value.trim().toUpperCase();
-
-                    if (stockSymbol.length > 0) {
-                        showLoadingSuggestions(suggestionsContainer);
-                        const stockData = await fetchStockSuggestionsEU(stockSymbol);
-
-                        if (this.value.trim().toUpperCase() === stockSymbol) {
-                            displaySuggestions(stockData, suggestionsContainer, inputId);
-                        }
-                    } else {
-                        clearSuggestions(suggestionsContainer);
-                    }
-                }, 200) // 防抖 200 毫秒
-            );
-
-            // 設置失去焦點事件，延時清除建議框
-            inputElement.addEventListener('blur', () => {
-                setTimeout(() => clearSuggestions(suggestionsContainer), 200);
-            });
-        } else {
-            console.error(`Element not found for inputId: ${inputId} or suggestionsContainerId: ${suggestionsContainerId}`);
+        if (!suggestionsContainer) {
+            console.error(`Suggestions container not found for: ${suggestionsContainerId}`);
+            return;
         }
-    });
-});
+
+        if (stockSymbol.length > 0) {
+            showLoadingSuggestions(suggestionsContainer);
+            const stockData = await fetchStockSuggestionsEU(stockSymbol);
+            displaySuggestions(stockData, suggestionsContainer, event.target.id);
+        } else {
+            clearSuggestions(suggestionsContainer);
+        }
+    }
+}, 200)); // 防抖 200 毫秒
 
 async function fetchStockSuggestionsEU(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
