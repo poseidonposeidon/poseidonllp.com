@@ -335,6 +335,7 @@ div {
     justify-content: center;
     align-items: center;
     margin-bottom: 10px;
+    position: relative;
 }
 
 #stockSymbol {
@@ -1345,30 +1346,33 @@ button:not(.info-input button):hover {
     background-color: #1e1e1e;
 }
 
-
+/*compare er 推薦框*/
 .suggestions-container-eu {
     display: none; /* 預設隱藏 */
     position: absolute;
-    background-color: white;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    z-index: 1000;
-    max-height: 200px;
-    overflow-y: auto;
-    width: calc(100% - 2px); /* 和輸入框寬度一致 */
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    top: 100%; /* 位於輸入框正下方 */
+    left: 0; /* 與輸入框左側對齊 */
+    width: 100%; /* 與輸入框寬度一致 */
+    background-color: #ffffff; /* 白色背景 */
+    border: 1px solid #ccc; /* 邊框樣式 */
+    border-radius: 4px; /* 邊角圓滑 */
+    z-index: 1000; /* 保持在頂層 */
+    max-height: 200px; /* 限制最大高度，避免列表過長 */
+    overflow-y: auto; /* 若內容超出，顯示滾動條 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* 添加陰影 */
 }
 
 .suggestions-container-eu.active {
-    display: block; /* 只有當 active 類別存在時顯示 */
+    display: block; /* 當有建議時顯示 */
 }
 
 .suggestions-container-eu div {
     padding: 8px;
     cursor: pointer;
+    font-size: 14px;
 }
 
 .suggestions-container-eu div:hover {
-    background-color: #f0f0f0;
+    background-color: #f0f0f0; /* 滑鼠懸停變色 */
 }
 
