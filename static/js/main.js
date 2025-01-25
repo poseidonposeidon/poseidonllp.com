@@ -2620,33 +2620,6 @@ document.getElementById('euStockSymbol').addEventListener('input', debounce(asyn
     }
 }, 100));
 
-['stock1-eu', 'stock2-eu', 'stock3-eu', 'stock4-eu', 'stock5-eu'].forEach(inputId => {
-    const suggestionsContainerId = `suggestions-${inputId}`;
-    const inputElement = document.getElementById(inputId);
-    const suggestionsContainer = document.getElementById(suggestionsContainerId);
-
-    inputElement.addEventListener(
-        'input',
-        debounce(async function () {
-            const stockSymbol = this.value.trim().toUpperCase();
-
-            if (stockSymbol.length > 0) {
-                showLoadingSuggestions(suggestionsContainer);
-                const stockData = await fetchStockSuggestionsEU(stockSymbol);
-
-                if (this.value.trim().toUpperCase() === stockSymbol) {
-                    displaySuggestions(stockData, suggestionsContainer, inputId);
-                }
-            } else {
-                clearSuggestions(suggestionsContainer);
-            }
-        }, 200) // 延遲 200 毫秒避免頻繁 API 呼叫
-    );
-
-    inputElement.addEventListener('blur', () => {
-        setTimeout(() => clearSuggestions(suggestionsContainer), 200); // 避免剛離開時誤清空
-    });
-});
 
 async function fetchStockSuggestionsEU(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
