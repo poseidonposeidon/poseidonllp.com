@@ -2620,19 +2620,12 @@ document.getElementById('euStockSymbol').addEventListener('input', debounce(asyn
     }
 }, 100));
 
-document.addEventListener('DOMContentLoaded', () => {
-    setupStockInputWithSuggestions('stock1-eu', 'suggestions-stock1-eu');
-    setupStockInputWithSuggestions('stock2-eu', 'suggestions-stock2-eu');
-    setupStockInputWithSuggestions('stock3-eu', 'suggestions-stock3-eu');
-    setupStockInputWithSuggestions('stock4-eu', 'suggestions-stock4-eu');
-    setupStockInputWithSuggestions('stock5-eu', 'suggestions-stock5-eu');
-});
-
-function setupStockInputWithSuggestions(inputId, suggestionsContainerId) {
-    const input = document.getElementById(inputId);
+['stock1-eu', 'stock2-eu', 'stock3-eu', 'stock4-eu', 'stock5-eu'].forEach(inputId => {
+    const suggestionsContainerId = `suggestions-${inputId}`;
+    const inputElement = document.getElementById(inputId);
     const suggestionsContainer = document.getElementById(suggestionsContainerId);
 
-    input.addEventListener(
+    inputElement.addEventListener(
         'input',
         debounce(async function () {
             const stockSymbol = this.value.trim().toUpperCase();
@@ -2650,10 +2643,10 @@ function setupStockInputWithSuggestions(inputId, suggestionsContainerId) {
         }, 200) // 延遲 200 毫秒避免頻繁 API 呼叫
     );
 
-    input.addEventListener('blur', () => {
-        setTimeout(() => clearSuggestions(suggestionsContainer), 200);
+    inputElement.addEventListener('blur', () => {
+        setTimeout(() => clearSuggestions(suggestionsContainer), 200); // 避免剛離開時誤清空
     });
-}
+});
 
 async function fetchStockSuggestionsEU(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
