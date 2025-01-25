@@ -1357,44 +1357,57 @@ function loadCompareSection(sectionId) {
         `,
         'compare-eu': `
             <h2>Compare EU Stocks</h2>
-<!--            <div class="info-input">-->
+            
+<!--            <div class="info-input" style="position: relative;">-->
 <!--                <label for="stock1-eu">Enter Stock 1 :</label>-->
 <!--                <input type="text" id="stock1-eu" placeholder="e.g., SAP.DE" oninput="this.value = this.value.toUpperCase();">-->
-<!--                -->
+<!--                <div id="suggestions-stock1-eu" class="suggestions-container-eu"></div>-->
+<!--            -->
 <!--                <label for="stock2-eu">Enter Stock 2 :</label>-->
 <!--                <input type="text" id="stock2-eu" placeholder="e.g., ADS.DE" oninput="this.value = this.value.toUpperCase();">-->
-<!--                -->
+<!--                <div id="suggestions-stock2-eu" class="suggestions-container-eu"></div>-->
+<!--            -->
 <!--                <label for="stock3-eu">Enter Stock 3 :</label>-->
 <!--                <input type="text" id="stock3-eu" placeholder="e.g., AIR.PA" oninput="this.value = this.value.toUpperCase();">-->
-<!--                -->
+<!--                <div id="suggestions-stock3-eu" class="suggestions-container-eu"></div>-->
+<!--            -->
 <!--                <label for="stock4-eu">Enter Stock 4 :</label>-->
 <!--                <input type="text" id="stock4-eu" placeholder="e.g., OR.PA" oninput="this.value = this.value.toUpperCase();">-->
-<!--                -->
+<!--                <div id="suggestions-stock4-eu" class="suggestions-container-eu"></div>-->
+<!--            -->
 <!--                <label for="stock5-eu">Enter Stock 5 :</label>-->
 <!--                <input type="text" id="stock5-eu" placeholder="e.g., DAI.DE" oninput="this.value = this.value.toUpperCase();">-->
+<!--                <div id="suggestions-stock5-eu" class="suggestions-container-eu"></div>-->
 <!--            </div>-->
-            <div class="info-input">
+            <div class="info-input" style="position: relative;">
                 <label for="stock1-eu">Enter Stock 1 :</label>
                 <input type="text" id="stock1-eu" placeholder="e.g., SAP.DE" oninput="this.value = this.value.toUpperCase();">
                 <div id="suggestions-stock1-eu" class="suggestions-container-eu"></div>
+            </div>
             
+            <div class="info-input" style="position: relative;">
                 <label for="stock2-eu">Enter Stock 2 :</label>
                 <input type="text" id="stock2-eu" placeholder="e.g., ADS.DE" oninput="this.value = this.value.toUpperCase();">
                 <div id="suggestions-stock2-eu" class="suggestions-container-eu"></div>
+            </div>
             
+            <div class="info-input" style="position: relative;">
                 <label for="stock3-eu">Enter Stock 3 :</label>
                 <input type="text" id="stock3-eu" placeholder="e.g., AIR.PA" oninput="this.value = this.value.toUpperCase();">
                 <div id="suggestions-stock3-eu" class="suggestions-container-eu"></div>
+            </div>
             
+            <div class="info-input" style="position: relative;">
                 <label for="stock4-eu">Enter Stock 4 :</label>
                 <input type="text" id="stock4-eu" placeholder="e.g., OR.PA" oninput="this.value = this.value.toUpperCase();">
                 <div id="suggestions-stock4-eu" class="suggestions-container-eu"></div>
+            </div>
             
+            <div class="info-input" style="position: relative;">
                 <label for="stock5-eu">Enter Stock 5 :</label>
                 <input type="text" id="stock5-eu" placeholder="e.g., DAI.DE" oninput="this.value = this.value.toUpperCase();">
                 <div id="suggestions-stock5-eu" class="suggestions-container-eu"></div>
             </div>
-
 
             <div class="chart-links">
                 <div class="category">
