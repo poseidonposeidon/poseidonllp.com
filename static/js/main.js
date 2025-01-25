@@ -1357,45 +1357,45 @@ function loadCompareSection(sectionId) {
         `,
         'compare-eu': `
             <h2>Compare EU Stocks</h2>
-            <div class="info-input">
-                <label for="stock1-eu">Enter Stock 1 :</label>
-                <input type="text" id="stock1-eu" placeholder="e.g., SAP.DE" oninput="this.value = this.value.toUpperCase();">
-                
-                <label for="stock2-eu">Enter Stock 2 :</label>
-                <input type="text" id="stock2-eu" placeholder="e.g., ADS.DE" oninput="this.value = this.value.toUpperCase();">
-                
-                <label for="stock3-eu">Enter Stock 3 :</label>
-                <input type="text" id="stock3-eu" placeholder="e.g., AIR.PA" oninput="this.value = this.value.toUpperCase();">
-                
-                <label for="stock4-eu">Enter Stock 4 :</label>
-                <input type="text" id="stock4-eu" placeholder="e.g., OR.PA" oninput="this.value = this.value.toUpperCase();">
-                
-                <label for="stock5-eu">Enter Stock 5 :</label>
-                <input type="text" id="stock5-eu" placeholder="e.g., DAI.DE" oninput="this.value = this.value.toUpperCase();">
-            </div>
 <!--            <div class="info-input">-->
 <!--                <label for="stock1-eu">Enter Stock 1 :</label>-->
 <!--                <input type="text" id="stock1-eu" placeholder="e.g., SAP.DE" oninput="this.value = this.value.toUpperCase();">-->
-<!--                <div id="suggestions-stock1-eu" class="suggestions-container-eu"></div>-->
-<!--            -->
+<!--                -->
 <!--                <label for="stock2-eu">Enter Stock 2 :</label>-->
 <!--                <input type="text" id="stock2-eu" placeholder="e.g., ADS.DE" oninput="this.value = this.value.toUpperCase();">-->
-<!--                <div id="suggestions-stock2-eu" class="suggestions-container-eu"></div>-->
-<!--            -->
+<!--                -->
 <!--                <label for="stock3-eu">Enter Stock 3 :</label>-->
 <!--                <input type="text" id="stock3-eu" placeholder="e.g., AIR.PA" oninput="this.value = this.value.toUpperCase();">-->
-<!--                <div id="suggestions-stock3-eu" class="suggestions-container-eu"></div>-->
-<!--            -->
+<!--                -->
 <!--                <label for="stock4-eu">Enter Stock 4 :</label>-->
 <!--                <input type="text" id="stock4-eu" placeholder="e.g., OR.PA" oninput="this.value = this.value.toUpperCase();">-->
-<!--                <div id="suggestions-stock4-eu" class="suggestions-container-eu"></div>-->
-<!--            -->
+<!--                -->
 <!--                <label for="stock5-eu">Enter Stock 5 :</label>-->
 <!--                <input type="text" id="stock5-eu" placeholder="e.g., DAI.DE" oninput="this.value = this.value.toUpperCase();">-->
-<!--                <div id="suggestions-stock5-eu" class="suggestions-container-eu"></div>-->
 <!--            </div>-->
+            <div class="info-input">
+                <label for="stock1-eu">Enter Stock 1 :</label>
+                <input type="text" id="stock1-eu" placeholder="e.g., SAP.DE" oninput="this.value = this.value.toUpperCase();">
+                <div id="suggestions-stock1-eu" class="suggestions-container-eu"></div>
+            
+                <label for="stock2-eu">Enter Stock 2 :</label>
+                <input type="text" id="stock2-eu" placeholder="e.g., ADS.DE" oninput="this.value = this.value.toUpperCase();">
+                <div id="suggestions-stock2-eu" class="suggestions-container-eu"></div>
+            
+                <label for="stock3-eu">Enter Stock 3 :</label>
+                <input type="text" id="stock3-eu" placeholder="e.g., AIR.PA" oninput="this.value = this.value.toUpperCase();">
+                <div id="suggestions-stock3-eu" class="suggestions-container-eu"></div>
+            
+                <label for="stock4-eu">Enter Stock 4 :</label>
+                <input type="text" id="stock4-eu" placeholder="e.g., OR.PA" oninput="this.value = this.value.toUpperCase();">
+                <div id="suggestions-stock4-eu" class="suggestions-container-eu"></div>
+            
+                <label for="stock5-eu">Enter Stock 5 :</label>
+                <input type="text" id="stock5-eu" placeholder="e.g., DAI.DE" oninput="this.value = this.value.toUpperCase();">
+                <div id="suggestions-stock5-eu" class="suggestions-container-eu"></div>
+            </div>
 
-        
+
             <div class="chart-links">
                 <div class="category">
                     <span class="title" onclick="toggleMenu('financials')">Financial Report</span>
@@ -2620,6 +2620,44 @@ document.getElementById('euStockSymbol').addEventListener('input', debounce(asyn
     }
 }, 100));
 
+document.addEventListener('DOMContentLoaded', () => {
+    // 定義需要監聽的輸入框 ID
+    const inputIds = ['stock1-eu', 'stock2-eu', 'stock3-eu', 'stock4-eu', 'stock5-eu'];
+
+    inputIds.forEach(inputId => {
+        const suggestionsContainerId = `suggestions-${inputId}`;
+        const inputElement = document.getElementById(inputId);
+        const suggestionsContainer = document.getElementById(suggestionsContainerId);
+
+        if (inputElement && suggestionsContainer) {
+            // 設置輸入事件監聽
+            inputElement.addEventListener(
+                'input',
+                debounce(async function () {
+                    const stockSymbol = this.value.trim().toUpperCase();
+
+                    if (stockSymbol.length > 0) {
+                        showLoadingSuggestions(suggestionsContainer);
+                        const stockData = await fetchStockSuggestionsEU(stockSymbol);
+
+                        if (this.value.trim().toUpperCase() === stockSymbol) {
+                            displaySuggestions(stockData, suggestionsContainer, inputId);
+                        }
+                    } else {
+                        clearSuggestions(suggestionsContainer);
+                    }
+                }, 200) // 防抖 200 毫秒
+            );
+
+            // 設置失去焦點事件，延時清除建議框
+            inputElement.addEventListener('blur', () => {
+                setTimeout(() => clearSuggestions(suggestionsContainer), 200);
+            });
+        } else {
+            console.error(`Element not found for inputId: ${inputId} or suggestionsContainerId: ${suggestionsContainerId}`);
+        }
+    });
+});
 
 async function fetchStockSuggestionsEU(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';

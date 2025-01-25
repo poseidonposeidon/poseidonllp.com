@@ -1346,22 +1346,24 @@ button:not(.info-input button):hover {
 }
 
 
-/*.suggestions-container-eu {*/
-/*    position: absolute;*/
-/*    background-color: white;*/
-/*    border: 1px solid #ccc;*/
-/*    border-radius: 4px;*/
-/*    z-index: 1000;*/
-/*    max-height: 200px;*/
-/*    overflow-y: auto;*/
-/*    width: calc(100% - 2px); !* 和輸入框寬度一致 *!*/
-/*}*/
+.suggestions-container-eu {
+    position: absolute;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+    width: calc(100% - 2px); /* 和輸入框寬度一致 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
 
-/*.suggestions-container-eu div {*/
-/*    padding: 8px;*/
-/*    cursor: pointer;*/
-/*}*/
+.suggestions-container-eu div {
+    padding: 8px;
+    cursor: pointer;
+}
 
-/*.suggestions-container-eu div:hover {*/
-/*    background-color: #f0f0f0;*/
-/*}*/
+.suggestions-container-eu div:hover {
+    background-color: #f0f0f0;
+}
+
