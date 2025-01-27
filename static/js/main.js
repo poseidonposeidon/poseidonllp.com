@@ -1538,6 +1538,20 @@ function loadCompareSection(sectionId) {
     }
 }
 
+// 監聽指定輸入框的 keydown 事件
+document.querySelectorAll('#stock1-eu, #stock2-eu, #stock3-eu, #stock4-eu, #stock5-eu').forEach(input => {
+    input.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') { // 檢測是否按下 Enter 鍵
+            const suggestionsContainerId = `suggestions-${this.id}`;
+            const suggestionsContainer = document.getElementById(suggestionsContainerId);
+
+            if (suggestionsContainer) {
+                clearSuggestions(suggestionsContainer); // 清空並隱藏推薦框
+            }
+        }
+    });
+});
+
 function toggleMenu(menuId) {
     const submenu = document.getElementById(menuId);
     const category = submenu.parentElement; // 取得 category 元素
