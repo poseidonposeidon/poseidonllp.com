@@ -1539,13 +1539,16 @@ function loadCompareSection(sectionId) {
 }
 
 // 監聽指定輸入框的 keydown 事件
-document.querySelectorAll('#stock1-eu, #stock2-eu, #stock3-eu, #stock4-eu, #stock5-eu').forEach(input => {
+document.querySelectorAll('.info-input input').forEach(input => {
     input.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
-            // 獲取建議框容器
-            const suggestionsContainer = document.getElementById('suggestions-container-eu');
-            // 執行清空建議框的操作
-            clearSuggestions();
+            // 查找當前輸入框對應的建議框
+            const suggestionsContainer = this.parentElement.querySelector('.suggestions-container-eu');
+
+            // 如果找到建議框，則清空並隱藏
+            if (suggestionsContainer) {
+                clearSuggestions(suggestionsContainer); // 傳入建議框元素進行清空
+            }
         }
     });
 });
