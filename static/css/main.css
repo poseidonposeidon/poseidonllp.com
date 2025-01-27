@@ -1352,7 +1352,8 @@ button:not(.info-input button):hover {
     position: absolute; /* 絕對定位 */
     top: 100%; /* 位於輸入框正下方 */
     left: 0; /* 確保與輸入框的左側邊緣對齊 */
-    width: calc(100% - 2px); /* 與輸入框寬度一致 */
+    right: 0; /* 確保與輸入框的右側邊緣對齊 */
+    width: inherit; /* 繼承父容器（input）的寬度 */
     background-color: #ffffff; /* 白色背景 */
     border: 1px solid #ccc; /* 邊框樣式 */
     border-radius: 4px; /* 邊角圓滑 */
@@ -1375,4 +1376,5 @@ button:not(.info-input button):hover {
 .suggestions-container-eu div:hover {
     background-color: #f0f0f0; /* 滑鼠懸停變色 */
 }
+
 
