@@ -1542,13 +1542,10 @@ function loadCompareSection(sectionId) {
 document.querySelectorAll('#stock1-eu, #stock2-eu, #stock3-eu, #stock4-eu, #stock5-eu').forEach(input => {
     input.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
-            // 獲取對應的建議框容器
-            const suggestionsContainerId = `suggestions-${this.id}`;
-            const suggestionsContainer = document.getElementById(suggestionsContainerId);
-
-            if (suggestionsContainer) {
-                clearSuggestions(); // 清空建議框，呼叫全域 clearSuggestions 函數
-            }
+            // 獲取建議框容器
+            const suggestionsContainer = document.getElementById('suggestions-container-eu');
+            // 執行清空建議框的操作
+            clearSuggestions();
         }
     });
 });
