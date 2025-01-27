@@ -336,6 +336,7 @@ div {
     align-items: center;
     margin-bottom: 10px;
     position: relative;
+    align-items: flex-start;
 }
 
 #stockSymbol {
@@ -1352,7 +1353,7 @@ button:not(.info-input button):hover {
     position: absolute; /* 絕對定位 */
     top: 100%; /* 位於輸入框正下方 */
     left: 0; /* 與輸入框的左側對齊 */
-    width: 100%; /* 寬度與父容器一致 */
+    width: 50%; /* 寬度與父容器一致 */
     background-color: #ffffff; /* 白色背景 */
     border: 1px solid #ccc; /* 邊框樣式 */
     border-radius: 4px; /* 邊角圓滑 */
