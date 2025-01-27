@@ -394,7 +394,19 @@
             clearSuggestions(); // 按下 Enter 時執行 clearSuggestions()
         }
     });
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') { // 檢測是否按下 Enter 鍵
+            const activeInput = document.activeElement; // 獲取當前聚焦的輸入框
+            if (activeInput && activeInput.matches('#stock1-eu, #stock2-eu, #stock3-eu, #stock4-eu, #stock5-eu')) {
+                const suggestionsContainerId = `suggestions-${activeInput.id}`;
+                const suggestionsContainer = document.getElementById(suggestionsContainerId);
 
+                if (suggestionsContainer) {
+                    clearSuggestions(suggestionsContainer); // 清空並隱藏推薦框
+                }
+            }
+        }
+    });
 
 </script>
 
