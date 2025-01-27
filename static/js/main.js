@@ -1541,12 +1541,13 @@ function loadCompareSection(sectionId) {
 // 監聽指定輸入框的 keydown 事件
 document.querySelectorAll('#stock1-eu, #stock2-eu, #stock3-eu, #stock4-eu, #stock5-eu').forEach(input => {
     input.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') { // 檢測是否按下 Enter 鍵
+        if (event.key === 'Enter') {
+            // 獲取對應的建議框容器
             const suggestionsContainerId = `suggestions-${this.id}`;
             const suggestionsContainer = document.getElementById(suggestionsContainerId);
 
             if (suggestionsContainer) {
-                clearSuggestions(suggestionsContainer); // 清空並隱藏推薦框
+                clearSuggestions(); // 清空建議框，呼叫全域 clearSuggestions 函數
             }
         }
     });
@@ -2529,6 +2530,21 @@ function clearSuggestions(container = null) {
                 break;
             case 'stock-input':
                 container = document.getElementById('suggestions-container');
+                break;
+            case 'stock1-eu':
+                container = document.getElementById('suggestions-stock1-eu');
+                break;
+            case 'stock2-eu':
+                container = document.getElementById('suggestions-stock2-eu');
+                break;
+            case 'stock3-eu':
+                container = document.getElementById('suggestions-stock3-eu');
+                break;
+            case 'stock4-eu':
+                container = document.getElementById('suggestions-stock4-eu');
+                break;
+            case 'stock5-eu':
+                container = document.getElementById('suggestions-stock5-eu');
                 break;
             default:
                 console.error('未知的輸入框 id');
