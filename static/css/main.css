@@ -333,7 +333,7 @@ div {
 .info-input {
     display: flex;
     justify-content: center;
-    align-items: center;
+    /*align-items: center;*/
     margin-bottom: 10px;
     position: relative;
     align-items: flex-start;
@@ -1354,7 +1354,7 @@ button:not(.info-input button):hover {
     top: 100%; /* 位於輸入框正下方 */
     left: 0; /* 與輸入框的左側對齊 */
     width: 50%; /* 寬度與父容器一致 */
-    background-color: #ffffff; /* 白色背景 */
+    background-color: #666; /* 白色背景 */
     border: 1px solid #ccc; /* 邊框樣式 */
     border-radius: 4px; /* 邊角圓滑 */
     z-index: 1000; /* 保持在頂層 */
@@ -1375,7 +1375,7 @@ button:not(.info-input button):hover {
 }
 
 .suggestions-container-eu div:hover {
-    background-color: #1e1e1e; /* 滑鼠懸停變色 */
+    background-color: #2e2d2d; /* 滑鼠懸停變色 */
 }
 
 
