@@ -101,7 +101,7 @@ function generatePagination(newsList, currentPage) {
 
 // 初始化函數
 async function initNewsSection() {
-    const filterButtons = document.querySelectorAll('.filter-section button');
+    const filterButtons = document.querySelectorAll('.filter-section button[data-category]');
     let newsList = await fetchStockNews('all');
     displayNews(newsList, 1); // 預設顯示第 1 頁
     generatePagination(newsList, 1);
