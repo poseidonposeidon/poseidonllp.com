@@ -55,7 +55,7 @@ function displayNews(newsList, currentPage = 1) {
         newsItem.innerHTML = `
             <img src="${imageUrl}" alt="${news.title}" class="news-image">
             <div class="news-content">
-                <h3>${news.title}</h3>
+                <h3><a href="${news.url}" target="_blank">${news.title}</a></h3>
                 <p>${news.text}</p>
                 <a href="${news.url}" target="_blank">Read more</a>
                 <span>${new Date(news.publishedDate).toLocaleString()}</span>
