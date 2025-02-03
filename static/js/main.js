@@ -5,6 +5,7 @@ const baseUrl = 'https://api.poseidonllp.com';
 //////News////
 // 獲取股票新聞函數
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
+const MAX_VISIBLE_PAGES = 5;
 
 async function fetchStockNews(category = 'all', symbol = '', startDate = '', endDate = '') {
     let url = `${BASE_URL}stock_news?limit=1000&apikey=${API_KEY}`;
@@ -74,29 +75,86 @@ function displayNews(newsList, currentPage = 1) {
 }
 
 // 生成分頁按鈕
+function createPageButton(pageNumber, currentPage, newsList) {
+    const button = document.createElement('button');
+    button.textContent = pageNumber;
+    button.classList.add('pagination-button');
+    if (pageNumber === currentPage) {
+        button.classList.add('active');
+    }
+    // 加入內聯樣式調整間距
+    button.style.margin = '0 5px';
+    button.style.padding = '5px 10px';
+
+    button.addEventListener('click', () => {
+        // 重新顯示該頁新聞與更新分頁
+        displayNews(newsList, pageNumber);
+        generatePagination(newsList, pageNumber);
+    });
+    return button;
+}
+
 function generatePagination(newsList, currentPage) {
     const paginationContainer = document.getElementById('pagination-container');
     paginationContainer.innerHTML = '';
 
     const totalPages = Math.ceil(newsList.length / NEWS_PER_PAGE);
 
-    for (let i = 1; i <= totalPages; i++) {
-        const button = document.createElement('button');
-        button.textContent = i;
-        button.classList.add('pagination-button');
-        if (i === currentPage) {
-            button.classList.add('active');
+    // 若總頁數少於或等於最大顯示數，則直接顯示所有按鈕
+    if (totalPages <= MAX_VISIBLE_PAGES + 1) { // +1 可保留最後一頁（或第一頁）避免重複
+        for (let i = 1; i <= totalPages; i++) {
+            const btn = createPageButton(i, currentPage, newsList);
+            paginationContainer.appendChild(btn);
         }
+        return;
+    }
 
-        // 添加內聯樣式的空隙
-        button.style.margin = '0 5px';
-        button.style.padding = '5px 10px'; // 可選：美化按鈕外觀
+    let startPage, endPage;
 
-        button.addEventListener('click', () => {
-            displayNews(newsList, i);
-            generatePagination(newsList, i);
-        });
-        paginationContainer.appendChild(button);
+    // 根據目前所在的頁碼決定滑動視窗
+    if (currentPage <= MAX_VISIBLE_PAGES) {
+        // 若目前頁數在前面，顯示 1 ~ MAX_VISIBLE_PAGES
+        startPage = 1;
+        endPage = MAX_VISIBLE_PAGES;
+    } else if (currentPage > totalPages - Math.floor(MAX_VISIBLE_PAGES / 2)) {
+        // 若目前頁數接近最後，則顯示最後 MAX_VISIBLE_PAGES 頁
+        startPage = totalPages - MAX_VISIBLE_PAGES + 1;
+        endPage = totalPages;
+    } else {
+        // 中間狀況：以目前頁為中心（偏右邊或偏左邊都可調整）
+        startPage = currentPage - Math.floor(MAX_VISIBLE_PAGES / 2);
+        endPage = startPage + MAX_VISIBLE_PAGES - 1;
+    }
+
+    // 若起始頁不是第一頁，先顯示第一頁按鈕
+    if (startPage > 1) {
+        const firstButton = createPageButton(1, currentPage, newsList);
+        paginationContainer.appendChild(firstButton);
+        // 如果起始頁與第一頁之間有間隔，顯示省略號
+        if (startPage > 2) {
+            const ellipsis = document.createElement('span');
+            ellipsis.textContent = '...';
+            ellipsis.style.margin = '0 5px';
+            paginationContainer.appendChild(ellipsis);
+        }
+    }
+
+    // 顯示中間滑動視窗的分頁按鈕
+    for (let i = startPage; i <= endPage; i++) {
+        const btn = createPageButton(i, currentPage, newsList);
+        paginationContainer.appendChild(btn);
+    }
+
+    // 若結束頁不是最後一頁，則顯示省略號與最後一頁按鈕
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            const ellipsis = document.createElement('span');
+            ellipsis.textContent = '...';
+            ellipsis.style.margin = '0 5px';
+            paginationContainer.appendChild(ellipsis);
+        }
+        const lastButton = createPageButton(totalPages, currentPage, newsList);
+        paginationContainer.appendChild(lastButton);
     }
 }
 
@@ -160,7 +218,6 @@ document.getElementById('filter-by-date').addEventListener('click', async () => 
     displayNews(newsList, 1);
     generatePagination(newsList, 1);
 });
-
 
 document.getElementById('stock-input').addEventListener('input', function (event) {
     event.target.value = event.target.value.toUpperCase(); // 轉換為大寫
