@@ -7,18 +7,18 @@ const baseUrl = 'https://api.poseidonllp.com';
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
 const MAX_VISIBLE_PAGES = 5;
 
-async function fetchStockNews(category = 'all', symbol = '', startDate = '', endDate = '') {
+async function fetchStockNews(category = 'all', symbol = '', date = '') {
     let url = `${BASE_URL}stock_news?limit=1000&apikey=${API_KEY}`;
+
     if (symbol) {
         url += `&symbol=${symbol}`;
     }
-    if (startDate) {
-        url += `&startDate=${startDate}`;
+    if (date) {
+        // 使用同一日期作為 from 和 to 的值
+        url += `&from=${date}&to=${date}`;
     }
-    if (endDate) {
-        url += `&endDate=${endDate}`;
-    }
-    console.log("Constructed URL:", url); // 加入這行除錯用
+
+    console.log("Constructed URL:", url); // 除錯用
     try {
         const response = await fetch(url);
         if (!response.ok) {
@@ -31,6 +31,7 @@ async function fetchStockNews(category = 'all', symbol = '', startDate = '', end
         return [];
     }
 }
+
 
 // 根據類別篩選新聞
 function filterNewsByCategory(newsData, category) {
@@ -194,23 +195,16 @@ function initSearchInput() {
 }
 
 document.getElementById('filter-by-date').addEventListener('click', async () => {
-    const startDate = document.getElementById('start-date').value;
-    const endDate = document.getElementById('end-date').value;
+    const date = document.getElementById('news-date').value;
 
-    // 驗證兩個日期欄位是否都有填寫
-    if (!startDate || !endDate) {
-        alert('請選擇完整的日期範圍');
+    // 檢查日期是否有選擇
+    if (!date) {
+        alert('請選擇日期');
         return;
     }
 
-    // 驗證起始日期不得晚於結束日期
-    if (new Date(startDate) > new Date(endDate)) {
-        alert('起始日期不能大於結束日期');
-        return;
-    }
-
-    // 調用 fetchStockNews 並傳入日期範圍參數
-    const newsList = await fetchStockNews('all', '', startDate, endDate);
+    // 呼叫 fetchStockNews 時，將 date 參數傳入，同時作為 from 和 to 的值
+    const newsList = await fetchStockNews('all', '', date);
     displayNews(newsList, 1);
     generatePagination(newsList, 1);
 });
