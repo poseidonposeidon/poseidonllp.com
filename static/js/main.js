@@ -17,6 +17,7 @@ async function fetchStockNews(category = 'all', symbol = '', startDate = '', end
     if (endDate) {
         url += `&endDate=${endDate}`;
     }
+    console.log("Constructed URL:", url); // 加入這行除錯用
     try {
         const response = await fetch(url);
         if (!response.ok) {
