@@ -7,7 +7,7 @@ const baseUrl = 'https://api.poseidonllp.com';
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
 
 async function fetchStockNews(category = 'all', symbol = '', startDate = '', endDate = '') {
-    let url = `${BASE_URL}stock_news?apikey=${API_KEY}`;
+    let url = `${BASE_URL}stock_news?limit=100&apikey=${API_KEY}`;
     if (symbol) {
         url += `&symbol=${symbol}`;
     }
