@@ -6,10 +6,16 @@ const baseUrl = 'https://api.poseidonllp.com';
 // 獲取股票新聞函數
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
 
-async function fetchStockNews(category = 'all', symbol = '') {
+async function fetchStockNews(category = 'all', symbol = '', startDate = '', endDate = '') {
     let url = `${BASE_URL}stock_news?apikey=${API_KEY}`;
     if (symbol) {
-        url += `&symbol=${symbol}`; // 如果有股票代號，添加到查詢參數
+        url += `&symbol=${symbol}`;
+    }
+    if (startDate) {
+        url += `&startDate=${startDate}`;
+    }
+    if (endDate) {
+        url += `&endDate=${endDate}`;
     }
     try {
         const response = await fetch(url);
@@ -131,6 +137,29 @@ function initSearchInput() {
     const stockInput = document.getElementById('stock-input');
     stockInput.addEventListener('keyup', handleStockSearch);
 }
+
+document.getElementById('filter-by-date').addEventListener('click', async () => {
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+
+    // 驗證兩個日期欄位是否都有填寫
+    if (!startDate || !endDate) {
+        alert('請選擇完整的日期範圍');
+        return;
+    }
+
+    // 驗證起始日期不得晚於結束日期
+    if (new Date(startDate) > new Date(endDate)) {
+        alert('起始日期不能大於結束日期');
+        return;
+    }
+
+    // 調用 fetchStockNews 並傳入日期範圍參數
+    const newsList = await fetchStockNews('all', '', startDate, endDate);
+    displayNews(newsList, 1);
+    generatePagination(newsList, 1);
+});
+
 
 document.getElementById('stock-input').addEventListener('input', function (event) {
     event.target.value = event.target.value.toUpperCase(); // 轉換為大寫
