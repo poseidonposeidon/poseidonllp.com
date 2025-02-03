@@ -346,13 +346,24 @@
 <!--/////////////////////////////////body資料/////////////////////////////////-->
 <div class="body-container">
     <div class="filter-section" id="filter-section">
-        <h1>Financial News</h1> </br>
+        <h1>Financial News</h1>
+        <br>
         <input
                 type="text"
                 id="stock-input"
                 placeholder="Enter U.S stock symbol to search news."
                 class="stock-input"
         />
+
+        <!-- 新增日期篩選區塊 -->
+        <div class="date-range-filter">
+            <label for="start-date">Start Date:</label>
+            <input type="date" id="start-date">
+            <label for="end-date">End Date:</label>
+            <input type="date" id="end-date">
+            <button id="filter-by-date">Filter by Date</button>
+        </div>
+
         <div id="suggestions-container" class="suggestions-container"></div>
     </div>
     <div class="news-container" id="news-container">
