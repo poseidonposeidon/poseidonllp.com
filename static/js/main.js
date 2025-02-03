@@ -8,7 +8,7 @@ const NEWS_PER_PAGE = 10; // 每頁新聞數量
 const MAX_VISIBLE_PAGES = 5;
 
 async function fetchStockNews(category = 'all', symbol = '', startDate = '', endDate = '') {
-    let url = `${BASE_URL}stock_news?limit=2000&apikey=${API_KEY}`;
+    let url = `${BASE_URL}stock_news?limit=1000&apikey=${API_KEY}`;
     if (symbol) {
         url += `&symbol=${symbol}`;
     }
