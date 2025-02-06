@@ -1242,15 +1242,24 @@ button:not(.info-input button):hover {
     color: #ffffff;
 }
 
+/* 讓標題獨立一行 */
 .filter-section {
     display: flex;
-    justify-content: center;
+    flex-direction: column; /* 讓內容垂直排列 */
+    align-items: center; /* 置中對齊 */
     gap: 15px;
     margin-bottom: 20px;
     background-color: #121212;
     position: relative;
-    flex-direction: column;
+    padding: 15px 0;
+}
+
+.filter-inputs {
+    display: flex;
+    gap: 15px; /* 控制輸入框與日期選擇的間距 */
+    justify-content: center;
     align-items: center;
+    flex-wrap: wrap; /* 當空間不足時自動換行 */
 }
 
 .filter-section h1{
