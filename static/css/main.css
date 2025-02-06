@@ -1249,12 +1249,17 @@ button:not(.info-input button):hover {
     margin-bottom: 20px;
     background-color: #121212;
     position: relative;
+    flex-direction: column;
+    align-items: center;
 }
 
 .filter-section h1{
     background-color: #121212;
     white-space: nowrap; /* 禁止換行 */
     overflow: hidden; /* 防止超出邊界 */
+    text-align: center; /* 文字置中 */
+    width: 100%; /* 讓標題占滿整行 */
+    margin-bottom: 10px; /* 增加與輸入框的間距 */
 }
 
 .filter-section button {
