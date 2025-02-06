@@ -10,28 +10,30 @@ const MAX_VISIBLE_PAGES = 5;
 async function fetchStockNews(category = 'all', symbol = '', date = '') {
     let url = `${BASE_URL}stock_news?limit=1000&apikey=${API_KEY}`;
 
-    // 如果有股票代號，才加上 symbol 參數
     if (symbol) {
         url += `&symbol=${symbol}`;
     }
-    // 如果有選擇日期，才加上日期範圍
     if (date) {
         url += `&from=${date}&to=${date}`;
     }
 
-    console.log("Constructed URL:", url); // 除錯用
     try {
         const response = await fetch(url);
         if (!response.ok) {
             throw new Error(`Error fetching news: ${response.status}`);
         }
-        const data = await response.json();
+        let data = await response.json();
+
+        // 過濾掉 site 為 "seekingalpha.com" 的新聞
+        data = data.filter(news => news.site !== "seekingalpha.com");
+
         return category === 'all' ? data : filterNewsByCategory(data, category);
     } catch (error) {
         console.error("Error fetching stock news:", error);
         return [];
     }
 }
+
 // 根據類別篩選新聞
 function filterNewsByCategory(newsData, category) {
     if (category === 'all') {
