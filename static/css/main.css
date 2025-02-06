@@ -1254,7 +1254,7 @@ button:not(.info-input button):hover {
     padding: 15px 0;
 }
 
-.filter-inputs {
+.stock-input {
     display: flex;
     gap: 15px; /* 控制輸入框與日期選擇的間距 */
     justify-content: center;
