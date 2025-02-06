@@ -1260,6 +1260,7 @@ button:not(.info-input button):hover {
     justify-content: center;
     align-items: center;
     flex-wrap: wrap; /* 當畫面過小時自動換行 */
+    background-color: #121212;
 }
 
 .filter-section h1{
