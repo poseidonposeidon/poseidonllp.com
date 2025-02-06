@@ -348,20 +348,22 @@
     <div class="filter-section" id="filter-section">
         <h1>Financial News</h1>
         <br>
-        <input
-                type="text"
-                id="stock-input"
-                placeholder="Enter U.S stock symbol."
-                class="stock-input"
-        />
 
-        <!-- 新增日期篩選區塊 -->
-        <div class="date-range-filter" style="background-color:#121212">
-            <label for="news-date">Select Date:</label>
-            <input type="date" id="news-date">
-            <button id="filter-by-date">OK</button>
+        <div class="filter-inputs">
+            <input
+                    type="text"
+                    id="stock-input"
+                    placeholder="Enter U.S stock symbol"
+                    class="stock-input"
+            />
+
+            <!-- 新增日期篩選區塊 -->
+            <div class="date-range-filter" style="background-color:#121212">
+                <label for="news-date">Select Date:</label>
+                <input type="date" id="news-date">
+                <button id="filter-by-date">OK</button>
+            </div>
         </div>
-
 
         <div id="suggestions-container" class="suggestions-container"></div>
     </div>

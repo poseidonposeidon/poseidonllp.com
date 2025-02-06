@@ -1254,12 +1254,12 @@ button:not(.info-input button):hover {
     padding: 15px 0;
 }
 
-.stock-input {
+.filter-inputs {
     display: flex;
-    gap: 15px; /* 控制輸入框與日期選擇的間距 */
+    gap: 15px; /* 控制輸入框與日期選擇之間的距離 */
     justify-content: center;
     align-items: center;
-    flex-wrap: wrap; /* 當空間不足時自動換行 */
+    flex-wrap: wrap; /* 當畫面過小時自動換行 */
 }
 
 .filter-section h1{
@@ -1288,6 +1288,30 @@ button:not(.info-input button):hover {
 .filter-section button.active {
     background-color: #90caf9;
     color: #121212;
+}
+
+.stock-input {
+    width: 250px;
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #444;
+    background-color: #121212;
+    color: #b0bec5;
+    text-transform: uppercase;
+}
+
+.stock-input:focus {
+    border-color: #90caf9;
+    background-color: #1e1e1e;
+}
+
+.date-range-filter {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* 控制內部間距 */
+    background-color: #121212;
+    padding: 5px;
+    border-radius: 5px;
 }
 
 .pagination-button {
@@ -1341,23 +1365,6 @@ button:not(.info-input button):hover {
     font-size: 0.9em;
     margin-top: -10px;
     margin-bottom: 10px;
-}
-
-.stock-input {
-    width: 300px;
-    padding: 10px;
-    border-radius: 5px;
-    border: 1px solid #444;
-    background-color: #121212;
-    color: #b0bec5;
-    margin-bottom: 10px;
-    outline: none;
-    text-transform: uppercase; /* 顯示大寫 */
-}
-
-.stock-input:focus {
-    border-color: #90caf9;
-    background-color: #1e1e1e;
 }
 
 /*compare er 推薦框*/
