@@ -10,11 +10,12 @@ const MAX_VISIBLE_PAGES = 5;
 async function fetchStockNews(category = 'all', symbol = '', date = '') {
     let url = `${BASE_URL}stock_news?limit=1000&apikey=${API_KEY}`;
 
+    // 如果有股票代號，才加上 symbol 參數
     if (symbol) {
         url += `&symbol=${symbol}`;
     }
+    // 如果有選擇日期，才加上日期範圍
     if (date) {
-        // 使用同一日期作為 from 和 to 的值
         url += `&from=${date}&to=${date}`;
     }
 
@@ -31,8 +32,6 @@ async function fetchStockNews(category = 'all', symbol = '', date = '') {
         return [];
     }
 }
-
-
 // 根據類別篩選新聞
 function filterNewsByCategory(newsData, category) {
     if (category === 'all') {
@@ -177,17 +176,20 @@ async function initNewsSection() {
 
 async function handleStockSearch(event) {
     if (event.key === 'Enter') {
-        const input = event.target.value.trim().toUpperCase(); // 獲取輸入值，轉為大寫
-        if (!input) {
+        const stockInput = event.target.value.trim().toUpperCase(); // 轉大寫
+        const selectedDate = document.getElementById('news-date').value; // 取得日期（如果有選）
+
+        if (!stockInput) {
             alert('Please enter a valid stock symbol');
             return;
         }
-        const newsList = await fetchStockNews('all', input); // 根據股票代號查詢新聞
-        displayNews(newsList, 1); // 顯示查詢結果
+
+        // 如果使用者輸入了公司代號，則帶入公司代號 &（可選）日期
+        const newsList = await fetchStockNews('all', stockInput, selectedDate || '');
+        displayNews(newsList, 1); // 顯示新聞
         generatePagination(newsList, 1); // 更新分頁
     }
 }
-
 // 初始化輸入框監聽
 function initSearchInput() {
     const stockInput = document.getElementById('stock-input');
@@ -195,16 +197,16 @@ function initSearchInput() {
 }
 
 document.getElementById('filter-by-date').addEventListener('click', async () => {
-    const date = document.getElementById('news-date').value;
+    const selectedDate = document.getElementById('news-date').value;
+    const stockInput = document.getElementById('stock-input').value.trim().toUpperCase(); // 取得輸入的股票代號（如果有）
 
-    // 檢查日期是否有選擇
-    if (!date) {
+    if (!selectedDate) {
         alert('請選擇日期');
         return;
     }
 
-    // 呼叫 fetchStockNews 時，將 date 參數傳入，同時作為 from 和 to 的值
-    const newsList = await fetchStockNews('all', '', date);
+    // 🟢 如果有輸入公司代號，則查詢該公司當天新聞；如果沒輸入，則查詢該日期所有新聞
+    const newsList = await fetchStockNews('all', stockInput || '', selectedDate);
     displayNews(newsList, 1);
     generatePagination(newsList, 1);
 });
