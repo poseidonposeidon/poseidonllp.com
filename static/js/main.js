@@ -1374,22 +1374,6 @@ function loadCompareSection(sectionId) {
         `,
         'compare-us': `
             <h2>Compare US Stocks</h2>
-<!--            <div class="info-input">-->
-<!--                <label for="stock1-us">Enter Stock 1 :</label>-->
-<!--                <input type="text" id="stock1-us" placeholder="e.g., AAPL" oninput="this.value = this.value.toUpperCase();">-->
-<!--                -->
-<!--                <label for="stock2-us">Enter Stock 2 :</label>-->
-<!--                <input type="text" id="stock2-us" placeholder="e.g., TSLA" oninput="this.value = this.value.toUpperCase();">-->
-<!--                -->
-<!--                <label for="stock3-us">Enter Stock 3 :</label>-->
-<!--                <input type="text" id="stock3-us" placeholder="e.g., MSFT" oninput="this.value = this.value.toUpperCase();">-->
-<!--                -->
-<!--                <label for="stock4-us">Enter Stock 4 :</label>-->
-<!--                <input type="text" id="stock4-us" placeholder="e.g., AMZN" oninput="this.value = this.value.toUpperCase();">-->
-<!--                -->
-<!--                <label for="stock5-us">Enter Stock 5 :</label>-->
-<!--                <input type="text" id="stock5-us" placeholder="e.g., NVDA" oninput="this.value = this.value.toUpperCase();">-->
-<!--            </div>-->
             <div class="info-input" style="position: relative;">
                 <label for="stock1-us">Enter Stock 1 :</label>
                 <input type="text" id="stock1-us" placeholder="e.g., AAPL">
@@ -1647,6 +1631,17 @@ function loadCompareSection(sectionId) {
         console.error("Compare section not found");
     }
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const stockInputs = document.querySelectorAll('#stock1-us, #stock2-us, #stock3-us, #stock4-us, #stock5-us');
+
+    stockInputs.forEach(input => {
+        input.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    });
+});
+
 
 // 清除推薦框
 document.querySelectorAll('.info-input input').forEach(input => {
