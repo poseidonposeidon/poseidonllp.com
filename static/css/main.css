@@ -1368,8 +1368,8 @@ button:not(.info-input button):hover {
     margin-bottom: 10px;
 }
 
-/*compare er 推薦框*/
-.suggestions-container-eu {
+/*compare EU推薦框*/
+.suggestions-container-eu , .suggestions-container-us{
     display: none; /* 預設隱藏 */
     position: absolute; /* 絕對定位 */
     top: 100%; /* 位於輸入框正下方 */
@@ -1386,17 +1386,17 @@ button:not(.info-input button):hover {
     box-sizing: border-box; /* 確保寬度計算包含 padding 和 border */
 }
 
-.suggestions-container-eu.active {
+.suggestions-container-eu.active , .suggestions-container-us.active{
     display: block; /* 當有建議時顯示 */
 }
 
-.suggestions-container-eu div {
+.suggestions-container-eu div , .suggestions-container-us div{
     padding: 8px;
     cursor: pointer;
     font-size: 14px;
 }
 
-.suggestions-container-eu div:hover {
+.suggestions-container-eu div:hover , .suggestions-container-us div:hover {
     background-color: #2e2d2d; /* 滑鼠懸停變色 */
 }
 

@@ -2748,7 +2748,7 @@ document.addEventListener('input', debounce(async function (event) {
         // 當輸入內容有長度時顯示推薦框，否則隱藏
         if (stockSymbol.length > 0) {
             showLoadingSuggestions(suggestionsContainer); // 顯示"載入中"狀態
-            const stockData = await fetchStockSuggestionsUS(stockSymbol);
+            const stockData = await fetchStockSuggestions(stockSymbol);
             displaySuggestions(stockData, suggestionsContainer, event.target.id); // 顯示推薦內容
         } else {
             clearSuggestions(suggestionsContainer); // 清空並隱藏推薦框
