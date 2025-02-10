@@ -1651,13 +1651,7 @@ document.querySelectorAll('.info-input input').forEach(input => {
 document.querySelectorAll('.info-input input').forEach(input => {
     input.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
-            // 查找當前輸入框對應的建議框
-            const suggestionsContainer = this.parentElement.querySelector('.suggestions-container-us');
-
-            // 如果找到建議框，則清空並隱藏
-            if (suggestionsContainer) {
-                clearSuggestions(suggestionsContainer);
-            }
+            clearSuggestions();
         }
     });
 });
