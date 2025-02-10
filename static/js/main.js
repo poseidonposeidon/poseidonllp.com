@@ -1928,142 +1928,78 @@ function updateMarket(button) {
     loadIndustryData();
 }
 
-async function fetchBatchHistoricalData(symbols, timeframe) {
-    const symbolString = symbols.join(",");
-    const url = `${BASE_URL}historical-price-full/${symbolString}?apikey=${API_KEY}`;
-    console.log(`Fetching historical data for symbols: ${symbolString} with timeframe: ${timeframe}`);
+// 獲取單一股票的歷史數據並計算指定時間段的變化百分比
+async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
+    const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
+    console.log(`Fetching historical data for ${stockSymbol} with timeframe: ${timeframe}`);
 
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`Error fetching batch historical data for symbols: ${symbolString}`);
+            throw new Error(`Error fetching historical data for ${stockSymbol}`);
         }
+
         const data = await response.json();
+        const historicalPrices = data.historical;
 
-        // 如果只查詢一支股票，可能回傳物件；若查詢多支則回傳陣列
-        return Array.isArray(data) ? data : [data];
+        if (!historicalPrices || historicalPrices.length < 2) {
+            console.warn(`Insufficient historical data for ${stockSymbol}`);
+            return 0;
+        }
+
+        // 確保數據按日期降序排列
+        historicalPrices.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+        let latestClose = historicalPrices[0].close;
+        let previousClose;
+
+        if (timeframe === "ytd") {
+            const targetDate = new Date(new Date().getFullYear(), 0, 1); // 當年 1 月 1 日
+            const filteredPrices = historicalPrices.filter(item => new Date(item.date) <= targetDate);
+
+            previousClose = filteredPrices.length
+                ? filteredPrices[filteredPrices.length - 1].close // 最近的有效交易日收盤價
+                : historicalPrices[historicalPrices.length - 1]?.close; // 如果沒有，則取最舊數據
+        } else {
+            const targetDate = new Date();
+            if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
+            else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
+            else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
+
+            previousClose = historicalPrices.find(item => new Date(item.date) <= targetDate)?.close;
+        }
+
+        if (!previousClose) {
+            console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
+            return 0;
+        }
+
+        return ((latestClose - previousClose) / previousClose) * 100;
     } catch (error) {
-        console.error("Error in fetchBatchHistoricalData:", error);
-        return [];
-    }
-}
-
-function calculateStockChange(historicalData, timeframe) {
-    if (!historicalData || historicalData.length < 2) {
+        console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
         return 0;
     }
-
-    // 依日期降冪排序
-    historicalData.sort((a, b) => new Date(b.date) - new Date(a.date));
-    let latestClose = historicalData[0].close;
-    let previousClose;
-
-    if (timeframe === "ytd") {
-        const targetDate = new Date(new Date().getFullYear(), 0, 1);
-        const filtered = historicalData.filter(item => new Date(item.date) <= targetDate);
-        previousClose = filtered.length
-            ? filtered[filtered.length - 1].close
-            : historicalData[historicalData.length - 1]?.close;
-    } else {
-        const targetDate = new Date();
-        if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
-        else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
-        else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
-
-        previousClose = historicalData.find(item => new Date(item.date) <= targetDate)?.close;
-    }
-
-    if (!previousClose) {
-        return 0;
-    }
-
-    return ((latestClose - previousClose) / previousClose) * 100;
 }
-
-// 獲取單一股票的歷史數據並計算指定時間段的變化百分比
-// async function fetchHistoricalPercentageChange(stockSymbol, timeframe) {
-//     const url = `${BASE_URL}historical-price-full/${stockSymbol}?apikey=${API_KEY}`;
-//     console.log(`Fetching historical data for ${stockSymbol} with timeframe: ${timeframe}`);
-//
-//     try {
-//         const response = await fetch(url);
-//         if (!response.ok) {
-//             throw new Error(`Error fetching historical data for ${stockSymbol}`);
-//         }
-//
-//         const data = await response.json();
-//         const historicalPrices = data.historical;
-//
-//         if (!historicalPrices || historicalPrices.length < 2) {
-//             console.warn(`Insufficient historical data for ${stockSymbol}`);
-//             return 0;
-//         }
-//
-//         // 確保數據按日期降序排列
-//         historicalPrices.sort((a, b) => new Date(b.date) - new Date(a.date));
-//
-//         let latestClose = historicalPrices[0].close;
-//         let previousClose;
-//
-//         if (timeframe === "ytd") {
-//             const targetDate = new Date(new Date().getFullYear(), 0, 1); // 當年 1 月 1 日
-//             const filteredPrices = historicalPrices.filter(item => new Date(item.date) <= targetDate);
-//
-//             previousClose = filteredPrices.length
-//                 ? filteredPrices[filteredPrices.length - 1].close // 最近的有效交易日收盤價
-//                 : historicalPrices[historicalPrices.length - 1]?.close; // 如果沒有，則取最舊數據
-//         } else {
-//             const targetDate = new Date();
-//             if (timeframe === "1m") targetDate.setMonth(targetDate.getMonth() - 1);
-//             else if (timeframe === "3m") targetDate.setMonth(targetDate.getMonth() - 3);
-//             else if (timeframe === "1y") targetDate.setFullYear(targetDate.getFullYear() - 1);
-//
-//             previousClose = historicalPrices.find(item => new Date(item.date) <= targetDate)?.close;
-//         }
-//
-//         if (!previousClose) {
-//             console.warn(`No data for ${stockSymbol} at target timeframe: ${timeframe}`);
-//             return 0;
-//         }
-//
-//         return ((latestClose - previousClose) / previousClose) * 100;
-//     } catch (error) {
-//         console.error(`Error fetching historical percentage change for ${stockSymbol}:`, error);
-//         return 0;
-//     }
-// }
 
 // 修改計算產業表現邏輯
 async function calculateIndustryPerformance(industryData) {
     const industryPerformance = {};
 
-    // 對於每個產業，將股票代碼合併成一個逗號分隔的字串一次查詢
     for (const [industry, stocks] of Object.entries(industryData)) {
-        // 進行批次 API 請求
-        const batchData = await fetchBatchHistoricalData(stocks, currentTimeframe);
+        // 使用 Promise.all 同時處理多隻股票的數據請求
+        const changes = await Promise.all(
+            stocks.map(stock => fetchHistoricalPercentageChange(stock, currentTimeframe))
+        );
 
-        // 建立一個暫存陣列來儲存各股票的百分比變化
-        const changes = [];
-
-        // batchData 為陣列，每個元素包含一支股票的歷史資料
-        batchData.forEach(stockData => {
-            // 檢查是否有歷史資料
-            if (stockData && stockData.historical && stockData.historical.length > 0) {
-                const change = calculateStockChange(stockData.historical, currentTimeframe);
-                changes.push(change);
-            }
-        });
-
-        // 過濾有效數據並計算平均值
+        // 過濾有效數據，並計算平均漲跌幅
         const validChanges = changes.filter(change => !isNaN(change));
         const totalChange = validChanges.reduce((sum, change) => sum + change, 0);
         industryPerformance[industry] = validChanges.length > 0 ? totalChange / validChanges.length : 0;
     }
 
-    console.log("Calculated Industry Performance (Batch):", industryPerformance);
+    console.log("Calculated Industry Performance (Parallel):", industryPerformance);
     return industryPerformance;
 }
-
 
 // 根據漲幅設定顏色
 function getColorByPerformance(performance) {
@@ -3590,9 +3526,9 @@ async function displayChart(type) {
         ? ['stock1-tw', 'stock2-tw', 'stock3-tw', 'stock4-tw', 'stock5-tw']
         : isCompareUS
             ? ['stock1-us', 'stock2-us', 'stock3-us', 'stock4-us', 'stock5-us']
-        : isCompareEU
-            ? ['stock1-eu', 'stock2-eu', 'stock3-eu', 'stock4-eu', 'stock5-eu']
-            : ['stock1', 'stock2', 'stock3', 'stock4', 'stock5'];
+            : isCompareEU
+                ? ['stock1-eu', 'stock2-eu', 'stock3-eu', 'stock4-eu', 'stock5-eu']
+                : ['stock1', 'stock2', 'stock3', 'stock4', 'stock5'];
 
     const stocks = stockInputs
         .map(id => {
