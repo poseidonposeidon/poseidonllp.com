@@ -1376,33 +1376,34 @@ function loadCompareSection(sectionId) {
             <h2>Compare US Stocks</h2>
             <div class="info-input" style="position: relative;">
                 <label for="stock1-us">Enter Stock 1 :</label>
-                <input type="text" id="stock1-us" placeholder="e.g., AAPL">
+                <input type="text" id="stock1-us" placeholder="e.g., AAPL" oninput="this.value = this.value.toUpperCase();">
                 <div id="suggestions-stock1-us" class="suggestions-container-us"></div>
             </div>
-        
+            
             <div class="info-input" style="position: relative;">
                 <label for="stock2-us">Enter Stock 2 :</label>
-                <input type="text" id="stock2-us" placeholder="e.g., TSLA">
+                <input type="text" id="stock2-us" placeholder="e.g., TSLA" oninput="this.value = this.value.toUpperCase();">
                 <div id="suggestions-stock2-us" class="suggestions-container-us"></div>
             </div>
-        
+            
             <div class="info-input" style="position: relative;">
                 <label for="stock3-us">Enter Stock 3 :</label>
-                <input type="text" id="stock3-us" placeholder="e.g., MSFT">
+                <input type="text" id="stock3-us" placeholder="e.g., MSFT" oninput="this.value = this.value.toUpperCase();">
                 <div id="suggestions-stock3-us" class="suggestions-container-us"></div>
             </div>
-        
+            
             <div class="info-input" style="position: relative;">
                 <label for="stock4-us">Enter Stock 4 :</label>
-                <input type="text" id="stock4-us" placeholder="e.g., AMZN">
+                <input type="text" id="stock4-us" placeholder="e.g., AMZN" oninput="this.value = this.value.toUpperCase();">
                 <div id="suggestions-stock4-us" class="suggestions-container-us"></div>
             </div>
-        
+            
             <div class="info-input" style="position: relative;">
                 <label for="stock5-us">Enter Stock 5 :</label>
-                <input type="text" id="stock5-us" placeholder="e.g., NVDA">
+                <input type="text" id="stock5-us" placeholder="e.g., NVDA" oninput="this.value = this.value.toUpperCase();">
                 <div id="suggestions-stock5-us" class="suggestions-container-us"></div>
             </div>
+
 
             
             <div class="chart-links">
@@ -1631,17 +1632,6 @@ function loadCompareSection(sectionId) {
         console.error("Compare section not found");
     }
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    const stockInputs = document.querySelectorAll('#stock1-us, #stock2-us, #stock3-us, #stock4-us, #stock5-us');
-
-    stockInputs.forEach(input => {
-        input.addEventListener('input', function() {
-            this.value = this.value.toUpperCase();
-        });
-    });
-});
-
 
 // 清除推薦框
 document.querySelectorAll('.info-input input').forEach(input => {
