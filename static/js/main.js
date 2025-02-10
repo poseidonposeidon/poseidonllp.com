@@ -1374,21 +1374,50 @@ function loadCompareSection(sectionId) {
         `,
         'compare-us': `
             <h2>Compare US Stocks</h2>
-            <div class="info-input">
+<!--            <div class="info-input">-->
+<!--                <label for="stock1-us">Enter Stock 1 :</label>-->
+<!--                <input type="text" id="stock1-us" placeholder="e.g., AAPL" oninput="this.value = this.value.toUpperCase();">-->
+<!--                -->
+<!--                <label for="stock2-us">Enter Stock 2 :</label>-->
+<!--                <input type="text" id="stock2-us" placeholder="e.g., TSLA" oninput="this.value = this.value.toUpperCase();">-->
+<!--                -->
+<!--                <label for="stock3-us">Enter Stock 3 :</label>-->
+<!--                <input type="text" id="stock3-us" placeholder="e.g., MSFT" oninput="this.value = this.value.toUpperCase();">-->
+<!--                -->
+<!--                <label for="stock4-us">Enter Stock 4 :</label>-->
+<!--                <input type="text" id="stock4-us" placeholder="e.g., AMZN" oninput="this.value = this.value.toUpperCase();">-->
+<!--                -->
+<!--                <label for="stock5-us">Enter Stock 5 :</label>-->
+<!--                <input type="text" id="stock5-us" placeholder="e.g., NVDA" oninput="this.value = this.value.toUpperCase();">-->
+<!--            </div>-->
+            <div class="info-input" style="position: relative;">
                 <label for="stock1-us">Enter Stock 1 :</label>
-                <input type="text" id="stock1-us" placeholder="e.g., AAPL" oninput="this.value = this.value.toUpperCase();">
-                
+                <input type="text" id="stock1-us" placeholder="e.g., AAPL">
+                <div id="suggestions-stock1-us" class="suggestions-container-us"></div>
+            </div>
+        
+            <div class="info-input" style="position: relative;">
                 <label for="stock2-us">Enter Stock 2 :</label>
-                <input type="text" id="stock2-us" placeholder="e.g., TSLA" oninput="this.value = this.value.toUpperCase();">
-                
+                <input type="text" id="stock2-us" placeholder="e.g., TSLA">
+                <div id="suggestions-stock2-us" class="suggestions-container-us"></div>
+            </div>
+        
+            <div class="info-input" style="position: relative;">
                 <label for="stock3-us">Enter Stock 3 :</label>
-                <input type="text" id="stock3-us" placeholder="e.g., MSFT" oninput="this.value = this.value.toUpperCase();">
-                
+                <input type="text" id="stock3-us" placeholder="e.g., MSFT">
+                <div id="suggestions-stock3-us" class="suggestions-container-us"></div>
+            </div>
+        
+            <div class="info-input" style="position: relative;">
                 <label for="stock4-us">Enter Stock 4 :</label>
-                <input type="text" id="stock4-us" placeholder="e.g., AMZN" oninput="this.value = this.value.toUpperCase();">
-                
+                <input type="text" id="stock4-us" placeholder="e.g., AMZN">
+                <div id="suggestions-stock4-us" class="suggestions-container-us"></div>
+            </div>
+        
+            <div class="info-input" style="position: relative;">
                 <label for="stock5-us">Enter Stock 5 :</label>
-                <input type="text" id="stock5-us" placeholder="e.g., NVDA" oninput="this.value = this.value.toUpperCase();">
+                <input type="text" id="stock5-us" placeholder="e.g., NVDA">
+                <div id="suggestions-stock5-us" class="suggestions-container-us"></div>
             </div>
 
             
@@ -1619,7 +1648,7 @@ function loadCompareSection(sectionId) {
     }
 }
 
-// 監聽指定輸入框的 keydown 事件
+// 清除推薦框
 document.querySelectorAll('.info-input input').forEach(input => {
     input.addEventListener('keydown', function (event) {
         if (event.key === 'Enter') {
@@ -1629,6 +1658,20 @@ document.querySelectorAll('.info-input input').forEach(input => {
             // 如果找到建議框，則清空並隱藏
             if (suggestionsContainer) {
                 clearSuggestions(suggestionsContainer); // 傳入建議框元素進行清空
+            }
+        }
+    });
+});
+
+document.querySelectorAll('.info-input input').forEach(input => {
+    input.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter') {
+            // 查找當前輸入框對應的建議框
+            const suggestionsContainer = this.parentElement.querySelector('.suggestions-container-us');
+
+            // 如果找到建議框，則清空並隱藏
+            if (suggestionsContainer) {
+                clearSuggestions(suggestionsContainer);
             }
         }
     });
@@ -2689,6 +2732,30 @@ document.getElementById('stock-input').addEventListener('input', debounce(async 
         clearSuggestions(suggestionsContainer); // 如果輸入框為空，清空建議
     }
 }, 300));
+
+document.addEventListener('input', debounce(async function (event) {
+    // 確認事件目標是美股的輸入框
+    if (event.target.matches('#stock1-us, #stock2-us, #stock3-us, #stock4-us, #stock5-us')) {
+        const stockSymbol = event.target.value.trim().toUpperCase(); // 取得輸入內容
+        const suggestionsContainerId = `suggestions-${event.target.id}`;
+        const suggestionsContainer = document.getElementById(suggestionsContainerId);
+
+        if (!suggestionsContainer) {
+            console.error(`Suggestions container not found for: ${suggestionsContainerId}`);
+            return;
+        }
+
+        // 當輸入內容有長度時顯示推薦框，否則隱藏
+        if (stockSymbol.length > 0) {
+            showLoadingSuggestions(suggestionsContainer); // 顯示"載入中"狀態
+            const stockData = await fetchStockSuggestionsUS(stockSymbol);
+            displaySuggestions(stockData, suggestionsContainer, event.target.id); // 顯示推薦內容
+        } else {
+            clearSuggestions(suggestionsContainer); // 清空並隱藏推薦框
+        }
+    }
+}, 200));
+
 
 async function fetchStockSuggestions(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
