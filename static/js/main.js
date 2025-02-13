@@ -1939,15 +1939,20 @@ function updateMarket(button) {
     const marketTitle = document.getElementById("marketTitle");
     if (currentMarket === "TW") {
         marketTitle.textContent = "台股市場焦點";
+        loadIndustryData();
     } else if (currentMarket === "US") {
         marketTitle.textContent = "美股市場焦點";
+        loadIndustryData();
     } else if (currentMarket === "JP") {
         marketTitle.textContent = "日股市場焦點";
+        loadIndustryData();
     } else if (currentMarket === "EU") {
         marketTitle.textContent = "歐股市場焦點";
+        loadIndustryData();
+    } else if (currentMarket === "Global") {
+        marketTitle.textContent = "全球市場熱力圖";
+        loadGlobalMarketHeatmap();
     }
-
-    loadIndustryData();
 }
 
 // 獲取單一股票的歷史數據並計算指定時間段的變化百分比
@@ -2077,15 +2082,76 @@ function updateTimeframe(button) {
     document.querySelectorAll(".time-filters button").forEach(btn => btn.classList.remove("active"));
     button.classList.add("active");
 
-    // 加載數據
-    loadIndustryData();
+    // 依照市場類型進行數據加載
+    if (currentMarket === "Global") {
+        loadGlobalMarketHeatmap();
+    } else {
+        loadIndustryData();
+    }
 }
-//////////////////////////////////////////////////////////////////////
-// 初始化頁面
-// document.addEventListener("DOMContentLoaded", () => {
-//     loadIndustryData();
-// });
-//
+
+function getFormattedDate(monthsOffset = 0) {
+    const date = new Date();
+    date.setMonth(date.getMonth() - monthsOffset);
+    return date.toISOString().split('T')[0];
+}
+
+async function loadGlobalMarketHeatmap() {
+    const industryGrid = document.getElementById("industryGrid");
+    industryGrid.innerHTML = `<p>Loading Global Market Heatmap...</p>`;
+
+    try {
+        const timeframeMap = {
+            "1m": getFormattedDate(1),
+            "3m": getFormattedDate(3),
+            "ytd": new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
+            "1y": getFormattedDate(12)
+        };
+        const fromDate = timeframeMap[currentTimeframe] || getFormattedDate(1);
+        const toDate = new Date().toISOString().split('T')[0];
+
+        const response = await fetch(`https://financialmodelingprep.com/api/v3/historical-sectors-performance?from=${fromDate}&to=${toDate}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`);
+        if (!response.ok) throw new Error("Failed to fetch global market data");
+
+        const data = await response.json();
+        const latestData = data[0]; // 取得最新的產業數據
+
+        const industryPerformance = {
+            "基本材料": latestData.basicMaterialsChangesPercentage,
+            "通訊服務": latestData.communicationServicesChangesPercentage,
+            "消費性周期": latestData.consumerCyclicalChangesPercentage,
+            "消費性防禦": latestData.consumerDefensiveChangesPercentage,
+            "能源": latestData.energyChangesPercentage,
+            "金融服務": latestData.financialServicesChangesPercentage,
+            "醫療保健": latestData.healthcareChangesPercentage,
+            "工業": latestData.industrialsChangesPercentage,
+            "房地產": latestData.realEstateChangesPercentage,
+            "科技": latestData.technologyChangesPercentage,
+            "公用事業": latestData.utilitiesChangesPercentage
+        };
+
+        industryGrid.innerHTML = Object.entries(industryPerformance)
+            .map(([industry, performance]) => {
+                const color = getColorByPerformance(performance);
+                return `
+                    <div class="industry-item" style="background-color: ${color};">
+                        <span>${industry}</span>
+                        <strong>${performance.toFixed(2)}%</strong>
+                    </div>
+                `;
+            })
+            .join("");
+    } catch (error) {
+        console.error("Error loading global market heatmap:", error);
+        industryGrid.innerHTML = "<p>Failed to load global market data. Please try again later.</p>";
+    }
+}
+
+// 根據漲跌幅設定顏色
+function getColorByPerformance(performance) {
+    return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
+}
+
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
