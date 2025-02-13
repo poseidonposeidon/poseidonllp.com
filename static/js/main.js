@@ -2028,10 +2028,7 @@ async function calculateIndustryPerformance(industryData) {
     return industryPerformance;
 }
 
-// 根據漲幅設定顏色
-function getColorByPerformance(performance) {
-    return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
-}
+
 
 // 修改產業數據選擇邏輯
 async function loadIndustryData() {
@@ -2147,11 +2144,10 @@ async function loadGlobalMarketHeatmap() {
     }
 }
 
-// 根據漲跌幅設定顏色
+// 根據漲幅設定顏色
 function getColorByPerformance(performance) {
     return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
 }
-
 //////////////////////////////////////////////////////////////////////////////
 function fetchStock() {
     const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
