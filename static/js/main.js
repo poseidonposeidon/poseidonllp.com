@@ -1811,11 +1811,12 @@ function loadExplore(sectionId) {
                 <h2 id="marketTitle">台股市場焦點</h2>
                 <p>市場焦點基於各產業前10大公司的漲跌幅平均值計算，點擊區塊可查看完整概念股清單，快速掌握市場趨勢。</p>
                 <div class="market-filters">
-                    <button class="active" data-market="TW" onclick="updateMarket(this)">TW</button>
+                    <button class="active" data-market="Global" onclick="updateMarket(this)">Global</button>
+                    <button data-market="TW" onclick="updateMarket(this)">TW</button>
                     <button data-market="US" onclick="updateMarket(this)">US</button>
                     <button data-market="JP" onclick="updateMarket(this)">JP</button>
                     <button data-market="EU" onclick="updateMarket(this)">EU</button>
-                    <button data-market="Global" onclick="updateMarket(this)">Global</button>
+                    
                 </div>
                 <div class="time-filters">
                     <button class="active" data-timeframe="1m" onclick="updateTimeframe(this)">1月</button>
@@ -1836,7 +1837,7 @@ function loadExplore(sectionId) {
 }
 //////////////////////////市場焦點/////////////////////////////////////////////
 let currentTimeframe = "1m"; // 默認時間範圍
-let currentMarket = "TW"; // 默認市場
+let currentMarket = "Global"; // 默認市場
 //歐洲
 const industryStocksEU = {
     "半導體": ["ASML.AS", "IFX.DE", "STM.PA", "NXPI", "ON"],
