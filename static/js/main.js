@@ -1302,9 +1302,14 @@ function loadAIBoxSection(sectionId) {
 let currentSectionId = null; // 用於記錄當前顯示的 sectionId
 
 function formatInput(input) {
-    // 僅允許數字和字母，並將字母轉為大寫
-    input.value = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+    // 允許英文字母 (A-Z, a-z)、數字 (0-9) 和 "."，但 "." 不能是第一個字元且不能重複
+    input.value = input.value
+        .toUpperCase() // 自動轉換為大寫
+        .replace(/[^A-Z0-9.]/g, '') // 移除非字母、數字和點的字符
+        .replace(/^\./, '') // 防止第一個字符為 "."
+        .replace(/\.{2,}/g, '.'); // 防止連續輸入多個 "."
 }
+
 
 function loadCompareSection(sectionId) {
     const sections = {
