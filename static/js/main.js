@@ -2093,6 +2093,29 @@ function getFormattedDate(monthsOffset = 0) {
     return date.toISOString().split('T')[0];
 }
 
+function calculateCumulativeChange(data, fromDate, toDate) {
+    const relevantData = data.filter(entry => new Date(entry.date) >= new Date(fromDate) && new Date(entry.date) <= new Date(toDate));
+
+    function computeGrowthRate(changes) {
+        return (changes.reduce((acc, change) => acc * (1 + change / 100), 1) - 1) * 100;
+    }
+
+    return {
+        "基本材料": computeGrowthRate(relevantData.map(d => d.basicMaterialsChangesPercentage)),
+        "通訊服務": computeGrowthRate(relevantData.map(d => d.communicationServicesChangesPercentage)),
+        "消費性周期": computeGrowthRate(relevantData.map(d => d.consumerCyclicalChangesPercentage)),
+        "消費性防禦": computeGrowthRate(relevantData.map(d => d.consumerDefensiveChangesPercentage)),
+        "能源": computeGrowthRate(relevantData.map(d => d.energyChangesPercentage)),
+        "金融服務": computeGrowthRate(relevantData.map(d => d.financialServicesChangesPercentage)),
+        "醫療保健": computeGrowthRate(relevantData.map(d => d.healthcareChangesPercentage)),
+        "工業": computeGrowthRate(relevantData.map(d => d.industrialsChangesPercentage)),
+        "房地產": computeGrowthRate(relevantData.map(d => d.realEstateChangesPercentage)),
+        "科技": computeGrowthRate(relevantData.map(d => d.technologyChangesPercentage)),
+        "公用事業": computeGrowthRate(relevantData.map(d => d.utilitiesChangesPercentage))
+    };
+}
+
+// 載入全球市場熱力圖
 async function loadGlobalMarketHeatmap() {
     const industryGrid = document.getElementById("industryGrid");
     industryGrid.innerHTML = `<p>Loading Global Market Heatmap...</p>`;
@@ -2114,33 +2137,7 @@ async function loadGlobalMarketHeatmap() {
         if (!response.ok) throw new Error("Failed to fetch global market data");
 
         const data = await response.json();
-
-        // 取得 fromDate 和 toDate 的數據
-        const fromData = data.find(entry => entry.date === fromDate);
-        const toData = data.find(entry => entry.date === toDate);
-
-        if (!fromData || !toData) {
-            throw new Error("Insufficient data for comparison");
-        }
-
-        // 計算漲跌幅
-        function calculateChange(from, to) {
-            return ((to - from) / Math.abs(from)) * 100;
-        }
-
-        const industryPerformance = {
-            "基本材料": calculateChange(fromData.basicMaterialsChangesPercentage, toData.basicMaterialsChangesPercentage),
-            "通訊服務": calculateChange(fromData.communicationServicesChangesPercentage, toData.communicationServicesChangesPercentage),
-            "消費性周期": calculateChange(fromData.consumerCyclicalChangesPercentage, toData.consumerCyclicalChangesPercentage),
-            "消費性防禦": calculateChange(fromData.consumerDefensiveChangesPercentage, toData.consumerDefensiveChangesPercentage),
-            "能源": calculateChange(fromData.energyChangesPercentage, toData.energyChangesPercentage),
-            "金融服務": calculateChange(fromData.financialServicesChangesPercentage, toData.financialServicesChangesPercentage),
-            "醫療保健": calculateChange(fromData.healthcareChangesPercentage, toData.healthcareChangesPercentage),
-            "工業": calculateChange(fromData.industrialsChangesPercentage, toData.industrialsChangesPercentage),
-            "房地產": calculateChange(fromData.realEstateChangesPercentage, toData.realEstateChangesPercentage),
-            "科技": calculateChange(fromData.technologyChangesPercentage, toData.technologyChangesPercentage),
-            "公用事業": calculateChange(fromData.utilitiesChangesPercentage, toData.utilitiesChangesPercentage)
-        };
+        const industryPerformance = calculateCumulativeChange(data, fromDate, toDate);
 
         industryGrid.innerHTML = Object.entries(industryPerformance)
             .map(([industry, performance]) => {
@@ -2157,8 +2154,8 @@ async function loadGlobalMarketHeatmap() {
         console.error("Error loading global market heatmap:", error);
         industryGrid.innerHTML = "<p>Failed to load global market data. Please try again later.</p>";
     }
-}
-// 根據漲幅設定顏色
+}// 根據漲幅設定顏色
+
 function getColorByPerformance(performance) {
     return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
 }
