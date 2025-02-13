@@ -2111,20 +2111,24 @@ async function loadGlobalMarketHeatmap() {
         if (!response.ok) throw new Error("Failed to fetch global market data");
 
         const data = await response.json();
-        const latestData = data[0]; // 取得最新的產業數據
+
+        // 選擇最接近 fromDate 的日期
+        const closestData = data.reduce((prev, curr) =>
+            Math.abs(new Date(curr.date) - new Date(fromDate)) < Math.abs(new Date(prev.date) - new Date(fromDate)) ? curr : prev
+        );
 
         const industryPerformance = {
-            "基本材料": latestData.basicMaterialsChangesPercentage,
-            "通訊服務": latestData.communicationServicesChangesPercentage,
-            "消費性周期": latestData.consumerCyclicalChangesPercentage,
-            "消費性防禦": latestData.consumerDefensiveChangesPercentage,
-            "能源": latestData.energyChangesPercentage,
-            "金融服務": latestData.financialServicesChangesPercentage,
-            "醫療保健": latestData.healthcareChangesPercentage,
-            "工業": latestData.industrialsChangesPercentage,
-            "房地產": latestData.realEstateChangesPercentage,
-            "科技": latestData.technologyChangesPercentage,
-            "公用事業": latestData.utilitiesChangesPercentage
+            "基本材料": closestData.basicMaterialsChangesPercentage,
+            "通訊服務": closestData.communicationServicesChangesPercentage,
+            "消費性周期": closestData.consumerCyclicalChangesPercentage,
+            "消費性防禦": closestData.consumerDefensiveChangesPercentage,
+            "能源": closestData.energyChangesPercentage,
+            "金融服務": closestData.financialServicesChangesPercentage,
+            "醫療保健": closestData.healthcareChangesPercentage,
+            "工業": closestData.industrialsChangesPercentage,
+            "房地產": closestData.realEstateChangesPercentage,
+            "科技": closestData.technologyChangesPercentage,
+            "公用事業": closestData.utilitiesChangesPercentage
         };
 
         industryGrid.innerHTML = Object.entries(industryPerformance)
