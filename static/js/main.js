@@ -2106,32 +2106,40 @@ async function loadGlobalMarketHeatmap() {
         };
         const fromDate = timeframeMap[currentTimeframe] || getFormattedDate(1);
         const toDate = new Date().toISOString().split('T')[0];
-        
+
         const apiUrl = `https://financialmodelingprep.com/api/v3/historical-sectors-performance?from=${fromDate}&to=${toDate}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`;
         console.log("Fetching data from API:", apiUrl);
 
-        const response = await fetch(`https://financialmodelingprep.com/api/v3/historical-sectors-performance?from=${fromDate}&to=${toDate}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`);
+        const response = await fetch(apiUrl);
         if (!response.ok) throw new Error("Failed to fetch global market data");
 
         const data = await response.json();
 
-        // 選擇最接近 fromDate 的日期
-        const closestData = data.reduce((prev, curr) =>
-            Math.abs(new Date(curr.date) - new Date(fromDate)) < Math.abs(new Date(prev.date) - new Date(fromDate)) ? curr : prev
-        );
+        // 取得 fromDate 和 toDate 的數據
+        const fromData = data.find(entry => entry.date === fromDate);
+        const toData = data.find(entry => entry.date === toDate);
+
+        if (!fromData || !toData) {
+            throw new Error("Insufficient data for comparison");
+        }
+
+        // 計算漲跌幅
+        function calculateChange(from, to) {
+            return ((to - from) / Math.abs(from)) * 100;
+        }
 
         const industryPerformance = {
-            "基本材料": closestData.basicMaterialsChangesPercentage,
-            "通訊服務": closestData.communicationServicesChangesPercentage,
-            "消費性周期": closestData.consumerCyclicalChangesPercentage,
-            "消費性防禦": closestData.consumerDefensiveChangesPercentage,
-            "能源": closestData.energyChangesPercentage,
-            "金融服務": closestData.financialServicesChangesPercentage,
-            "醫療保健": closestData.healthcareChangesPercentage,
-            "工業": closestData.industrialsChangesPercentage,
-            "房地產": closestData.realEstateChangesPercentage,
-            "科技": closestData.technologyChangesPercentage,
-            "公用事業": closestData.utilitiesChangesPercentage
+            "基本材料": calculateChange(fromData.basicMaterialsChangesPercentage, toData.basicMaterialsChangesPercentage),
+            "通訊服務": calculateChange(fromData.communicationServicesChangesPercentage, toData.communicationServicesChangesPercentage),
+            "消費性周期": calculateChange(fromData.consumerCyclicalChangesPercentage, toData.consumerCyclicalChangesPercentage),
+            "消費性防禦": calculateChange(fromData.consumerDefensiveChangesPercentage, toData.consumerDefensiveChangesPercentage),
+            "能源": calculateChange(fromData.energyChangesPercentage, toData.energyChangesPercentage),
+            "金融服務": calculateChange(fromData.financialServicesChangesPercentage, toData.financialServicesChangesPercentage),
+            "醫療保健": calculateChange(fromData.healthcareChangesPercentage, toData.healthcareChangesPercentage),
+            "工業": calculateChange(fromData.industrialsChangesPercentage, toData.industrialsChangesPercentage),
+            "房地產": calculateChange(fromData.realEstateChangesPercentage, toData.realEstateChangesPercentage),
+            "科技": calculateChange(fromData.technologyChangesPercentage, toData.technologyChangesPercentage),
+            "公用事業": calculateChange(fromData.utilitiesChangesPercentage, toData.utilitiesChangesPercentage)
         };
 
         industryGrid.innerHTML = Object.entries(industryPerformance)
@@ -2150,7 +2158,6 @@ async function loadGlobalMarketHeatmap() {
         industryGrid.innerHTML = "<p>Failed to load global market data. Please try again later.</p>";
     }
 }
-
 // 根據漲幅設定顏色
 function getColorByPerformance(performance) {
     return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
