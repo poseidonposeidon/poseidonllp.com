@@ -2106,6 +2106,9 @@ async function loadGlobalMarketHeatmap() {
         };
         const fromDate = timeframeMap[currentTimeframe] || getFormattedDate(1);
         const toDate = new Date().toISOString().split('T')[0];
+        
+        const apiUrl = `https://financialmodelingprep.com/api/v3/historical-sectors-performance?from=${fromDate}&to=${toDate}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`;
+        console.log("Fetching data from API:", apiUrl);
 
         const response = await fetch(`https://financialmodelingprep.com/api/v3/historical-sectors-performance?from=${fromDate}&to=${toDate}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`);
         if (!response.ok) throw new Error("Failed to fetch global market data");
