@@ -2130,9 +2130,6 @@ async function loadGlobalMarketHeatmap() {
         const fromDate = timeframeMap[currentTimeframe] || getFormattedDate(1);
         const toDate = new Date().toISOString().split('T')[0];
 
-        const apiUrl = `https://financialmodelingprep.com/api/v3/historical-sectors-performance?from=${fromDate}&to=${toDate}&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`;
-        console.log("Fetching data from API:", apiUrl);
-
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error("Failed to fetch global market data");
 
@@ -3117,17 +3114,35 @@ async function fetchStockWithExchangeSuffixGlobal(stockCode, apiKey) {
 
         const data = await response.json();
 
-        // 判斷輸入是否為台灣股票（純數字）
+        // 1. 台股判斷 (純數字，例如 "2330")
         if (/^\d+$/.test(stockCode)) {
-            // 尋找台灣股票代碼
             const filteredData = data.filter(item => item.symbol.endsWith('.TW') || item.symbol.endsWith('.TWO'));
             const match = filteredData.find(item => item.symbol.split('.')[0] === stockCode);
-            return match ? match.symbol : `${stockCode}.TW`; // 如果未匹配，預設為 .TW
+            return match ? match.symbol : `${stockCode}.TW`; // 預設為 .TW
         }
 
-        // 處理全球股票代碼的邏輯
+        // 2. 美股判斷 (純字母，如 "AAPL", "TSLA")
+        if (/^[A-Z]+$/.test(stockCode)) {
+            const match = data.find(item => item.symbol === stockCode);
+            return match ? match.symbol : stockCode; // 預設直接返回輸入的代碼
+        }
+
+        // 3. 歐股判斷 (帶有 `.`，例如 "SAP.DE", "AIR.PA")
+        if (stockCode.includes('.')) {
+            const filteredData = data.filter(item =>
+                item.symbol.toUpperCase() === stockCode.toUpperCase() ||
+                (item.exchange && item.exchange.toLowerCase().includes('euronext')) ||
+                (item.exchange && item.exchange.toLowerCase().includes('xetra')) // XETRA (德國)
+            );
+
+            const match = filteredData.find(item => item.symbol.toUpperCase() === stockCode.toUpperCase());
+            return match ? match.symbol : stockCode; // 預設返回輸入的代碼
+        }
+
+        // 4. 其他市場的處理 (如香港 `HKEX`)
         const match = data.find(item => item.symbol.includes(stockCode));
         return match ? match.symbol : null;
+
     } catch (error) {
         console.error('Error fetching global stock exchange:', error);
         return null;
