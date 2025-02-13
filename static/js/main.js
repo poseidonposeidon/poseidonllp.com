@@ -1815,6 +1815,7 @@ function loadExplore(sectionId) {
                     <button data-market="US" onclick="updateMarket(this)">US</button>
                     <button data-market="JP" onclick="updateMarket(this)">JP</button>
                     <button data-market="EU" onclick="updateMarket(this)">EU</button>
+                    <button data-market="Global" onclick="updateMarket(this)">Global</button>
                 </div>
                 <div class="time-filters">
                     <button class="active" data-timeframe="1m" onclick="updateTimeframe(this)">1月</button>
@@ -2027,8 +2028,6 @@ async function calculateIndustryPerformance(industryData) {
     console.log("Calculated Industry Performance (Parallel):", industryPerformance);
     return industryPerformance;
 }
-
-
 
 // 修改產業數據選擇邏輯
 async function loadIndustryData() {
