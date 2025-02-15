@@ -1651,41 +1651,33 @@ function loadCompareSection(sectionId) {
 }
 
 // 清除推薦框
-document.querySelectorAll('.info-input input').forEach(input => {
-    input.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            // 查找當前輸入框對應的建議框
-            const suggestionsContainer = this.parentElement.querySelector('.suggestions-container-eu');
+// 監聽全局 Enter 鍵，確保所有推薦框能正確關閉
+document.addEventListener('keydown', function (event) {
+    if (event.key === 'Enter') {
+        const activeInput = document.activeElement; // 取得當前輸入框
+        if (!activeInput || !activeInput.matches('.info-input input')) return;
 
-            // 如果找到建議框，則清空並隱藏
-            if (suggestionsContainer) {
-                clearSuggestions(suggestionsContainer); // 傳入建議框元素進行清空
-            }
-        }
-    });
+        // 查找所有可能的推薦框 (multi, us, eu, tw)
+        const suggestionsContainers = activeInput.parentElement.querySelectorAll(
+            '.suggestions-container-multi, .suggestions-container-us, .suggestions-container-eu, .suggestions-container-tw'
+        );
+
+        // 遍歷並清除所有推薦框
+        suggestionsContainers.forEach(suggestionsContainer => {
+            clearSuggestionss(suggestionsContainer);
+        });
+    }
 });
 
-document.querySelectorAll('.info-input input').forEach(input => {
-    input.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            clearSuggestions();
-        }
-    });
-});
+// **清除推薦框函數**
+function clearSuggestionss(container) {
+    if (container) {
+        container.innerHTML = ''; // 清空內容
+        container.classList.remove('active'); // 移除顯示狀態
+        container.style.display = 'none'; // 強制隱藏
+    }
+}
 
-document.querySelectorAll('.info-input input').forEach(input => {
-    input.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            // 查找當前輸入框對應的建議框
-            const suggestionsContainer = this.parentElement.querySelector('.suggestions-container-multi');
-
-            // 如果找到建議框，則清空並隱藏
-            if (suggestionsContainer) {
-                clearSuggestions(suggestionsContainer);
-            }
-        }
-    });
-});
 
 
 function toggleMenu(menuId) {
