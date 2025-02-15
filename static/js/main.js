@@ -3121,17 +3121,25 @@ async function fetchStockSuggestionsCombined(stockSymbol) {
             fetch(apiUrls.TW).then(res => res.json())
         ]);
 
-        // 過濾對應市場的股票代碼
+        // 美股 (USD)
         const usStocks = responses[0].filter(stock => stock.currency === 'USD')
             .map(stock => ({ symbol: stock.symbol, market: 'US' }));
 
+        // 歐股 (EUR, GBp)
         const euStocks = responses[1].filter(stock => stock.currency === 'EUR' || stock.currency === 'GBp')
             .map(stock => ({ symbol: stock.symbol, market: 'EU' }));
 
+        // 台股 (TWD) - 確保 .TW 和 .TWO 正確處理
         const twStocks = responses[2].filter(stock => stock.currency === 'TWD')
             .map(stock => {
                 let symbol = stock.symbol;
-                // 保留 `.TW` 或 `.TWO`
+
+                // 修正：移除 API 可能加上的 `O`
+                symbol = symbol.replace('O.TW', '.TWO'); // 修正上櫃
+                symbol = symbol.replace('O.TWO', '.TWO'); // 確保上櫃股票正確
+                symbol = symbol.replace('.TW', '.TW'); // 確保上市股票正確
+
+                // 確保只返回 .TW 或 .TWO 代碼
                 if (symbol.endsWith('.TW') || symbol.endsWith('.TWO')) {
                     return { symbol, market: 'TW' };
                 }
