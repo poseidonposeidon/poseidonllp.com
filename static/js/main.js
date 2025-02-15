@@ -1534,24 +1534,36 @@ function loadCompareSection(sectionId) {
         `,
         'compare-multi': `
             <h2>Compare Global Stocks</h2>
-            <div class="info-input">
+            <div class="info-input" style="position: relative;">
                 <label for="stock1">Stock 1:</label>
-                <input type="text" id="stock1" placeholder="e.g., 2330 or AAPL" oninput="formatInput(this)">
-            
-                <label for="stock2">Stock 2:</label>
-                <input type="text" id="stock2" placeholder="e.g., 2317 or TSLA" oninput="formatInput(this)">
-            
-                <label for="stock3">Stock 3:</label>
-                <input type="text" id="stock3" placeholder="e.g., 2881 or GOOG" oninput="formatInput(this)">
-            
-                <label for="stock4">Stock 4:</label>
-                <input type="text" id="stock4" placeholder="e.g., 1301 or MSFT" oninput="formatInput(this)">
-            
-                <label for="stock5">Stock 5:</label>
-                <input type="text" id="stock5" placeholder="e.g., 1101 or AMZN" oninput="formatInput(this)">
+                <input type="text" id="stock1" placeholder="e.g., 2330 or AAPL" oninput="this.value = this.value.toUpperCase();">
+                <div id="suggestions-stock1" class="suggestions-container-multi"></div>
             </div>
-
             
+            <div class="info-input" style="position: relative;">
+                <label for="stock2">Stock 2:</label>
+                <input type="text" id="stock2" placeholder="e.g., 2317 or TSLA" oninput="this.value = this.value.toUpperCase();">
+                <div id="suggestions-stock2" class="suggestions-container-multi"></div>
+            </div>
+            
+            <div class="info-input" style="position: relative;">
+                <label for="stock3">Stock 3:</label>
+                <input type="text" id="stock3" placeholder="e.g., 2881 or GOOG" oninput="this.value = this.value.toUpperCase();">
+                <div id="suggestions-stock3" class="suggestions-container-multi"></div>
+            </div>
+            
+            <div class="info-input" style="position: relative;">
+                <label for="stock4">Stock 4:</label>
+                <input type="text" id="stock4" placeholder="e.g., 1301 or MSFT" oninput="this.value = this.value.toUpperCase();">
+                <div id="suggestions-stock4" class="suggestions-container-multi"></div>
+            </div>
+            
+            <div class="info-input" style="position: relative;">
+                <label for="stock5">Stock 5:</label>
+                <input type="text" id="stock5" placeholder="e.g., 1101 or AMZN" oninput="this.value = this.value.toUpperCase();">
+                <div id="suggestions-stock5" class="suggestions-container-multi"></div>
+            </div>
+         
             <!-- 新增切換圖表的功能 -->
             <div class="chart-links">
                 <div class="category">
@@ -3047,6 +3059,87 @@ async function fetchStockSuggestionsCN(stockSymbol) {
     } catch (error) {
         console.error('Error fetching stock data:', error);
         return [];
+    }
+}
+
+//台股美股歐股
+// 監聽 compare-multi 內的所有輸入框
+document.addEventListener('input', debounce(async function(event) {
+    if (event.target.matches('#stock1, #stock2, #stock3, #stock4, #stock5')) {
+        const stockSymbol = event.target.value.trim().toUpperCase();
+        const suggestionsContainerId = `suggestions-${event.target.id}`;
+        let suggestionsContainer = document.getElementById(suggestionsContainerId);
+
+        // 如果推薦框不存在，則動態建立
+        if (!suggestionsContainer) {
+            suggestionsContainer = document.createElement('div');
+            suggestionsContainer.id = suggestionsContainerId;
+            suggestionsContainer.classList.add('suggestions-container-multi');
+            event.target.parentNode.appendChild(suggestionsContainer);
+        }
+
+        // 當輸入內容有長度時顯示推薦框，否則隱藏
+        if (stockSymbol.length > 0) {
+            showLoadingSuggestions(suggestionsContainer);
+            const stockData = await fetchStockSuggestionsCombined(stockSymbol);
+            displaySuggestionsCombined(stockData, suggestionsContainer, event.target.id);
+        } else {
+            clearSuggestions(suggestionsContainer);
+        }
+    }
+}, 200));
+
+// **請求台股、美股、歐股**
+async function fetchStockSuggestionsCombined(stockSymbol) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+    const apiUrls = {
+        US: `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`,
+        EU: `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`,
+        TW: `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`
+    };
+
+    try {
+        // 發送所有請求
+        const responses = await Promise.all([
+            fetch(apiUrls.US).then(res => res.json()),
+            fetch(apiUrls.EU).then(res => res.json()),
+            fetch(apiUrls.TW).then(res => res.json())
+        ]);
+
+        // 過濾對應市場的股票代碼
+        const usStocks = responses[0].filter(stock => stock.currency === 'USD')
+            .map(stock => ({ symbol: stock.symbol, market: 'US' }));
+
+        const euStocks = responses[1].filter(stock => stock.currency === 'EUR' || stock.currency === 'GBp')
+            .map(stock => ({ symbol: stock.symbol, market: 'EU' }));
+
+        const twStocks = responses[2].filter(stock => stock.currency === 'TWD')
+            .map(stock => ({ symbol: stock.symbol.replace('.TW', ''), market: 'TW' }));
+
+        // 合併所有市場的建議結果
+        return [...usStocks, ...euStocks, ...twStocks];
+    } catch (error) {
+        console.error('Error fetching stock data:', error);
+        return [];
+    }
+}
+
+// **顯示綜合推薦結果**
+function displaySuggestionsCombined(suggestions, container, inputId) {
+    container.innerHTML = '';
+    if (suggestions.length > 0) {
+        suggestions.forEach(({ symbol, market }) => {
+            const suggestionDiv = document.createElement('div');
+            suggestionDiv.textContent = `${symbol} (${market})`;
+            suggestionDiv.addEventListener('click', () => {
+                document.getElementById(inputId).value = symbol;
+                clearSuggestions(container);
+            });
+            container.appendChild(suggestionDiv);
+        });
+        container.classList.add('active');
+    } else {
+        showNoSuggestions(container);
     }
 }
 
