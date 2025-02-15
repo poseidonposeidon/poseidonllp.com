@@ -3102,7 +3102,7 @@ document.addEventListener('input', debounce(async function(event) {
             clearSuggestions(suggestionsContainer);
         }
     }
-}, 200));
+}, 100));
 
 // **請求台股、美股、歐股**
 async function fetchStockSuggestionsCombined(stockSymbol) {
@@ -3129,7 +3129,14 @@ async function fetchStockSuggestionsCombined(stockSymbol) {
             .map(stock => ({ symbol: stock.symbol, market: 'EU' }));
 
         const twStocks = responses[2].filter(stock => stock.currency === 'TWD')
-            .map(stock => ({ symbol: stock.symbol.replace('.TW', ''), market: 'TW' }));
+            .map(stock => {
+                let symbol = stock.symbol;
+                // 保留 `.TW` 或 `.TWO`
+                if (symbol.endsWith('.TW') || symbol.endsWith('.TWO')) {
+                    return { symbol, market: 'TW' };
+                }
+                return null; // 過濾掉無效代碼
+            }).filter(stock => stock !== null); // 移除 `null` 值
 
         // 合併所有市場的建議結果
         return [...usStocks, ...euStocks, ...twStocks];
