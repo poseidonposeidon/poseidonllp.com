@@ -1533,7 +1533,7 @@ function loadCompareSection(sectionId) {
             </div>
         `,
         'compare-multi': `
-            <h2>Compare Global Stocks</h2>
+            <h2>Compare Global Stocks (TW , U.S , EU)</h2>
             <div class="info-input" style="position: relative;">
                 <label for="stock1">Stock 1:</label>
                 <input type="text" id="stock1" placeholder="e.g., 2330 or AAPL" oninput="this.value = this.value.toUpperCase();">
