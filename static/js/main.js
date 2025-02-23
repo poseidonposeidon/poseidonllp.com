@@ -4032,7 +4032,6 @@ function drawChart(labels, dataSets, type) {
                     maxBarThickness: 50,
                     barPercentage: 0.9,
                     categoryPercentage: 1.0,
-                    stacked: true // 讓 bar 疊加
                 }
             }
         }
