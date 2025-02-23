@@ -3965,18 +3965,30 @@ function drawChart(labels, dataSets, type) {
         };
     });
 
-    // 計算最大值和最小值，確保 Y 軸適當
+    // 計算所有非空資料的最大與最小值
     const allValues = formattedDataSets.flatMap(set => set.data).filter(value => value !== null);
     const maxValue = Math.max(...allValues);
     const minValue = Math.min(...allValues);
 
-    // 根據 type 決定圖表類型：若屬於特定類型則使用 bar 圖
+    // 判斷圖表類型：對特定數據使用 bar，否則使用 line
     const chartType = ['eps', 'revenue', 'costOfRevenue', 'operatingExpenses', 'operatingIncome'].includes(type) ? 'bar' : 'line';
 
     const chartData = {
         labels: allDates,
         datasets: formattedDataSets
     };
+
+    // 依據圖表類型調整 x 軸設定：bar 圖使用 category scale，其他則使用 time scale
+    const xScaleConfig = chartType === 'bar'
+        ? {
+            type: 'category',
+            ticks: { autoSkip: false }
+        }
+        : {
+            type: 'time',
+            time: { unit: 'quarter' },
+            ticks: { autoSkip: true, maxRotation: 0, minRotation: 0 }
+        };
 
     chartInstance = new Chart(ctx, {
         type: chartType,
@@ -3987,15 +3999,13 @@ function drawChart(labels, dataSets, type) {
             aspectRatio: 2,
             scales: {
                 x: {
-                    type: 'time',
-                    time: { unit: 'quarter' },
-                    ticks: { autoSkip: true, maxRotation: 0, minRotation: 0 },
-                    stacked: false  // 取消堆疊，分開呈現
+                    ...xScaleConfig,
+                    stacked: false  // 取消堆疊，讓各個 bar 分開呈現
                 },
                 y: {
                     beginAtZero: true,
-                    suggestedMin: minValue * 0.8, // 確保最小值不會太靠近底部
-                    suggestedMax: maxValue * 1.2, // 增加 20% 預留空間，防止壓縮
+                    suggestedMin: minValue * 0.8, // 為了不讓數值太靠近底部
+                    suggestedMax: maxValue * 1.2, // 增加20%預留空間防止壓縮
                     ticks: {
                         callback: function (value) {
                             if (type === 'stockPrice') {
@@ -4008,7 +4018,7 @@ function drawChart(labels, dataSets, type) {
                                 : value.toFixed(2) + '%';
                         }
                     },
-                    stacked: false  // 取消堆疊，分開呈現
+                    stacked: false
                 }
             },
             plugins: {
@@ -4028,12 +4038,11 @@ function drawChart(labels, dataSets, type) {
             },
             elements: {
                 bar: {
-                    // 固定 bar 厚度，避免因空間拉伸導致 bar 過細
+                    // 固定 bar 厚度，確保即使資料多也不會過細
                     barThickness: 50,
                     maxBarThickness: 50,
                     barPercentage: 0.9,
-                    categoryPercentage: 1.0,
-                    stacked: false  // 確保每個數據獨立呈現，不堆疊
+                    categoryPercentage: 1.0
                 }
             }
         }
