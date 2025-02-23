@@ -3987,12 +3987,13 @@ function drawChart(labels, dataSets, type) {
                 x: {
                     type: 'time',
                     time: { unit: 'quarter' },
-                    ticks: { autoSkip: true, maxRotation: 0, minRotation: 0 }
+                    ticks: { autoSkip: true, maxRotation: 0, minRotation: 0 },
+                    stacked: true // 讓 bar 疊加而不是並排，避免過細
                 },
                 y: {
                     beginAtZero: true,
                     suggestedMin: minValue * 0.8, // 確保最小值不會太靠近底部
-                    suggestedMax: maxValue * 1.2, // 增加 20% 預留空間
+                    suggestedMax: maxValue * 1.2, // 增加 20% 預留空間，防止壓縮
                     ticks: {
                         callback: function (value) {
                             if (type === 'stockPrice') {
@@ -4004,7 +4005,8 @@ function drawChart(labels, dataSets, type) {
                                 ? value.toLocaleString()
                                 : value.toFixed(2) + '%';
                         }
-                    }
+                    },
+                    stacked: true // 讓 bar 疊加而不是並排，避免過細
                 }
             },
             plugins: {
@@ -4026,9 +4028,9 @@ function drawChart(labels, dataSets, type) {
                 bar: {
                     barThickness: 'flex', // 讓 bar 自適應
                     maxBarThickness: 50,  // 增加最大 bar 寬度，避免太細
-                    barPercentage: maxValue / minValue > 100 ? 0.9 : 0.8, // 如果數值範圍過大，增加 bar 佔比
-                    categoryPercentage: maxValue / minValue > 100 ? 0.95 : 0.85, // 避免 bar 太細
-                    grouped: false // 確保不同數據不會擠壓彼此
+                    barPercentage: 0.9,   // 讓 bar 保持較大寬度
+                    categoryPercentage: 1.0, // 讓 bar 不被壓縮
+                    stacked: true // 讓 bar 疊加
                 }
             }
         }
