@@ -3964,7 +3964,7 @@ function drawChart(labels, dataSets, type) {
         };
     });
 
-    // 計算最大值，用來調整 y 軸範圍，確保不會壓縮小值
+    // 計算最大值和最小值，確保 Y 軸適當
     const allValues = formattedDataSets.flatMap(set => set.data).filter(value => value !== null);
     const maxValue = Math.max(...allValues);
     const minValue = Math.min(...allValues);
@@ -3990,8 +3990,9 @@ function drawChart(labels, dataSets, type) {
                     ticks: { autoSkip: true, maxRotation: 0, minRotation: 0 }
                 },
                 y: {
-                    beginAtZero: true, // 確保柱狀圖從 0 開始
-                    suggestedMax: maxValue * 1.1, // 增加 10% 預留空間
+                    beginAtZero: true,
+                    suggestedMin: minValue * 0.8, // 確保最小值不會太靠近底部
+                    suggestedMax: maxValue * 1.2, // 增加 20% 預留空間
                     ticks: {
                         callback: function (value) {
                             if (type === 'stockPrice') {
@@ -4024,8 +4025,10 @@ function drawChart(labels, dataSets, type) {
             elements: {
                 bar: {
                     barThickness: 'flex', // 讓 bar 自適應
-                    maxBarThickness: 40,  // 設定最大 bar 寬度，防止太細
-                    grouped: false        // 確保不同數據不會擠壓彼此
+                    maxBarThickness: 50,  // 增加最大 bar 寬度，避免太細
+                    barPercentage: maxValue / minValue > 100 ? 0.9 : 0.8, // 如果數值範圍過大，增加 bar 佔比
+                    categoryPercentage: maxValue / minValue > 100 ? 0.95 : 0.85, // 避免 bar 太細
+                    grouped: false // 確保不同數據不會擠壓彼此
                 }
             }
         }
