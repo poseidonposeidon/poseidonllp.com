@@ -3919,6 +3919,16 @@ function drawChart(labels, dataSets, type) {
     const allDates = [...new Set(dataSets.flatMap(data => data.map(item => item.date.split('T')[0])))]
         .sort((a, b) => new Date(a) - new Date(b));
 
+    // 格式化日期成「YYYY Qx」格式，例如 "2024 Q1"
+    function formatDateToQuarter(dateStr) {
+        const date = new Date(dateStr);
+        const year = date.getFullYear();
+        const quarter = Math.floor(date.getMonth() / 3) + 1;
+        return `${year} Q${quarter}`;
+    }
+
+    const formattedDates = allDates.map(formatDateToQuarter);
+
     const formattedDataSets = dataSets.map((data, index) => {
         const formattedData = allDates.map(date => {
             const entry = data.find(item => item.date.split('T')[0] === date);
@@ -3965,30 +3975,17 @@ function drawChart(labels, dataSets, type) {
         };
     });
 
-    // 計算所有非空資料的最大與最小值
+    // 計算最大值和最小值
     const allValues = formattedDataSets.flatMap(set => set.data).filter(value => value !== null);
     const maxValue = Math.max(...allValues);
     const minValue = Math.min(...allValues);
 
-    // 判斷圖表類型：對特定數據使用 bar，否則使用 line
     const chartType = ['eps', 'revenue', 'costOfRevenue', 'operatingExpenses', 'operatingIncome'].includes(type) ? 'bar' : 'line';
 
     const chartData = {
-        labels: allDates,
+        labels: formattedDates,  // 使用格式化後的「YYYY Qx」
         datasets: formattedDataSets
     };
-
-    // 依據圖表類型調整 x 軸設定：bar 圖使用 category scale，其他則使用 time scale
-    const xScaleConfig = chartType === 'bar'
-        ? {
-            type: 'category',
-            ticks: { autoSkip: false }
-        }
-        : {
-            type: 'time',
-            time: { unit: 'quarter' },
-            ticks: { autoSkip: true, maxRotation: 0, minRotation: 0 }
-        };
 
     chartInstance = new Chart(ctx, {
         type: chartType,
@@ -3999,13 +3996,17 @@ function drawChart(labels, dataSets, type) {
             aspectRatio: 2,
             scales: {
                 x: {
-                    ...xScaleConfig,
-                    stacked: false  // 取消堆疊，讓各個 bar 分開呈現
+                    type: 'category', // 使用類別型 x 軸，不要用時間
+                    ticks: {
+                        autoSkip: true,  // 自動跳過部分標籤
+                        maxTicksLimit: 10, // 限制最多顯示 10 個標籤，避免擁擠
+                    },
+                    stacked: false
                 },
                 y: {
                     beginAtZero: true,
-                    suggestedMin: minValue * 0.8, // 為了不讓數值太靠近底部
-                    suggestedMax: maxValue * 1.2, // 增加20%預留空間防止壓縮
+                    suggestedMin: minValue * 0.8,
+                    suggestedMax: maxValue * 1.2,
                     ticks: {
                         callback: function (value) {
                             if (type === 'stockPrice') {
@@ -4038,7 +4039,6 @@ function drawChart(labels, dataSets, type) {
             },
             elements: {
                 bar: {
-                    // 固定 bar 厚度，確保即使資料多也不會過細
                     barThickness: 50,
                     maxBarThickness: 50,
                     barPercentage: 0.9,
