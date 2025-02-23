@@ -1310,7 +1310,6 @@ function formatInput(input) {
         .replace(/\.{2,}/g, '.'); // 防止連續輸入多個 "."
 }
 
-
 function loadCompareSection(sectionId) {
     const sections = {
         'compare-tw': `
@@ -1677,8 +1676,6 @@ function clearSuggestionss(container) {
         container.style.display = 'none'; // 強制隱藏
     }
 }
-
-
 
 function toggleMenu(menuId) {
     const submenu = document.getElementById(menuId);
@@ -3921,31 +3918,29 @@ function drawChart(labels, dataSets, type) {
 
     const allDates = [...new Set(dataSets.flatMap(data => data.map(item => item.date.split('T')[0])))].sort((a, b) => new Date(a) - new Date(b));
 
-    // console.log('All Dates:', allDates);
-
     const formattedDataSets = dataSets.map((data, index) => {
         const formattedData = allDates.map(date => {
             const entry = data.find(item => item.date.split('T')[0] === date);
             if (!entry) return null;
 
             switch (type) {
-                case 'grossMarginYoY': return entry.grossProfitYoY !== undefined ? entry.grossProfitYoY : null;
-                case 'operatingMarginYoY': return entry.operatingMarginYoY !== undefined ? entry.operatingMarginYoY : null;
-                case 'netProfitYoY': return entry.netProfitYoY !== undefined ? entry.netProfitYoY : null;
-                case 'eps': return entry.eps !== undefined ? entry.eps : null;
-                case 'revenue': return entry.revenue !== undefined ? entry.revenue : null;
-                case 'costOfRevenue': return entry.revenue !== undefined ? entry.revenue : null;
-                case 'operatingExpenses': return entry.revenue !== undefined ? entry.revenue : null;
-                case 'grossMargin': return entry.margin !== undefined ? entry.margin : null;
-                case 'operatingMargin': return entry.margin !== undefined ? entry.margin : null;
-                case 'netProfitMargin': return entry.margin !== undefined ? entry.margin : null;
-                case 'roe': return entry.margin !== undefined ? entry.margin : null;
-                case 'externalROE': return entry.margin !== undefined ? entry.margin : null;
-                case 'revenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
-                case 'quarterlyRevenueGrowthRate': return entry.margin !== undefined ? entry.margin : null;
-                case 'operatingIncome': return entry.operatingIncome !== undefined ? entry.operatingIncome : null;
-                case 'stockPrice': return entry.price !== undefined ? entry.price : null;
-                case 'peRatio': return entry.peRatio !== undefined ? entry.peRatio : null;
+                case 'grossMarginYoY': return entry.grossProfitYoY ?? null;
+                case 'operatingMarginYoY': return entry.operatingMarginYoY ?? null;
+                case 'netProfitYoY': return entry.netProfitYoY ?? null;
+                case 'eps': return entry.eps ?? null;
+                case 'revenue': return entry.revenue ?? null;
+                case 'costOfRevenue': return entry.revenue ?? null;
+                case 'operatingExpenses': return entry.revenue ?? null;
+                case 'grossMargin': return entry.margin ?? null;
+                case 'operatingMargin': return entry.margin ?? null;
+                case 'netProfitMargin': return entry.margin ?? null;
+                case 'roe': return entry.margin ?? null;
+                case 'externalROE': return entry.margin ?? null;
+                case 'revenueGrowthRate': return entry.margin ?? null;
+                case 'quarterlyRevenueGrowthRate': return entry.margin ?? null;
+                case 'operatingIncome': return entry.operatingIncome ?? null;
+                case 'stockPrice': return entry.price ?? null;
+                case 'peRatio': return entry.peRatio ?? null;
                 default: return null;
             }
         });
@@ -3969,7 +3964,12 @@ function drawChart(labels, dataSets, type) {
         };
     });
 
-    const chartType = (type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome') ? 'bar' : 'line';
+    // 計算最大值，用來調整 y 軸範圍，確保不會壓縮小值
+    const allValues = formattedDataSets.flatMap(set => set.data).filter(value => value !== null);
+    const maxValue = Math.max(...allValues);
+    const minValue = Math.min(...allValues);
+
+    const chartType = ['eps', 'revenue', 'costOfRevenue', 'operatingExpenses', 'operatingIncome'].includes(type) ? 'bar' : 'line';
 
     const chartData = {
         labels: allDates,
@@ -3990,7 +3990,8 @@ function drawChart(labels, dataSets, type) {
                     ticks: { autoSkip: true, maxRotation: 0, minRotation: 0 }
                 },
                 y: {
-                    beginAtZero: false,
+                    beginAtZero: true, // 確保柱狀圖從 0 開始
+                    suggestedMax: maxValue * 1.1, // 增加 10% 預留空間
                     ticks: {
                         callback: function (value) {
                             if (type === 'stockPrice') {
@@ -3998,7 +3999,9 @@ function drawChart(labels, dataSets, type) {
                             } else if (type === 'peRatio') {
                                 return value.toFixed(2);
                             }
-                            return type === 'eps' || type === 'revenue' || type === 'costOfRevenue' || type === 'operatingExpenses' || type === 'operatingIncome' ? value.toLocaleString() : value.toFixed(2) + '%';
+                            return ['eps', 'revenue', 'costOfRevenue', 'operatingExpenses', 'operatingIncome'].includes(type)
+                                ? value.toLocaleString()
+                                : value.toFixed(2) + '%';
                         }
                     }
                 }
@@ -4016,6 +4019,13 @@ function drawChart(labels, dataSets, type) {
                             return 'No data';
                         }
                     }
+                }
+            },
+            elements: {
+                bar: {
+                    barThickness: 'flex', // 讓 bar 自適應
+                    maxBarThickness: 40,  // 設定最大 bar 寬度，防止太細
+                    grouped: false        // 確保不同數據不會擠壓彼此
                 }
             }
         }
