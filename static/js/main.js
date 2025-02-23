@@ -3916,7 +3916,8 @@ function drawChart(labels, dataSets, type) {
         chartInstance.destroy();
     }
 
-    const allDates = [...new Set(dataSets.flatMap(data => data.map(item => item.date.split('T')[0])))].sort((a, b) => new Date(a) - new Date(b));
+    const allDates = [...new Set(dataSets.flatMap(data => data.map(item => item.date.split('T')[0])))]
+        .sort((a, b) => new Date(a) - new Date(b));
 
     const formattedDataSets = dataSets.map((data, index) => {
         const formattedData = allDates.map(date => {
@@ -3989,7 +3990,7 @@ function drawChart(labels, dataSets, type) {
                     type: 'time',
                     time: { unit: 'quarter' },
                     ticks: { autoSkip: true, maxRotation: 0, minRotation: 0 },
-                    stacked: true // 讓 bar 疊加而不是並排，避免過細
+                    stacked: false  // 取消堆疊，分開呈現
                 },
                 y: {
                     beginAtZero: true,
@@ -4007,7 +4008,7 @@ function drawChart(labels, dataSets, type) {
                                 : value.toFixed(2) + '%';
                         }
                     },
-                    stacked: true // 讓 bar 疊加而不是並排，避免過細
+                    stacked: false  // 取消堆疊，分開呈現
                 }
             },
             plugins: {
@@ -4027,12 +4028,12 @@ function drawChart(labels, dataSets, type) {
             },
             elements: {
                 bar: {
-                    // 將 barThickness 固定為 50，避免因空間拉伸導致 bar 過細
+                    // 固定 bar 厚度，避免因空間拉伸導致 bar 過細
                     barThickness: 50,
                     maxBarThickness: 50,
                     barPercentage: 0.9,
                     categoryPercentage: 1.0,
-                    stacked: false
+                    stacked: false  // 確保每個數據獨立呈現，不堆疊
                 }
             }
         }
