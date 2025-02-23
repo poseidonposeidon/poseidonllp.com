@@ -3969,6 +3969,7 @@ function drawChart(labels, dataSets, type) {
     const maxValue = Math.max(...allValues);
     const minValue = Math.min(...allValues);
 
+    // 根據 type 決定圖表類型：若屬於特定類型則使用 bar 圖
     const chartType = ['eps', 'revenue', 'costOfRevenue', 'operatingExpenses', 'operatingIncome'].includes(type) ? 'bar' : 'line';
 
     const chartData = {
@@ -4026,10 +4027,11 @@ function drawChart(labels, dataSets, type) {
             },
             elements: {
                 bar: {
-                    barThickness: 'flex', // 讓 bar 自適應
-                    maxBarThickness: 50,  // 增加最大 bar 寬度，避免太細
-                    barPercentage: 0.9,   // 讓 bar 保持較大寬度
-                    categoryPercentage: 1.0, // 讓 bar 不被壓縮
+                    // 將 barThickness 固定為 50，避免因空間拉伸導致 bar 過細
+                    barThickness: 50,
+                    maxBarThickness: 50,
+                    barPercentage: 0.9,
+                    categoryPercentage: 1.0,
                     stacked: true // 讓 bar 疊加
                 }
             }
