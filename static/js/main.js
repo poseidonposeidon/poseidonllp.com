@@ -2115,13 +2115,27 @@ function getFormattedDate(monthsOffset = 0) {
 }
 
 function calculateCumulativeChange(data, fromDate, toDate) {
+    let availableDates = data.map(entry => entry.date);
+    console.log("Available Dates in API Response:", availableDates);
+    console.log(`Checking for data between ${fromDate} and ${toDate}`);
+
+    // 找到最接近的可用日期
+    function getClosestDate(targetDate, availableDates) {
+        return availableDates.reduce((closest, current) => {
+            return Math.abs(new Date(current) - new Date(targetDate)) < Math.abs(new Date(closest) - new Date(targetDate)) ? current : closest;
+        });
+    }
+
+    let adjustedFromDate = getClosestDate(fromDate, availableDates);
+    console.log(`Adjusted From Date: ${adjustedFromDate}`);
+
     // 過濾出符合時間範圍的數據
     const relevantData = data.filter(entry =>
-        new Date(entry.date) >= new Date(fromDate) && new Date(entry.date) <= new Date(toDate)
+        new Date(entry.date) >= new Date(adjustedFromDate) && new Date(entry.date) <= new Date(toDate)
     );
 
     if (relevantData.length === 0) {
-        console.warn("No relevant data found for the selected timeframe:", fromDate, toDate);
+        console.warn("No relevant data found for the adjusted timeframe:", adjustedFromDate, toDate);
         return {
             "基本材料": 0,
             "通訊服務": 0,
