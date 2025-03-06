@@ -2116,10 +2116,10 @@ function getFormattedDate(monthsOffset = 0) {
 
 function calculateCumulativeChange(data, fromDate, toDate) {
     let availableDates = data.map(entry => entry.date);
+
     console.log("Available Dates in API Response:", availableDates);
     console.log(`Checking for data between ${fromDate} and ${toDate}`);
 
-    // 找到最接近的可用日期
     function getClosestDate(targetDate, availableDates) {
         return availableDates.reduce((closest, current) => {
             return Math.abs(new Date(current) - new Date(targetDate)) < Math.abs(new Date(closest) - new Date(targetDate)) ? current : closest;
@@ -2129,7 +2129,6 @@ function calculateCumulativeChange(data, fromDate, toDate) {
     let adjustedFromDate = getClosestDate(fromDate, availableDates);
     console.log(`Adjusted From Date: ${adjustedFromDate}`);
 
-    // 過濾出符合時間範圍的數據
     const relevantData = data.filter(entry =>
         new Date(entry.date) >= new Date(adjustedFromDate) && new Date(entry.date) <= new Date(toDate)
     );
@@ -2187,19 +2186,9 @@ async function loadGlobalMarketHeatmap() {
             throw new Error("Invalid API response format");
         }
 
-        const timeframeMap = {
-            "1m": getFormattedDate(1),
-            "3m": getFormattedDate(3),
-            "ytd": new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
-            "1y": getFormattedDate(12)
-        };
-        const fromDate = timeframeMap[currentTimeframe] || getFormattedDate(1);
-        const toDate = new Date().toISOString().split('T')[0];
-
-        console.log(`Calculating cumulative change from ${fromDate} to ${toDate}`);
-
+        // 🔹 修正格式轉換，確保 `date` 是 `YYYY-MM-DD`
         const formattedData = Object.entries(data).map(([date, sectors]) => ({
-            date,
+            date, // 這裡的 date 現在是正確的 "YYYY-MM-DD" 格式
             basicMaterialsChangesPercentage: parseFloat(sectors["Basic Materials"]) || 0,
             communicationServicesChangesPercentage: parseFloat(sectors["Communication Services"]) || 0,
             consumerCyclicalChangesPercentage: parseFloat(sectors["Consumer Cyclical"]) || 0,
@@ -2212,6 +2201,19 @@ async function loadGlobalMarketHeatmap() {
             technologyChangesPercentage: parseFloat(sectors["Information Technology"]) || 0,
             utilitiesChangesPercentage: parseFloat(sectors["Utilities"]) || 0
         }));
+
+        console.log("Formatted Data:", formattedData.map(d => d.date)); // 確保日期正確
+
+        const timeframeMap = {
+            "1m": getFormattedDate(1),
+            "3m": getFormattedDate(3),
+            "ytd": new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0],
+            "1y": getFormattedDate(12)
+        };
+        const fromDate = timeframeMap[currentTimeframe] || getFormattedDate(1);
+        const toDate = new Date().toISOString().split('T')[0];
+
+        console.log(`Calculating cumulative change from ${fromDate} to ${toDate}`);
 
         const industryPerformance = calculateCumulativeChange(formattedData, fromDate, toDate);
         console.log("Calculated Industry Performance:", industryPerformance);
