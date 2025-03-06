@@ -2142,9 +2142,51 @@ async function loadGlobalMarketHeatmap() {
     industryGrid.innerHTML = `<p>Loading Global Market Heatmap...</p>`;
 
     try {
-        // 明確定義 API URL
         const apiUrl = `${BASE_URL}sector-performance?apikey=${API_KEY}`;
+        const response = await fetch(apiUrl);
+        if (!response.ok) throw new Error("Failed to fetch global market data");
 
+        const data = await response.json();
+        console.log("API 回應數據:", data); // 偵錯用，查看 API 回應格式
+
+        // 確保 API 回應的是陣列
+        if (!Array.isArray(data)) {
+            console.error("API 回應格式錯誤:", data);
+            throw new Error("API response is not an array");
+        }
+
+        // 建立對應的產業名稱映射 (API 的名稱 -> 系統內部名稱)
+        const sectorMapping = {
+            "Materials": "基本材料",
+            "Communication Services": "通訊服務",
+            "Consumer Cyclical": "消費性周期",
+            "Consumer Defensive": "消費性防禦",
+            "Energy": "能源",
+            "Financials": "金融服務",
+            "Health Care": "醫療保健",
+            "Industrials": "工業",
+            "Real Estate": "房地產",
+            "Information Technology": "科技",
+            "Utilities": "公用事業"
+        };
+
+        // 轉換 API 回應格式為 `calculateCumulativeChange()` 需要的格式
+        const formattedData = data.map(sector => ({
+            date: new Date().toISOString().split('T')[0], // 加入當天日期
+            basicMaterialsChangesPercentage: sector.sector === "Materials" ? parseFloat(sector.changesPercentage) : 0,
+            communicationServicesChangesPercentage: sector.sector === "Communication Services" ? parseFloat(sector.changesPercentage) : 0,
+            consumerCyclicalChangesPercentage: sector.sector === "Consumer Cyclical" ? parseFloat(sector.changesPercentage) : 0,
+            consumerDefensiveChangesPercentage: sector.sector === "Consumer Defensive" ? parseFloat(sector.changesPercentage) : 0,
+            energyChangesPercentage: sector.sector === "Energy" ? parseFloat(sector.changesPercentage) : 0,
+            financialServicesChangesPercentage: sector.sector === "Financials" ? parseFloat(sector.changesPercentage) : 0,
+            healthcareChangesPercentage: sector.sector === "Health Care" ? parseFloat(sector.changesPercentage) : 0,
+            industrialsChangesPercentage: sector.sector === "Industrials" ? parseFloat(sector.changesPercentage) : 0,
+            realEstateChangesPercentage: sector.sector === "Real Estate" ? parseFloat(sector.changesPercentage) : 0,
+            technologyChangesPercentage: sector.sector === "Information Technology" ? parseFloat(sector.changesPercentage) : 0,
+            utilitiesChangesPercentage: sector.sector === "Utilities" ? parseFloat(sector.changesPercentage) : 0
+        }));
+
+        // 取得時間範圍
         const timeframeMap = {
             "1m": getFormattedDate(1),
             "3m": getFormattedDate(3),
@@ -2153,33 +2195,6 @@ async function loadGlobalMarketHeatmap() {
         };
         const fromDate = timeframeMap[currentTimeframe] || getFormattedDate(1);
         const toDate = new Date().toISOString().split('T')[0];
-
-        const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error("Failed to fetch global market data");
-
-        const data = await response.json();
-        console.log("API 回傳的全球市場數據:", data); // 確認 API 回應的結構
-
-        // 檢查 API 回應是否包含 `sectorPerformance`
-        if (!data.sectorPerformance) {
-            throw new Error("API response does not contain 'sectorPerformance' field");
-        }
-
-        // 解析 API 回應數據，轉換為 `calculateCumulativeChange()` 需要的格式
-        const formattedData = data.sectorPerformance.map(sector => ({
-            date: toDate,  // API 沒有時間序列，所以我們手動設定日期
-            basicMaterialsChangesPercentage: sector.sector === "Basic Materials" ? parseFloat(sector.changesPercentage) : 0,
-            communicationServicesChangesPercentage: sector.sector === "Communication Services" ? parseFloat(sector.changesPercentage) : 0,
-            consumerCyclicalChangesPercentage: sector.sector === "Consumer Cyclical" ? parseFloat(sector.changesPercentage) : 0,
-            consumerDefensiveChangesPercentage: sector.sector === "Consumer Defensive" ? parseFloat(sector.changesPercentage) : 0,
-            energyChangesPercentage: sector.sector === "Energy" ? parseFloat(sector.changesPercentage) : 0,
-            financialServicesChangesPercentage: sector.sector === "Financial Services" ? parseFloat(sector.changesPercentage) : 0,
-            healthcareChangesPercentage: sector.sector === "Healthcare" ? parseFloat(sector.changesPercentage) : 0,
-            industrialsChangesPercentage: sector.sector === "Industrials" ? parseFloat(sector.changesPercentage) : 0,
-            realEstateChangesPercentage: sector.sector === "Real Estate" ? parseFloat(sector.changesPercentage) : 0,
-            technologyChangesPercentage: sector.sector === "Technology" ? parseFloat(sector.changesPercentage) : 0,
-            utilitiesChangesPercentage: sector.sector === "Utilities" ? parseFloat(sector.changesPercentage) : 0
-        }));
 
         // 計算產業的累積變化
         const industryPerformance = calculateCumulativeChange(formattedData, fromDate, toDate);
