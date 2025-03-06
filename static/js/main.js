@@ -2115,24 +2115,45 @@ function getFormattedDate(monthsOffset = 0) {
 }
 
 function calculateCumulativeChange(data, fromDate, toDate) {
-    const relevantData = data.filter(entry => new Date(entry.date) >= new Date(fromDate) && new Date(entry.date) <= new Date(toDate));
+    // 過濾出符合時間範圍的數據
+    const relevantData = data.filter(entry =>
+        new Date(entry.date) >= new Date(fromDate) && new Date(entry.date) <= new Date(toDate)
+    );
+
+    if (relevantData.length === 0) {
+        console.warn("No relevant data found for the selected timeframe:", fromDate, toDate);
+        return {
+            "基本材料": 0,
+            "通訊服務": 0,
+            "消費性周期": 0,
+            "消費性防禦": 0,
+            "能源": 0,
+            "金融服務": 0,
+            "醫療保健": 0,
+            "工業": 0,
+            "房地產": 0,
+            "科技": 0,
+            "公用事業": 0
+        };
+    }
 
     function computeGrowthRate(changes) {
+        if (changes.length === 0) return 0;
         return (changes.reduce((acc, change) => acc * (1 + change / 100), 1) - 1) * 100;
     }
 
     return {
-        "基本材料": computeGrowthRate(relevantData.map(d => d.basicMaterialsChangesPercentage)),
-        "通訊服務": computeGrowthRate(relevantData.map(d => d.communicationServicesChangesPercentage)),
-        "消費性周期": computeGrowthRate(relevantData.map(d => d.consumerCyclicalChangesPercentage)),
-        "消費性防禦": computeGrowthRate(relevantData.map(d => d.consumerDefensiveChangesPercentage)),
-        "能源": computeGrowthRate(relevantData.map(d => d.energyChangesPercentage)),
-        "金融服務": computeGrowthRate(relevantData.map(d => d.financialServicesChangesPercentage)),
-        "醫療保健": computeGrowthRate(relevantData.map(d => d.healthcareChangesPercentage)),
-        "工業": computeGrowthRate(relevantData.map(d => d.industrialsChangesPercentage)),
-        "房地產": computeGrowthRate(relevantData.map(d => d.realEstateChangesPercentage)),
-        "科技": computeGrowthRate(relevantData.map(d => d.technologyChangesPercentage)),
-        "公用事業": computeGrowthRate(relevantData.map(d => d.utilitiesChangesPercentage))
+        "基本材料": computeGrowthRate(relevantData.map(d => d.basicMaterialsChangesPercentage ?? 0)),
+        "通訊服務": computeGrowthRate(relevantData.map(d => d.communicationServicesChangesPercentage ?? 0)),
+        "消費性周期": computeGrowthRate(relevantData.map(d => d.consumerCyclicalChangesPercentage ?? 0)),
+        "消費性防禦": computeGrowthRate(relevantData.map(d => d.consumerDefensiveChangesPercentage ?? 0)),
+        "能源": computeGrowthRate(relevantData.map(d => d.energyChangesPercentage ?? 0)),
+        "金融服務": computeGrowthRate(relevantData.map(d => d.financialServicesChangesPercentage ?? 0)),
+        "醫療保健": computeGrowthRate(relevantData.map(d => d.healthcareChangesPercentage ?? 0)),
+        "工業": computeGrowthRate(relevantData.map(d => d.industrialsChangesPercentage ?? 0)),
+        "房地產": computeGrowthRate(relevantData.map(d => d.realEstateChangesPercentage ?? 0)),
+        "科技": computeGrowthRate(relevantData.map(d => d.technologyChangesPercentage ?? 0)),
+        "公用事業": computeGrowthRate(relevantData.map(d => d.utilitiesChangesPercentage ?? 0))
     };
 }
 
@@ -2161,22 +2182,25 @@ async function loadGlobalMarketHeatmap() {
         const fromDate = timeframeMap[currentTimeframe] || getFormattedDate(1);
         const toDate = new Date().toISOString().split('T')[0];
 
+        console.log(`Calculating cumulative change from ${fromDate} to ${toDate}`);
+
         const formattedData = Object.entries(data).map(([date, sectors]) => ({
             date,
-            basicMaterialsChangesPercentage: sectors["Basic Materials"] ?? 0,
-            communicationServicesChangesPercentage: sectors["Communication Services"] ?? 0,
-            consumerCyclicalChangesPercentage: sectors["Consumer Cyclical"] ?? 0,
-            consumerDefensiveChangesPercentage: sectors["Consumer Defensive"] ?? 0,
-            energyChangesPercentage: sectors["Energy"] ?? 0,
-            financialServicesChangesPercentage: sectors["Financials"] ?? 0,
-            healthcareChangesPercentage: sectors["Healthcare"] ?? 0,
-            industrialsChangesPercentage: sectors["Industrials"] ?? 0,
-            realEstateChangesPercentage: sectors["Real Estate"] ?? 0,
-            technologyChangesPercentage: sectors["Information Technology"] ?? 0,
-            utilitiesChangesPercentage: sectors["Utilities"] ?? 0
+            basicMaterialsChangesPercentage: parseFloat(sectors["Basic Materials"]) || 0,
+            communicationServicesChangesPercentage: parseFloat(sectors["Communication Services"]) || 0,
+            consumerCyclicalChangesPercentage: parseFloat(sectors["Consumer Cyclical"]) || 0,
+            consumerDefensiveChangesPercentage: parseFloat(sectors["Consumer Defensive"]) || 0,
+            energyChangesPercentage: parseFloat(sectors["Energy"]) || 0,
+            financialServicesChangesPercentage: parseFloat(sectors["Financials"]) || 0,
+            healthcareChangesPercentage: parseFloat(sectors["Healthcare"]) || 0,
+            industrialsChangesPercentage: parseFloat(sectors["Industrials"]) || 0,
+            realEstateChangesPercentage: parseFloat(sectors["Real Estate"]) || 0,
+            technologyChangesPercentage: parseFloat(sectors["Information Technology"]) || 0,
+            utilitiesChangesPercentage: parseFloat(sectors["Utilities"]) || 0
         }));
 
         const industryPerformance = calculateCumulativeChange(formattedData, fromDate, toDate);
+        console.log("Calculated Industry Performance:", industryPerformance);
 
         industryGrid.innerHTML = Object.entries(industryPerformance)
             .map(([industry, performance]) => {
