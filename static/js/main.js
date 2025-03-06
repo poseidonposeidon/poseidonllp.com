@@ -2161,30 +2161,23 @@ async function loadGlobalMarketHeatmap() {
     industryGrid.innerHTML = `<p>Loading Global Market Heatmap...</p>`;
 
     try {
-        const apiUrl = `${BASE_URL}historical-sectors-performance?apikey=${API_KEY}`;
+        // 🔸 修改處：在 API URL 中加上 &limit=365 (或你需要的更大天數)
+        const apiUrl = `${BASE_URL}historical-sectors-performance?apikey=${API_KEY}&limit=365`;
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error("Failed to fetch global market data");
 
         const data = await response.json();
         console.log("API 回應數據:", data);
 
-        // data 已經是陣列，例如：
-        // [
-        //   { date: "2025-03-06", basicMaterialsChangesPercentage: 1.51092, ... },
-        //   { date: "2025-03-05", basicMaterialsChangesPercentage: 1.51092, ... },
-        //   ...
-        // ]
-
+        // 檢查回傳是否為陣列
         if (!Array.isArray(data) || data.length === 0) {
             throw new Error("Invalid API response format");
         }
 
-        // 不要再用 Object.entries(data)；直接 map 即可
+        // 直接用 map 處理
         const formattedData = data.map(item => {
-            // item: { date: "2025-03-06", basicMaterialsChangesPercentage: 1.51092, ... }
-            // 這裡可視需要做其他處理，例如 parseFloat()
             return {
-                date: item.date,
+                date: item.date, // 已經是 "YYYY-MM-DD" 格式的日期
                 basicMaterialsChangesPercentage: parseFloat(item.basicMaterialsChangesPercentage) || 0,
                 communicationServicesChangesPercentage: parseFloat(item.communicationServicesChangesPercentage) || 0,
                 consumerCyclicalChangesPercentage: parseFloat(item.consumerCyclicalChangesPercentage) || 0,
@@ -2199,9 +2192,9 @@ async function loadGlobalMarketHeatmap() {
             };
         });
 
-        console.log("Formatted Data:", formattedData.map(d => d.date));
+        console.log("Formatted Data (dates):", formattedData.map(d => d.date));
 
-        // 取得使用者選的 timeframe 後，計算 fromDate 與 toDate
+        // 選擇不同 timeframe
         const timeframeMap = {
             "1m": getFormattedDate(1),
             "3m": getFormattedDate(3),
@@ -2216,6 +2209,7 @@ async function loadGlobalMarketHeatmap() {
         const industryPerformance = calculateCumulativeChange(formattedData, fromDate, toDate);
         console.log("Calculated Industry Performance:", industryPerformance);
 
+        // 更新畫面
         industryGrid.innerHTML = Object.entries(industryPerformance)
             .map(([industry, performance]) => {
                 const color = getColorByPerformance(performance);
