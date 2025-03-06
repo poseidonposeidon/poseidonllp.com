@@ -2133,22 +2133,22 @@ function calculateCumulativeChange(data, fromDate, toDate) {
         new Date(entry.date) >= new Date(adjustedFromDate) && new Date(entry.date) <= new Date(toDate)
     );
 
-    if (relevantData.length === 0) {
-        console.warn("No relevant data found for the adjusted timeframe:", adjustedFromDate, toDate);
-        return {
-            "基本材料": 0,
-            "通訊服務": 0,
-            "消費性周期": 0,
-            "消費性防禦": 0,
-            "能源": 0,
-            "金融服務": 0,
-            "醫療保健": 0,
-            "工業": 0,
-            "房地產": 0,
-            "科技": 0,
-            "公用事業": 0
-        };
-    }
+    // if (relevantData.length === 0) {
+    //     console.warn("No relevant data found for the adjusted timeframe:", adjustedFromDate, toDate);
+    //     return {
+    //         "基本材料": 0,
+    //         "通訊服務": 0,
+    //         "消費性周期": 0,
+    //         "消費性防禦": 0,
+    //         "能源": 0,
+    //         "金融服務": 0,
+    //         "醫療保健": 0,
+    //         "工業": 0,
+    //         "房地產": 0,
+    //         "科技": 0,
+    //         "公用事業": 0
+    //     };
+    // }
 
     function computeGrowthRate(changes) {
         if (changes.length === 0) return 0;
