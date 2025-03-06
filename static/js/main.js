@@ -2142,6 +2142,9 @@ async function loadGlobalMarketHeatmap() {
     industryGrid.innerHTML = `<p>Loading Global Market Heatmap...</p>`;
 
     try {
+        // 明確定義 API URL
+        const apiUrl = `${BASE_URL}sector-performance?apikey=${API_KEY}`;
+
         const timeframeMap = {
             "1m": getFormattedDate(1),
             "3m": getFormattedDate(3),
@@ -2155,8 +2158,33 @@ async function loadGlobalMarketHeatmap() {
         if (!response.ok) throw new Error("Failed to fetch global market data");
 
         const data = await response.json();
-        const industryPerformance = calculateCumulativeChange(data, fromDate, toDate);
+        console.log("API 回傳的全球市場數據:", data); // 確認 API 回應的結構
 
+        // 檢查 API 回應是否包含 `sectorPerformance`
+        if (!data.sectorPerformance) {
+            throw new Error("API response does not contain 'sectorPerformance' field");
+        }
+
+        // 解析 API 回應數據，轉換為 `calculateCumulativeChange()` 需要的格式
+        const formattedData = data.sectorPerformance.map(sector => ({
+            date: toDate,  // API 沒有時間序列，所以我們手動設定日期
+            basicMaterialsChangesPercentage: sector.sector === "Basic Materials" ? parseFloat(sector.changesPercentage) : 0,
+            communicationServicesChangesPercentage: sector.sector === "Communication Services" ? parseFloat(sector.changesPercentage) : 0,
+            consumerCyclicalChangesPercentage: sector.sector === "Consumer Cyclical" ? parseFloat(sector.changesPercentage) : 0,
+            consumerDefensiveChangesPercentage: sector.sector === "Consumer Defensive" ? parseFloat(sector.changesPercentage) : 0,
+            energyChangesPercentage: sector.sector === "Energy" ? parseFloat(sector.changesPercentage) : 0,
+            financialServicesChangesPercentage: sector.sector === "Financial Services" ? parseFloat(sector.changesPercentage) : 0,
+            healthcareChangesPercentage: sector.sector === "Healthcare" ? parseFloat(sector.changesPercentage) : 0,
+            industrialsChangesPercentage: sector.sector === "Industrials" ? parseFloat(sector.changesPercentage) : 0,
+            realEstateChangesPercentage: sector.sector === "Real Estate" ? parseFloat(sector.changesPercentage) : 0,
+            technologyChangesPercentage: sector.sector === "Technology" ? parseFloat(sector.changesPercentage) : 0,
+            utilitiesChangesPercentage: sector.sector === "Utilities" ? parseFloat(sector.changesPercentage) : 0
+        }));
+
+        // 計算產業的累積變化
+        const industryPerformance = calculateCumulativeChange(formattedData, fromDate, toDate);
+
+        // 更新前端顯示
         industryGrid.innerHTML = Object.entries(industryPerformance)
             .map(([industry, performance]) => {
                 const color = getColorByPerformance(performance);
@@ -2172,7 +2200,7 @@ async function loadGlobalMarketHeatmap() {
         console.error("Error loading global market heatmap:", error);
         industryGrid.innerHTML = "<p>Failed to load global market data. Please try again later.</p>";
     }
-}// 根據漲幅設定顏色
+}
 
 function getColorByPerformance(performance) {
     return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
