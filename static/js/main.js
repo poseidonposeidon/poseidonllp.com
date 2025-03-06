@@ -1960,9 +1960,9 @@ function updateMarket(button) {
     button.classList.add("active");
 
     const marketTitle = document.getElementById("marketTitle");
-    if (currentMarket === "TW") {
-        marketTitle.textContent = "台股市場焦點";
-        loadIndustryData();
+    if (currentMarket === "Global") {
+        marketTitle.textContent = "全球市場熱力圖";
+        loadGlobalMarketHeatmap();
     } else if (currentMarket === "US") {
         marketTitle.textContent = "美股市場焦點";
         loadIndustryData();
@@ -1972,9 +1972,9 @@ function updateMarket(button) {
     } else if (currentMarket === "EU") {
         marketTitle.textContent = "歐股市場焦點";
         loadIndustryData();
-    } else if (currentMarket === "Global") {
-        marketTitle.textContent = "全球市場熱力圖";
-        loadGlobalMarketHeatmap();
+    } else if (currentMarket === "TW") {
+        marketTitle.textContent = "台股市場焦點";
+        loadIndustryData()
     }
 }
 
