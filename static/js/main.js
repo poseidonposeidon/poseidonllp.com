@@ -1829,7 +1829,7 @@ function loadExplore(sectionId) {
     const sections = {
         'market': `
             <div class="section" id="market">
-                <h2 id="marketTitle">台股市場焦點</h2>
+                <h2 id="marketTitle">全球市場熱力圖</h2>
                 <p>市場焦點基於各產業前10大公司的漲跌幅平均值計算，點擊區塊可查看完整概念股清單，快速掌握市場趨勢。</p>
                 <div class="market-filters">
                     <button class="active" data-market="Global" onclick="updateMarket(this)">Global</button>
