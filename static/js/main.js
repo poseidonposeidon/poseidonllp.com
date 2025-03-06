@@ -2168,35 +2168,40 @@ async function loadGlobalMarketHeatmap() {
         const data = await response.json();
         console.log("API 回應數據:", data);
 
-        if (typeof data !== 'object' || Object.keys(data).length === 0) {
+        // data 已經是陣列，例如：
+        // [
+        //   { date: "2025-03-06", basicMaterialsChangesPercentage: 1.51092, ... },
+        //   { date: "2025-03-05", basicMaterialsChangesPercentage: 1.51092, ... },
+        //   ...
+        // ]
+
+        if (!Array.isArray(data) || data.length === 0) {
             throw new Error("Invalid API response format");
         }
 
-        // 修正：手動將 "MM-DD-YYYY" → "YYYY-MM-DD"
-        const formattedData = Object.entries(data).map(([rawDate, sectors]) => {
-            // 假設原始 rawDate 形如 "03-06-2025"
-            const [month, day, year] = rawDate.split('-');
-            // 重新組成 "2025-03-06" 讓 new Date(...) 能正確解譯
-            const isoDate = `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
-
+        // 不要再用 Object.entries(data)；直接 map 即可
+        const formattedData = data.map(item => {
+            // item: { date: "2025-03-06", basicMaterialsChangesPercentage: 1.51092, ... }
+            // 這裡可視需要做其他處理，例如 parseFloat()
             return {
-                date: isoDate,
-                basicMaterialsChangesPercentage: parseFloat(sectors["Basic Materials"]) || 0,
-                communicationServicesChangesPercentage: parseFloat(sectors["Communication Services"]) || 0,
-                consumerCyclicalChangesPercentage: parseFloat(sectors["Consumer Cyclical"]) || 0,
-                consumerDefensiveChangesPercentage: parseFloat(sectors["Consumer Defensive"]) || 0,
-                energyChangesPercentage: parseFloat(sectors["Energy"]) || 0,
-                financialServicesChangesPercentage: parseFloat(sectors["Financials"]) || 0,
-                healthcareChangesPercentage: parseFloat(sectors["Healthcare"]) || 0,
-                industrialsChangesPercentage: parseFloat(sectors["Industrials"]) || 0,
-                realEstateChangesPercentage: parseFloat(sectors["Real Estate"]) || 0,
-                technologyChangesPercentage: parseFloat(sectors["Information Technology"]) || 0,
-                utilitiesChangesPercentage: parseFloat(sectors["Utilities"]) || 0
+                date: item.date,
+                basicMaterialsChangesPercentage: parseFloat(item.basicMaterialsChangesPercentage) || 0,
+                communicationServicesChangesPercentage: parseFloat(item.communicationServicesChangesPercentage) || 0,
+                consumerCyclicalChangesPercentage: parseFloat(item.consumerCyclicalChangesPercentage) || 0,
+                consumerDefensiveChangesPercentage: parseFloat(item.consumerDefensiveChangesPercentage) || 0,
+                energyChangesPercentage: parseFloat(item.energyChangesPercentage) || 0,
+                financialServicesChangesPercentage: parseFloat(item.financialServicesChangesPercentage) || 0,
+                healthcareChangesPercentage: parseFloat(item.healthcareChangesPercentage) || 0,
+                industrialsChangesPercentage: parseFloat(item.industrialsChangesPercentage) || 0,
+                realEstateChangesPercentage: parseFloat(item.realEstateChangesPercentage) || 0,
+                technologyChangesPercentage: parseFloat(item.technologyChangesPercentage) || 0,
+                utilitiesChangesPercentage: parseFloat(item.utilitiesChangesPercentage) || 0
             };
         });
 
-        console.log("Formatted Data:", formattedData.map(d => d.date)); // 應該都是 "YYYY-MM-DD"
+        console.log("Formatted Data:", formattedData.map(d => d.date));
 
+        // 取得使用者選的 timeframe 後，計算 fromDate 與 toDate
         const timeframeMap = {
             "1m": getFormattedDate(1),
             "3m": getFormattedDate(3),
