@@ -2136,57 +2136,22 @@ function calculateCumulativeChange(data, fromDate, toDate) {
     };
 }
 
-// 載入全球市場熱力圖
 async function loadGlobalMarketHeatmap() {
     const industryGrid = document.getElementById("industryGrid");
     industryGrid.innerHTML = `<p>Loading Global Market Heatmap...</p>`;
 
     try {
-        const apiUrl = `${BASE_URL}sector-performance?apikey=${API_KEY}`;
+        const apiUrl = `${BASE_URL}historical-sectors-performance?apikey=${API_KEY}`;
         const response = await fetch(apiUrl);
         if (!response.ok) throw new Error("Failed to fetch global market data");
 
         const data = await response.json();
-        console.log("API 回應數據:", data); // 偵錯用，查看 API 回應格式
+        console.log("API 回應數據:", data);
 
-        // 確保 API 回應的是陣列
-        if (!Array.isArray(data)) {
-            console.error("API 回應格式錯誤:", data);
-            throw new Error("API response is not an array");
+        if (typeof data !== 'object' || Object.keys(data).length === 0) {
+            throw new Error("Invalid API response format");
         }
 
-        // 建立對應的產業名稱映射 (API 的名稱 -> 系統內部名稱)
-        const sectorMapping = {
-            "Materials": "基本材料",
-            "Communication Services": "通訊服務",
-            "Consumer Cyclical": "消費性周期",
-            "Consumer Defensive": "消費性防禦",
-            "Energy": "能源",
-            "Financials": "金融服務",
-            "Health Care": "醫療保健",
-            "Industrials": "工業",
-            "Real Estate": "房地產",
-            "Information Technology": "科技",
-            "Utilities": "公用事業"
-        };
-
-        // 轉換 API 回應格式為 `calculateCumulativeChange()` 需要的格式
-        const formattedData = data.map(sector => ({
-            date: new Date().toISOString().split('T')[0], // 加入當天日期
-            basicMaterialsChangesPercentage: sector.sector === "Materials" ? parseFloat(sector.changesPercentage) : 0,
-            communicationServicesChangesPercentage: sector.sector === "Communication Services" ? parseFloat(sector.changesPercentage) : 0,
-            consumerCyclicalChangesPercentage: sector.sector === "Consumer Cyclical" ? parseFloat(sector.changesPercentage) : 0,
-            consumerDefensiveChangesPercentage: sector.sector === "Consumer Defensive" ? parseFloat(sector.changesPercentage) : 0,
-            energyChangesPercentage: sector.sector === "Energy" ? parseFloat(sector.changesPercentage) : 0,
-            financialServicesChangesPercentage: sector.sector === "Financials" ? parseFloat(sector.changesPercentage) : 0,
-            healthcareChangesPercentage: sector.sector === "Health Care" ? parseFloat(sector.changesPercentage) : 0,
-            industrialsChangesPercentage: sector.sector === "Industrials" ? parseFloat(sector.changesPercentage) : 0,
-            realEstateChangesPercentage: sector.sector === "Real Estate" ? parseFloat(sector.changesPercentage) : 0,
-            technologyChangesPercentage: sector.sector === "Information Technology" ? parseFloat(sector.changesPercentage) : 0,
-            utilitiesChangesPercentage: sector.sector === "Utilities" ? parseFloat(sector.changesPercentage) : 0
-        }));
-
-        // 取得時間範圍
         const timeframeMap = {
             "1m": getFormattedDate(1),
             "3m": getFormattedDate(3),
@@ -2196,10 +2161,23 @@ async function loadGlobalMarketHeatmap() {
         const fromDate = timeframeMap[currentTimeframe] || getFormattedDate(1);
         const toDate = new Date().toISOString().split('T')[0];
 
-        // 計算產業的累積變化
+        const formattedData = Object.entries(data).map(([date, sectors]) => ({
+            date,
+            basicMaterialsChangesPercentage: sectors["Basic Materials"] ?? 0,
+            communicationServicesChangesPercentage: sectors["Communication Services"] ?? 0,
+            consumerCyclicalChangesPercentage: sectors["Consumer Cyclical"] ?? 0,
+            consumerDefensiveChangesPercentage: sectors["Consumer Defensive"] ?? 0,
+            energyChangesPercentage: sectors["Energy"] ?? 0,
+            financialServicesChangesPercentage: sectors["Financials"] ?? 0,
+            healthcareChangesPercentage: sectors["Healthcare"] ?? 0,
+            industrialsChangesPercentage: sectors["Industrials"] ?? 0,
+            realEstateChangesPercentage: sectors["Real Estate"] ?? 0,
+            technologyChangesPercentage: sectors["Information Technology"] ?? 0,
+            utilitiesChangesPercentage: sectors["Utilities"] ?? 0
+        }));
+
         const industryPerformance = calculateCumulativeChange(formattedData, fromDate, toDate);
 
-        // 更新前端顯示
         industryGrid.innerHTML = Object.entries(industryPerformance)
             .map(([industry, performance]) => {
                 const color = getColorByPerformance(performance);
