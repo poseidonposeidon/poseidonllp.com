@@ -1,38 +1,59 @@
 const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf";
 const BASE_URL = "https://financialmodelingprep.com/api/v3/";
+const ALTERNATE_URL = "https://financialmodelingprep.com/stable/fmp-articles";
 const baseUrl = 'https://api.poseidonllp.com';
 
 //////News////
 // 獲取股票新聞函數
+let isUsingAlternateSource = false; //
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
 const MAX_VISIBLE_PAGES = 5;
 
-async function fetchStockNews(category = 'all', symbol = '', date = '') {
-    let url = `${BASE_URL}stock_news?limit=1000&apikey=${API_KEY}`;
+document.getElementById("toggle-news-source").addEventListener("click", async () => {
+    isUsingAlternateSource = !isUsingAlternateSource;
+    await loadNews(); // 重新載入新聞
+});
 
-    if (symbol) {
-        url += `&symbol=${symbol}`;
-    }
-    if (date) {
-        url += `&from=${date}&to=${date}`;
+async function fetchStockNews(category = "all", symbol = "", date = "") {
+    let url;
+    if (isUsingAlternateSource) {
+        url = `${ALTERNATE_URL}?apikey=${API_KEY}`;
+    } else {
+        url = `${BASE_URL}stock_news?limit=1000&apikey=${API_KEY}`;
+        if (symbol) url += `&symbol=${encodeURIComponent(symbol)}`;
+        if (date) url += `&from=${date}&to=${date}`;
     }
 
     try {
         const response = await fetch(url);
-        if (!response.ok) {
-            throw new Error(`Error fetching news: ${response.status}`);
-        }
+        if (!response.ok) throw new Error(`Error fetching news: ${response.status}`);
+
         let data = await response.json();
-
-        // 過濾掉 site 為 "seekingalpha.com" 的新聞
-        data = data.filter(news => news.site !== "seekingalpha.com");
-
-        return category === 'all' ? data : filterNewsByCategory(data, category);
+        if (!isUsingAlternateSource) {
+            data = data.filter(news => news.site !== "seekingalpha.com");
+        }
+        return data;
     } catch (error) {
         console.error("Error fetching stock news:", error);
         return [];
     }
 }
+
+async function loadNews() {
+    let newsList = await fetchStockNews("all");
+    displayNews(newsList, 1);
+    generatePagination(newsList, 1);
+
+    // 更新按鈕文字
+    document.getElementById("toggle-news-source").textContent = isUsingAlternateSource
+        ? "Switch to API v3 News"
+        : "Switch to FMP Articles";
+}
+
+// 頁面加載時初始化
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadNews();
+});
 
 // 根據類別篩選新聞
 function filterNewsByCategory(newsData, category) {
