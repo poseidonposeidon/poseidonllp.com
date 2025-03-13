@@ -29,10 +29,21 @@ async function fetchStockNews(category = "all", symbol = "", date = "") {
         if (!response.ok) throw new Error(`Error fetching news: ${response.status}`);
 
         let data = await response.json();
-        if (!isUsingAlternateSource) {
-            data = data.filter(news => news.site !== "seekingalpha.com");
+
+        if (isUsingAlternateSource) {
+            // **轉換 fmp-articles API 格式，使其與原本的格式一致**
+            return data.map(news => ({
+                title: news.title,
+                publishedDate: news.date, // 新 API 使用 "date" 而非 "publishedDate"
+                text: news.content.replace(/<[^>]+>/g, ""), // **移除 HTML 標籤**
+                url: news.link, // **新 API 使用 "link" 而非 "url"**
+                image: news.image || "placeholder.jpg", // **確保有預設圖片**
+                site: news.site, // **網站來源**
+            }));
+        } else {
+            // **舊 API：過濾掉 "seekingalpha.com"**
+            return data.filter(news => news.site !== "seekingalpha.com");
         }
-        return data;
     } catch (error) {
         console.error("Error fetching stock news:", error);
         return [];
@@ -44,7 +55,7 @@ async function loadNews() {
     displayNews(newsList, 1);
     generatePagination(newsList, 1);
 
-    // 更新按鈕文字
+    // **更新按鈕文字**
     document.getElementById("toggle-news-source").textContent = isUsingAlternateSource
         ? "Switch to API v3 News"
         : "Switch to FMP Articles";
