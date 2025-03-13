@@ -11,7 +11,22 @@ const MAX_VISIBLE_PAGES = 5;
 
 document.getElementById("toggle-news-source").addEventListener("click", async () => {
     isUsingAlternateSource = !isUsingAlternateSource;
-    await loadNews(); // 重新載入新聞
+
+    // 重新載入新聞
+    await loadNews();
+
+    // **切換輸入區塊的可見性**
+    const filterInputs = document.querySelector(".filter-inputs");
+    if (isUsingAlternateSource) {
+        filterInputs.style.display = "none"; // 隱藏輸入區塊
+    } else {
+        filterInputs.style.display = "block"; // 顯示輸入區塊
+    }
+
+    // **更新按鈕文字**
+    document.getElementById("toggle-news-source").textContent = isUsingAlternateSource
+        ? "Switch to API v3 News"
+        : "Switch to FMP Articles";
 });
 
 async function fetchStockNews(category = "all", symbol = "", date = "") {
