@@ -16,7 +16,9 @@ document.getElementById("toggle-news-source").addEventListener("click", async ()
 
 async function fetchStockNews(category = "all", symbol = "", date = "") {
     let url;
+
     if (isUsingAlternateSource) {
+        // 新 API 不支援直接透過 URL 傳入 symbol 或 date
         url = `${ALTERNATE_URL}?apikey=${API_KEY}`;
     } else {
         url = `${BASE_URL}stock_news?limit=1000&apikey=${API_KEY}`;
@@ -31,19 +33,32 @@ async function fetchStockNews(category = "all", symbol = "", date = "") {
         let data = await response.json();
 
         if (isUsingAlternateSource) {
-            // **轉換 fmp-articles API 格式，使其與原本的格式一致**
-            return data.map(news => ({
+            // 轉換 fmp-articles API 格式，統一為原本 displayNews 所需要的格式
+            data = data.map(news => ({
                 title: news.title,
-                publishedDate: news.date, // 新 API 使用 "date" 而非 "publishedDate"
-                text: news.content.replace(/<[^>]+>/g, ""), // **移除 HTML 標籤**
-                url: news.link, // **新 API 使用 "link" 而非 "url"**
-                image: news.image || "placeholder.jpg", // **確保有預設圖片**
-                site: news.site, // **網站來源**
+                publishedDate: news.date, // 新 API 使用 "date"
+                text: news.content.replace(/<[^>]+>/g, ""), // 移除 HTML 標籤
+                url: news.link, // 新 API 使用 "link"
+                image: news.image || "placeholder.jpg", // 確保有預設圖片
+                site: news.site, // 新 API 的來源
+                tickers: news.tickers ? news.tickers.toUpperCase() : "", // 處理 tickers 字段
             }));
+
+            // 如果有輸入股票代碼，根據 tickers 進行篩選
+            if (symbol) {
+                data = data.filter(news => news.tickers && news.tickers.includes(symbol));
+            }
+
+            // 如果有選取日期，根據 publishedDate 篩選（假設日期格式為 "YYYY-MM-DD"）
+            if (date) {
+                data = data.filter(news => news.publishedDate && news.publishedDate.startsWith(date));
+            }
         } else {
-            // **舊 API：過濾掉 "seekingalpha.com"**
-            return data.filter(news => news.site !== "seekingalpha.com");
+            // 舊 API 分支，過濾掉 "seekingalpha.com" 的新聞
+            data = data.filter(news => news.site !== "seekingalpha.com");
         }
+
+        return data;
     } catch (error) {
         console.error("Error fetching stock news:", error);
         return [];
@@ -59,6 +74,23 @@ async function loadNews() {
     document.getElementById("toggle-news-source").textContent = isUsingAlternateSource
         ? "Switch to API v3 News"
         : "Switch to FMP Articles";
+}
+
+async function handleStockSearch(event) {
+    if (event.key === "Enter") {
+        const stockInput = event.target.value.trim().toUpperCase(); // 轉大寫
+        const selectedDate = document.getElementById("news-date").value; // 取得日期（如果有選）
+
+        if (!stockInput) {
+            alert("Please enter a valid stock symbol");
+            return;
+        }
+
+        // **確保 selectedDate 為 undefined 時不傳遞**
+        const newsList = await fetchStockNews("all", stockInput, selectedDate ? selectedDate : undefined);
+        displayNews(newsList, 1);
+        generatePagination(newsList, 1);
+    }
 }
 
 // 頁面加載時初始化
@@ -230,17 +262,17 @@ function initSearchInput() {
     stockInput.addEventListener('keyup', handleStockSearch);
 }
 
-document.getElementById('filter-by-date').addEventListener('click', async () => {
-    const selectedDate = document.getElementById('news-date').value;
-    const stockInput = document.getElementById('stock-input').value.trim().toUpperCase(); // 取得輸入的股票代號（如果有）
+document.getElementById("filter-by-date").addEventListener("click", async () => {
+    const selectedDate = document.getElementById("news-date").value;
+    const stockInput = document.getElementById("stock-input").value.trim().toUpperCase(); // 取得輸入的股票代號（如果有）
 
     if (!selectedDate) {
-        alert('請選擇日期');
+        alert("請選擇日期");
         return;
     }
 
-    // 🟢 如果有輸入公司代號，則查詢該公司當天新聞；如果沒輸入，則查詢該日期所有新聞
-    const newsList = await fetchStockNews('all', stockInput || '', selectedDate);
+    // **確保 selectedDate 為 undefined 時不傳遞**
+    const newsList = await fetchStockNews("all", stockInput || "", selectedDate ? selectedDate : undefined);
     displayNews(newsList, 1);
     generatePagination(newsList, 1);
 });
