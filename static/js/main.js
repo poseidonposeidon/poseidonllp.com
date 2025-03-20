@@ -33,12 +33,24 @@ async function fetchStockNews(category = "all", symbol = "", date = "") {
     let url;
 
     if (isUsingAlternateSource) {
-        // 新 API 不支援直接透過 URL 傳入 symbol 或 date
+        // 維持原始不變
         url = `${ALTERNATE_URL}?apikey=${API_KEY}`;
     } else {
-        url = `https://financialmodelingprep.com/stable/news/general-latest?limit=1000&apikey=${API_KEY}`;
-        if (symbol) url += `&symbol=${encodeURIComponent(symbol)}`;
-        if (date) url += `&from=${date}&to=${date}`;
+        if (symbol || date) {
+            // 有指定股票代碼或日期，使用特定API
+            url = `https://financialmodelingprep.com/stable/news/stock?apikey=${API_KEY}`;
+
+            if (symbol) {
+                url += `&symbols=${encodeURIComponent(symbol)}`;
+            }
+
+            if (date) {
+                url += `&to=${date}`;
+            }
+        } else {
+            // 無指定股票或日期，使用一般API
+            url = `https://financialmodelingprep.com/stable/news/general-latest?limit=1000&apikey=${API_KEY}`;
+        }
     }
 
     try {
@@ -51,25 +63,23 @@ async function fetchStockNews(category = "all", symbol = "", date = "") {
             // 轉換 fmp-articles API 格式，統一為原本 displayNews 所需要的格式
             data = data.map(news => ({
                 title: news.title,
-                publishedDate: news.date, // 新 API 使用 "date"
-                text: news.content.replace(/<[^>]+>/g, ""), // 移除 HTML 標籤
-                url: news.link, // 新 API 使用 "link"
-                image: news.image || "placeholder.jpg", // 確保有預設圖片
-                site: news.site, // 新 API 的來源
-                tickers: news.tickers ? news.tickers.toUpperCase() : "", // 處理 tickers 字段
+                publishedDate: news.date,
+                text: news.content.replace(/<[^>]+>/g, ""),
+                url: news.link,
+                image: news.image || "placeholder.jpg",
+                site: news.site,
+                tickers: news.tickers ? news.tickers.toUpperCase() : "",
             }));
 
-            // 如果有輸入股票代碼，根據 tickers 進行篩選
             if (symbol) {
                 data = data.filter(news => news.tickers && news.tickers.includes(symbol));
             }
 
-            // 如果有選取日期，根據 publishedDate 篩選（假設日期格式為 "YYYY-MM-DD"）
             if (date) {
                 data = data.filter(news => news.publishedDate && news.publishedDate.startsWith(date));
             }
         } else {
-            // 舊 API 分支，過濾掉 "seekingalpha.com" 的新聞
+            // 排除 seekingalpha.com 的新聞
             data = data.filter(news => news.site !== "seekingalpha.com");
         }
 
