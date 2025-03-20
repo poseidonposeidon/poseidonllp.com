@@ -36,7 +36,7 @@ async function fetchStockNews(category = "all", symbol = "", date = "") {
         // 新 API 不支援直接透過 URL 傳入 symbol 或 date
         url = `${ALTERNATE_URL}?apikey=${API_KEY}`;
     } else {
-        url = `${BASE_URL}stock_news?limit=1000&apikey=${API_KEY}`;
+        url = `https://financialmodelingprep.com/stable/news/general-latest?limit=1000&apikey=${API_KEY}`;
         if (symbol) url += `&symbol=${encodeURIComponent(symbol)}`;
         if (date) url += `&from=${date}&to=${date}`;
     }
