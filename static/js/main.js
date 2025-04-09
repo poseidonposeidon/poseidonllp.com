@@ -27,6 +27,10 @@ document.getElementById("toggle-news-source").addEventListener("click", async ()
     document.getElementById("toggle-news-source").textContent = isUsingAlternateSource
         ? "切換至 原始 新聞來源"
         : "切換至 FMP 新聞來源";
+    const message = document.createElement("div");
+    message.textContent = "你好FMP";
+    message.style.marginTop = "10px";
+    document.getElementById("toggle-news-source").insertAdjacentElement("afterend", message);
 });
 
 async function fetchStockNews(category = "all", symbol = "", date = "") {
