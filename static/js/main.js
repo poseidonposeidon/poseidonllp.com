@@ -25,8 +25,8 @@ document.getElementById("toggle-news-source").addEventListener("click", async ()
 
     // **更新按鈕文字**
     document.getElementById("toggle-news-source").textContent = isUsingAlternateSource
-        ? "Switch to API v3 News"
-        : "Switch to FMP Articles";
+        ? "切換至 原始 新聞來源"
+        : "切換至 FMP 新聞來源";
 });
 
 async function fetchStockNews(category = "all", symbol = "", date = "") {
