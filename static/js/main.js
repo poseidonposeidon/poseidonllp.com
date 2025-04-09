@@ -28,7 +28,7 @@ document.getElementById("toggle-news-source").addEventListener("click", async ()
         ? "切換至 原始 新聞來源"
         : "切換至 FMP 新聞來源";
     const message = document.createElement("div");
-    message.textContent = "你好FMP";
+    message.textContent = "帳號 : poseidon@poseidonllp.com  密碼 : poseidon52369168";
     message.style.marginTop = "10px";
     document.getElementById("toggle-news-source").insertAdjacentElement("afterend", message);
 });
