@@ -2324,13 +2324,70 @@ function getColorByPerformance(performance) {
     return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
 }
 //////////////////////////////////////////////////////////////////////////////
-function fetchStock() {
-    const stockSymbol = document.getElementById('stockSymbol').value.trim().toUpperCase();
-    const previousSymbol = document.getElementById('outputSymbol').getAttribute('data-last-symbol');
 
-    if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbol').innerText = 'Current query: ' + stockSymbol;
-        document.getElementById('outputSymbol').setAttribute('data-last-symbol', stockSymbol);
+const LOG_QUERY_API_ENDPOINT = 'https://api.poseidonllp.com/api/log_query'; // 替換成你的實際 API 端點
+
+async function logUserQuery(market, queryText) {
+    try {
+        const payload = {
+            market: market,
+            query: queryText,
+            timestamp: new Date().toISOString(),
+        };
+
+        // 示例：假設你將用戶名存在 localStorage (你需要根據你的應用調整)
+        const currentUsername = localStorage.getItem('loggedInUsername');
+        if (currentUsername) {
+            payload.username = currentUsername;
+        } else {
+            payload.username = 'anonymous'; // 或者不發送 username 字段
+        }
+
+        const token = localStorage.getItem('authToken'); // 或者從其他地方獲取 token
+
+        const fetchOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(payload)
+        };
+
+        if (token) {
+            fetchOptions.headers['Authorization'] = `Bearer ${token}`;
+        }
+
+        const response = await fetch(LOG_QUERY_API_ENDPOINT, fetchOptions);
+
+        if (!response.ok) {
+            console.error('Failed to log query:', await response.text(), 'Payload:', payload);
+        } else {
+            console.log('Query logged successfully:', payload);
+        }
+    } catch (error) {
+        console.error('Error logging query:', error);
+    }
+}
+
+
+function fetchStock() {
+    const stockSymbolInput = document.getElementById('stockSymbol');
+    const stockSymbol = stockSymbolInput.value.trim().toUpperCase();
+    const outputSymbolElement = document.getElementById('outputSymbol');
+    const previousSymbol = outputSymbolElement.getAttribute('data-last-symbol');
+
+    if (!stockSymbol) {
+        // alert('Please enter a U.S. stock symbol.'); // 你可以選擇是否彈出提示
+        return null;
+    }
+
+    // 只有當股票代碼有效且與上次不同時才執行主要邏輯
+    // 或者當股票代碼與上次相同但仍然希望記錄並可能刷新數據時
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
+        logUserQuery('US', stockSymbol); // **記錄查詢**
+
+        outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
+        outputSymbolElement.setAttribute('data-last-symbol', stockSymbol);
 
         // Clear previous company data
         const companyProfileContainer = document.getElementById('companyProfileContainer');
@@ -2361,33 +2418,53 @@ function fetchStock() {
             }
         });
 
-        const sections = document.querySelectorAll('.section');
+        const sections = document.querySelectorAll('.section'); // 確保 .section 元素存在且 collapseSection 已定義
         sections.forEach(section => {
             section.classList.remove('fixed');
-            collapseSection(section);
+            if (typeof collapseSection === 'function') { // 檢查函數是否存在
+                collapseSection(section);
+            }
         });
 
         // Fetch and display company profile and price information
         Promise.all([
-            fetchCompanyProfile(stockSymbol),
+            fetchCompanyProfile(stockSymbol), // 確保這些函數已定義
             fetchCompanyPrice(stockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestions();
+                if (typeof clearSuggestions === 'function') { // 檢查函數是否存在
+                    clearSuggestions();
+                }
             }, 1500); // 延迟1秒后清除建议框
         });
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
+        // 如果代碼相同，選擇性記錄重複查詢
+        logUserQuery('US', stockSymbol); // **記錄重複查詢 (可選)**
+        console.log("US Stock: Same symbol as previous, query logged again (optional).");
+        // 這裡可以根據需求決定是否需要重新獲取數據或執行其他操作
     }
 
     return stockSymbol;
 }
 
 function fetchJPStock() {
-    const stockSymbol = document.getElementById('jpStockSymbol').value.trim() + ".T";
-    const previousSymbol = document.getElementById('outputSymbolJP').getAttribute('data-last-symbol');
+    const stockSymbolInput = document.getElementById('jpStockSymbol');
+    const rawSymbol = stockSymbolInput.value.trim();
+    const outputSymbolElement = document.getElementById('outputSymbolJP');
+    const previousSymbol = outputSymbolElement.getAttribute('data-last-symbol');
 
-    if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbolJP').innerText = 'Current query: ' + stockSymbol;
-        document.getElementById('outputSymbolJP').setAttribute('data-last-symbol', stockSymbol);
+    if (!rawSymbol) {
+        // alert('Please enter a Japanese stock symbol.');
+        return null;
+    }
+
+    const stockSymbol = rawSymbol + ".T";
+
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
+        logUserQuery('JP', rawSymbol); // **記錄查詢 (使用原始輸入)**
+
+        outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
+        outputSymbolElement.setAttribute('data-last-symbol', stockSymbol);
 
         // Clear previous company data
         const companyProfileContainerJP = document.getElementById('companyProfileContainerJP');
@@ -2397,7 +2474,7 @@ function fetchJPStock() {
 
         const priceContainerJP = document.getElementById('PriceContainerJP');
         if (priceContainerJP) {
-            priceContainerJP.innerHTML = ''; // Clear previous price data
+            priceContainerJP.innerHTML = '';
         }
 
         const containers = [
@@ -2410,7 +2487,6 @@ function fetchJPStock() {
             'stockDividendCalendarContainerJP',
             'insiderTradesContainerJP'
         ];
-
         containers.forEach(containerId => {
             const container = document.getElementById(containerId);
             if (container) {
@@ -2421,35 +2497,44 @@ function fetchJPStock() {
         const sections = document.querySelectorAll('.section');
         sections.forEach(section => {
             section.classList.remove('fixed');
-            collapseSection(section);
+            if (typeof collapseSection === 'function') {
+                collapseSection(section);
+            }
         });
 
-        // Fetch and display company profile and price information
         Promise.all([
             fetchJPCompanyProfile(stockSymbol),
             fetchJPCompanyPrice(stockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestions();
-            }, 1500); // 延迟1秒后清除建议框
+                if (typeof clearSuggestions === 'function') {
+                    clearSuggestions();
+                }
+            }, 1500);
         });
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
+        logUserQuery('JP', rawSymbol); // **記錄重複查詢 (可選)**
+        console.log("JP Stock: Same symbol as previous, query logged again (optional).");
     }
 
     return stockSymbol;
 }
 
 async function fetchStockExchange(stockSymbol) {
+    // 此函數保持不變，因為它不直接由用戶觸發查詢記錄
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/api/v3/search?query=${stockSymbol}&apikey=${apiKey}`;
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
-            throw new Error('Network response was not ok');
+            throw new Error(`Network response was not ok: ${response.status}`);
         }
         const data = await response.json();
-
-        // 過濾出包含 .TW 或 .TWO 的結果
-        const filteredData = data.filter(item => item.symbol.endsWith('.TW') || item.symbol.endsWith('.TWO'));
+        if (!Array.isArray(data)) { // API 可能返回非陣列錯誤
+            console.error('API did not return an array for stock exchange search:', data);
+            return null;
+        }
+        const filteredData = data.filter(item => item.symbol && (item.symbol.endsWith('.TW') || item.symbol.endsWith('.TWO')));
         if (filteredData.length > 0) {
             const match = filteredData.find(item => item.symbol.split('.')[0] === stockSymbol);
             return match ? match.exchangeShortName : null;
@@ -2463,13 +2548,19 @@ async function fetchStockExchange(stockSymbol) {
 }
 
 async function fetchTWStock() {
-    const stockSymbol = document.getElementById('twStockSymbol').value.trim();
-    const previousSymbol = document.getElementById('outputSymbolTW').getAttribute('data-last-symbol');
+    const stockSymbolInput = document.getElementById('twStockSymbol');
+    const stockSymbol = stockSymbolInput.value.trim(); // 原始輸入
+    const outputSymbolElement = document.getElementById('outputSymbolTW');
+    const previousSymbol = outputSymbolElement.getAttribute('data-last-symbol');
 
-    // 调用 API 来判断交易所类型
+    if (!stockSymbol) {
+        // alert('Please enter a Taiwan stock symbol.');
+        return null;
+    }
+
     const exchangeShortName = await fetchStockExchange(stockSymbol);
     if (!exchangeShortName) {
-        alert('无法判断股票代码所属的交易所');
+        alert('无法判断股票代码所属的交易所 (Exchange not determinable for: ' + stockSymbol + ')');
         return null;
     }
 
@@ -2479,281 +2570,305 @@ async function fetchTWStock() {
     } else if (exchangeShortName === 'TWO') {
         fullStockSymbol = stockSymbol + '.TWO';
     } else {
-        alert('未知的交易所类型');
+        alert('未知的交易所类型 (Unknown exchange type for: ' + stockSymbol + ')');
         return null;
     }
 
-    if (fullStockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbolTW').innerText = 'Current query: ' + fullStockSymbol;
-        document.getElementById('outputSymbolTW').setAttribute('data-last-symbol', fullStockSymbol);
+    if (fullStockSymbol && (fullStockSymbol !== previousSymbol)) {
+        logUserQuery('TW', stockSymbol); // **記錄查詢 (使用原始輸入)**
 
-        // 清除之前的公司资料
+        outputSymbolElement.innerText = 'Current query: ' + fullStockSymbol;
+        outputSymbolElement.setAttribute('data-last-symbol', fullStockSymbol);
+
         const companyProfileContainerTW = document.getElementById('companyProfileContainerTW');
         if (companyProfileContainerTW) {
             companyProfileContainerTW.innerHTML = '';
         }
-
         const priceContainerTW = document.getElementById('PriceContainerTW');
         if (priceContainerTW) {
-            priceContainerTW.innerHTML = ''; // 清除之前的价格资料
+            priceContainerTW.innerHTML = '';
         }
-
         const containers = [
             'incomeStatementContainerTW',
             'balanceSheetContainerTW',
             'cashflowContainerTW',
         ];
-
         containers.forEach(containerId => {
             const container = document.getElementById(containerId);
             if (container) {
                 container.innerHTML = '';
             }
         });
-
         const sections = document.querySelectorAll('.section');
         sections.forEach(section => {
             section.classList.remove('fixed');
-            collapseSection(section);
+            if (typeof collapseSection === 'function') {
+                collapseSection(section);
+            }
         });
 
-        // Fetch and display company profile and price information
         Promise.all([
             fetchTWCompanyProfile(fullStockSymbol),
             fetchTWCompanyPrice(fullStockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestions();
-            }, 1500); // 延迟1秒后清除建议框
+                if (typeof clearSuggestions === 'function') {
+                    clearSuggestions();
+                }
+            }, 1500);
         });
+    } else if (fullStockSymbol && fullStockSymbol === previousSymbol) {
+        logUserQuery('TW', stockSymbol); // **記錄重複查詢 (可選)**
+        console.log("TW Stock: Same symbol as previous, query logged again (optional).");
     }
 
     return fullStockSymbol;
 }
 
 function fetchEUStock() {
-    const stockSymbol = document.getElementById('euStockSymbol').value.trim().toUpperCase();
-    const previousSymbol = document.getElementById('outputSymbolEU').getAttribute('data-last-symbol');
+    const stockSymbolInput = document.getElementById('euStockSymbol');
+    const stockSymbol = stockSymbolInput.value.trim().toUpperCase();
+    const outputSymbolElement = document.getElementById('outputSymbolEU');
+    const previousSymbol = outputSymbolElement.getAttribute('data-last-symbol');
 
-    if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbolEU').innerText = 'Current query: ' + stockSymbol;
-        document.getElementById('outputSymbolEU').setAttribute('data-last-symbol', stockSymbol);
+    if (!stockSymbol) {
+        // alert('Please enter an EU stock symbol.');
+        return null;
+    }
 
-        // Clear previous company data
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
+        logUserQuery('EU', stockSymbol); // **記錄查詢**
+
+        outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
+        outputSymbolElement.setAttribute('data-last-symbol', stockSymbol);
+
         const companyProfileContainerEU = document.getElementById('companyProfileContainerEU');
         if (companyProfileContainerEU) {
             companyProfileContainerEU.innerHTML = '';
         }
-
         const priceContainerEU = document.getElementById('PriceContainerEU');
         if (priceContainerEU) {
-            priceContainerEU.innerHTML = ''; // Clear previous price data
+            priceContainerEU.innerHTML = '';
         }
-
         const containersEU = [
-            'incomeStatementContainerEU',
-            'balanceSheetContainerEU',
-            'cashflowContainerEU',
-            'earningsCallTranscriptContainerEU',
-            'earningsCallCalendarContainerEU',
-            'historicalEarningsContainerEU',
-            'stockDividendCalendarContainerEU',
-            'insiderTradesContainerEU'
+            'incomeStatementContainerEU', 'balanceSheetContainerEU', 'cashflowContainerEU',
+            'earningsCallTranscriptContainerEU', 'earningsCallCalendarContainerEU',
+            'historicalEarningsContainerEU', 'stockDividendCalendarContainerEU', 'insiderTradesContainerEU'
         ];
-
         containersEU.forEach(containerId => {
             const container = document.getElementById(containerId);
             if (container) {
                 container.innerHTML = '';
             }
         });
-
         const sectionsEU = document.querySelectorAll('.section');
         sectionsEU.forEach(section => {
             section.classList.remove('fixed');
-            collapseSection(section);
+            if (typeof collapseSection === 'function') {
+                collapseSection(section);
+            }
         });
 
-        // Fetch and display company profile and price information
         Promise.all([
             fetchEUCompanyProfile(stockSymbol),
             fetchEUCompanyPrice(stockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestions();
-            }, 1500); // 延迟1秒后清除建议框
+                if (typeof clearSuggestions === 'function') {
+                    clearSuggestions();
+                }
+            }, 1500);
         });
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
+        logUserQuery('EU', stockSymbol); // **記錄重複查詢 (可選)**
+        console.log("EU Stock: Same symbol as previous, query logged again (optional).");
     }
 
     return stockSymbol;
 }
 
 function fetchKRStock() {
-    const stockSymbol = document.getElementById('krStockSymbol').value.trim().toUpperCase();
-    const previousSymbol = document.getElementById('outputSymbolKR').getAttribute('data-last-symbol');
+    const stockSymbolInput = document.getElementById('krStockSymbol');
+    const stockSymbol = stockSymbolInput.value.trim().toUpperCase();
+    const outputSymbolElement = document.getElementById('outputSymbolKR');
+    const previousSymbol = outputSymbolElement.getAttribute('data-last-symbol');
 
-    if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbolKR').innerText = 'Current query: ' + stockSymbol;
-        document.getElementById('outputSymbolKR').setAttribute('data-last-symbol', stockSymbol);
+    if (!stockSymbol) {
+        // alert('Please enter a Korean stock symbol.');
+        return null;
+    }
 
-        // Clear previous company data
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
+        logUserQuery('KR', stockSymbol); // **記錄查詢**
+
+        outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
+        outputSymbolElement.setAttribute('data-last-symbol', stockSymbol);
+
         const companyProfileContainerKR = document.getElementById('companyProfileContainerKR');
         if (companyProfileContainerKR) {
             companyProfileContainerKR.innerHTML = '';
         }
-
         const priceContainerKR = document.getElementById('PriceContainerKR');
         if (priceContainerKR) {
-            priceContainerKR.innerHTML = ''; // Clear previous price data
+            priceContainerKR.innerHTML = '';
         }
-
         const containersKR = [
-            'incomeStatementContainerKR',
-            'balanceSheetContainerKR',
-            'cashflowContainerKR',
-            'earningsCallTranscriptContainerKR',
-            'earningsCallCalendarContainerKR',
-            'historicalEarningsContainerKR',
-            'stockDividendCalendarContainerKR',
-            'insiderTradesContainerKR'
+            'incomeStatementContainerKR', 'balanceSheetContainerKR', 'cashflowContainerKR',
+            'earningsCallTranscriptContainerKR', 'earningsCallCalendarContainerKR',
+            'historicalEarningsContainerKR', 'stockDividendCalendarContainerKR', 'insiderTradesContainerKR'
         ];
-
         containersKR.forEach(containerId => {
             const container = document.getElementById(containerId);
             if (container) {
                 container.innerHTML = '';
             }
         });
-
         const sectionsKR = document.querySelectorAll('.section');
         sectionsKR.forEach(section => {
             section.classList.remove('fixed');
-            collapseSection(section);
+            if (typeof collapseSection === 'function') {
+                collapseSection(section);
+            }
         });
 
-        // Fetch and display company profile and price information
         Promise.all([
             fetchKRCompanyProfile(stockSymbol),
             fetchKRCompanyPrice(stockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestions();
-            }, 1500); // 延迟1秒后清除建议框
+                if (typeof clearSuggestions === 'function') {
+                    clearSuggestions();
+                }
+            }, 1500);
         });
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
+        logUserQuery('KR', stockSymbol); // **記錄重複查詢 (可選)**
+        console.log("KR Stock: Same symbol as previous, query logged again (optional).");
     }
 
     return stockSymbol;
 }
 
 function fetchHKStock() {
-    const stockSymbol = document.getElementById('hkStockSymbol').value.trim() + ".HK";
-    const previousSymbol = document.getElementById('outputSymbolHK').getAttribute('data-last-symbol');
+    const stockSymbolInput = document.getElementById('hkStockSymbol');
+    const rawSymbol = stockSymbolInput.value.trim();
+    const outputSymbolElement = document.getElementById('outputSymbolHK');
+    const previousSymbol = outputSymbolElement.getAttribute('data-last-symbol');
 
-    if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbolHK').innerText = 'Current query: ' + stockSymbol;
-        document.getElementById('outputSymbolHK').setAttribute('data-last-symbol', stockSymbol);
+    if (!rawSymbol) {
+        // alert('Please enter a Hong Kong stock symbol.');
+        return null;
+    }
+    const stockSymbol = rawSymbol + ".HK";
 
-        // Clear previous company data
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
+        logUserQuery('HK', rawSymbol); // **記錄查詢 (使用原始輸入)**
+
+        outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
+        outputSymbolElement.setAttribute('data-last-symbol', stockSymbol);
+
         const companyProfileContainerHK = document.getElementById('companyProfileContainerHK');
         if (companyProfileContainerHK) {
             companyProfileContainerHK.innerHTML = '';
         }
-
         const priceContainerHK = document.getElementById('PriceContainerHK');
         if (priceContainerHK) {
-            priceContainerHK.innerHTML = ''; // Clear previous price data
+            priceContainerHK.innerHTML = '';
         }
-
         const containersHK = [
-            'incomeStatementContainerHK',
-            'balanceSheetContainerHK',
-            'cashflowContainerHK',
-            'earningsCallTranscriptContainerHK',
-            'earningsCallCalendarContainerHK',
-            'historicalEarningsContainerHK',
-            'stockDividendCalendarContainerHK',
-            'insiderTradesContainerHK'
+            'incomeStatementContainerHK', 'balanceSheetContainerHK', 'cashflowContainerHK',
+            'earningsCallTranscriptContainerHK', 'earningsCallCalendarContainerHK',
+            'historicalEarningsContainerHK', 'stockDividendCalendarContainerHK', 'insiderTradesContainerHK'
         ];
-
         containersHK.forEach(containerId => {
             const container = document.getElementById(containerId);
             if (container) {
                 container.innerHTML = '';
             }
         });
-
         const sectionsHK = document.querySelectorAll('.section');
         sectionsHK.forEach(section => {
             section.classList.remove('fixed');
-            collapseSection(section);
+            if (typeof collapseSection === 'function') {
+                collapseSection(section);
+            }
         });
 
-        // Fetch and display company profile and price information
         Promise.all([
             fetchHKCompanyProfile(stockSymbol),
             fetchHKCompanyPrice(stockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestions();
-            }, 1500); // 延迟1秒后清除建议框
+                if (typeof clearSuggestions === 'function') {
+                    clearSuggestions();
+                }
+            }, 1500);
         });
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
+        logUserQuery('HK', rawSymbol); // **記錄重複查詢 (可選)**
+        console.log("HK Stock: Same symbol as previous, query logged again (optional).");
     }
 
     return stockSymbol;
 }
 
 function fetchCNStock() {
-    const stockSymbol = document.getElementById('cnStockSymbol').value.trim();
-    const previousSymbol = document.getElementById('outputSymbolCN').getAttribute('data-last-symbol');
+    const stockSymbolInput = document.getElementById('cnStockSymbol');
+    const stockSymbol = stockSymbolInput.value.trim();
+    const outputSymbolElement = document.getElementById('outputSymbolCN');
+    const previousSymbol = outputSymbolElement.getAttribute('data-last-symbol');
 
-    if (stockSymbol !== previousSymbol) {
-        document.getElementById('outputSymbolCN').innerText = 'Current query: ' + stockSymbol;
-        document.getElementById('outputSymbolCN').setAttribute('data-last-symbol', stockSymbol);
+    if (!stockSymbol) {
+        // alert('Please enter a Chinese stock symbol.');
+        return null;
+    }
 
-        // 清除之前的公司数据
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
+        logUserQuery('CN', stockSymbol); // **記錄查詢**
+
+        outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
+        outputSymbolElement.setAttribute('data-last-symbol', stockSymbol);
+
         const companyProfileContainerCN = document.getElementById('companyProfileContainerCN');
         if (companyProfileContainerCN) {
             companyProfileContainerCN.innerHTML = '';
         }
-
         const priceContainerCN = document.getElementById('PriceContainerCN');
         if (priceContainerCN) {
-            priceContainerCN.innerHTML = ''; // 清除之前的价格数据
+            priceContainerCN.innerHTML = '';
         }
-
         const containersCN = [
-            'incomeStatementContainerCN',
-            'balanceSheetContainerCN',
-            'cashflowContainerCN',
-            'earningsCallTranscriptContainerCN',
-            'earningsCallCalendarContainerCN',
-            'historicalEarningsContainerCN',
-            'stockDividendCalendarContainerCN',
-            'insiderTradesContainerCN'
+            'incomeStatementContainerCN', 'balanceSheetContainerCN', 'cashflowContainerCN',
+            'earningsCallTranscriptContainerCN', 'earningsCallCalendarContainerCN',
+            'historicalEarningsContainerCN', 'stockDividendCalendarContainerCN', 'insiderTradesContainerCN'
         ];
-
         containersCN.forEach(containerId => {
             const container = document.getElementById(containerId);
             if (container) {
                 container.innerHTML = '';
             }
         });
-
         const sectionsCN = document.querySelectorAll('.section');
         sectionsCN.forEach(section => {
             section.classList.remove('fixed');
-            collapseSection(section);
+            if (typeof collapseSection === 'function') {
+                collapseSection(section);
+            }
         });
 
-        // Fetch and display company profile and price information
         Promise.all([
             fetchCNCompanyProfile(stockSymbol),
             fetchCNCompanyPrice(stockSymbol)
         ]).then(() => {
             setTimeout(() => {
-                clearSuggestions();
-            }, 1500); // 延迟1秒后清除建议框
+                if (typeof clearSuggestions === 'function') {
+                    clearSuggestions();
+                }
+            }, 1500);
         });
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
+        logUserQuery('CN', stockSymbol); // **記錄重複查詢 (可選)**
+        console.log("CN Stock: Same symbol as previous, query logged again (optional).");
     }
 
     return stockSymbol;
