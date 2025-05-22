@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <title>使用者登入次數</title>
+    <style>
+        table {
+            width: 50%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<h1>使用者登入次數</h1>
+{% if login_data %}
+<table>
+    <thead>
+    <tr>
+        <th>使用者名稱 (Username)</th>
+        <th>登入次數 (Login Count)</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for username, count in login_data %}
+    <tr>
+        <td>{{ username }}</td>
+        <td>{{ count }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>目前沒有登入記錄。</p>
+{% endif %}
+<br>
+<a href="{{ url_for('home') }}">返回首頁</a>
+</body>
+</html>
