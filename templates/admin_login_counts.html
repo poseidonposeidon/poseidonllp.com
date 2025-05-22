@@ -1,26 +1,53 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
-    <title>使用者登入次數</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>使用者登入統計</title>
     <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+        }
         table {
-            width: 50%;
+            width: 60%;
+            margin: 20px auto;
             border-collapse: collapse;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            background-color: #fff;
         }
         th, td {
-            border: 1px solid black;
-            padding: 8px;
+            border: 1px solid #ddd;
+            padding: 12px;
             text-align: left;
         }
         th {
-            background-color: #f2f2f2;
+            background-color: #007bff;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .no-data {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
         }
     </style>
 </head>
 <body>
-<h1>使用者登入次數</h1>
-{% if login_data %}
+<h1>使用者登入次數統計</h1>
+
+{% if users_stats %}
 <table>
     <thead>
     <tr>
@@ -29,18 +56,18 @@
     </tr>
     </thead>
     <tbody>
-    {% for username, count in login_data %}
+    {% for stat in users_stats %}
     <tr>
-        <td>{{ username }}</td>
-        <td>{{ count }}</td>
+        <td>{{ stat.username }}</td>
+        <td>{{ stat.login_count }}</td>
     </tr>
     {% endfor %}
     </tbody>
 </table>
 {% else %}
-<p>目前沒有登入記錄。</p>
+<p class="no-data">目前沒有使用者資料可顯示。</p>
 {% endif %}
-<br>
-<a href="{{ url_for('home') }}">返回首頁</a>
+
+
 </body>
 </html>
