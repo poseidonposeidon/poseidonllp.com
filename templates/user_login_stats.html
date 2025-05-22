@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>使用者登入統計</title>
+    <title>使用者登入統計 (Fetch API)</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -34,40 +34,90 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        tr:hover {
+        #statsTableBody tr:hover { /* 確保 hover 效果應用於動態添加的行 */
             background-color: #f1f1f1;
         }
-        .no-data {
+        .loading-message, .error-message, .no-data {
             text-align: center;
             padding: 20px;
             font-style: italic;
+        }
+        .error-message {
+            color: red;
         }
     </style>
 </head>
 <body>
 <h1>使用者登入次數統計</h1>
 
-{% if users_stats %}
-<table>
+<div id="loading" class="loading-message">正在載入資料...</div>
+<div id="error" class="error-message" style="display:none;"></div>
+
+<table id="statsTable" style="display:none;">
     <thead>
     <tr>
         <th>使用者名稱 (Username)</th>
         <th>登入次數 (Login Count)</th>
     </tr>
     </thead>
-    <tbody>
-    {% for stat in users_stats %}
-    <tr>
-        <td>{{ stat.username }}</td>
-        <td>{{ stat.login_count }}</td>
-    </tr>
-    {% endfor %}
+    <tbody id="statsTableBody">
+    <!-- 資料將由 JavaScript 動態填入 -->
     </tbody>
 </table>
-{% else %}
-<p class="no-data">目前沒有使用者資料可顯示。</p>
-{% endif %}
+<p id="noData" class="no-data" style="display:none;">目前沒有使用者資料可顯示。</p>
 
+<p style="text-align:center; margin-top: 20px;">
+    <!-- 如果你的 Flask 應用還提供其他頁面，可以這樣連結 -->
+    <!-- <a href="{{ url_for('home') }}">返回首頁</a> -->
+    <!-- 如果這是純前端或不同來源，直接寫 URL -->
+    <a href="/">返回首頁</a>
+</p>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statsTable = document.getElementById('statsTable');
+        const statsTableBody = document.getElementById('statsTableBody');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const noDataDiv = document.getElementById('noData');
+
+        // 假設你的 API 部署在 https://api.poseidonllp.com/
+        // 並且 Flask 路由是 /api/user_login_stats
+        const apiUrl = 'https://api.poseidonllp.com/api/user_login_stats';
+        // 或者如果你在同一個域名下測試，可以只用相對路徑: const apiUrl = '/api/user_login_stats';
+
+        fetch(apiUrl)
+            .then(response => {
+                if (!response.ok) {
+                    // 如果伺服器回傳錯誤狀態 (例如 404, 500)
+                    return response.json().then(errData => {
+                        throw new Error(errData.error || `伺服器錯誤: ${response.status}`);
+                    });
+                }
+                return response.json(); // 解析 JSON 數據
+            })
+            .then(data => {
+                loadingDiv.style.display = 'none'; // 隱藏載入訊息
+                if (data && data.users_stats && data.users_stats.length > 0) {
+                    statsTable.style.display = 'table'; // 顯示表格
+                    data.users_stats.forEach(stat => {
+                        const row = statsTableBody.insertRow();
+                        const cell1 = row.insertCell(0);
+                        const cell2 = row.insertCell(1);
+                        cell1.textContent = stat.username;
+                        cell2.textContent = stat.login_count;
+                    });
+                } else {
+                    noDataDiv.style.display = 'block'; // 顯示無資料訊息
+                }
+            })
+            .catch(error => {
+                console.error('獲取使用者統計資料時發生錯誤:', error);
+                loadingDiv.style.display = 'none'; // 隱藏載入訊息
+                errorDiv.textContent = '無法載入資料：' + error.message;
+                errorDiv.style.display = 'block'; // 顯示錯誤訊息
+            });
+    });
+</script>
 </body>
 </html>
