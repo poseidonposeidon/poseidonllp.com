@@ -185,7 +185,8 @@
 					console.log('Response data:', body);
 					if (status === 200 && body.message === "Login successful") {
 						localStorage.setItem('authToken', body.token);
-						window.location.href = "/templates/home";
+						// window.location.href = "/templates/home";
+						window.location.href = "/home";
 						alert('Login successful!');
 					} else {
 						alert("Invalid username or password");
