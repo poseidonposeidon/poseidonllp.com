@@ -2328,47 +2328,24 @@ function getColorByPerformance(performance) {
 const LOG_QUERY_API_ENDPOINT = 'https://api.poseidonllp.com/api/log_query'; // 替換成你的實際 API 端點
 
 async function logUserQuery(market, queryText) {
-    try {
-        const payload = {
-            market: market,
-            query: queryText,
-            timestamp: new Date().toISOString(),
-        };
-
-        // 示例：假設你將用戶名存在 localStorage (你需要根據你的應用調整)
-        const currentUsername = localStorage.getItem('loggedInUsername');
-        if (currentUsername) {
-            payload.username = currentUsername;
-        } else {
-            payload.username = 'anonymous'; // 或者不發送 username 字段
-        }
-
-        const token = localStorage.getItem('authToken'); // 或者從其他地方獲取 token
-
-        const fetchOptions = {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(payload)
-        };
-
-        if (token) {
-            fetchOptions.headers['Authorization'] = `Bearer ${token}`;
-        }
-
-        const response = await fetch(LOG_QUERY_API_ENDPOINT, fetchOptions);
-
-        if (!response.ok) {
-            console.error('Failed to log query:', await response.text(), 'Payload:', payload);
-        } else {
-            console.log('Query logged successfully:', payload);
-        }
-    } catch (error) {
-        console.error('Error logging query:', error);
+    const token = localStorage.getItem('authToken');
+    const payload = {
+        market,
+        query: queryText,
+        timestamp: new Date().toISOString()
+    };
+    const res = await fetch('https://api.poseidonllp.com/api/log_query', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            ...(token && { 'Authorization': `Bearer ${token}` })
+        },
+        body: JSON.stringify(payload)
+    });
+    if (!res.ok) {
+        console.error('紀錄失敗', await res.text());
     }
 }
-
 
 function fetchStock() {
     const stockSymbolInput = document.getElementById('stockSymbol');
