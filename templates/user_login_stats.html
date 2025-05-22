@@ -5,7 +5,7 @@
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>使用者統計與查詢日誌 (Fetch API)</title> <!-- 可以更新一下標題 -->
+    <title>使用者統計與查詢日誌 (Fetch API)</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -13,12 +13,20 @@
             background-color: #f4f4f4;
             color: #333;
         }
-        h1, h2 { /* 將 h2 也加入樣式 */
+        h1, h2 {
             color: #333;
             text-align: center;
         }
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        select {
+            font-size: 1rem;
+            padding: 5px 10px;
+        }
         table {
-            width: 80%; /* 稍微加寬一點以容納更多內容或兩個表格 */
+            width: 80%;
             margin: 20px auto;
             border-collapse: collapse;
             box-shadow: 0 2px 15px rgba(0,0,0,0.1);
@@ -36,8 +44,8 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        /* 確保 hover 效果應用於動態添加的行 */
-        #statsTableBody tr:hover, #stockLogsTableBody tr:hover {
+        #statsTableBody tr:hover,
+        #stockLogsTableBody tr:hover {
             background-color: #f1f1f1;
         }
         .loading-message, .error-message, .no-data {
@@ -51,7 +59,13 @@
     </style>
 </head>
 <body>
+
 <h1>使用者登入次數統計</h1>
+
+<div class="controls">
+    <label for="monthSelect">選擇月份：</label>
+    <select id="monthSelect"></select>
+</div>
 
 <div id="loadingUserStats" class="loading-message">正在載入使用者登入統計...</div>
 <div id="errorUserStats" class="error-message" style="display:none;"></div>
@@ -63,15 +77,15 @@
         <th>登入次數 (Login Count)</th>
     </tr>
     </thead>
-    <tbody id="statsTableBody">
-    <!-- 使用者登入資料將由 JavaScript 動態填入 -->
-    </tbody>
+    <tbody id="statsTableBody"></tbody>
 </table>
-<p id="noDataUserStats" class="no-data" style="display:none;">目前沒有使用者登入統計資料可顯示。</p>
+<p id="noDataUserStats" class="no-data" style="display:none;">
+    目前沒有該月份的使用者登入統計資料可顯示。
+</p>
 
-<hr style="margin: 40px auto; width: 80%;"> <!-- 分隔線 -->
+<hr style="margin: 40px auto; width: 80%;">
 
-<h2>股票查詢日誌</h2> <!-- 新增標題 -->
+<h2>股票查詢日誌</h2>
 
 <div id="loadingStockLogs" class="loading-message">正在載入股票查詢日誌...</div>
 <div id="errorStockLogs" class="error-message" style="display:none;"></div>
@@ -85,12 +99,11 @@
         <th>查詢時間</th>
     </tr>
     </thead>
-    <tbody id="stockLogsTableBody">
-    <!-- 股票查詢日誌資料將由 JavaScript 動態填入 -->
-    </tbody>
+    <tbody id="stockLogsTableBody"></tbody>
 </table>
-<p id="noDataStockLogs" class="no-data" style="display:none;">目前沒有股票查詢日誌可顯示。</p>
-
+<p id="noDataStockLogs" class="no-data" style="display:none;">
+    目前沒有股票查詢日誌可顯示。
+</p>
 
 <p style="text-align:center; margin-top: 20px;">
     <a href="/">返回首頁</a>
@@ -98,36 +111,58 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // --- 使用者登入統計相關元素 ---
+        // --- 元素 ---
+        const monthSelect = document.getElementById('monthSelect');
+
         const statsTable = document.getElementById('statsTable');
         const statsTableBody = document.getElementById('statsTableBody');
         const loadingUserStatsDiv = document.getElementById('loadingUserStats');
         const errorUserStatsDiv = document.getElementById('errorUserStats');
         const noDataUserStatsDiv = document.getElementById('noDataUserStats');
-        const userStatsApiUrl = 'https://api.poseidonllp.com/api/user_login_stats'; // 使用相對路徑
+        const userStatsApiUrl = '/api/user_login_stats';  // 相對路徑
 
-        // --- 股票查詢日誌相關元素 ---
         const stockLogsTable = document.getElementById('stockLogsTable');
         const stockLogsTableBody = document.getElementById('stockLogsTableBody');
         const loadingStockLogsDiv = document.getElementById('loadingStockLogs');
         const errorStockLogsDiv = document.getElementById('errorStockLogs');
         const noDataStockLogsDiv = document.getElementById('noDataStockLogs');
-        const stockLogsApiUrl = 'https://api.poseidonllp.com/api/stock_query_logs'; // 使用相對路徑
+        const stockLogsApiUrl = '/api/stock_query_logs';
 
-        // 函數：獲取並顯示使用者登入統計
-        function fetchUserLoginStats() {
-            fetch(userStatsApiUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(errData => {
-                            throw new Error(errData.error || `伺服器錯誤 (使用者統計): ${response.status}`);
-                        });
+        // --- 建立最近 12 個月的選單 ---
+        function populateMonthOptions() {
+            const now = new Date();
+            for (let i = 0; i < 12; i++) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const ym = d.toISOString().slice(0, 7);
+                const opt = document.createElement('option');
+                opt.value = ym;
+                opt.textContent = ym;
+                monthSelect.appendChild(opt);
+            }
+            // 預設選擇「當前月份」
+            monthSelect.value = new Date().toISOString().slice(0, 7);
+        }
+
+        // --- 取得並顯示使用者登入統計 ---
+        function fetchUserLoginStats(month) {
+            // 重置顯示
+            statsTable.style.display = 'none';
+            noDataUserStatsDiv.style.display = 'none';
+            errorUserStatsDiv.style.display = 'none';
+            loadingUserStatsDiv.style.display = 'block';
+            statsTableBody.innerHTML = '';
+
+            const url = `${userStatsApiUrl}?month=${month}`;
+            fetch(url)
+                .then(res => {
+                    if (!res.ok) {
+                        return res.json().then(err => { throw new Error(err.error || res.status) });
                     }
-                    return response.json();
+                    return res.json();
                 })
                 .then(data => {
                     loadingUserStatsDiv.style.display = 'none';
-                    if (data && data.users_stats && data.users_stats.length > 0) {
+                    if (data.users_stats && data.users_stats.length) {
                         statsTable.style.display = 'table';
                         data.users_stats.forEach(stat => {
                             const row = statsTableBody.insertRow();
@@ -138,54 +173,63 @@
                         noDataUserStatsDiv.style.display = 'block';
                     }
                 })
-                .catch(error => {
-                    console.error('獲取使用者統計資料時發生錯誤:', error);
+                .catch(err => {
+                    console.error('錯誤（使用者統計）：', err);
                     loadingUserStatsDiv.style.display = 'none';
-                    errorUserStatsDiv.textContent = '無法載入使用者統計資料：' + error.message;
+                    errorUserStatsDiv.textContent = '無法載入資料：' + err.message;
                     errorUserStatsDiv.style.display = 'block';
                 });
         }
 
-        // 函數：獲取並顯示股票查詢日誌
+        // --- 取得並顯示股票查詢日誌 ---
         function fetchStockQueryLogs() {
+            stockLogsTable.style.display = 'none';
+            noDataStockLogsDiv.style.display = 'none';
+            errorStockLogsDiv.style.display = 'none';
+            loadingStockLogsDiv.style.display = 'block';
+            stockLogsTableBody.innerHTML = '';
+
             fetch(stockLogsApiUrl)
-                .then(response => {
-                    if (!response.ok) {
-                        return response.json().then(errData => {
-                            throw new Error(errData.error || `伺服器錯誤 (查詢日誌): ${response.status}`);
-                        });
+                .then(res => {
+                    if (!res.ok) {
+                        return res.json().then(err => { throw new Error(err.error || res.status) });
                     }
-                    return response.json();
+                    return res.json();
                 })
                 .then(data => {
                     loadingStockLogsDiv.style.display = 'none';
-                    if (data && data.stock_logs && data.stock_logs.length > 0) {
+                    if (data.stock_logs && data.stock_logs.length) {
                         stockLogsTable.style.display = 'table';
                         data.stock_logs.forEach(log => {
                             const row = stockLogsTableBody.insertRow();
                             row.insertCell(0).textContent = log.username;
                             row.insertCell(1).textContent = log.market_area;
                             row.insertCell(2).textContent = log.query_text;
-                            // 格式化時間戳 (可選，如果 API 回傳的是 ISO 字串)
-                            const date = new Date(log.timestamp);
-                            row.insertCell(3).textContent = date.toLocaleString('zh-TW'); // 或者您喜歡的其他格式
+                            row.insertCell(3).textContent = new Date(log.timestamp).toLocaleString('zh-TW');
                         });
                     } else {
                         noDataStockLogsDiv.style.display = 'block';
                     }
                 })
-                .catch(error => {
-                    console.error('獲取股票查詢日誌時發生錯誤:', error);
+                .catch(err => {
+                    console.error('錯誤（查詢日誌）：', err);
                     loadingStockLogsDiv.style.display = 'none';
-                    errorStockLogsDiv.textContent = '無法載入股票查詢日誌：' + error.message;
+                    errorStockLogsDiv.textContent = '無法載入日誌：' + err.message;
                     errorStockLogsDiv.style.display = 'block';
                 });
         }
 
-        // 頁面載入完成後，分別獲取兩部分資料
-        fetchUserLoginStats();
+        // --- 初始動作 ---
+        populateMonthOptions();
+        // 當月份改變時重新載入統計
+        monthSelect.addEventListener('change', () => {
+            fetchUserLoginStats(monthSelect.value);
+        });
+        // 頁面載入先顯示當月統計
+        fetchUserLoginStats(monthSelect.value);
         fetchStockQueryLogs();
     });
 </script>
+
 </body>
 </html>
