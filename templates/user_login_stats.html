@@ -5,7 +5,7 @@
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>使用者登入統計 (Fetch API)</title>
+    <title>使用者登入統計與查詢紀錄</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -13,12 +13,12 @@
             background-color: #f4f4f4;
             color: #333;
         }
-        h1 {
+        h1, h2 {
             color: #333;
             text-align: center;
         }
         table {
-            width: 60%;
+            width: 80%;
             margin: 20px auto;
             border-collapse: collapse;
             box-shadow: 0 2px 15px rgba(0,0,0,0.1);
@@ -36,7 +36,7 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        #statsTableBody tr:hover { /* 確保 hover 效果應用於動態添加的行 */
+        tr:hover {
             background-color: #f1f1f1;
         }
         .loading-message, .error-message, .no-data {
@@ -47,77 +47,119 @@
         .error-message {
             color: red;
         }
+        .section-container {
+            width: 80%;
+            margin: 0 auto 40px;
+        }
     </style>
 </head>
 <body>
 <h1>使用者登入次數統計</h1>
+<div class="section-container">
+    <div id="loading-stats" class="loading-message">正在載入登入統計資料...</div>
+    <div id="error-stats" class="error-message" style="display:none;"></div>
+    <table id="statsTable" style="display:none;">
+        <thead>
+        <tr>
+            <th>使用者名稱 (Username)</th>
+            <th>登入次數 (Login Count)</th>
+        </tr>
+        </thead>
+        <tbody id="statsTableBody"></tbody>
+    </table>
+    <div id="noData-stats" class="no-data" style="display:none;">目前沒有使用者登入統計可顯示。</div>
+</div>
 
-<div id="loading" class="loading-message">正在載入資料...</div>
-<div id="error" class="error-message" style="display:none;"></div>
-
-<table id="statsTable" style="display:none;">
-    <thead>
-    <tr>
-        <th>使用者名稱 (Username)</th>
-        <th>登入次數 (Login Count)</th>
-    </tr>
-    </thead>
-    <tbody id="statsTableBody">
-    <!-- 資料將由 JavaScript 動態填入 -->
-    </tbody>
-</table>
-<p id="noData" class="no-data" style="display:none;">目前沒有使用者資料可顯示。</p>
+<h2>使用者查詢紀錄</h2>
+<div class="section-container">
+    <div id="loading-logs" class="loading-message">正在載入查詢紀錄...</div>
+    <div id="error-logs" class="error-message" style="display:none;"></div>
+    <table id="logsTable" style="display:none;">
+        <thead>
+        <tr>
+            <th>使用者 (Username)</th>
+            <th>市場 (Market)</th>
+            <th>查詢內容 (Query)</th>
+            <th>時間 (Timestamp)</th>
+        </tr>
+        </thead>
+        <tbody id="logsTableBody"></tbody>
+    </table>
+    <div id="noData-logs" class="no-data" style="display:none;">目前沒有查詢紀錄可顯示。</div>
+</div>
 
 <p style="text-align:center; margin-top: 20px;">
-    <!-- 如果你的 Flask 應用還提供其他頁面，可以這樣連結 -->
-    <!-- <a href="{{ url_for('home') }}">返回首頁</a> -->
-    <!-- 如果這是純前端或不同來源，直接寫 URL -->
     <a href="/">返回首頁</a>
 </p>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // --- 載入使用者登入統計 ---
+        const statsUrl = '/api/user_login_stats';  // 或 https://api.poseidonllp.com/api/user_login_stats
+        const loadingStats = document.getElementById('loading-stats');
+        const errorStats = document.getElementById('error-stats');
         const statsTable = document.getElementById('statsTable');
-        const statsTableBody = document.getElementById('statsTableBody');
-        const loadingDiv = document.getElementById('loading');
-        const errorDiv = document.getElementById('error');
-        const noDataDiv = document.getElementById('noData');
+        const statsBody = document.getElementById('statsTableBody');
+        const noDataStats = document.getElementById('noData-stats');
 
-        // 假設你的 API 部署在 https://api.poseidonllp.com/
-        // 並且 Flask 路由是 /api/user_login_stats
-        const apiUrl = 'https://api.poseidonllp.com/api/user_login_stats';
-        // 或者如果你在同一個域名下測試，可以只用相對路徑: const apiUrl = '/api/user_login_stats';
-
-        fetch(apiUrl)
-            .then(response => {
-                if (!response.ok) {
-                    // 如果伺服器回傳錯誤狀態 (例如 404, 500)
-                    return response.json().then(errData => {
-                        throw new Error(errData.error || `伺服器錯誤: ${response.status}`);
-                    });
-                }
-                return response.json(); // 解析 JSON 數據
+        fetch(statsUrl)
+            .then(res => {
+                if (!res.ok) return res.json().then(e=>{throw new Error(e.error||res.status)});
+                return res.json();
             })
             .then(data => {
-                loadingDiv.style.display = 'none'; // 隱藏載入訊息
-                if (data && data.users_stats && data.users_stats.length > 0) {
-                    statsTable.style.display = 'table'; // 顯示表格
-                    data.users_stats.forEach(stat => {
-                        const row = statsTableBody.insertRow();
-                        const cell1 = row.insertCell(0);
-                        const cell2 = row.insertCell(1);
-                        cell1.textContent = stat.username;
-                        cell2.textContent = stat.login_count;
+                loadingStats.style.display = 'none';
+                if (data.users_stats?.length) {
+                    statsTable.style.display = 'table';
+                    data.users_stats.forEach(item => {
+                        const row = statsBody.insertRow();
+                        row.insertCell(0).textContent = item.username;
+                        row.insertCell(1).textContent = item.login_count;
                     });
                 } else {
-                    noDataDiv.style.display = 'block'; // 顯示無資料訊息
+                    noDataStats.style.display = 'block';
                 }
             })
-            .catch(error => {
-                console.error('獲取使用者統計資料時發生錯誤:', error);
-                loadingDiv.style.display = 'none'; // 隱藏載入訊息
-                errorDiv.textContent = '無法載入資料：' + error.message;
-                errorDiv.style.display = 'block'; // 顯示錯誤訊息
+            .catch(err => {
+                loadingStats.style.display = 'none';
+                errorStats.textContent = '無法載入登入統計：' + err.message;
+                errorStats.style.display = 'block';
+            });
+
+        // --- 載入查詢紀錄 ---
+        const logsUrl = '/api/query_logs';  // 請替換為你實作的 GET 查詢紀錄端點
+        const loadingLogs = document.getElementById('loading-logs');
+        const errorLogs = document.getElementById('error-logs');
+        const logsTable = document.getElementById('logsTable');
+        const logsBody = document.getElementById('logsTableBody');
+        const noDataLogs = document.getElementById('noData-logs');
+
+        fetch(logsUrl)
+            .then(res => {
+                if (!res.ok) return res.json().then(e=>{throw new Error(e.error||res.status)});
+                return res.json();
+            })
+            .then(data => {
+                loadingLogs.style.display = 'none';
+                if (data.logs?.length) {
+                    logsTable.style.display = 'table';
+                    data.logs.forEach(item => {
+                        const row = logsBody.insertRow();
+                        row.insertCell(0).textContent = item.username || 'anonymous';
+                        row.insertCell(1).textContent = item.market_area;
+                        row.insertCell(2).textContent = item.query_text;
+                        // 格式化 ISO 時間為本地顯示
+                        const dt = new Date(item.timestamp);
+                        row.insertCell(3).textContent = dt.toLocaleString();
+                    });
+                } else {
+                    noDataLogs.style.display = 'block';
+                }
+            })
+            .catch(err => {
+                loadingLogs.style.display = 'none';
+                errorLogs.textContent = '無法載入查詢紀錄：' + err.message;
+                errorLogs.style.display = 'block';
             });
     });
 </script>
