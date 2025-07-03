@@ -178,21 +178,33 @@
 			body: JSON.stringify({ username, password })
 		})
 				.then(response => {
-					console.log('Response status:', response.status);
-					return response.json().then(data => ({ status: response.status, body: data }));
+					if (!response.ok) {
+						// 如果回應狀態不是 2xx，先拋出錯誤讓 catch 處理
+						return response.json().then(err => { throw new Error(err.message || 'Login failed'); });
+					}
+					return response.json();
 				})
-				.then(({ status, body }) => {
-					console.log('Response data:', body);
-					if (status === 200 && body.message === "Login successful") {
-						localStorage.setItem('authToken', body.token);
-						window.location.href = "/templates/home";
-						alert('Login successful!');
+				.then(data => {
+					console.log('Response data:', data);
+
+					// 【新增的判斷邏輯】
+					if (data.isAdmin) {
+						// 如果是管理員，直接跳轉到後端指定的頁面
+						alert('Admin login successful!');
+						// 注意：後端 url_for('user_login_stats') 回傳的是 /user_login_stats
+						// 所以這裡直接使用即可
+						window.location.href = data.redirectTo;
 					} else {
-						alert("Invalid username or password");
+						// 正常用戶，儲存 token 並跳轉到主頁
+						alert('Login successful!');
+						localStorage.setItem('authToken', data.token);
+						// 修正跳轉路徑，通常是跳到根目錄或 /home
+						window.location.href = "/home";
 					}
 				})
 				.catch(error => {
 					console.error('Error:', error);
+					// 顯示更具體的錯誤訊息
 					alert('An error occurred during login: ' + error.message);
 				});
 	});
