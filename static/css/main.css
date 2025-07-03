@@ -1201,7 +1201,7 @@ button:not(.info-input button):hover {
     padding: 20px;
     border-radius: 10px;
     width: 100%;
-    color: #e0e0e0;
+    /*color: #e0e0e0;*/
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
     display: flex;
     gap: 10px;
@@ -1230,6 +1230,7 @@ button:not(.info-input button):hover {
 
 .news-item p {
     margin: 5px 0;
+    color: #555555;
 }
 
 .news-item a {
