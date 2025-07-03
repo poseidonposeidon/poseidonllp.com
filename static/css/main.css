@@ -1401,3 +1401,106 @@ button:not(.info-input button):hover {
 }
 
 
+/* ================================== */
+/*          白天模式 (Light Mode)         */
+/* ================================== */
+
+/* 當 body 有 .light-mode class 時，套用以下樣式 */
+
+body.light-mode {
+    background-color: #f0f2f5; /* 淺灰色背景 */
+    color: #1c1c1c; /* 深色文字 */
+}
+
+body.light-mode h1,
+body.light-mode h2 {
+    color: #333; /* 標題用深一點的顏色 */
+}
+
+/* 輸入框、按鈕 */
+body.light-mode input,
+body.light-mode button:not(.info-input button):not(.pagination-button) {
+    background-color: #ffffff; /* 白色背景 */
+    border: 1px solid #ccc;
+    color: #1c1c1c; /* 深色文字 */
+}
+
+body.light-mode input:focus {
+    border-color: #007bff;
+    background-color: #ffffff;
+}
+
+/* 所有的 div 容器 */
+body.light-mode div {
+    background-color: #ffffff; /* 容器背景改為白色 */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 加點陰影才好看 */
+}
+
+/* 導覽列 */
+body.light-mode .navbar,
+body.light-mode .navbar-links,
+body.light-mode .dropdown,
+body.light-mode .dropdown-content,
+body.light-mode .dropdown-container {
+    background-color: #ffffff;
+}
+
+body.light-mode .navbar-links a,
+body.light-mode .dropdown-content a {
+    color: #333; /* 連結文字變深色 */
+}
+
+body.light-mode .navbar-links a:hover,
+body.light-mode .dropdown-content a:hover {
+    color: #007bff; /* 滑鼠移上去變藍色 */
+}
+
+/* 你那些彈出視窗 */
+body.light-mode .info-section,
+body.light-mode .ai-box-section,
+body.light-mode #compare {
+    background-color: #f8f9fa; /* 彈窗用稍微不同的背景色 */
+    color: #1c1c1c;
+    border: 1px solid #dee2e6;
+}
+
+/* 新聞區塊 */
+body.light-mode .news-item {
+    background-color: #ffffff;
+    border-bottom: 1px solid #eee;
+}
+
+body.light-mode .news-item h3,
+body.light-mode .news-item a {
+    color: #0056b3;
+}
+
+/* 聊天框 */
+body.light-mode .chat-container,
+body.light-mode #chat-input {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    color: #333;
+}
+
+body.light-mode .chat-message {
+    background-color: #007bff; /* 你的訊息用藍色 */
+    color: white;
+}
+
+body.light-mode .chat-response {
+    background-color: #e9ecef; /* AI 回應用淺灰色 */
+    color: #333;
+}
+
+/* 還有你那個導覽列切換按鈕的樣式 */
+.theme-toggle-button {
+    background: none !important; /* 強制背景透明 */
+    border: none !important;
+    padding: 5px !important;
+    cursor: pointer;
+}
+.theme-toggle-button img {
+    width: 24px;
+    height: 24px;
+}

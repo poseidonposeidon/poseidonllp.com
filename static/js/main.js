@@ -3,6 +3,54 @@ const BASE_URL = "https://financialmodelingprep.com/api/v3/";
 const ALTERNATE_URL = "https://financialmodelingprep.com/stable/fmp-articles";
 const baseUrl = 'https://api.poseidonllp.com';
 
+// 等整個網頁文件都載入完畢再執行
+document.addEventListener('DOMContentLoaded', () => {
+
+    // 抓到我們需要的元素
+    const themeToggleButton = document.getElementById('theme-toggle-button');
+    const themeIcon = document.getElementById('theme-icon');
+    const body = document.body;
+
+    // 定義圖示的路徑，你不要寫錯了
+    const sunIcon = '/static/img/sun.png';
+    const moonIcon = '/static/img/moon.png';
+
+    // 函式：用來更新按鈕圖示和 body 的 class
+    const applyTheme = (theme) => {
+        if (theme === 'light') {
+            body.classList.add('light-mode');
+            themeIcon.src = moonIcon; // 白天模式顯示月亮圖示，表示可以切換到夜晚
+        } else {
+            body.classList.remove('light-mode');
+            themeIcon.src = sunIcon;  // 夜晚模式顯示太陽圖示，表示可以切換到白天
+        }
+    };
+
+    // 函式：切換主題
+    const toggleTheme = () => {
+        // 判斷當前是什麼模式，然後切換到另一種
+        const currentTheme = body.classList.contains('light-mode') ? 'dark' : 'light';
+        const newTheme = (currentTheme === 'dark') ? 'light' : 'dark';
+
+        // 儲存新的選擇到 localStorage
+        localStorage.setItem('theme', newTheme);
+
+        // 套用新的主題樣式
+        applyTheme(newTheme);
+    };
+
+    // 頁面一載入，就先檢查 localStorage 有沒有存過主題
+    const savedTheme = localStorage.getItem('theme') || 'dark'; // 如果沒有，預設就是暗黑模式
+    applyTheme(savedTheme);
+
+    // 幫按鈕加上點擊事件監聽
+    themeToggleButton.addEventListener('click', (e) => {
+        e.preventDefault(); // 防止 a 標籤跳轉頁面
+        toggleTheme();
+    });
+
+});
+
 //////News////
 // 獲取股票新聞函數
 let isUsingAlternateSource = false; //
