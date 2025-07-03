@@ -850,7 +850,7 @@ button:not(.info-input button):hover {
     overflow: hidden; /* 隱藏多餘內容 */
     transition: max-height 0.5s ease-in, opacity 0.4s ease-in; /* 收起動畫 */
     opacity: 0;
-    background-color: #1e1e1e;
+    /*background-color: #1e1e1e;*/
     border-radius: 5px;
     position: absolute;
     top: 100%;  /* 子選單放置在 title 之下 */
