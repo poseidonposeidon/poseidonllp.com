@@ -240,64 +240,107 @@ function createPageButton(pageNumber, currentPage, newsList) {
 
 function generatePagination(newsList, currentPage) {
     const paginationContainer = document.getElementById('pagination-container');
-    paginationContainer.innerHTML = '';
+    paginationContainer.innerHTML = ''; // 清空舊按鈕
 
     const totalPages = Math.ceil(newsList.length / NEWS_PER_PAGE);
 
-    // 如果總頁數很少，直接顯示所有分頁按鈕
-    if (totalPages <= MAX_VISIBLE_PAGES + 2) { // +2 用於顯示第一和最後頁按鈕
-        for (let i = 1; i <= totalPages; i++) {
-            paginationContainer.appendChild(createPageButton(i, currentPage, newsList));
-        }
+    // 如果只有一頁或根本沒東西，就什麼都不要顯示，保持乾淨
+    if (totalPages <= 1) {
         return;
     }
 
-    // 以偏移量計算中間視窗 (使目前頁數能置中)
-    const offset = Math.floor(MAX_VISIBLE_PAGES / 2);
-    let startPage, endPage;
+    // --- 步驟一：建立「上一頁」按鈕 ---
+    const prevButton = document.createElement('button');
+    prevButton.textContent = '<< Prev'; // 你想寫中文「上一頁」也行，隨便你
+    prevButton.classList.add('pagination-button');
+    // 如果是第一頁，就讓它不能按
+    if (currentPage === 1) {
+        prevButton.disabled = true;
+        prevButton.style.cursor = 'not-allowed'; // 游標也改一下，比較專業
+    }
+    prevButton.addEventListener('click', () => {
+        displayNews(newsList, currentPage - 1);
+        generatePagination(newsList, currentPage - 1);
+    });
+    paginationContainer.appendChild(prevButton);
 
-    if (currentPage <= offset + 1) {
-        // 如果目前頁數靠近最前端
-        startPage = 1;
-        endPage = MAX_VISIBLE_PAGES;
-    } else if (currentPage >= totalPages - offset) {
-        // 如果目前頁數靠近最後端
-        startPage = totalPages - MAX_VISIBLE_PAGES + 1;
-        endPage = totalPages;
+
+    // --- 步驟二：中間的數字按鈕（沿用你大部分的舊邏輯）---
+    const createPageButton = (pageNumber) => { // 把你的舊函式搬進來，作用域比較清楚
+        const button = document.createElement('button');
+        button.textContent = pageNumber;
+        button.classList.add('pagination-button');
+        if (pageNumber === currentPage) {
+            button.classList.add('active');
+        }
+        button.addEventListener('click', () => {
+            displayNews(newsList, pageNumber);
+            generatePagination(newsList, pageNumber);
+        });
+        return button;
+    };
+
+    // 建立要顯示的頁碼陣列
+    let pagesToShow = [];
+    if (totalPages <= MAX_VISIBLE_PAGES + 2) {
+        for (let i = 1; i <= totalPages; i++) {
+            pagesToShow.push(i);
+        }
     } else {
-        // 中間區段：以目前頁數為中心
-        startPage = currentPage - offset;
-        endPage = currentPage + offset;
+        pagesToShow.push(1); // 永遠顯示第一頁
+        let start = Math.max(2, currentPage - 2);
+        let end = Math.min(totalPages - 1, currentPage + 2);
+
+        // 確保視窗寬度
+        if (currentPage < 4) {
+            end = 5;
+        }
+        if (currentPage > totalPages - 3) {
+            start = totalPages - 4;
+        }
+
+        if (start > 2) {
+            pagesToShow.push('...');
+        }
+        for (let i = start; i <= end; i++) {
+            pagesToShow.push(i);
+        }
+        if (end < totalPages - 1) {
+            pagesToShow.push('...');
+        }
+        pagesToShow.push(totalPages); // 永遠顯示最後一頁
     }
 
-    // 如果起始頁不包含第一頁，先加上第一頁按鈕
-    if (startPage > 1) {
-        paginationContainer.appendChild(createPageButton(1, currentPage, newsList));
-        if (startPage > 2) {
-            // 如果第一頁和視窗起始頁之間超過1個頁碼，加上省略號
+    // 根據頁碼陣列產生按鈕或省略號
+    pagesToShow.forEach(page => {
+        if (page === '...') {
             const ellipsis = document.createElement('span');
             ellipsis.textContent = '...';
-            ellipsis.style.margin = '0 5px';
+            ellipsis.style.margin = '0 10px'; // 給省略號一點空間
+            ellipsis.style.alignSelf = 'center';
             paginationContainer.appendChild(ellipsis);
+        } else {
+            paginationContainer.appendChild(createPageButton(page));
         }
-    }
+    });
 
-    // 顯示中間的滑動視窗分頁按鈕
-    for (let i = startPage; i <= endPage; i++) {
-        paginationContainer.appendChild(createPageButton(i, currentPage, newsList));
-    }
 
-    // 如果視窗結束頁不包含最後一頁，則加上省略號和最後一頁按鈕
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            const ellipsis = document.createElement('span');
-            ellipsis.textContent = '...';
-            ellipsis.style.margin = '0 5px';
-            paginationContainer.appendChild(ellipsis);
-        }
-        paginationContainer.appendChild(createPageButton(totalPages, currentPage, newsList));
+    // --- 步驟三：建立「下一頁」按鈕 ---
+    const nextButton = document.createElement('button');
+    nextButton.textContent = 'Next >>'; // 同上，你想寫中文也行
+    nextButton.classList.add('pagination-button');
+    // 如果是最後一頁，就讓它不能按
+    if (currentPage === totalPages) {
+        nextButton.disabled = true;
+        nextButton.style.cursor = 'not-allowed';
     }
+    nextButton.addEventListener('click', () => {
+        displayNews(newsList, currentPage + 1);
+        generatePagination(newsList, currentPage + 1);
+    });
+    paginationContainer.appendChild(nextButton);
 }
+
 // 初始化函數
 async function initNewsSection() {
     const filterButtons = document.querySelectorAll('.filter-section button[data-category]');
