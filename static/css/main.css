@@ -689,7 +689,7 @@ button:not(.info-input button):hover {
 }
 
 .suggestions-list div:hover {
-    background-color: #333;
+    /*background-color: #333;*/
 }
 
 #buttonContainer {
