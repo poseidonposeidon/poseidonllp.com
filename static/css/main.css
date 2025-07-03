@@ -873,7 +873,7 @@ button:not(.info-input button):hover {
 }
 
 .chart-links .category .submenu a:hover {
-    background-color: #1e1e1e; /* hover 時背景變深 */
+    /*background-color: #1e1e1e; !* hover 時背景變深 *!*/
     color: #ffffff; /* hover 時字體顏色變白 */
 }
 
