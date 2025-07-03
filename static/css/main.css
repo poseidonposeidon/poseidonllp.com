@@ -397,7 +397,7 @@ button:not(.info-input button):hover {
     text-align: center;
     margin: 10px auto;
     padding: 20px;
-    background-color: #1e1e1e;
+    /*background-color: #1e1e1e;*/
     border-radius: 5px;
     max-width: 100%;
 }
