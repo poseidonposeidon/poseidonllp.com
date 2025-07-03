@@ -670,7 +670,7 @@ button:not(.info-input button):hover {
     display: none;
     position: absolute;
     border: 1px solid #ccc;
-    background-color: #1c1c1c;
+    /*background-color: #1c1c1c;*/
     max-height: 200px;
     overflow-y: auto;
     width: calc(100% - 20px);
