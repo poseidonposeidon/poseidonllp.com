@@ -1408,21 +1408,20 @@ button:not(.info-input button):hover {
 /* 當 body 有 .light-mode class 時，套用以下樣式 */
 
 body.light-mode {
-    background-color: #f0f2f5; /* 淺灰色背景 */
-    color: #1c1c1c; /* 深色文字 */
+    background-color: #f0f2f5;
+    color: #1c1c1c;
 }
 
 body.light-mode h1,
 body.light-mode h2 {
-    color: #333; /* 標題用深一點的顏色 */
+    color: #333;
 }
 
-/* 輸入框、按鈕 */
 body.light-mode input,
 body.light-mode button:not(.info-input button):not(.pagination-button) {
-    background-color: #ffffff; /* 白色背景 */
+    background-color: #ffffff;
     border: 1px solid #ccc;
-    color: #1c1c1c; /* 深色文字 */
+    color: #1c1c1c;
 }
 
 body.light-mode input:focus {
@@ -1430,46 +1429,103 @@ body.light-mode input:focus {
     background-color: #ffffff;
 }
 
-/* 所有的 div 容器 */
+/* 所有的 div 容器，這條規則比較通用，先放著 */
 body.light-mode div {
-    background-color: #ffffff; /* 容器背景改為白色 */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 加點陰影才好看 */
-}
-
-/* 導覽列 */
-body.light-mode .navbar,
-body.light-mode .navbar-links,
-body.light-mode .dropdown,
-body.light-mode .dropdown-content,
-body.light-mode .dropdown-container {
     background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
-body.light-mode .navbar-links a,
-body.light-mode .dropdown-content a {
-    color: #333; /* 連結文字變深色 */
+/* 導覽列和下拉選單 - 整合在這裡！*/
+body.light-mode .navbar {
+    background-color: #ffffff;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* 導覽列也需要陰影 */
+}
+
+body.light-mode .dropdown-container,
+body.light-mode .dropdown {
+    background-color: transparent; /* 這些容器本身應該是透明的 */
+    box-shadow: none;
+    border: none;
+}
+
+body.light-mode .dropdown-content {
+    background-color: #ffffff !important; /* 背景是白色 */
+    border: 1px solid #ddd;              /* 加上邊框 */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1); /* 加上陰影 */
+}
+
+body.light-mode .navbar-links a {
+    color: #333; /* 主連結文字是深色 */
+    background-color: transparent; /* 背景透明 */
 }
 
 body.light-mode .navbar-links a:hover,
-body.light-mode .dropdown-content a:hover {
+body.light-mode .navbar-links > .dropdown-container > .dropdown:hover > a {
     color: #007bff; /* 滑鼠移上去變藍色 */
 }
+
+body.light-mode .dropdown-content a {
+    color: #333;
+    background-color: #ffffff;
+}
+
+body.light-mode .dropdown-content a:hover {
+    color: #007bff;
+    background-color: #f0f2f5; /* 背景來點淺灰色 */
+}
+
+
+/* 中間篩選區塊 - 整合在這裡！*/
+body.light-mode .filter-section {
+    background-color: transparent;
+    box-shadow: none;
+}
+body.light-mode .filter-section h1 {
+    color: #333;
+    background-color: transparent;
+}
+body.light-mode .filter-inputs,
+body.light-mode .date-range-filter {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #eee;
+    box-shadow: none;
+}
+body.light-mode .stock-input,
+body.light-mode #news-date {
+    background-color: #ffffff;
+    border: 1px solid #ccc;
+    color: #333;
+}
+body.light-mode .filter-section button,
+body.light-mode #filter-by-date {
+    background-color: #e9ecef;
+    color: #333;
+    border: 1px solid #ccc;
+}
+body.light-mode .filter-section button:hover,
+body.light-mode #filter-by-date:hover {
+    background-color: #d6d8db;
+}
+
 
 /* 你那些彈出視窗 */
 body.light-mode .info-section,
 body.light-mode .ai-box-section,
 body.light-mode #compare {
-    background-color: #f8f9fa; /* 彈窗用稍微不同的背景色 */
+    background-color: #f8f9fa;
     color: #1c1c1c;
     border: 1px solid #dee2e6;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15); /* 彈窗陰影可以重一點 */
 }
 
 /* 新聞區塊 */
 body.light-mode .news-item {
     background-color: #ffffff;
     border-bottom: 1px solid #eee;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
 }
-
 body.light-mode .news-item h3,
 body.light-mode .news-item a {
     color: #0056b3;
@@ -1482,20 +1538,18 @@ body.light-mode #chat-input {
     border: 1px solid #ccc;
     color: #333;
 }
-
 body.light-mode .chat-message {
-    background-color: #007bff; /* 你的訊息用藍色 */
+    background-color: #007bff;
     color: white;
 }
-
 body.light-mode .chat-response {
-    background-color: #e9ecef; /* AI 回應用淺灰色 */
+    background-color: #e9ecef;
     color: #333;
 }
 
-/* 還有你那個導覽列切換按鈕的樣式 */
+/* 主題切換按鈕本身樣式 - 這個不用動 */
 .theme-toggle-button {
-    background: none !important; /* 強制背景透明 */
+    background: none !important;
     border: none !important;
     padding: 5px !important;
     cursor: pointer;
