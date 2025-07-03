@@ -4,18 +4,11 @@ const ALTERNATE_URL = "https://financialmodelingprep.com/stable/fmp-articles";
 const baseUrl = 'https://api.poseidonllp.com';
 
 document.addEventListener('DOMContentLoaded', () => {
-
-    // --- 任務一：設定主題切換功能 ---
+    // 頁面載入後，所有需要「綁定」到頁面元素上的功能都在這裡統一執行
     setupThemeToggle();
-
-    // --- 任務二：初始化新聞區塊 ---
     initNewsSection();
-
-    // --- 任務三：初始化搜尋框功能 ---
-    initSearchInput();
-
+    // initSearchAndFilters();
 });
-
 function setupThemeToggle() {
     const themeToggleButton = document.getElementById('theme-toggle-button');
     const themeIcon = document.getElementById('theme-icon');
@@ -190,14 +183,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     await loadNews();
 });
 
-// 根據類別篩選新聞
-function filterNewsByCategory(newsData, category) {
-    if (category === 'all') {
-        return newsData;
-    }
-    return newsData.filter(news => news.sector?.toLowerCase() === category.toLowerCase());
-}
-
 // 顯示新聞
 function displayNews(newsList, currentPage = 1) {
     const newsContainer = document.getElementById('news-container');
@@ -233,25 +218,6 @@ function displayNews(newsList, currentPage = 1) {
 }
 
 // 生成分頁按鈕
-function createPageButton(pageNumber, currentPage, newsList) {
-    const button = document.createElement('button');
-    button.textContent = pageNumber;
-    button.classList.add('pagination-button');
-    if (pageNumber === currentPage) {
-        button.classList.add('active');
-    }
-    // 設定按鈕的間距
-    button.style.margin = '0 5px';
-    button.style.padding = '5px 10px';
-
-    button.addEventListener('click', () => {
-        // 點擊按鈕後更新新聞顯示及分頁視窗
-        displayNews(newsList, pageNumber);
-        generatePagination(newsList, pageNumber);
-    });
-    return button;
-}
-
 function generatePagination(newsList, currentPage) {
     const paginationContainer = document.getElementById('pagination-container');
     paginationContainer.innerHTML = ''; // 清空舊按鈕
@@ -375,22 +341,37 @@ async function initNewsSection() {
     });
 }
 
-async function handleStockSearch(event) {
-    if (event.key === 'Enter') {
-        const stockInput = event.target.value.trim().toUpperCase(); // 轉大寫
-        const selectedDate = document.getElementById('news-date').value; // 取得日期（如果有選）
+async function handleToggleNewsSource() {
+    isUsingAlternateSource = !isUsingAlternateSource;
+    await loadNews();
 
-        if (!stockInput) {
-            alert('Please enter a valid stock symbol');
-            return;
+    const filterInputs = document.querySelector(".filter-inputs");
+    const toggleButton = document.getElementById("toggle-news-source");
+    const messageId = 'fmp-login-message';
+
+    if (isUsingAlternateSource) {
+        // --- 切換到 FMP 來源 ---
+        filterInputs.style.display = "none";
+        toggleButton.textContent = "切換至 原始 新聞來源";
+
+        if (!document.getElementById(messageId)) {
+            const message = document.createElement("div");
+            message.id = messageId;
+            message.textContent = "帳號 : poseidon@poseidonllp.com  密碼 : poseidon52369168";
+            message.style.marginTop = "10px";
+            toggleButton.insertAdjacentElement("afterend", message);
         }
-
-        // 如果使用者輸入了公司代號，則帶入公司代號 &（可選）日期
-        const newsList = await fetchStockNews('all', stockInput, selectedDate || '');
-        displayNews(newsList, 1); // 顯示新聞
-        generatePagination(newsList, 1); // 更新分頁
+    } else {
+        // --- 切換回原始來源 ---
+        filterInputs.style.display = "flex";
+        toggleButton.textContent = "切換至 FMP 新聞來源";
+        const existingMessage = document.getElementById(messageId);
+        if (existingMessage) {
+            existingMessage.remove();
+        }
     }
 }
+
 // 初始化輸入框監聽
 function initSearchInput() {
     const stockInput = document.getElementById('stock-input');
