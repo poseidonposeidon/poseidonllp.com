@@ -1531,6 +1531,15 @@ body.light-mode .news-item a {
     color: #0056b3;
 }
 
+body.light-mode .news-item p {
+    color: #555555; /* 給它一個能看清楚的深灰色！不要再用淺色了！ */
+}
+
+/* 順便把日期也修正一下，不然也看不見 */
+body.light-mode .news-item span {
+    color: #777777; /* 日期用稍微淺一點的灰色，但也要看得到 */
+}
+
 /* 聊天框 */
 body.light-mode .chat-container,
 body.light-mode #chat-input {
