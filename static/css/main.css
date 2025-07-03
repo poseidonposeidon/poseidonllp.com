@@ -280,7 +280,7 @@ div {
     font-size: 16px; /* 增加输入框字体大小 */
     border-radius: 5px;
     border: 1px solid #444;
-    background-color: #2c2c2c;
+    /*background-color: #2c2c2c;*/
     color: #fff;
 }
 
