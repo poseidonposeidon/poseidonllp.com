@@ -61,25 +61,39 @@ const MAX_VISIBLE_PAGES = 5;
 document.getElementById("toggle-news-source").addEventListener("click", async () => {
     isUsingAlternateSource = !isUsingAlternateSource;
 
-    // 重新載入新聞
     await loadNews();
 
-    // **切換輸入區塊的可見性**
     const filterInputs = document.querySelector(".filter-inputs");
-    if (isUsingAlternateSource) {
-        filterInputs.style.display = "none"; // 隱藏輸入區塊
-    } else {
-        filterInputs.style.display = "block"; // 顯示輸入區塊
-    }
+    const toggleButton = document.getElementById("toggle-news-source");
+    const messageId = 'fmp-login-message'; // 給我們的訊息一個專屬的 ID，方便尋找
 
-    // **更新按鈕文字**
-    document.getElementById("toggle-news-source").textContent = isUsingAlternateSource
-        ? "切換至 原始 新聞來源"
-        : "切換至 FMP 新聞來源";
-    const message = document.createElement("div");
-    message.textContent = "帳號 : poseidon@poseidonllp.com  密碼 : poseidon52369168";
-    message.style.marginTop = "10px";
-    document.getElementById("toggle-news-source").insertAdjacentElement("afterend", message);
+    if (isUsingAlternateSource) {
+        // --- 切換到 FMP 來源 ---
+        filterInputs.style.display = "none";
+        toggleButton.textContent = "切換至 原始 新聞來源";
+
+        // 先檢查頁面上是不是已經有這個訊息了
+        if (!document.getElementById(messageId)) {
+            // 如果沒有，才建立並加上去
+            const message = document.createElement("div");
+            message.id = messageId; // 記得要給它 ID！
+            message.textContent = "帳號 : poseidon@poseidonllp.com  密碼 : poseidon52369168";
+            message.style.marginTop = "10px";
+            toggleButton.insertAdjacentElement("afterend", message);
+        }
+
+    } else {
+        // --- 切換回原始來源 ---
+        filterInputs.style.display = "flex"; // 建議用 flex，比 block 好
+        toggleButton.textContent = "切換至 FMP 新聞來源";
+
+        // 找到那個訊息元素
+        const existingMessage = document.getElementById(messageId);
+        if (existingMessage) {
+            // 如果找到了，就把它從頁面上移除！
+            existingMessage.remove();
+        }
+    }
 });
 
 async function fetchStockNews(category = "all", symbol = "", date = "") {
