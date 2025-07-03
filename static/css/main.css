@@ -27,7 +27,7 @@ body.modal-open {
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    background-color: #1e1e1e;
+    /*background-color: #1e1e1e;*/
     padding: 20px;
     z-index: 999;
     max-height: 80%;
