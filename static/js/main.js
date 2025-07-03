@@ -8167,48 +8167,51 @@ function startPolling(encodedFilename) {
             },
             body: JSON.stringify({ filename: encodedFilename })
         })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    // 如果伺服器回傳錯誤 (例如 404, 500)，也停止輪詢
+                    throw new Error(`Server responded with status: ${response.status}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                // 【核心修改在這裡】
                 if (data.status === 'completed') {
                     clearInterval(pollingInterval);
-                    fetchTranscriptionResult(encodedFilename);
                     statusElement.textContent = 'Transcription completed';
+
+                    // 直接從 data 中獲取結果並顯示
+                    // 注意：後端回傳的結果在 data.result
+                    // 我們需要模擬 displayTranscription 函式期望的格式 { text: "..." }
+                    if (data.result) {
+                        displayTranscription({ text: data.result }); // 將結果傳給顯示函式
+                        // 如果需要，也可以從 data.originalFilename 獲取原始檔名來更新文字檔列表
+                        fetchTextFileList(data.originalFilename, true);
+                    } else {
+                        // 處理雖然狀態是 completed 但沒有結果的情況
+                        showAlert('Transcription completed, but no result was returned.');
+                    }
+
                 } else if (data.status === 'in_progress') {
-                    statusElement.textContent = `Transcription in progress... ${data.progress || ''}`;
+                    // 'in_progress' 狀態下，後端目前沒有回傳進度百分比，所以顯示通用訊息
+                    statusElement.textContent = 'Transcription in progress...';
                 } else if (data.status === 'queued') {
                     statusElement.textContent = 'The task is still in the queue, please wait....';
+                } else if (data.status === 'error') {
+                    // 處理後端回傳的錯誤狀態
+                    clearInterval(pollingInterval);
+                    const errorMessage = data.error || 'An unknown error occurred during transcription.';
+                    statusElement.textContent = `Error: ${errorMessage}`;
+                    showAlert(`Transcription failed: ${errorMessage}`);
                 }
             })
             .catch(error => {
                 clearInterval(pollingInterval);
                 console.error('An error occurred while checking status:', error);
-                showAlert('An error occurred while checking the transcription status, please check the results manually later');
+                showAlert('An error occurred while checking the transcription status, please check the results manually later.');
                 statusElement.textContent = 'Status check failed';
             });
     }, 5000); // 每5秒检查一次
-}
-
-function fetchTranscriptionResult(filename) {
-    fetch(`${baseUrl}/get_transcription_result`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ filename: filename })
-    })
-        .then(response => response.json())
-        .then(data => {
-            if (data.text) {
-                displayTranscription(data);
-                fetchTextFileList(currentOriginalFileName, true);
-            } else {
-                showAlert('Failed to retrieve transcription result');
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching transcription result:', error);
-            showAlert('Error fetching transcription result, please try again later');
-        });
 }
 
 function clearPreviousResult() {
