@@ -8293,16 +8293,14 @@ function copyToClipboard(text) {
 
 function downloadTextFile() {
     const select = document.getElementById('textFileSelect');
-    const textFileName = select.value;
-    if (!textFileName) {
+    const encodedFileName = select.value; // 直接使用這個編碼過的檔名
+    if (!encodedFileName) {
         alert('Please select a text file!');
         return;
     }
 
-    // 將檔案名稱從 URL 編碼轉回 UTF-8
-    const decodedFileName = decodeURIComponent(textFileName);
-
-    const downloadUrl = `${baseUrl}/download_text_file/${encodeURIComponent(decodedFileName)}`;
+    // 直接將編碼後的檔名用於 URL
+    const downloadUrl = `${baseUrl}/download_text_file/${encodedFileName}`;
 
     console.log("Starting file download:", downloadUrl);
 
@@ -8321,7 +8319,8 @@ function downloadTextFile() {
             console.log("File downloaded successfully, processing Blob data...");
             const downloadLink = document.createElement('a');
             downloadLink.href = URL.createObjectURL(blob);
-            downloadLink.download = decodedFileName; // 使用解碼後的檔案名稱
+            // download 屬性需要的是給使用者看的、未編碼的檔名
+            downloadLink.download = decodeURIComponent(encodedFileName);
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
