@@ -4373,7 +4373,7 @@ function drawChart(labels, dataSets, type) {
 
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${stockSymbol}&apikey=${apiKey}?`;
+    const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
