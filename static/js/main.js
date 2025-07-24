@@ -4652,7 +4652,6 @@ function fetchIncomeStatement() {
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
 }
 
-
 function fetchJPIncomeStatement() {
     const stockSymbol = fetchJPStock();
     const period = document.getElementById('periodJP').value;
@@ -4873,18 +4872,22 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
+    // =================================================================
+    // 第一步：更新 rows 物件的定義
+    // =================================================================
     let rows = {
         date: ['Date'],
         symbol: ['Symbol'],
         reportedCurrency: ['Reported Currency'],
         cik: ['CIK'],
-        fillingDate: ['Filling Date'],
-        calendarYear: ['Calendar Year'],
+        filingDate: ['Filing Date'], // 修正拼寫
+        acceptedDate: ['Accepted Date'], // 新增
+        fiscalYear: ['Fiscal Year'], // 替換 calendarYear
         period: ['Period'],
         revenue: ['Revenue'],
         costOfRevenue: ['Cost of Revenue'],
         grossProfit: ['Gross Profit'],
-        grossProfitRatio: ['Gross Profit Ratio'],
+        grossProfitRatio: ['Gross Profit Ratio'], // 需要手動計算
         researchAndDevelopmentExpenses: ['Research and Development Expenses'],
         generalAndAdministrativeExpenses: ['General and Administrative Expenses'],
         sellingAndMarketingExpenses: ['Selling and Marketing Expenses'],
@@ -4892,40 +4895,51 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         otherExpenses: ['Other Expenses'],
         operatingExpenses: ['Operating Expenses'],
         costAndExpenses: ['Cost and Expenses'],
+        netInterestIncome: ['Net Interest Income'], // 新增
         interestIncome: ['Interest Income'],
         interestExpense: ['Interest Expense'],
         depreciationAndAmortization: ['Depreciation and Amortization'],
         ebitda: ['EBITDA'],
-        ebitdaratio: ['EBITDA Ratio'],
+        ebitdaratio: ['EBITDA Ratio'], // 需要手動計算
+        ebit: ['EBIT'], // 新增
+        nonOperatingIncomeExcludingInterest: ['Non-Operating Income (Excl. Interest)'], // 新增
         operatingIncome: ['Operating Income'],
-        operatingIncomeRatio: ['Operating Income Ratio'],
+        operatingIncomeRatio: ['Operating Income Ratio'], // 需要手動計算
         totalOtherIncomeExpensesNet: ['Total Other Income Expenses Net'],
         incomeBeforeTax: ['Income Before Tax'],
-        incomeBeforeTaxRatio: ['Income Before Tax Ratio'],
+        incomeBeforeTaxRatio: ['Income Before Tax Ratio'], // 需要手動計算
         incomeTaxExpense: ['Income Tax Expense'],
+        netIncomeFromContinuingOperations: ['Net Income from Continuing Ops'], // 新增
+        netIncomeFromDiscontinuedOperations: ['Net Income from Discontinued Ops'], // 新增
+        otherAdjustmentsToNetIncome: ['Other Adjustments to Net Income'], // 新增
         netIncome: ['Net Income'],
-        netIncomeRatio: ['Net Income Ratio'],
+        netIncomeDeductions: ['Net Income Deductions'], // 新增
+        bottomLineNetIncome: ['Bottom Line Net Income'], // 新增
+        netIncomeRatio: ['Net Income Ratio'], // 需要手動計算
         eps: ['EPS'],
-        epsdiluted: ['EPS Diluted'],
+        epsDiluted: ['EPS Diluted'], // 修正大小寫
         weightedAverageShsOut: ['Weighted Average Shares Outstanding'],
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
-        link: ['SEC Link'],
-        finalLink: ['10K Link'],
         growthRate: [period === 'annual' ? 'YoY Growth' : 'YoY Growth']
+        // 移除了 link 和 finalLink
     };
 
+    // =================================================================
+    // 第二步：更新 forEach 迴圈，匹配新的資料結構並計算比率
+    // =================================================================
     data.forEach((entry, index) => {
+        // 填充數據
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
         rows.cik.push(entry.cik || 'N/A');
-        rows.fillingDate.push(entry.fillingDate || 'N/A');
-        rows.calendarYear.push(entry.calendarYear || 'N/A');
+        rows.filingDate.push(entry.filingDate || 'N/A');
+        rows.acceptedDate.push(entry.acceptedDate || 'N/A');
+        rows.fiscalYear.push(entry.fiscalYear || 'N/A');
         rows.period.push(entry.period || 'N/A');
         rows.revenue.push(formatNumber(entry.revenue));
         rows.costOfRevenue.push(formatNumber(entry.costOfRevenue));
         rows.grossProfit.push(formatNumber(entry.grossProfit));
-        rows.grossProfitRatio.push(entry.grossProfitRatio ? (entry.grossProfitRatio * 100).toFixed(2) + '%' : 'N/A');
         rows.researchAndDevelopmentExpenses.push(formatNumber(entry.researchAndDevelopmentExpenses));
         rows.generalAndAdministrativeExpenses.push(formatNumber(entry.generalAndAdministrativeExpenses));
         rows.sellingAndMarketingExpenses.push(formatNumber(entry.sellingAndMarketingExpenses));
@@ -4933,26 +4947,37 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.otherExpenses.push(formatNumber(entry.otherExpenses));
         rows.operatingExpenses.push(formatNumber(entry.operatingExpenses));
         rows.costAndExpenses.push(formatNumber(entry.costAndExpenses));
+        rows.netInterestIncome.push(formatNumber(entry.netInterestIncome));
         rows.interestIncome.push(formatNumber(entry.interestIncome));
         rows.interestExpense.push(formatNumber(entry.interestExpense));
         rows.depreciationAndAmortization.push(formatNumber(entry.depreciationAndAmortization));
         rows.ebitda.push(formatNumber(entry.ebitda));
-        rows.ebitdaratio.push(entry.ebitdaratio ? (entry.ebitdaratio * 100).toFixed(2) + '%' : 'N/A');
+        rows.ebit.push(formatNumber(entry.ebit));
+        rows.nonOperatingIncomeExcludingInterest.push(formatNumber(entry.nonOperatingIncomeExcludingInterest));
         rows.operatingIncome.push(formatNumber(entry.operatingIncome));
-        rows.operatingIncomeRatio.push(entry.operatingIncomeRatio ? (entry.operatingIncomeRatio * 100).toFixed(2) + '%' : 'N/A');
         rows.totalOtherIncomeExpensesNet.push(formatNumber(entry.totalOtherIncomeExpensesNet));
         rows.incomeBeforeTax.push(formatNumber(entry.incomeBeforeTax));
-        rows.incomeBeforeTaxRatio.push(entry.incomeBeforeTaxRatio ? (entry.incomeBeforeTaxRatio * 100).toFixed(2) + '%' : 'N/A');
         rows.incomeTaxExpense.push(formatNumber(entry.incomeTaxExpense));
+        rows.netIncomeFromContinuingOperations.push(formatNumber(entry.netIncomeFromContinuingOperations));
+        rows.netIncomeFromDiscontinuedOperations.push(formatNumber(entry.netIncomeFromDiscontinuedOperations));
+        rows.otherAdjustmentsToNetIncome.push(formatNumber(entry.otherAdjustmentsToNetIncome));
         rows.netIncome.push(formatNumber(entry.netIncome));
-        rows.netIncomeRatio.push(entry.netIncomeRatio ? (entry.netIncomeRatio * 100).toFixed(2) + '%' : 'N/A');
+        rows.netIncomeDeductions.push(formatNumber(entry.netIncomeDeductions));
+        rows.bottomLineNetIncome.push(formatNumber(entry.bottomLineNetIncome));
         rows.eps.push(entry.eps || 'N/A');
-        rows.epsdiluted.push(entry.epsdiluted || 'N/A');
+        rows.epsDiluted.push(entry.epsDiluted || 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
-        rows.link.push(entry.link ? `<a class="styled-link" href="${entry.link}" target="_blank">Link</a>` : 'N/A');
-        rows.finalLink.push(entry.finalLink ? `<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Link</a>` : 'N/A');
 
+        // 手動計算比率
+        const revenue = entry.revenue;
+        rows.grossProfitRatio.push(revenue ? ((entry.grossProfit / revenue) * 100).toFixed(2) + '%' : 'N/A');
+        rows.ebitdaratio.push(revenue ? ((entry.ebitda / revenue) * 100).toFixed(2) + '%' : 'N/A');
+        rows.operatingIncomeRatio.push(revenue ? ((entry.operatingIncome / revenue) * 100).toFixed(2) + '%' : 'N/A');
+        rows.incomeBeforeTaxRatio.push(revenue ? ((entry.incomeBeforeTax / revenue) * 100).toFixed(2) + '%' : 'N/A');
+        rows.netIncomeRatio.push(revenue ? ((entry.netIncome / revenue) * 100).toFixed(2) + '%' : 'N/A');
+
+        // 計算增長率 (這部分邏輯不變)
         if (index > 0) {
             if (period === 'annual') {
                 let lastRevenue = data[index - 1].revenue;
@@ -4965,7 +4990,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                     rows.growthRate.push('N/A');
                 }
             } else {
-                let previousYearSameQuarterIndex = data.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
+                let previousYearSameQuarterIndex = data.findIndex(e => e.fiscalYear === (parseInt(entry.fiscalYear) - 1).toString() && e.period === entry.period);
                 if (previousYearSameQuarterIndex !== -1) {
                     let lastRevenue = data[previousYearSameQuarterIndex].revenue;
                     if (entry.revenue && lastRevenue) {
@@ -4987,6 +5012,9 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     });
 
+    // =================================================================
+    // 後續的 HTML 生成和圖表繪製部分，維持不變
+    // =================================================================
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
