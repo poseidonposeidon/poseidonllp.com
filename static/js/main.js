@@ -4370,7 +4370,7 @@ function drawChart(labels, dataSets, type) {
     });
 }
 //////////////////////////////Profile//////////////////////////////////////////////
-
+///123///
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
     const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${stockSymbol}&apikey=${apiKey}`;
