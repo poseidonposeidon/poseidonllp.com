@@ -4614,7 +4614,7 @@ function fetchIncomeStatement() {
         return;
     }
 
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol={stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
 
 }
