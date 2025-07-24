@@ -4658,18 +4658,24 @@ function fetchJPIncomeStatement() {
     const yearRange = document.getElementById('yearRangeJP').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    if (!stockSymbol) {
-        alert('Please enter a stock symbol.');
-        return;
+    let limit;
+    const years = parseInt(yearRange);
+
+    if (yearRange === 'all') {
+        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
+        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
+        limit = 120;
+    } else {
+        // 如果選擇的是季度報告，則 limit 是 年份 * 4
+        // 如果選擇的是年度報告，則 limit 就是 年份
+        limit = (period === 'quarter') ? (years * 4) : years;
     }
 
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    // 建立新版的 API URL
+    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
+    // --- 修改結束 ---
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period , yearRange);
 
-    // 請求本益比河流圖的資料
-    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
-    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartJP'); // 傳入對應的 chartId
 }
 
 async function fetchTWIncomeStatement() {
@@ -4678,12 +4684,22 @@ async function fetchTWIncomeStatement() {
     const yearRange = document.getElementById('yearRangeTW').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    if (!stockSymbol) {
-        alert('Please enter a stock symbol.');
-        return;
+    let limit;
+    const years = parseInt(yearRange);
+
+    if (yearRange === 'all') {
+        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
+        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
+        limit = 120;
+    } else {
+        // 如果選擇的是季度報告，則 limit 是 年份 * 4
+        // 如果選擇的是年度報告，則 limit 就是 年份
+        limit = (period === 'quarter') ? (years * 4) : years;
     }
 
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    // 建立新版的 API URL
+    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
+    // --- 修改結束 ---
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period ,yearRange);
 
     // const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
@@ -4697,12 +4713,22 @@ function fetchEUIncomeStatement() {
     const yearRange = document.getElementById('yearRangeEU').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    if (!stockSymbol) {
-        alert('Please enter a stock symbol.');
-        return;
+    let limit;
+    const years = parseInt(yearRange);
+
+    if (yearRange === 'all') {
+        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
+        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
+        limit = 120;
+    } else {
+        // 如果選擇的是季度報告，則 limit 是 年份 * 4
+        // 如果選擇的是年度報告，則 limit 就是 年份
+        limit = (period === 'quarter') ? (years * 4) : years;
     }
 
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    // 建立新版的 API URL
+    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
+    // --- 修改結束 ---
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
@@ -4716,12 +4742,22 @@ function fetchKRIncomeStatement() {
     const yearRange = document.getElementById('yearRangeKR').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    if (!stockSymbol) {
-        alert('Please enter a stock symbol.');
-        return;
+    let limit;
+    const years = parseInt(yearRange);
+
+    if (yearRange === 'all') {
+        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
+        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
+        limit = 120;
+    } else {
+        // 如果選擇的是季度報告，則 limit 是 年份 * 4
+        // 如果選擇的是年度報告，則 limit 就是 年份
+        limit = (period === 'quarter') ? (years * 4) : years;
     }
 
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    // 建立新版的 API URL
+    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
+    // --- 修改結束 ---
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
@@ -4735,12 +4771,22 @@ function fetchHKIncomeStatement() {
     const yearRange = document.getElementById('yearRangeHK').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    if (!stockSymbol) {
-        alert('Please enter a stock symbol.');
-        return;
+    let limit;
+    const years = parseInt(yearRange);
+
+    if (yearRange === 'all') {
+        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
+        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
+        limit = 120;
+    } else {
+        // 如果選擇的是季度報告，則 limit 是 年份 * 4
+        // 如果選擇的是年度報告，則 limit 就是 年份
+        limit = (period === 'quarter') ? (years * 4) : years;
     }
 
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    // 建立新版的 API URL
+    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
+    // --- 修改結束 ---
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
@@ -4754,12 +4800,22 @@ function fetchCNIncomeStatement() {
     const yearRange = document.getElementById('yearRangeCN').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    if (!stockSymbol) {
-        alert('Please enter a stock symbol.');
-        return;
+    let limit;
+    const years = parseInt(yearRange);
+
+    if (yearRange === 'all') {
+        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
+        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
+        limit = 120;
+    } else {
+        // 如果選擇的是季度報告，則 limit 是 年份 * 4
+        // 如果選擇的是年度報告，則 limit 就是 年份
+        limit = (period === 'quarter') ? (years * 4) : years;
     }
 
-    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+    // 建立新版的 API URL
+    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
+    // --- 修改結束 ---
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
