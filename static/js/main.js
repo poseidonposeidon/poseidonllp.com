@@ -4881,7 +4881,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         reportedCurrency: ['Reported Currency'],
         cik: ['CIK'],
         filingDate: ['Filing Date'], // 修正拼寫
-        acceptedDate: ['Accepted Date'], // 新增
+        // acceptedDate: ['Accepted Date'], // 新增
         fiscalYear: ['Fiscal Year'], // 替換 calendarYear
         period: ['Period'],
         revenue: ['Revenue'],
