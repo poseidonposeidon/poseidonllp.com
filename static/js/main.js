@@ -4862,18 +4862,6 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
 }
 
 function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange) {
-    // const currentYear = new Date().getFullYear();
-    //
-    // // 過濾數據以包含多兩年的數據
-    // const filteredDataForTable = data.filter(entry => {
-    //     const entryYear = parseInt(entry.calendarYear);
-    //     return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 1));
-    // });
-    //
-    // const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
-    //     return !(index === 0 && entry.growthRate === 'N/A');
-    // });
-
     if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
@@ -4883,7 +4871,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         return;
     }
 
-    // 按日期升序排序
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let rows = {
@@ -4927,8 +4914,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         growthRate: [period === 'annual' ? 'YoY Growth' : 'YoY Growth']
     };
 
-    // 填充行數據並計算增長率
-    filteredDataForTable.forEach((entry, index) => {
+    data.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
@@ -4964,15 +4950,12 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.epsdiluted.push(entry.epsdiluted || 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
-
-        // 新增 link 和 finalLink
         rows.link.push(entry.link ? `<a class="styled-link" href="${entry.link}" target="_blank">Link</a>` : 'N/A');
         rows.finalLink.push(entry.finalLink ? `<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Link</a>` : 'N/A');
 
-        // 計算增長率
         if (index > 0) {
             if (period === 'annual') {
-                let lastRevenue = filteredDataForTable[index - 1].revenue;
+                let lastRevenue = data[index - 1].revenue;
                 if (entry.revenue && lastRevenue) {
                     let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                     entry.growthRate = parseFloat(growthRate.toFixed(2));
@@ -4982,9 +4965,9 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                     rows.growthRate.push('N/A');
                 }
             } else {
-                let previousYearSameQuarterIndex = filteredDataForTable.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
+                let previousYearSameQuarterIndex = data.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
                 if (previousYearSameQuarterIndex !== -1) {
-                    let lastRevenue = filteredDataForTable[previousYearSameQuarterIndex].revenue;
+                    let lastRevenue = data[previousYearSameQuarterIndex].revenue;
                     if (entry.revenue && lastRevenue) {
                         let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                         entry.growthRate = parseFloat(growthRate.toFixed(2));
@@ -5004,7 +4987,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     });
 
-    // 構建 HTML 表格
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
@@ -5020,7 +5002,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     </div>
     `;
 
-    // 創建容器結構，並綁定唯一的下載按鈕ID
     const downloadButtonId = `downloadBtn_${chartId}`;
     container.innerHTML = `
         <button id="${downloadButtonId}">Download as Excel</button>
@@ -5035,13 +5016,11 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         <div id="chartContainer" style="margin-top: 20px;">
             <canvas id="${chartId}"></canvas>
         </div>
-        <!-- 新增本益比河流圖的canvas -->
         <div id="peBandContainer" style="margin-top: 20px;">
             <canvas id="peBandChart_${chartId}"></canvas>
         </div>
     `;
 
-    // 設置scroll位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
@@ -5052,24 +5031,24 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     }, 100);
 
-    // 創建圖表，僅使用篩選後的數據（刪除多出來的那一年）
+    const filteredDataForChart = data.filter(entry => entry.growthRate !== null && entry.growthRate !== 'N/A');
+
     createOperatingChart(filteredDataForChart, operatingChartId);
     createIncomeStatementChart(filteredDataForChart, chartId);
+
     const peBandCanvasId = `peBandChart_${chartId}`;
 
-    // 新增：創建本益比河流圖
     setTimeout(() => {
         fetchPEBandData(
-            `https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?timeseries=3650&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,  // 改成3650天（10年）
-            `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=40&period=quarter&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,  // 確保是10年的季度數據
-            peBandCanvasId // 傳入帶有 chartId 的唯一 ID
+            `https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?timeseries=3650&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
+            `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=40&period=quarter&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
+            peBandCanvasId
         );
     }, 500);
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline';
 
-    // 清除舊的事件並綁定新的下載按鈕事件
     bindDownloadButton(rows, data[0].symbol, downloadButtonId);
 }
 
