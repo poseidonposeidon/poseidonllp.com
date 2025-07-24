@@ -4603,26 +4603,10 @@ let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的�
 
 let peBandChartInstances = {};
 
-// function fetchIncomeStatement() {
-//     const stockSymbol = fetchStock();
-//     const period = document.getElementById('period').value;
-//     const yearRange = document.getElementById('yearRange').value;
-//     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的實際 API 密鑰
-//
-//     if (!stockSymbol) {
-//         alert('Please enter a stock symbol.');
-//         return;
-//     }
-//
-//     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-//     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
-//
-// }
-
 function fetchIncomeStatement() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
-    const yearRange = document.getElementById('yearRange').value; // 我們仍然需要讀取這個值
+    const yearRange = document.getElementById('yearRange').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的實際 API 密鑰
 
     if (!stockSymbol) {
@@ -4630,27 +4614,43 @@ function fetchIncomeStatement() {
         return;
     }
 
-    // --- 主要修改區域 ---
-    let limit;
-    const years = parseInt(yearRange);
-
-    if (yearRange === 'all') {
-        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
-        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
-        limit = 120;
-    } else {
-        // 如果選擇的是季度報告，則 limit 是 年份 * 4
-        // 如果選擇的是年度報告，則 limit 就是 年份
-        limit = (period === 'quarter') ? (years * 4) : years;
-    }
-
-    // 建立新版的 API URL
-    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
-    // --- 修改結束 ---
-
-    // 呼叫 fetchData_IncomeStatement 的部分保持不變
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
+
 }
+
+// function fetchIncomeStatement() {
+//     const stockSymbol = fetchStock();
+//     const period = document.getElementById('period').value;
+//     const yearRange = document.getElementById('yearRange').value; // 我們仍然需要讀取這個值
+//     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的實際 API 密鑰
+//
+//     if (!stockSymbol) {
+//         alert('Please enter a stock symbol.');
+//         return;
+//     }
+//
+//     // --- 主要修改區域 ---
+//     let limit;
+//     const years = parseInt(yearRange);
+//
+//     if (yearRange === 'all') {
+//         // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
+//         // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
+//         limit = 120;
+//     } else {
+//         // 如果選擇的是季度報告，則 limit 是 年份 * 4
+//         // 如果選擇的是年度報告，則 limit 就是 年份
+//         limit = (period === 'quarter') ? (years * 4) : years;
+//     }
+//
+//     // 建立新版的 API URL
+//     const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
+//     // --- 修改結束 ---
+//
+//     // 呼叫 fetchData_IncomeStatement 的部分保持不變
+//     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
+// }
 
 function fetchJPIncomeStatement() {
     const stockSymbol = fetchJPStock();
@@ -4658,24 +4658,18 @@ function fetchJPIncomeStatement() {
     const yearRange = document.getElementById('yearRangeJP').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    let limit;
-    const years = parseInt(yearRange);
-
-    if (yearRange === 'all') {
-        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
-        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
-        limit = 120;
-    } else {
-        // 如果選擇的是季度報告，則 limit 是 年份 * 4
-        // 如果選擇的是年度報告，則 limit 就是 年份
-        limit = (period === 'quarter') ? (years * 4) : years;
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
     }
 
-    // 建立新版的 API URL
-    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
-    // --- 修改結束 ---
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period , yearRange);
 
+    // 請求本益比河流圖的資料
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
+    const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
+    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartJP'); // 傳入對應的 chartId
 }
 
 async function fetchTWIncomeStatement() {
@@ -4684,22 +4678,12 @@ async function fetchTWIncomeStatement() {
     const yearRange = document.getElementById('yearRangeTW').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    let limit;
-    const years = parseInt(yearRange);
-
-    if (yearRange === 'all') {
-        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
-        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
-        limit = 120;
-    } else {
-        // 如果選擇的是季度報告，則 limit 是 年份 * 4
-        // 如果選擇的是年度報告，則 limit 就是 年份
-        limit = (period === 'quarter') ? (years * 4) : years;
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
     }
 
-    // 建立新版的 API URL
-    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
-    // --- 修改結束 ---
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period ,yearRange);
 
     // const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
@@ -4713,22 +4697,12 @@ function fetchEUIncomeStatement() {
     const yearRange = document.getElementById('yearRangeEU').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    let limit;
-    const years = parseInt(yearRange);
-
-    if (yearRange === 'all') {
-        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
-        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
-        limit = 120;
-    } else {
-        // 如果選擇的是季度報告，則 limit 是 年份 * 4
-        // 如果選擇的是年度報告，則 limit 就是 年份
-        limit = (period === 'quarter') ? (years * 4) : years;
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
     }
 
-    // 建立新版的 API URL
-    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
-    // --- 修改結束 ---
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
@@ -4742,22 +4716,12 @@ function fetchKRIncomeStatement() {
     const yearRange = document.getElementById('yearRangeKR').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    let limit;
-    const years = parseInt(yearRange);
-
-    if (yearRange === 'all') {
-        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
-        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
-        limit = 120;
-    } else {
-        // 如果選擇的是季度報告，則 limit 是 年份 * 4
-        // 如果選擇的是年度報告，則 limit 就是 年份
-        limit = (period === 'quarter') ? (years * 4) : years;
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
     }
 
-    // 建立新版的 API URL
-    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
-    // --- 修改結束 ---
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
@@ -4771,22 +4735,12 @@ function fetchHKIncomeStatement() {
     const yearRange = document.getElementById('yearRangeHK').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    let limit;
-    const years = parseInt(yearRange);
-
-    if (yearRange === 'all') {
-        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
-        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
-        limit = 120;
-    } else {
-        // 如果選擇的是季度報告，則 limit 是 年份 * 4
-        // 如果選擇的是年度報告，則 limit 就是 年份
-        limit = (period === 'quarter') ? (years * 4) : years;
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
     }
 
-    // 建立新版的 API URL
-    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
-    // --- 修改結束 ---
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
@@ -4800,22 +4754,12 @@ function fetchCNIncomeStatement() {
     const yearRange = document.getElementById('yearRangeCN').value;  // 使用對應的年份範圍選擇器
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    let limit;
-    const years = parseInt(yearRange);
-
-    if (yearRange === 'all') {
-        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
-        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
-        limit = 120;
-    } else {
-        // 如果選擇的是季度報告，則 limit 是 年份 * 4
-        // 如果選擇的是年度報告，則 limit 就是 年份
-        limit = (period === 'quarter') ? (years * 4) : years;
+    if (!stockSymbol) {
+        alert('Please enter a stock symbol.');
+        return;
     }
 
-    // 建立新版的 API URL
-    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
-    // --- 修改結束 ---
+    const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
 
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
@@ -4917,7 +4861,19 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
 }
 
 function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange) {
-    if (!data || !Array.isArray(data) || data.length === 0) {
+    const currentYear = new Date().getFullYear();
+
+    // 過濾數據以包含多兩年的數據
+    const filteredDataForTable = data.filter(entry => {
+        const entryYear = parseInt(entry.calendarYear);
+        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 1));
+    });
+
+    const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
+        return !(index === 0 && entry.growthRate === 'N/A');
+    });
+
+    if (!filteredDataForTable || !Array.isArray(filteredDataForTable) || filteredDataForTable.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
         if (expandButton) expandButton.style.display = 'none';
@@ -4926,24 +4882,21 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         return;
     }
 
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
+    // 按日期升序排序
+    filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // =================================================================
-    // 第一步：更新 rows 物件的定義
-    // =================================================================
     let rows = {
         date: ['Date'],
         symbol: ['Symbol'],
         reportedCurrency: ['Reported Currency'],
         cik: ['CIK'],
-        filingDate: ['Filing Date'], // 修正拼寫
-        // acceptedDate: ['Accepted Date'], // 新增
-        fiscalYear: ['Fiscal Year'], // 替換 calendarYear
+        fillingDate: ['Filling Date'],
+        calendarYear: ['Calendar Year'],
         period: ['Period'],
         revenue: ['Revenue'],
         costOfRevenue: ['Cost of Revenue'],
         grossProfit: ['Gross Profit'],
-        grossProfitRatio: ['Gross Profit Ratio'], // 需要手動計算
+        grossProfitRatio: ['Gross Profit Ratio'],
         researchAndDevelopmentExpenses: ['Research and Development Expenses'],
         generalAndAdministrativeExpenses: ['General and Administrative Expenses'],
         sellingAndMarketingExpenses: ['Selling and Marketing Expenses'],
@@ -4951,51 +4904,41 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         otherExpenses: ['Other Expenses'],
         operatingExpenses: ['Operating Expenses'],
         costAndExpenses: ['Cost and Expenses'],
-        netInterestIncome: ['Net Interest Income'], // 新增
         interestIncome: ['Interest Income'],
         interestExpense: ['Interest Expense'],
         depreciationAndAmortization: ['Depreciation and Amortization'],
         ebitda: ['EBITDA'],
-        ebitdaratio: ['EBITDA Ratio'], // 需要手動計算
-        ebit: ['EBIT'], // 新增
-        nonOperatingIncomeExcludingInterest: ['Non-Operating Income (Excl. Interest)'], // 新增
+        ebitdaratio: ['EBITDA Ratio'],
         operatingIncome: ['Operating Income'],
-        operatingIncomeRatio: ['Operating Income Ratio'], // 需要手動計算
+        operatingIncomeRatio: ['Operating Income Ratio'],
         totalOtherIncomeExpensesNet: ['Total Other Income Expenses Net'],
         incomeBeforeTax: ['Income Before Tax'],
-        incomeBeforeTaxRatio: ['Income Before Tax Ratio'], // 需要手動計算
+        incomeBeforeTaxRatio: ['Income Before Tax Ratio'],
         incomeTaxExpense: ['Income Tax Expense'],
-        netIncomeFromContinuingOperations: ['Net Income from Continuing Ops'], // 新增
-        netIncomeFromDiscontinuedOperations: ['Net Income from Discontinued Ops'], // 新增
-        otherAdjustmentsToNetIncome: ['Other Adjustments to Net Income'], // 新增
         netIncome: ['Net Income'],
-        netIncomeDeductions: ['Net Income Deductions'], // 新增
-        bottomLineNetIncome: ['Bottom Line Net Income'], // 新增
-        netIncomeRatio: ['Net Income Ratio'], // 需要手動計算
+        netIncomeRatio: ['Net Income Ratio'],
         eps: ['EPS'],
-        epsDiluted: ['EPS Diluted'], // 修正大小寫
+        epsdiluted: ['EPS Diluted'],
         weightedAverageShsOut: ['Weighted Average Shares Outstanding'],
         weightedAverageShsOutDil: ['Weighted Average Shares Outstanding Diluted'],
+        link: ['SEC Link'],
+        finalLink: ['10K Link'],
         growthRate: [period === 'annual' ? 'YoY Growth' : 'YoY Growth']
-        // 移除了 link 和 finalLink
     };
 
-    // =================================================================
-    // 第二步：更新 forEach 迴圈，匹配新的資料結構並計算比率
-    // =================================================================
-    data.forEach((entry, index) => {
-        // 填充數據
+    // 填充行數據並計算增長率
+    filteredDataForTable.forEach((entry, index) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
         rows.cik.push(entry.cik || 'N/A');
-        rows.filingDate.push(entry.filingDate || 'N/A');
-        // rows.acceptedDate.push(entry.acceptedDate || 'N/A');
-        rows.fiscalYear.push(entry.fiscalYear || 'N/A');
+        rows.fillingDate.push(entry.fillingDate || 'N/A');
+        rows.calendarYear.push(entry.calendarYear || 'N/A');
         rows.period.push(entry.period || 'N/A');
         rows.revenue.push(formatNumber(entry.revenue));
         rows.costOfRevenue.push(formatNumber(entry.costOfRevenue));
         rows.grossProfit.push(formatNumber(entry.grossProfit));
+        rows.grossProfitRatio.push(entry.grossProfitRatio ? (entry.grossProfitRatio * 100).toFixed(2) + '%' : 'N/A');
         rows.researchAndDevelopmentExpenses.push(formatNumber(entry.researchAndDevelopmentExpenses));
         rows.generalAndAdministrativeExpenses.push(formatNumber(entry.generalAndAdministrativeExpenses));
         rows.sellingAndMarketingExpenses.push(formatNumber(entry.sellingAndMarketingExpenses));
@@ -5003,40 +4946,32 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.otherExpenses.push(formatNumber(entry.otherExpenses));
         rows.operatingExpenses.push(formatNumber(entry.operatingExpenses));
         rows.costAndExpenses.push(formatNumber(entry.costAndExpenses));
-        rows.netInterestIncome.push(formatNumber(entry.netInterestIncome));
         rows.interestIncome.push(formatNumber(entry.interestIncome));
         rows.interestExpense.push(formatNumber(entry.interestExpense));
         rows.depreciationAndAmortization.push(formatNumber(entry.depreciationAndAmortization));
         rows.ebitda.push(formatNumber(entry.ebitda));
-        rows.ebit.push(formatNumber(entry.ebit));
-        rows.nonOperatingIncomeExcludingInterest.push(formatNumber(entry.nonOperatingIncomeExcludingInterest));
+        rows.ebitdaratio.push(entry.ebitdaratio ? (entry.ebitdaratio * 100).toFixed(2) + '%' : 'N/A');
         rows.operatingIncome.push(formatNumber(entry.operatingIncome));
+        rows.operatingIncomeRatio.push(entry.operatingIncomeRatio ? (entry.operatingIncomeRatio * 100).toFixed(2) + '%' : 'N/A');
         rows.totalOtherIncomeExpensesNet.push(formatNumber(entry.totalOtherIncomeExpensesNet));
         rows.incomeBeforeTax.push(formatNumber(entry.incomeBeforeTax));
+        rows.incomeBeforeTaxRatio.push(entry.incomeBeforeTaxRatio ? (entry.incomeBeforeTaxRatio * 100).toFixed(2) + '%' : 'N/A');
         rows.incomeTaxExpense.push(formatNumber(entry.incomeTaxExpense));
-        rows.netIncomeFromContinuingOperations.push(formatNumber(entry.netIncomeFromContinuingOperations));
-        rows.netIncomeFromDiscontinuedOperations.push(formatNumber(entry.netIncomeFromDiscontinuedOperations));
-        rows.otherAdjustmentsToNetIncome.push(formatNumber(entry.otherAdjustmentsToNetIncome));
         rows.netIncome.push(formatNumber(entry.netIncome));
-        rows.netIncomeDeductions.push(formatNumber(entry.netIncomeDeductions));
-        rows.bottomLineNetIncome.push(formatNumber(entry.bottomLineNetIncome));
+        rows.netIncomeRatio.push(entry.netIncomeRatio ? (entry.netIncomeRatio * 100).toFixed(2) + '%' : 'N/A');
         rows.eps.push(entry.eps || 'N/A');
-        rows.epsDiluted.push(entry.epsDiluted || 'N/A');
+        rows.epsdiluted.push(entry.epsdiluted || 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
 
-        // 手動計算比率
-        const revenue = entry.revenue;
-        rows.grossProfitRatio.push(revenue ? ((entry.grossProfit / revenue) * 100).toFixed(2) + '%' : 'N/A');
-        rows.ebitdaratio.push(revenue ? ((entry.ebitda / revenue) * 100).toFixed(2) + '%' : 'N/A');
-        rows.operatingIncomeRatio.push(revenue ? ((entry.operatingIncome / revenue) * 100).toFixed(2) + '%' : 'N/A');
-        rows.incomeBeforeTaxRatio.push(revenue ? ((entry.incomeBeforeTax / revenue) * 100).toFixed(2) + '%' : 'N/A');
-        rows.netIncomeRatio.push(revenue ? ((entry.netIncome / revenue) * 100).toFixed(2) + '%' : 'N/A');
+        // 新增 link 和 finalLink
+        rows.link.push(entry.link ? `<a class="styled-link" href="${entry.link}" target="_blank">Link</a>` : 'N/A');
+        rows.finalLink.push(entry.finalLink ? `<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Link</a>` : 'N/A');
 
-        // 計算增長率 (這部分邏輯不變)
+        // 計算增長率
         if (index > 0) {
             if (period === 'annual') {
-                let lastRevenue = data[index - 1].revenue;
+                let lastRevenue = filteredDataForTable[index - 1].revenue;
                 if (entry.revenue && lastRevenue) {
                     let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                     entry.growthRate = parseFloat(growthRate.toFixed(2));
@@ -5046,9 +4981,9 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                     rows.growthRate.push('N/A');
                 }
             } else {
-                let previousYearSameQuarterIndex = data.findIndex(e => e.fiscalYear === (parseInt(entry.fiscalYear) - 1).toString() && e.period === entry.period);
+                let previousYearSameQuarterIndex = filteredDataForTable.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
                 if (previousYearSameQuarterIndex !== -1) {
-                    let lastRevenue = data[previousYearSameQuarterIndex].revenue;
+                    let lastRevenue = filteredDataForTable[previousYearSameQuarterIndex].revenue;
                     if (entry.revenue && lastRevenue) {
                         let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                         entry.growthRate = parseFloat(growthRate.toFixed(2));
@@ -5068,9 +5003,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     });
 
-    // =================================================================
-    // 後續的 HTML 生成和圖表繪製部分，維持不變
-    // =================================================================
+    // 構建 HTML 表格
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
         <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
@@ -5086,6 +5019,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     </div>
     `;
 
+    // 創建容器結構，並綁定唯一的下載按鈕ID
     const downloadButtonId = `downloadBtn_${chartId}`;
     container.innerHTML = `
         <button id="${downloadButtonId}">Download as Excel</button>
@@ -5100,11 +5034,13 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         <div id="chartContainer" style="margin-top: 20px;">
             <canvas id="${chartId}"></canvas>
         </div>
+        <!-- 新增本益比河流圖的canvas -->
         <div id="peBandContainer" style="margin-top: 20px;">
             <canvas id="peBandChart_${chartId}"></canvas>
         </div>
     `;
 
+    // 設置scroll位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
@@ -5115,24 +5051,24 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     }, 100);
 
-    const filteredDataForChart = data.filter(entry => entry.growthRate !== null && entry.growthRate !== 'N/A');
-
+    // 創建圖表，僅使用篩選後的數據（刪除多出來的那一年）
     createOperatingChart(filteredDataForChart, operatingChartId);
     createIncomeStatementChart(filteredDataForChart, chartId);
-
     const peBandCanvasId = `peBandChart_${chartId}`;
 
+    // 新增：創建本益比河流圖
     setTimeout(() => {
         fetchPEBandData(
-            `https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?timeseries=3650&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
-            `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=40&period=quarter&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
-            peBandCanvasId
+            `https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?timeseries=3650&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,  // 改成3650天（10年）
+            `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=40&period=quarter&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,  // 確保是10年的季度數據
+            peBandCanvasId // 傳入帶有 chartId 的唯一 ID
         );
     }, 500);
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline';
 
+    // 清除舊的事件並綁定新的下載按鈕事件
     bindDownloadButton(rows, data[0].symbol, downloadButtonId);
 }
 
@@ -5314,7 +5250,7 @@ function createOperatingChart(data, chartId) {
 function createIncomeStatementChart(data, chartId) {
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 過濾掉增長率為 null 的數據 (這一步驟可以保留)
+    // 过滤掉增长率为 null 的数据
     const validData = data.filter(entry => entry.growthRate !== null);
 
     const ctx = document.getElementById(chartId).getContext('2d');
@@ -5335,44 +5271,36 @@ function createIncomeStatementChart(data, chartId) {
                     backgroundColor: 'rgb(225,167,121,0.7)',
                     yAxisID: 'y'
                 },
-                // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ 主要修改區域 ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
                 {
                     type: 'line',
                     label: 'Gross Profit Ratio',
-                    // 直接在這裡計算比率，並確保分母不為零
-                    data: validData.map(entry => entry.revenue ? (entry.grossProfit / entry.revenue) * 100 : null),
+                    data: validData.map(entry => entry.grossProfitRatio * 100),
                     borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
-                    backgroundColor: 'rgba(102, 204, 204, 0.7)',
-                    yAxisID: 'y1',
-                    hidden: false // 確保預設為顯示
+                    backgroundColor: 'rgba(102, 204, 204, 0.7)', // 半透明藍綠色
+                    yAxisID: 'y1'
                 },
                 {
                     type: 'line',
                     label: 'Operating Income Ratio',
-                    // 直接在這裡計算比率
-                    data: validData.map(entry => entry.revenue ? (entry.operatingIncome / entry.revenue) * 100 : null),
+                    data: validData.map(entry => entry.operatingIncomeRatio * 100),
                     borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
-                    backgroundColor: 'rgba(153, 204, 255, 0.7)',
-                    yAxisID: 'y1',
-                    hidden: false // 確保預設為顯示
+                    backgroundColor: 'rgba(153, 204, 255, 0.7)', // 半透明淺藍色
+                    yAxisID: 'y1'
                 },
                 {
                     type: 'line',
                     label: 'Net Income Ratio',
-                    // 直接在這裡計算比率
-                    data: validData.map(entry => entry.revenue ? (entry.netIncome / entry.revenue) * 100 : null),
+                    data: validData.map(entry => entry.netIncomeRatio * 100),
                     borderColor: 'rgba(232, 232, 232, 1)', // 淺灰色 (#E8E8E8)
-                    backgroundColor: 'rgba(232, 232, 232, 0.7)',
-                    yAxisID: 'y1',
-                    hidden: false // 確保預設為顯示
+                    backgroundColor: 'rgba(232, 232, 232, 0.7)', // 半透明淺灰色
+                    yAxisID: 'y1'
                 },
-                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ 修改結束 ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
                 {
                     type: 'line',
                     label: 'Growth Rate',
                     data: validData.map(entry => entry.growthRate),
                     borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
-                    backgroundColor: 'rgba(255, 153, 0, 0.9)',
+                    backgroundColor: 'rgba(255, 153, 0, 0.9)', // 半透明橙色
                     yAxisID: 'y1'
                 }
             ]
@@ -5388,7 +5316,6 @@ function createIncomeStatementChart(data, chartId) {
                     reverse: false
                 },
                 y: {
-                    type: 'linear', // 明確指定類型
                     beginAtZero: true,
                     title: {
                         display: true,
@@ -5397,7 +5324,7 @@ function createIncomeStatementChart(data, chartId) {
                     position: 'left'
                 },
                 y1: {
-                    type: 'linear', // 明確指定類型
+                    beginAtZero: true,
                     title: {
                         display: true,
                         text: 'Percentage (%)'
@@ -5413,20 +5340,18 @@ function createIncomeStatementChart(data, chartId) {
                     callbacks: {
                         label: function (tooltipItem) {
                             const value = tooltipItem.raw;
-                            if (value !== null && typeof value !== 'undefined') {
-                                // 判斷數據集標籤是否包含 'Ratio' 或 'Rate'
-                                if (tooltipItem.dataset.label.includes('Ratio') || tooltipItem.dataset.label.includes('Rate')) {
-                                    return `${tooltipItem.dataset.label}: ${value.toFixed(2)}%`;
-                                }
-                                return `${tooltipItem.dataset.label}: ${value.toLocaleString()}`;
+                            if (value !== null) {
+                                return tooltipItem.dataset.label.includes('Ratio')
+                                    ? value.toFixed(2) + '%'
+                                    : value.toLocaleString();
                             }
                             return 'No data';
                         }
                     },
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
-                    titleColor: 'rgba(255, 255, 255, 1)',
-                    bodyColor: 'rgba(255, 255, 255, 1)',
-                    borderColor: 'rgba(255, 255, 255, 1)',
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
+                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
+                    bodyColor: 'rgba(255, 255, 255, 1)', // 深藍字體 (#003366)
+                    borderColor: 'rgba(255, 255, 255, 1)', // 深藍邊框 (#003366)
                     borderWidth: 1
                 }
             }
