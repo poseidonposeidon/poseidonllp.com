@@ -149,7 +149,7 @@ async function fetchStockNews(category = "all", symbol = "", date = "") {
         return [];
     }
 }
-
+/**/
 async function loadNews() {
     let newsList = await fetchStockNews("all");
     displayNews(newsList, 1);
@@ -4373,7 +4373,7 @@ function drawChart(labels, dataSets, type) {
 
 function fetchCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/profile/${stockSymbol}?apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
