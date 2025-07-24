@@ -4383,7 +4383,7 @@ function fetchCompanyProfile(stockSymbol) {
 
 function fetchJPCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 這裡填入你的API密鑰
-    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -4393,7 +4393,7 @@ function fetchJPCompanyProfile(stockSymbol) {
 
 function fetchTWCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -4403,7 +4403,7 @@ function fetchTWCompanyProfile(stockSymbol) {
 
 function fetchEUCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -4413,7 +4413,7 @@ function fetchEUCompanyProfile(stockSymbol) {
 
 function fetchKRCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -4423,7 +4423,7 @@ function fetchKRCompanyProfile(stockSymbol) {
 
 function fetchHKCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -4433,7 +4433,7 @@ function fetchHKCompanyProfile(stockSymbol) {
 
 function fetchCNCompanyProfile(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/profile/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/profile?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -4459,7 +4459,7 @@ function displayCompanyProfile(data, container) {
 //////////////////////////////Price//////////////////////////////////////////////
 function fetchCompanyPrice(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/quote?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -4476,7 +4476,7 @@ function fetchCompanyPrice(stockSymbol) {
 
 function fetchJPCompanyPrice(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/quote?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -4493,7 +4493,7 @@ function fetchJPCompanyPrice(stockSymbol) {
 
 function fetchTWCompanyPrice(fullStockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${fullStockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/quote?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -4510,7 +4510,7 @@ function fetchTWCompanyPrice(fullStockSymbol) {
 
 function fetchEUCompanyPrice(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/quote?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -4527,7 +4527,7 @@ function fetchEUCompanyPrice(stockSymbol) {
 
 function fetchKRCompanyPrice(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/quote?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -4544,7 +4544,7 @@ function fetchKRCompanyPrice(stockSymbol) {
 
 function fetchHKCompanyPrice(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
-    const apiUrl = `https://financialmodelingprep.com/api/v3/quote/${stockSymbol}?apikey=${apiKey}`;
+    const apiUrl = `https://financialmodelingprep.com/stable/quote?symbol=${stockSymbol}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
