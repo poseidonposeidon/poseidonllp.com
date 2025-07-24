@@ -4934,7 +4934,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
         rows.cik.push(entry.cik || 'N/A');
         rows.filingDate.push(entry.filingDate || 'N/A');
-        rows.acceptedDate.push(entry.acceptedDate || 'N/A');
+        // rows.acceptedDate.push(entry.acceptedDate || 'N/A');
         rows.fiscalYear.push(entry.fiscalYear || 'N/A');
         rows.period.push(entry.period || 'N/A');
         rows.revenue.push(formatNumber(entry.revenue));
