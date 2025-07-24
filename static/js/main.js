@@ -4603,10 +4603,26 @@ let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的�
 
 let peBandChartInstances = {};
 
+// function fetchIncomeStatement() {
+//     const stockSymbol = fetchStock();
+//     const period = document.getElementById('period').value;
+//     const yearRange = document.getElementById('yearRange').value;
+//     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的實際 API 密鑰
+//
+//     if (!stockSymbol) {
+//         alert('Please enter a stock symbol.');
+//         return;
+//     }
+//
+//     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
+//     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
+//
+// }
+
 function fetchIncomeStatement() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
-    const yearRange = document.getElementById('yearRange').value;
+    const yearRange = document.getElementById('yearRange').value; // 我們仍然需要讀取這個值
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的實際 API 密鑰
 
     if (!stockSymbol) {
@@ -4614,10 +4630,28 @@ function fetchIncomeStatement() {
         return;
     }
 
-    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
+    // --- 主要修改區域 ---
+    let limit;
+    const years = parseInt(yearRange);
 
+    if (yearRange === 'all') {
+        // 對於 'all'，我們可以請求一個足夠大的數字，例如 120。
+        // 這相當於 30 年的季度數據或 120 年的年度數據，對大多數公司來說等於全部。
+        limit = 120;
+    } else {
+        // 如果選擇的是季度報告，則 limit 是 年份 * 4
+        // 如果選擇的是年度報告，則 limit 就是 年份
+        limit = (period === 'quarter') ? (years * 4) : years;
+    }
+
+    // 建立新版的 API URL
+    const apiUrl = `https://financialmodelingprep.com/stable/income-statement?symbol=${stockSymbol}&period=${period}&limit=${limit}&apikey=${apiKey}`;
+    // --- 修改結束 ---
+
+    // 呼叫 fetchData_IncomeStatement 的部分保持不變
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
 }
+
 
 function fetchJPIncomeStatement() {
     const stockSymbol = fetchJPStock();
@@ -4828,19 +4862,19 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
 }
 
 function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange) {
-    const currentYear = new Date().getFullYear();
+    // const currentYear = new Date().getFullYear();
+    //
+    // // 過濾數據以包含多兩年的數據
+    // const filteredDataForTable = data.filter(entry => {
+    //     const entryYear = parseInt(entry.calendarYear);
+    //     return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 1));
+    // });
+    //
+    // const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
+    //     return !(index === 0 && entry.growthRate === 'N/A');
+    // });
 
-    // 過濾數據以包含多兩年的數據
-    const filteredDataForTable = data.filter(entry => {
-        const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 1));
-    });
-
-    const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
-        return !(index === 0 && entry.growthRate === 'N/A');
-    });
-
-    if (!filteredDataForTable || !Array.isArray(filteredDataForTable) || filteredDataForTable.length === 0) {
+    if (!data || !Array.isArray(data) || data.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         const expandButton = document.getElementById('expandButton_Income');
         if (expandButton) expandButton.style.display = 'none';
@@ -4850,7 +4884,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     }
 
     // 按日期升序排序
-    filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
+    data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let rows = {
         date: ['Date'],
