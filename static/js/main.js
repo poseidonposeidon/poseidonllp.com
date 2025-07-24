@@ -5258,7 +5258,7 @@ function createOperatingChart(data, chartId) {
 function createIncomeStatementChart(data, chartId) {
     data.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-    // 过滤掉增长率为 null 的数据
+    // 過濾掉增長率為 null 的數據 (這一步驟可以保留)
     const validData = data.filter(entry => entry.growthRate !== null);
 
     const ctx = document.getElementById(chartId).getContext('2d');
@@ -5279,36 +5279,44 @@ function createIncomeStatementChart(data, chartId) {
                     backgroundColor: 'rgb(225,167,121,0.7)',
                     yAxisID: 'y'
                 },
+                // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼ 主要修改區域 ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
                 {
                     type: 'line',
                     label: 'Gross Profit Ratio',
-                    data: validData.map(entry => entry.grossProfitRatio * 100),
+                    // 直接在這裡計算比率，並確保分母不為零
+                    data: validData.map(entry => entry.revenue ? (entry.grossProfit / entry.revenue) * 100 : null),
                     borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
-                    backgroundColor: 'rgba(102, 204, 204, 0.7)', // 半透明藍綠色
-                    yAxisID: 'y1'
+                    backgroundColor: 'rgba(102, 204, 204, 0.7)',
+                    yAxisID: 'y1',
+                    hidden: false // 確保預設為顯示
                 },
                 {
                     type: 'line',
                     label: 'Operating Income Ratio',
-                    data: validData.map(entry => entry.operatingIncomeRatio * 100),
+                    // 直接在這裡計算比率
+                    data: validData.map(entry => entry.revenue ? (entry.operatingIncome / entry.revenue) * 100 : null),
                     borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
-                    backgroundColor: 'rgba(153, 204, 255, 0.7)', // 半透明淺藍色
-                    yAxisID: 'y1'
+                    backgroundColor: 'rgba(153, 204, 255, 0.7)',
+                    yAxisID: 'y1',
+                    hidden: false // 確保預設為顯示
                 },
                 {
                     type: 'line',
                     label: 'Net Income Ratio',
-                    data: validData.map(entry => entry.netIncomeRatio * 100),
+                    // 直接在這裡計算比率
+                    data: validData.map(entry => entry.revenue ? (entry.netIncome / entry.revenue) * 100 : null),
                     borderColor: 'rgba(232, 232, 232, 1)', // 淺灰色 (#E8E8E8)
-                    backgroundColor: 'rgba(232, 232, 232, 0.7)', // 半透明淺灰色
-                    yAxisID: 'y1'
+                    backgroundColor: 'rgba(232, 232, 232, 0.7)',
+                    yAxisID: 'y1',
+                    hidden: false // 確保預設為顯示
                 },
+                // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲ 修改結束 ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
                 {
                     type: 'line',
                     label: 'Growth Rate',
                     data: validData.map(entry => entry.growthRate),
                     borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
-                    backgroundColor: 'rgba(255, 153, 0, 0.9)', // 半透明橙色
+                    backgroundColor: 'rgba(255, 153, 0, 0.9)',
                     yAxisID: 'y1'
                 }
             ]
@@ -5324,6 +5332,7 @@ function createIncomeStatementChart(data, chartId) {
                     reverse: false
                 },
                 y: {
+                    type: 'linear', // 明確指定類型
                     beginAtZero: true,
                     title: {
                         display: true,
@@ -5332,7 +5341,7 @@ function createIncomeStatementChart(data, chartId) {
                     position: 'left'
                 },
                 y1: {
-                    beginAtZero: true,
+                    type: 'linear', // 明確指定類型
                     title: {
                         display: true,
                         text: 'Percentage (%)'
@@ -5348,18 +5357,20 @@ function createIncomeStatementChart(data, chartId) {
                     callbacks: {
                         label: function (tooltipItem) {
                             const value = tooltipItem.raw;
-                            if (value !== null) {
-                                return tooltipItem.dataset.label.includes('Ratio')
-                                    ? value.toFixed(2) + '%'
-                                    : value.toLocaleString();
+                            if (value !== null && typeof value !== 'undefined') {
+                                // 判斷數據集標籤是否包含 'Ratio' 或 'Rate'
+                                if (tooltipItem.dataset.label.includes('Ratio') || tooltipItem.dataset.label.includes('Rate')) {
+                                    return `${tooltipItem.dataset.label}: ${value.toFixed(2)}%`;
+                                }
+                                return `${tooltipItem.dataset.label}: ${value.toLocaleString()}`;
                             }
                             return 'No data';
                         }
                     },
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
-                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(255, 255, 255, 1)', // 深藍字體 (#003366)
-                    borderColor: 'rgba(255, 255, 255, 1)', // 深藍邊框 (#003366)
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'rgba(255, 255, 255, 1)',
+                    bodyColor: 'rgba(255, 255, 255, 1)',
+                    borderColor: 'rgba(255, 255, 255, 1)',
                     borderWidth: 1
                 }
             }
