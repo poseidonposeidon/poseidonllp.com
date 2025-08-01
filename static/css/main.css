@@ -1629,15 +1629,3 @@ body.light-mode .financial-table td {
 }
 
 
-.dividend-table {
-    table-layout: fixed; /* 固定表格佈局，讓寬度設定生效 */
-}
-
-/* 為股息表格的 th 和 td 設定寬度和文字處理 */
-.dividend-table th,
-.dividend-table td {
-    width: 150px; /* 設定固定寬度 */
-    overflow: hidden; /* 超出部分隱藏 */
-    text-overflow: ellipsis; /* 超出部分顯示省略號 */
-    white-space: nowrap; /* 強制不換行 */
-}
