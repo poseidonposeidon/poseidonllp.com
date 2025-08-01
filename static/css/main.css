@@ -76,7 +76,7 @@ input:focus {
 }
 
 div {
-    /*background-color: #1e1e1e;*/
+    background-color: #1e1e1e;
     margin-top: 10px;
     padding: 10px;
     border-radius: 5px;
@@ -1567,4 +1567,63 @@ body.light-mode .chat-response {
 .theme-toggle-button img {
     width: 24px;
     height: 24px;
+}
+
+/* ================================== */
+/*          財務報表表格樣式            */
+/* ================================== */
+
+/* 固定標題欄的容器樣式 (深色模式) */
+.fixed-header-column {
+    flex-shrink: 0;
+    background-color: #1e1e1e; /* 深色背景 */
+    z-index: 1;
+    border-right: 1px solid #000; /* 深色邊框 */
+}
+
+/* 統一的表格樣式 */
+.financial-table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+.financial-table th,
+.financial-table td {
+    border: 1px solid #444; /* 深色模式的儲存格邊框 */
+    padding: 8px 12px;
+    text-align: left;
+    white-space: nowrap;
+}
+
+.financial-table th {
+    background-color: #1e1e1e; /* 確保 th 也有背景色 */
+    color: #b0bec5;
+    position: sticky;
+    left: 0;
+}
+
+
+/* ================================== */
+/*      白天模式 (Light Mode) 覆蓋樣式    */
+/* ================================== */
+
+body.light-mode .fixed-header-column {
+    background-color: #f8f9fa; /* 淺灰色背景 */
+    border-right: 1px solid #dee2e6; /* 淺色邊框 */
+}
+
+body.light-mode .financial-table th,
+body.light-mode .financial-table td {
+    border: 1px solid #dee2e6; /* 淺色模式的儲存格邊框 */
+}
+
+body.light-mode .financial-table th {
+    background-color: #f8f9fa; /* 淺色背景 */
+    color: #212529; /* 深色文字 */
+}
+
+/* 如果需要，也可以為 td 指定白天模式的顏色 */
+body.light-mode .financial-table td {
+    color: #1c1c1c;
+    background-color: #ffffff;
 }
