@@ -5006,14 +5006,14 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     // 構建 HTML 表格
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
-        {/* 將 style 屬性移除，改用 class */}
+        
         <div class="fixed-header-column">
-            <table class="financial-table"> {/* 順便也幫 table 加上 class */}
+            <table class="financial-table"> 
                 ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
             </table>
         </div>
         <div class="scroll-right" style="overflow-x: auto;">
-            <table class="financial-table"> {/* 順便也幫 table 加上 class */}
+            <table class="financial-table"> 
                 ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
             </table>
         </div>
