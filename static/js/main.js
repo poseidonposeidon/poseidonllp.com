@@ -6311,7 +6311,7 @@ function displayCashflow(data, containerId, chartId, period, yearRange) {
     // 構建 HTML 表格
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
-        {/* 將 style 屬性移除，改用 class */}
+
         <div class="fixed-header-column">
             <table class="financial-table">
                 ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
