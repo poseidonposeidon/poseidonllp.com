@@ -6311,13 +6311,14 @@ function displayCashflow(data, containerId, chartId, period, yearRange) {
     // 構建 HTML 表格
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
-        <div style="flex-shrink: 0; background: #1e1e1e; z-index: 1; border-right: 1px solid #000;">
-            <table border="1" style="border-collapse: collapse; white-space: nowrap;">
+        {/* 將 style 屬性移除，改用 class */}
+        <div class="fixed-header-column">
+            <table class="financial-table">
                 ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
             </table>
         </div>
         <div class="scroll-right" style="overflow-x: auto;">
-            <table border="1" style="width: 100%; border-collapse: collapse; white-space: nowrap;">
+            <table class="financial-table">
                 ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
             </table>
         </div>
