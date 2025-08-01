@@ -76,7 +76,7 @@ input:focus {
 }
 
 div {
-    background-color: #1e1e1e;
+    /*background-color: #1e1e1e;*/
     margin-top: 10px;
     padding: 10px;
     border-radius: 5px;
