@@ -4792,41 +4792,68 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
         });
 }
 
+/**
+ * @param {string} stockSymbol - The stock symbol (e.g., 'AAPL').
+ * @param {string} chartId - The ID of the canvas element for the chart.
+ * @param {string} yearRange - The selected range, e.g., "5", "10", or "all".
+ */
 function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的 API 密鑰
-    let timeseries;
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 您的 API 金鑰
 
-    // 根據傳入的 yearRange 參數，轉換為 API 需要的天數
+    // --- 這是新的核心邏輯 ---
+
+    // 1. 取得今天的日期作為結束日期 (to)
+    const toDate = new Date();
+
+    // 2. 根據 yearRange 計算開始日期 (from)
+    const fromDate = new Date();
     const years = parseInt(yearRange);
 
     if (yearRange === 'all') {
-        // "all" 的情況，我們請求一個足夠大的數值，例如 20 年的數據
-        timeseries = 365 * 20;
+        // 若選擇 "All"，我們設定一個較長的年限，例如 20 年前
+        fromDate.setFullYear(fromDate.getFullYear() - 20);
     } else if (!isNaN(years)) {
-        // 如果是數字（5 或 10），則乘以 365
-        timeseries = years * 365;
+        // 若是數字，就從當前年份減去該數字
+        fromDate.setFullYear(fromDate.getFullYear() - years);
     } else {
-        // 如果傳入的值無效，提供一個預設值，例如 5 年
-        timeseries = 365 * 5;
+        // 提供一個安全的預設值，例如 5 年
+        fromDate.setFullYear(fromDate.getFullYear() - 5);
     }
 
-    // 使用動態計算出的 timeseries 來建立 API URL
-    const apiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=${timeseries}&apikey=${apiKey}`;
+    // 3. 將日期格式化為 API 需要的 "YYYY-MM-DD" 格式
+    const formatDate = (date) => {
+        const yyyy = date.getFullYear();
+        const mm = String(date.getMonth() + 1).padStart(2, '0'); // 月份從0開始，所以+1，並補零
+        const dd = String(date.getDate()).padStart(2, '0');      // 日期補零
+        return `${yyyy}-${mm}-${dd}`;
+    };
 
+    const fromDateString = formatDate(fromDate);
+    const toDateString = formatDate(toDate);
+
+    // 4. 建立使用 from 和 to 參數的新 API URL
+    const apiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=${fromDateString}&to=${toDateString}&apikey=${apiKey}`;
+
+    // 為了方便除錯，在主控台印出最終的 URL
+    console.log(`Fetching technical data with new URL: ${apiUrl}`);
+
+    // --- 後續的 fetch 邏輯保持不變 ---
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
+            const chartCanvas = document.getElementById(chartId);
+            if (!chartCanvas) {
+                console.error(`Canvas with ID ${chartId} not found.`);
+                return;
+            }
+
             if (data && data.historical && data.historical.length > 0) {
-                // API 回傳的數據是從新到舊，圖表需要從舊到新，所以要反轉陣列
                 const historicalData = data.historical.reverse();
                 createTechnicalAnalysisChart(historicalData, chartId);
             } else {
                 console.error('No historical price data found for this symbol.');
-                const chartCanvas = document.getElementById(chartId);
-                if(chartCanvas) {
-                    const container = chartCanvas.parentElement;
-                    container.innerHTML = '<p>No technical analysis data available for the selected range.</p>';
-                }
+                const container = chartCanvas.parentElement;
+                container.innerHTML = `<p>No technical analysis data available for "${stockSymbol}" in the selected range.</p>`;
             }
         })
         .catch(error => {
