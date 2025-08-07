@@ -5,13 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+<!--    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>-->
+<!--    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/pizzip@3.2.2/dist/pizzip.min.js"></script>-->
+<!--    <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.25.4/build/docxtemplater.min.js"></script>-->
+<!--    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.min.js"></script>
+
+    <!-- 2. Chart.js 的日期適配器 (用來處理時間軸，必須在核心之後) -->
     <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
+
+    <!-- 3. Chart.js 的縮放外掛 (已知與 Chart.js v4.4.1 相容) -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+
+    <!-- 4. 其他您確實有在使用的工具 (例如 Excel 匯出) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pizzip@3.2.2/dist/pizzip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.25.4/build/docxtemplater.min.js"></script>
-    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+
+    <!-- 5. 您的主要邏輯程式碼，務必放在所有函式庫之後 -->
+    <script src="main.js"></script>
 <!--    <script src="stockData.js"></script>-->
     <title>Poseidon Capital</title>
 </head>
