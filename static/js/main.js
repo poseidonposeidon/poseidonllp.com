@@ -4861,194 +4861,80 @@ function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
         });
 }
 
-// function createTechnicalAnalysisChart(data, chartId) {
-//     const ctx = document.getElementById(chartId).getContext('2d');
-//
-//     // 如果已有圖表實例，先銷毀，避免設定殘留
-//     if (technicalAnalysisChartInstance) {
-//         technicalAnalysisChartInstance.destroy();
-//     }
-//
-//     const labels = data.map(entry => entry.date);
-//     const closingPrices = data.map(entry => entry.close);
-//     const volumes = data.map(entry => entry.volume);
-//
-//     technicalAnalysisChartInstance = new Chart(ctx, {
-//         type: 'bar',
-//         data: {
-//             labels: labels,
-//             datasets: [
-//                 {
-//                     type: 'line',
-//                     label: 'Close Price',
-//                     data: closingPrices,
-//                     borderColor: 'rgba(75, 192, 192, 1)',
-//                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
-//                     yAxisID: 'yPrice',
-//                     tension: 0.1,
-//                     pointRadius: 0
-//                 },
-//                 {
-//                     type: 'bar',
-//                     label: 'Volume',
-//                     data: volumes,
-//                     backgroundColor: 'rgba(255, 159, 64, 0.5)',
-//                     borderColor: 'rgba(255, 159, 64, 1)',
-//                     yAxisID: 'yVolume'
-//                 }
-//             ]
-//         },
-//         options: {
-//             responsive: true,
-//             // ✨ --- 新增/修改的部分從這裡開始 --- ✨
-//             plugins: {
-//                 zoom: {
-//                     // 平移功能的設定
-//                     pan: {
-//                         enabled: true,  // 啟用平移
-//                         mode: 'x',      // 只允許在 x 軸（時間軸）上水平拖動
-//                         modifierKey: null,
-//                     },
-//                     // 縮放功能的設定
-//                     zoom: {
-//                         // 滑鼠滾輪縮放
-//                         wheel: {
-//                             enabled: true, // 啟用滑鼠滾輪縮放
-//                         },
-//                         // 手指開合縮放 (適用於觸控螢幕)
-//                         pinch: {
-//                             enabled: true, // 啟用手指開合縮放
-//                         },
-//                         mode: 'x',      // 只允許在 x 軸（時間軸）上進行縮放
-//                     }
-//                 },
-//                 // ✨ --- 新增/修改的部分到這裡結束 --- ✨
-//                 tooltip: {
-//                     mode: 'index',
-//                     intersect: false
-//                 }
-//             },
-//             scales: {
-//                 x: {
-//                     title: {
-//                         display: true,
-//                         text: 'Date'
-//                     }
-//                 },
-//                 yPrice: {
-//                     type: 'linear',
-//                     position: 'left',
-//                     title: {
-//                         display: true,
-//                         text: 'Stock Price (USD)'
-//                     }
-//                 },
-//                 yVolume: {
-//                     type: 'linear',
-//                     position: 'right',
-//                     title: {
-//                         display: true,
-//                         text: 'Volume'
-//                     },
-//                     grid: {
-//                         drawOnChartArea: false
-//                     }
-//                 }
-//             }
-//         }
-//     });
-// }
-
 function createTechnicalAnalysisChart(data, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 如果已有圖表實例，先銷毀，避免記憶體洩漏和設定衝突
+    // 如果已有圖表實例，先銷毀，避免設定殘留
     if (technicalAnalysisChartInstance) {
         technicalAnalysisChartInstance.destroy();
     }
 
-    // 1. 為 Chart.js v4 準備數據
-    // 將數據轉換為 {x, y} 的物件格式，這是處理時間序列數據的最佳實踐
-    const priceData = data.map(entry => ({ x: entry.date, y: entry.close }));
-    const volumeData = data.map(entry => ({ x: entry.date, y: entry.volume }));
+    const labels = data.map(entry => entry.date);
+    const closingPrices = data.map(entry => entry.close);
+    const volumes = data.map(entry => entry.volume);
 
     technicalAnalysisChartInstance = new Chart(ctx, {
-        // 圖表類型：基礎設為 bar，線圖將在 dataset 中覆蓋
         type: 'bar',
         data: {
-            // 在 v4 中，當數據格式為 {x,y} 時，不再需要全局的 labels 陣列
+            labels: labels,
             datasets: [
                 {
-                    type: 'line', // 將這個 dataset 的類型覆蓋為線圖
+                    type: 'line',
                     label: 'Close Price',
-                    data: priceData,
+                    data: closingPrices,
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    yAxisID: 'yPrice', // 綁定到左邊的價格 Y 軸
-                    tension: 0.1,      // 讓線條稍微有點曲線
-                    pointRadius: 0     // 不顯示數據點，讓線條更乾淨
+                    yAxisID: 'yPrice',
+                    tension: 0.1,
+                    pointRadius: 0
                 },
                 {
-                    type: 'bar', // 這個 dataset 維持 bar 類型
+                    type: 'bar',
                     label: 'Volume',
-                    data: volumeData,
+                    data: volumes,
                     backgroundColor: 'rgba(255, 159, 64, 0.5)',
                     borderColor: 'rgba(255, 159, 64, 1)',
-                    yAxisID: 'yVolume' // 綁定到右邊的成交量 Y 軸
+                    yAxisID: 'yVolume'
                 }
             ]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: false, // 允許圖表脫離原始長寬比，更好地填充容器
-            interaction: {
-                mode: 'index', // 讓提示框 (tooltip) 在同一個 x 軸位置觸發
-                intersect: false,
-            },
-            // 核心：外掛 (Plugins) 的設定
+            // ✨ --- 新增/修改的部分從這裡開始 --- ✨
             plugins: {
-                // 縮放與平移外掛的設定
                 zoom: {
+                    // 平移功能的設定
                     pan: {
-                        enabled: true,       // **啟用平移**
-                        mode: 'x',           // 只允許在 x 軸（時間軸）上水平拖動
-                        modifierKey: null,   // **強制平移不需按住任何鍵 (Shift/Ctrl/Alt)**
+                        enabled: true,  // 啟用平移
+                        mode: 'x',      // 只允許在 x 軸（時間軸）上水平拖動
+                        modifierKey: null,
                     },
+                    // 縮放功能的設定
                     zoom: {
                         // 滑鼠滾輪縮放
                         wheel: {
-                            enabled: true,   // **啟用滑鼠滾輪縮放**
+                            enabled: true, // 啟用滑鼠滾輪縮放
                         },
                         // 手指開合縮放 (適用於觸控螢幕)
                         pinch: {
-                            enabled: true,
+                            enabled: true, // 啟用手指開合縮放
                         },
-                        mode: 'x',           // 只允許在 x 軸（時間軸）上進行縮放
+                        mode: 'x',      // 只允許在 x 軸（時間軸）上進行縮放
                     }
                 },
-                // 提示框 (Tooltip) 的設定
+                // ✨ --- 新增/修改的部分到這裡結束 --- ✨
                 tooltip: {
                     mode: 'index',
                     intersect: false
                 }
             },
-            // 軸 (Scales) 的設定 (使用 Chart.js v4 的新語法)
             scales: {
-                // X 軸 (時間軸)
                 x: {
-                    type: 'time', // **明確告訴 v4 這是時間軸，需要 date-fns 適配器**
-                    time: {
-                        // 設定時間在提示框 (tooltip) 中顯示的格式
-                        tooltipFormat: 'yyyy-MM-dd',
-                        // 設定時間軸刻度顯示的單位，圖表會自動調整
-                        unit: 'day'
-                    },
                     title: {
                         display: true,
                         text: 'Date'
                     }
                 },
-                // Y 軸 (左側，價格)
                 yPrice: {
                     type: 'linear',
                     position: 'left',
@@ -5057,7 +4943,6 @@ function createTechnicalAnalysisChart(data, chartId) {
                         text: 'Stock Price (USD)'
                     }
                 },
-                // Y 軸 (右側，成交量)
                 yVolume: {
                     type: 'linear',
                     position: 'right',
@@ -5065,7 +4950,6 @@ function createTechnicalAnalysisChart(data, chartId) {
                         display: true,
                         text: 'Volume'
                     },
-                    // 確保成交量的網格線不會跟價格的網格線重疊，畫面更乾淨
                     grid: {
                         drawOnChartArea: false
                     }
@@ -5074,6 +4958,7 @@ function createTechnicalAnalysisChart(data, chartId) {
         }
     });
 }
+
 
 function calculatePEData(priceData, epsData) {
     const peData = priceData.map(priceEntry => {
