@@ -4603,6 +4603,8 @@ let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的�
 
 let peBandChartInstances = {};
 
+let technicalAnalysisChartInstance;
+
 function fetchIncomeStatement() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
@@ -4788,6 +4790,108 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
         .catch(error => {
             console.error('Error fetching PE Band data:', error);
         });
+}
+
+function fetchTechnicalAnalysisData(stockSymbol, chartId) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的 API 密鑰
+    // 獲取最近三年的數據 (365 * 3 ≈ 1095)
+    const apiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=1095&apikey=${apiKey}`;
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            if (data && data.historical) {
+                // API 回傳的數據是從新到舊，圖表需要從舊到新，所以要反轉陣列
+                const historicalData = data.historical.reverse();
+                createTechnicalAnalysisChart(historicalData, chartId);
+            } else {
+                console.error('No historical price data found for this symbol.');
+                const container = document.getElementById(chartId).parentElement;
+                container.innerHTML += '<p>No technical analysis data available.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching technical analysis data:', error);
+        });
+}
+
+function createTechnicalAnalysisChart(data, chartId) {
+    const ctx = document.getElementById(chartId).getContext('2d');
+
+    // 如果已有圖表實例，先銷毀
+    if (technicalAnalysisChartInstance) {
+        technicalAnalysisChartInstance.destroy();
+    }
+
+    const labels = data.map(entry => entry.date);
+    const closingPrices = data.map(entry => entry.close);
+    const volumes = data.map(entry => entry.volume);
+
+    technicalAnalysisChartInstance = new Chart(ctx, {
+        type: 'bar', // 基礎類型設為 bar
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'line', // 這個 dataset 改為 line
+                    label: 'Close Price',
+                    data: closingPrices,
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    yAxisID: 'yPrice', // 綁定到價格 Y 軸
+                    tension: 0.1,
+                    pointRadius: 0 // 不顯示數據點，讓線條更平滑
+                },
+                {
+                    type: 'bar', // 這個 dataset 維持 bar
+                    label: 'Volume',
+                    data: volumes,
+                    backgroundColor: 'rgba(255, 159, 64, 0.5)', // 橘色半透明
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    yAxisID: 'yVolume' // 綁定到交易量 Y 軸
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                },
+                // 價格 Y 軸
+                yPrice: {
+                    type: 'linear',
+                    position: 'left',
+                    title: {
+                        display: true,
+                        text: 'Stock Price (USD)'
+                    }
+                },
+                // 交易量 Y 軸
+                yVolume: {
+                    type: 'linear',
+                    position: 'right',
+                    title: {
+                        display: true,
+                        text: 'Volume'
+                    },
+                    // 確保交易量的網格線不會跟價格的網格線重疊
+                    grid: {
+                        drawOnChartArea: false
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            }
+        }
+    });
 }
 
 function calculatePEData(priceData, epsData) {
@@ -5039,6 +5143,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         <div id="peBandContainer" style="margin-top: 20px;">
             <canvas id="peBandChart_${chartId}"></canvas>
         </div>
+        <div id="technicalAnalysisContainer" style="margin-top: 20px;">
+            <h2>Technical Analysis (Price & Volume)</h2>
+            <canvas id="technicalAnalysisChart"></canvas>
+        </div>
     `;
 
     // 設置scroll位置
@@ -5066,6 +5174,11 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         );
     }, 500);
 
+    const stockSymbol = data[0].symbol;
+    fetchTechnicalAnalysisData(stockSymbol, 'technicalAnalysisChart');
+
+    // const expandButton = document.getElementById('expandButton_Income');
+    
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline';
 
