@@ -4864,7 +4864,7 @@ function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 function createTechnicalAnalysisChart(data, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 如果已有圖表實例，先銷毀
+    // 如果已有圖表實例，先銷毀，避免設定殘留
     if (technicalAnalysisChartInstance) {
         technicalAnalysisChartInstance.destroy();
     }
@@ -4874,32 +4874,59 @@ function createTechnicalAnalysisChart(data, chartId) {
     const volumes = data.map(entry => entry.volume);
 
     technicalAnalysisChartInstance = new Chart(ctx, {
-        type: 'bar', // 基礎類型設為 bar
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [
                 {
-                    type: 'line', // 這個 dataset 改為 line
+                    type: 'line',
                     label: 'Close Price',
                     data: closingPrices,
                     borderColor: 'rgba(75, 192, 192, 1)',
                     backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    yAxisID: 'yPrice', // 綁定到價格 Y 軸
+                    yAxisID: 'yPrice',
                     tension: 0.1,
-                    pointRadius: 0 // 不顯示數據點，讓線條更平滑
+                    pointRadius: 0
                 },
                 {
-                    type: 'bar', // 這個 dataset 維持 bar
+                    type: 'bar',
                     label: 'Volume',
                     data: volumes,
-                    backgroundColor: 'rgba(255, 159, 64, 0.5)', // 橘色半透明
+                    backgroundColor: 'rgba(255, 159, 64, 0.5)',
                     borderColor: 'rgba(255, 159, 64, 1)',
-                    yAxisID: 'yVolume' // 綁定到交易量 Y 軸
+                    yAxisID: 'yVolume'
                 }
             ]
         },
         options: {
             responsive: true,
+            // ✨ --- 新增/修改的部分從這裡開始 --- ✨
+            plugins: {
+                zoom: {
+                    // 平移功能的設定
+                    pan: {
+                        enabled: true,  // 啟用平移
+                        mode: 'x',      // 只允許在 x 軸（時間軸）上水平拖動
+                    },
+                    // 縮放功能的設定
+                    zoom: {
+                        // 滑鼠滾輪縮放
+                        wheel: {
+                            enabled: true, // 啟用滑鼠滾輪縮放
+                        },
+                        // 手指開合縮放 (適用於觸控螢幕)
+                        pinch: {
+                            enabled: true, // 啟用手指開合縮放
+                        },
+                        mode: 'x',      // 只允許在 x 軸（時間軸）上進行縮放
+                    }
+                },
+                // ✨ --- 新增/修改的部分到這裡結束 --- ✨
+                tooltip: {
+                    mode: 'index',
+                    intersect: false
+                }
+            },
             scales: {
                 x: {
                     title: {
@@ -4907,7 +4934,6 @@ function createTechnicalAnalysisChart(data, chartId) {
                         text: 'Date'
                     }
                 },
-                // 價格 Y 軸
                 yPrice: {
                     type: 'linear',
                     position: 'left',
@@ -4916,7 +4942,6 @@ function createTechnicalAnalysisChart(data, chartId) {
                         text: 'Stock Price (USD)'
                     }
                 },
-                // 交易量 Y 軸
                 yVolume: {
                     type: 'linear',
                     position: 'right',
@@ -4924,16 +4949,9 @@ function createTechnicalAnalysisChart(data, chartId) {
                         display: true,
                         text: 'Volume'
                     },
-                    // 確保交易量的網格線不會跟價格的網格線重疊
                     grid: {
                         drawOnChartArea: false
                     }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
                 }
             }
         }
@@ -5191,6 +5209,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         </div>
         <div id="technicalAnalysisContainer" style="margin-top: 20px;">
             <h2>Technical Analysis (Price & Volume)</h2>
+            <!-- 新增重設按鈕 -->
+            <button id="resetZoomBtn">Reset Zoom</button> 
             <canvas id="technicalAnalysisChart"></canvas>
         </div>
     `;
@@ -5222,6 +5242,18 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     const stockSymbol = data[0].symbol;
     fetchTechnicalAnalysisData(stockSymbol, 'technicalAnalysisChart', yearRange);
+
+    setTimeout(() => {
+        const resetButton = document.getElementById('resetZoomBtn');
+        if (resetButton) {
+            resetButton.onclick = () => {
+                // technicalAnalysisChartInstance 是我們儲存圖表實例的全域變數
+                if (technicalAnalysisChartInstance) {
+                    technicalAnalysisChartInstance.resetZoom();
+                }
+            };
+        }
+    }, 500);
 
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline';
