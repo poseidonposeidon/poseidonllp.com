@@ -4792,22 +4792,41 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
         });
 }
 
-function fetchTechnicalAnalysisData(stockSymbol, chartId) {
+function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的 API 密鑰
-    // 獲取最近三年的數據 (365 * 3 ≈ 1095)
-    const apiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=1095&apikey=${apiKey}`;
+    let timeseries;
+
+    // 根據傳入的 yearRange 參數，轉換為 API 需要的天數
+    const years = parseInt(yearRange);
+
+    if (yearRange === 'all') {
+        // "all" 的情況，我們請求一個足夠大的數值，例如 20 年的數據
+        timeseries = 365 * 20;
+    } else if (!isNaN(years)) {
+        // 如果是數字（5 或 10），則乘以 365
+        timeseries = years * 365;
+    } else {
+        // 如果傳入的值無效，提供一個預設值，例如 5 年
+        timeseries = 365 * 5;
+    }
+
+    // 使用動態計算出的 timeseries 來建立 API URL
+    const apiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=${timeseries}&apikey=${apiKey}`;
 
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            if (data && data.historical) {
+            if (data && data.historical && data.historical.length > 0) {
                 // API 回傳的數據是從新到舊，圖表需要從舊到新，所以要反轉陣列
                 const historicalData = data.historical.reverse();
                 createTechnicalAnalysisChart(historicalData, chartId);
             } else {
                 console.error('No historical price data found for this symbol.');
-                const container = document.getElementById(chartId).parentElement;
-                container.innerHTML += '<p>No technical analysis data available.</p>';
+                const chartCanvas = document.getElementById(chartId);
+                if(chartCanvas) {
+                    const container = chartCanvas.parentElement;
+                    container.innerHTML = '<p>No technical analysis data available for the selected range.</p>';
+                }
             }
         })
         .catch(error => {
@@ -5175,10 +5194,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     }, 500);
 
     const stockSymbol = data[0].symbol;
-    fetchTechnicalAnalysisData(stockSymbol, 'technicalAnalysisChart');
+    fetchTechnicalAnalysisData(stockSymbol, 'technicalAnalysisChart', yearRange);
 
-    // const expandButton = document.getElementById('expandButton_Income');
-    
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline';
 
@@ -6124,7 +6141,6 @@ function createPieChart(data, chartId, options = {}) {
         }
     });
 }
-
 
 function formatNumber(value) {
     return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
