@@ -4907,6 +4907,7 @@ function createTechnicalAnalysisChart(data, chartId) {
                     pan: {
                         enabled: true,  // 啟用平移
                         mode: 'x',      // 只允許在 x 軸（時間軸）上水平拖動
+                        modifierKey: null,
                     },
                     // 縮放功能的設定
                     zoom: {
