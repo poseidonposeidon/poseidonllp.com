@@ -4959,7 +4959,6 @@ function createTechnicalAnalysisChart(data, chartId) {
     });
 }
 
-
 function calculatePEData(priceData, epsData) {
     const peData = priceData.map(priceEntry => {
         const date = priceEntry.date;
@@ -5040,6 +5039,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     });
 
     const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
+        // 移除第一筆沒有增長率的數據，避免圖表顯示問題
         return !(index === 0 && entry.growthRate === 'N/A');
     });
 
@@ -5133,8 +5133,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.epsdiluted.push(entry.epsdiluted || 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
-
-        // 新增 link 和 finalLink
         rows.link.push(entry.link ? `<a class="styled-link" href="${entry.link}" target="_blank">Link</a>` : 'N/A');
         rows.finalLink.push(entry.finalLink ? `<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Link</a>` : 'N/A');
 
@@ -5173,10 +5171,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     });
 
-    // 構建 HTML 表格
     let tableHtml = `
     <div style="display: flex; overflow-x: auto;">
-        
         <div class="fixed-header-column">
             <table class="financial-table"> 
                 ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
@@ -5190,8 +5186,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     </div>
     `;
 
-    // 創建容器結構，並綁定唯一的下載按鈕ID
     const downloadButtonId = `downloadBtn_${chartId}`;
+    const peBandCanvasId = `peBandChart_${chartId}`;
+
+    // --- 修改後的 HTML 結構 ---
     container.innerHTML = `
         <button id="${downloadButtonId}">Download as Excel</button>
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
@@ -5200,24 +5198,27 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             </div>
         </div>
         <div id="operatingChartContainer" style="margin-top: 20px;">
+            <h2>Operating Performance</h2>
+            <button id="resetZoomBtn_Operating_${operatingChartId}">Reset Zoom</button> 
             <canvas id="${operatingChartId}"></canvas>
         </div>
         <div id="chartContainer" style="margin-top: 20px;">
+            <h2>Profitability & Growth</h2>
+            <button id="resetZoomBtn_Income_${chartId}">Reset Zoom</button> 
             <canvas id="${chartId}"></canvas>
         </div>
-        <!-- 新增本益比河流圖的canvas -->
         <div id="peBandContainer" style="margin-top: 20px;">
-            <canvas id="peBandChart_${chartId}"></canvas>
+            <h2>P/E Ratio History</h2>
+            <button id="resetZoomBtn_PEBand_${peBandCanvasId}">Reset Zoom</button> 
+            <canvas id="${peBandCanvasId}"></canvas>
         </div>
         <div id="technicalAnalysisContainer" style="margin-top: 20px;">
             <h2>Technical Analysis (Price & Volume)</h2>
-            <!-- 新增重設按鈕 -->
-            <button id="resetZoomBtn">Reset Zoom</button> 
+            <button id="resetZoomBtn_Tech">Reset Zoom</button> 
             <canvas id="technicalAnalysisChart"></canvas>
         </div>
     `;
 
-    // 設置scroll位置
     setTimeout(() => {
         const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
         if (scrollContainer) {
@@ -5228,28 +5229,57 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     }, 100);
 
-    // 創建圖表，僅使用篩選後的數據（刪除多出來的那一年）
+    // 創建圖表
     createOperatingChart(filteredDataForChart, operatingChartId);
     createIncomeStatementChart(filteredDataForChart, chartId);
-    const peBandCanvasId = `peBandChart_${chartId}`;
 
-    // 新增：創建本益比河流圖
     setTimeout(() => {
         fetchPEBandData(
-            `https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?timeseries=3650&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,  // 改成3650天（10年）
-            `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=40&period=quarter&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,  // 確保是10年的季度數據
-            peBandCanvasId // 傳入帶有 chartId 的唯一 ID
+            `https://financialmodelingprep.com/api/v3/historical-price-full/${data[0].symbol}?timeseries=3650&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
+            `https://financialmodelingprep.com/api/v3/income-statement/${data[0].symbol}?limit=40&period=quarter&apikey=GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf`,
+            peBandCanvasId
         );
     }, 500);
 
     const stockSymbol = data[0].symbol;
     fetchTechnicalAnalysisData(stockSymbol, 'technicalAnalysisChart', yearRange);
 
+    // --- 修改後的事件綁定邏輯 ---
     setTimeout(() => {
-        const resetButton = document.getElementById('resetZoomBtn');
-        if (resetButton) {
-            resetButton.onclick = () => {
-                // technicalAnalysisChartInstance 是我們儲存圖表實例的全域變數
+        // 營運圖表重設按鈕
+        const resetBtnOp = document.getElementById(`resetZoomBtn_Operating_${operatingChartId}`);
+        if (resetBtnOp) {
+            resetBtnOp.onclick = () => {
+                if (incomeStatementChartInstances[operatingChartId]) {
+                    incomeStatementChartInstances[operatingChartId].resetZoom();
+                }
+            };
+        }
+
+        // 損益圖表重設按鈕
+        const resetBtnIncome = document.getElementById(`resetZoomBtn_Income_${chartId}`);
+        if (resetBtnIncome) {
+            resetBtnIncome.onclick = () => {
+                if (incomeStatementChartInstances[chartId]) {
+                    incomeStatementChartInstances[chartId].resetZoom();
+                }
+            };
+        }
+
+        // PE河流圖重設按鈕
+        const resetBtnPE = document.getElementById(`resetZoomBtn_PEBand_${peBandCanvasId}`);
+        if (resetBtnPE) {
+            resetBtnPE.onclick = () => {
+                if (peBandChartInstances[peBandCanvasId]) {
+                    peBandChartInstances[peBandCanvasId].resetZoom();
+                }
+            };
+        }
+
+        // 技術分析圖重設按鈕
+        const resetBtnTech = document.getElementById('resetZoomBtn_Tech');
+        if (resetBtnTech) {
+            resetBtnTech.onclick = () => {
                 if (technicalAnalysisChartInstance) {
                     technicalAnalysisChartInstance.resetZoom();
                 }
@@ -5260,7 +5290,6 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     const expandButton = document.getElementById('expandButton_Income');
     if (expandButton) expandButton.style.display = 'inline';
 
-    // 清除舊的事件並綁定新的下載按鈕事件
     bindDownloadButton(rows, data[0].symbol, downloadButtonId);
 }
 
@@ -5334,105 +5363,35 @@ function createOperatingChart(data, chartId) {
         data: {
             labels: validData.map(entry => entry.date),
             datasets: [
-                {
-                    type: 'bar',
-                    label: 'Revenue',
-                    data: validData.map(entry => entry.revenue),
-                    borderColor: 'rgb(253,206,170,1)',
-                    backgroundColor: 'rgb(186,153,130,0.7)', // 半透明
-                    yAxisID: 'y',
-                    order: 1
-                },
-                {
-                    type: 'bar',
-                    label: 'Cost of Revenue',
-                    data: validData.map(entry => entry.costOfRevenue),
-                    borderColor: 'rgba(102, 204, 204, 1)',
-                    backgroundColor: 'rgba(102, 204, 204, 0.7)', // 半透明
-                    yAxisID: 'y',
-                    order: 1
-                },
-                {
-                    type: 'bar',
-                    label: 'Operating Expenses',
-                    data: validData.map(entry => entry.operatingExpenses),
-                    borderColor: 'rgba(153, 204, 255, 1)',
-                    backgroundColor: 'rgba(153, 204, 255, 0.7)', // 半透明
-                    yAxisID: 'y',
-                    order: 1
-                },
-                {
-                    type: 'bar',
-                    label: 'Operating Income',
-                    data: validData.map(entry => entry.operatingIncome),
-                    borderColor: 'rgba(232, 232, 232, 1)',
-                    backgroundColor: 'rgba(232, 232, 232, 0.7)', // 半透明
-                    yAxisID: 'y',
-                    order: 1
-                },
-                {
-                    type: 'line',
-                    label: 'Growth Rate',
-                    data: validData.map(entry => entry.growthRate),
-                    borderColor: 'rgba(255, 153, 0, 1)', // 橙色
-                    backgroundColor: 'rgba(255, 153, 0, 0.9)', // 半透明橙色
-                    borderWidth: 3, // 加粗折線
-                    pointRadius: 5, // 增大圓點
-                    pointBackgroundColor: 'rgba(255, 153, 0, 1)', // 鮮明顏色
-                    pointBorderColor: 'rgba(255, 153, 0, 1)',
-                    yAxisID: 'y1',
-                    order: 2 // 確保折線圖顯示在柱狀圖上方
-                }
+                { type: 'bar', label: 'Revenue', data: validData.map(entry => entry.revenue), borderColor: 'rgb(253,206,170,1)', backgroundColor: 'rgb(186,153,130,0.7)', yAxisID: 'y', order: 1 },
+                { type: 'bar', label: 'Cost of Revenue', data: validData.map(entry => entry.costOfRevenue), borderColor: 'rgba(102, 204, 204, 1)', backgroundColor: 'rgba(102, 204, 204, 0.7)', yAxisID: 'y', order: 1 },
+                { type: 'bar', label: 'Operating Expenses', data: validData.map(entry => entry.operatingExpenses), borderColor: 'rgba(153, 204, 255, 1)', backgroundColor: 'rgba(153, 204, 255, 0.7)', yAxisID: 'y', order: 1 },
+                { type: 'bar', label: 'Operating Income', data: validData.map(entry => entry.operatingIncome), borderColor: 'rgba(232, 232, 232, 1)', backgroundColor: 'rgba(232, 232, 232, 0.7)', yAxisID: 'y', order: 1 },
+                { type: 'line', label: 'Growth Rate', data: validData.map(entry => entry.growthRate), borderColor: 'rgba(255, 153, 0, 1)', backgroundColor: 'rgba(255, 153, 0, 0.9)', borderWidth: 3, pointRadius: 5, pointBackgroundColor: 'rgba(255, 153, 0, 1)', pointBorderColor: 'rgba(255, 153, 0, 1)', yAxisID: 'y1', order: 2 }
             ]
         },
         options: {
             responsive: true,
             scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    },
-                    reverse: false
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Value'
-                    },
-                    position: 'left'
-                },
-                y1: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Percentage (%)'
-                    },
-                    position: 'right',
-                    grid: {
-                        drawOnChartArea: false // 不在主區域繪製格線
-                    }
-                }
+                x: { title: { display: true, text: 'Date' }, reverse: false },
+                y: { beginAtZero: true, title: { display: true, text: 'Value' }, position: 'left' },
+                y1: { beginAtZero: true, title: { display: true, text: 'Percentage (%)' }, position: 'right', grid: { drawOnChartArea: false } }
             },
+            // --- 修改處：新增縮放/平移插件配置 ---
             plugins: {
+                zoom: {
+                    pan: { enabled: true, mode: 'x' },
+                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
+                },
                 tooltip: {
                     callbacks: {
                         label: function (tooltipItem) {
                             const value = tooltipItem.raw;
-                            if (value !== null) {
-                                return tooltipItem.dataset.label.includes('Rate')
-                                    ? value.toFixed(2) + '%'
-                                    : value.toLocaleString();
-                            }
+                            if (value !== null) { return tooltipItem.dataset.label.includes('Rate') ? value.toFixed(2) + '%' : value.toLocaleString(); }
                             return 'No data';
                         }
                     },
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
-                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色文字
-                    borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
-                    borderWidth: 1
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', titleColor: 'rgba(255, 255, 255, 1)', bodyColor: 'rgba(255, 255, 255, 1)', borderColor: 'rgba(255, 255, 255, 1)', borderWidth: 1
                 }
             }
         }
@@ -5455,96 +5414,35 @@ function createIncomeStatementChart(data, chartId) {
         data: {
             labels: validData.map(entry => entry.date),
             datasets: [
-                {
-                    type: 'bar',
-                    label: 'EPS',
-                    data: validData.map(entry => entry.eps),
-                    borderColor: 'rgb(253,206,170,1)',
-                    backgroundColor: 'rgb(225,167,121,0.7)',
-                    yAxisID: 'y'
-                },
-                {
-                    type: 'line',
-                    label: 'Gross Profit Ratio',
-                    data: validData.map(entry => entry.grossProfitRatio * 100),
-                    borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
-                    backgroundColor: 'rgba(102, 204, 204, 0.7)', // 半透明藍綠色
-                    yAxisID: 'y1'
-                },
-                {
-                    type: 'line',
-                    label: 'Operating Income Ratio',
-                    data: validData.map(entry => entry.operatingIncomeRatio * 100),
-                    borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
-                    backgroundColor: 'rgba(153, 204, 255, 0.7)', // 半透明淺藍色
-                    yAxisID: 'y1'
-                },
-                {
-                    type: 'line',
-                    label: 'Net Income Ratio',
-                    data: validData.map(entry => entry.netIncomeRatio * 100),
-                    borderColor: 'rgba(232, 232, 232, 1)', // 淺灰色 (#E8E8E8)
-                    backgroundColor: 'rgba(232, 232, 232, 0.7)', // 半透明淺灰色
-                    yAxisID: 'y1'
-                },
-                {
-                    type: 'line',
-                    label: 'Growth Rate',
-                    data: validData.map(entry => entry.growthRate),
-                    borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
-                    backgroundColor: 'rgba(255, 153, 0, 0.9)', // 半透明橙色
-                    yAxisID: 'y1'
-                }
+                { type: 'bar', label: 'EPS', data: validData.map(entry => entry.eps), borderColor: 'rgb(253,206,170,1)', backgroundColor: 'rgb(225,167,121,0.7)', yAxisID: 'y' },
+                { type: 'line', label: 'Gross Profit Ratio', data: validData.map(entry => entry.grossProfitRatio * 100), borderColor: 'rgba(102, 204, 204, 1)', backgroundColor: 'rgba(102, 204, 204, 0.7)', yAxisID: 'y1' },
+                { type: 'line', label: 'Operating Income Ratio', data: validData.map(entry => entry.operatingIncomeRatio * 100), borderColor: 'rgba(153, 204, 255, 1)', backgroundColor: 'rgba(153, 204, 255, 0.7)', yAxisID: 'y1' },
+                { type: 'line', label: 'Net Income Ratio', data: validData.map(entry => entry.netIncomeRatio * 100), borderColor: 'rgba(232, 232, 232, 1)', backgroundColor: 'rgba(232, 232, 232, 0.7)', yAxisID: 'y1' },
+                { type: 'line', label: 'Growth Rate', data: validData.map(entry => entry.growthRate), borderColor: 'rgba(255, 153, 0, 1)', backgroundColor: 'rgba(255, 153, 0, 0.9)', yAxisID: 'y1' }
             ]
         },
         options: {
             responsive: true,
             scales: {
-                x: {
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    },
-                    reverse: false
-                },
-                y: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Value'
-                    },
-                    position: 'left'
-                },
-                y1: {
-                    beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Percentage (%)'
-                    },
-                    position: 'right',
-                    grid: {
-                        drawOnChartArea: false
-                    }
-                }
+                x: { title: { display: true, text: 'Date' }, reverse: false },
+                y: { beginAtZero: true, title: { display: true, text: 'Value' }, position: 'left' },
+                y1: { beginAtZero: true, title: { display: true, text: 'Percentage (%)' }, position: 'right', grid: { drawOnChartArea: false } }
             },
+            // --- 修改處：新增縮放/平移插件配置 ---
             plugins: {
+                zoom: {
+                    pan: { enabled: true, mode: 'x' },
+                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
+                },
                 tooltip: {
                     callbacks: {
                         label: function (tooltipItem) {
                             const value = tooltipItem.raw;
-                            if (value !== null) {
-                                return tooltipItem.dataset.label.includes('Ratio')
-                                    ? value.toFixed(2) + '%'
-                                    : value.toLocaleString();
-                            }
+                            if (value !== null) { return tooltipItem.dataset.label.includes('Ratio') ? value.toFixed(2) + '%' : value.toLocaleString(); }
                             return 'No data';
                         }
                     },
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
-                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(255, 255, 255, 1)', // 深藍字體 (#003366)
-                    borderColor: 'rgba(255, 255, 255, 1)', // 深藍邊框 (#003366)
-                    borderWidth: 1
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)', titleColor: 'rgba(255, 255, 255, 1)', bodyColor: 'rgba(255, 255, 255, 1)', borderColor: 'rgba(255, 255, 255, 1)', borderWidth: 1
                 }
             }
         }
@@ -5553,25 +5451,18 @@ function createIncomeStatementChart(data, chartId) {
 
 function displayPEBandChart(peData, chartId) {
     const canvas = document.getElementById(chartId);
-
-    // 檢查 canvas 是否已正確生成
     if (!canvas) {
         console.error(`Canvas with ID ${chartId} not found.`);
         return;
     }
-
     const ctx = canvas.getContext('2d');
-
-    // 確保將日期轉換為 Date 對象
     const dates = peData.map(entry => new Date(entry.date));
     const peRatios = peData.map(entry => entry.peRatio);
 
-    // 檢查是否已有先前的圖表實例
     if (peBandChartInstances[chartId]) {
         peBandChartInstances[chartId].destroy();
     }
 
-    // 創建新的圖表實例
     peBandChartInstances[chartId] = new Chart(ctx, {
         type: 'line',
         data: {
@@ -5579,30 +5470,23 @@ function displayPEBandChart(peData, chartId) {
             datasets: [{
                 label: 'P/E Ratio',
                 data: peRatios,
-                borderColor: 'rgba(120, 160, 200, 1)', // 柔和的淡藍色
+                borderColor: 'rgba(120, 160, 200, 1)',
                 fill: false,
             }]
         },
         options: {
+            responsive: true,
             scales: {
-                x: {
-                    type: 'time',
-                    time: {
-                        unit: 'year',
-                        tooltipFormat: 'yyyy-MM-dd',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Date',
-                    },
-                },
-                y: {
-                    title: {
-                        display: true,
-                        text: 'P/E Ratio',
-                    },
-                },
+                x: { type: 'time', time: { unit: 'year', tooltipFormat: 'yyyy-MM-dd' }, title: { display: true, text: 'Date' } },
+                y: { title: { display: true, text: 'P/E Ratio' } }
             },
+            // --- 修改處：新增縮放/平移插件配置 ---
+            plugins: {
+                zoom: {
+                    pan: { enabled: true, mode: 'x' },
+                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
+                }
+            }
         },
     });
 }
