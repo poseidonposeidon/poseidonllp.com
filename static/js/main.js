@@ -4852,7 +4852,7 @@ function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 }
 
 /**
- * 創建包含 K線圖 和 成交量 的技術分析圖表 (性能與邊界修正版)
+ * 創建包含 K線圖 和 成交量 的技術分析圖表 (最終邊界與性能修正版)
  * @param {Array} data - 從 API 獲取的、已經按日期升序排列的歷史數據。
  * @param {string} chartId - 圖表 canvas 元素的 ID。
  */
@@ -4863,7 +4863,7 @@ function createTechnicalAnalysisChart(data, chartId) {
         technicalAnalysisChartInstances[chartId].destroy();
     }
 
-    // --- 數據準備 (與之前相同，無需修改) ---
+    // --- 數據準備 (不變) ---
     const candlestickData = data.map(entry => ({
         x: new Date(entry.date).valueOf(),
         o: entry.open,
@@ -4882,87 +4882,53 @@ function createTechnicalAnalysisChart(data, chartId) {
     }));
 
     // --- 圖表創建 ---
+
+    // ✨ --- 新增修正：為邊界增加一點視覺邊距 --- ✨
+    const firstDataPointX = candlestickData[0].x;
+    const lastDataPointX = candlestickData[candlestickData.length - 1].x;
+    const PADDING_DAYS = 30; // 在前後各增加 30 天的邊距
+    const padding = PADDING_DAYS * 24 * 60 * 60 * 1000; // 轉換為毫秒
+
     technicalAnalysisChartInstances[chartId] = new Chart(ctx, {
         type: 'candlestick',
-        data: {
+        data: { /* ... 數據部分不變 ... */
             datasets: [
                 {
                     label: 'OHLC',
                     data: candlestickData,
                     yAxisID: 'yPrice',
-                    color: {
-                        up: upColor.replace('0.7', '1'),
-                        down: downColor.replace('0.7', '1'),
-                        unchanged: '#999',
-                    },
+                    color: { up: upColor.replace('0.7', '1'), down: downColor.replace('0.7', '1'), unchanged: '#999' }
                 },
-                {
-                    type: 'bar',
-                    label: 'Volume',
-                    data: volumeData,
-                    yAxisID: 'yVolume',
-                }
+                { type: 'bar', label: 'Volume', data: volumeData, yAxisID: 'yVolume' }
             ]
         },
         options: {
-            responsive: true,
-            // ✨ --- 新增修正 #1：關閉動畫以提升性能 --- ✨
             animation: false,
-
-            scales: {
-                // ... scales 設定保持不變 ...
-                x: {
-                    type: 'time',
-                    time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd' },
-                    title: { display: true, text: 'Date' },
-                    ticks: { source: 'auto' }
-                },
-                yPrice: {
-                    type: 'linear',
-                    position: 'left',
-                    title: { display: true, text: 'Stock Price' }
-                },
-                yVolume: {
-                    type: 'linear',
-                    position: 'right',
-                    title: { display: true, text: 'Volume' },
-                    grid: { drawOnChartArea: false }
-                }
+            scales: { /* ... scales 部分不變 ... */
+                x: { type: 'time', time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd' }, title: { display: true, text: 'Date' }, ticks: { source: 'auto' } },
+                yPrice: { type: 'linear', position: 'left', title: { display: true, text: 'Stock Price' } },
+                yVolume: { type: 'linear', position: 'right', title: { display: true, text: 'Volume' }, grid: { drawOnChartArea: false } }
             },
             plugins: {
-                // ✨ --- 新增修正 #2：啟用數據抽取插件以解決卡頓 --- ✨
-                decimation: {
-                    enabled: true,
-                    algorithm: 'lttb', // Largest-Triangle-Three-Buckets 演算法，性能和視覺效果俱佳
-                    samples: 100, // 在一個視圖中最多顯示的樣本數，可根據需要調整
-                },
-
-                // ✨ --- 新增修正 #3：為縮放/平移插件設定邊界 --- ✨
+                decimation: { enabled: true, algorithm: 'lttb', samples: 100 },
                 zoom: {
-                    pan: {
-                        enabled: true,
-                        mode: 'x',
-                        // 設定平移的最小/最大範圍
-                        rangeMin: { x: candlestickData[0].x },
-                        rangeMax: { x: candlestickData[candlestickData.length - 1].x },
-                    },
-                    zoom: {
-                        wheel: { enabled: true },
-                        pinch: { enabled: true },
-                        mode: 'x',
-                        // 設定縮放的最小/最大範圍
-                        rangeMin: { x: candlestickData[0].x },
-                        rangeMax: { x: candlestickData[candlestickData.length - 1].x },
-                    }
-                },
+                    pan: { enabled: true, mode: 'x' },
+                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' },
 
-                // tooltip 設定保持不變
-                tooltip: {
+                    // ✨ --- 核心修正：使用 limits 來強制設定邊界 --- ✨
+                    limits: {
+                        x: {
+                            min: firstDataPointX - padding, // 設定最小邊界（含邊距）
+                            max: lastDataPointX + padding,  // 設定最大邊界（含邊距）
+                            minRange: 60 * 60 * 1000 * 24 * 7 // 可選：限制最小縮放範圍，例如至少顯示7天
+                        },
+                    },
+                },
+                tooltip: { /* ... tooltip 部分不變 ... */
                     mode: 'index',
                     intersect: false,
                     callbacks: {
                         label: function(context) {
-                            // ... callback 邏輯不變 ...
                             const datasetLabel = context.dataset.label || '';
                             if (context.dataset.type === 'candlestick') {
                                 const datapoint = context.raw;
