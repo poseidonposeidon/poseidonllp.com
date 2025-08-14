@@ -4883,8 +4883,7 @@ async function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 }
 
 /**
- * 創建一個功能完整、採用專業配色、圖例顯示正確且載入狀態穩定的技術分析圖表。
- *
+ * 創建一個功能完整、採用專業配色且圖例顯示正確的技術分析圖表。
  * @param {Array} priceHistory - 歷史價格數據 (OHLCV)，已按日期升序排列。
  * @param {Array} ma5History - 5日均線數據，已按日期升序排列。
  * @param {Array} ma10History - 10日均線數據，已按日期升序排列。
@@ -4893,49 +4892,71 @@ async function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 確保全域圖表實例儲存物件存在
+    // 如果圖表實例已存在，先銷毀，防止記憶體洩漏和渲染衝突
+    if (window.technicalAnalysisChartInstances && window.technicalAnalysisChartInstances[chartId]) {
+        window.technicalAnalysisChartInstances[chartId].destroy();
+    }
+    // 確保全局實例對象存在
     if (!window.technicalAnalysisChartInstances) {
         window.technicalAnalysisChartInstances = {};
     }
 
-    // 如果圖表實例已存在，先銷毀，防止記憶體洩漏和渲染衝突
-    if (window.technicalAnalysisChartInstances[chartId]) {
-        window.technicalAnalysisChartInstances[chartId].destroy();
-    }
-
-    // --- 1. 數據準備與配色方案 ---
+    // --- 1. 數據準備與【唯一】的配色方案 ---
 
     // 為深色背景設計的統一配色方案
     const upColor = 'rgba(16, 185, 129, 1)';     // 亮綠色 (上漲)
     const downColor = 'rgba(239, 68, 68, 1)';     // 亮紅色 (下跌)
     const ma5Color = 'rgba(255, 255, 255, 1)';   // 純白色 (5日線)
     const ma10Color = 'rgba(250, 204, 21, 1)';   // 亮黃色 (10日線)
-    const volumeOrangeColor = 'rgba(251, 146, 60, 0.6)'; // 指定的橘色 (60% 透明度)
+    const volumeOrangeColor = 'rgba(251, 146, 60, 0.6)'; // 您指定的橘色 (60% 透明度)
 
-    // 格式化所有圖表數據
-    const candlestickData = priceHistory.map(entry => ({ x: new Date(entry.date).valueOf(), o: entry.open, h: entry.high, l: entry.low, c: entry.close }));
-    const volumeData = priceHistory.map(entry => ({ x: new Date(entry.date).valueOf(), y: entry.volume }));
-    const ma5LineData = (ma5History && Array.isArray(ma5History)) ? ma5History.map(entry => ({ x: new Date(entry.date).valueOf(), y: entry.sma })) : [];
-    const ma10LineData = (ma10History && Array.isArray(ma10History)) ? ma10History.map(entry => ({ x: new Date(entry.date).valueOf(), y: entry.sma })) : [];
+    // 格式化 K 線圖數據
+    const candlestickData = priceHistory.map(entry => ({
+        x: new Date(entry.date).valueOf(),
+        o: entry.open,
+        h: entry.high,
+        l: entry.low,
+        c: entry.close
+    }));
 
-    // --- 2. 邊界計算 (用於縮放限制) ---
+    // ✨【修改一】: 簡化 volumeData 的準備，移除個別的顏色設定
+    const volumeData = priceHistory.map(entry => ({
+        x: new Date(entry.date).valueOf(),
+        y: entry.volume,
+    }));
 
-    const firstDataPointX = candlestickData.length > 0 ? candlestickData[0].x : undefined;
-    const lastDataPointX = candlestickData.length > 0 ? candlestickData[candlestickData.length - 1].x : undefined;
+    // 格式化均線數據
+    const ma5LineData = (ma5History && Array.isArray(ma5History)) ? ma5History.map(entry => ({
+        x: new Date(entry.date).valueOf(),
+        y: entry.sma
+    })) : [];
+
+    const ma10LineData = (ma10History && Array.isArray(ma10History)) ? ma10History.map(entry => ({
+        x: new Date(entry.date).valueOf(),
+        y: entry.sma
+    })) : [];
+
+
+    // --- 2. 邊界與邊距計算 ---
+
+    const firstDataPointX = candlestickData[0]?.x;
+    const lastDataPointX = candlestickData[candlestickData.length - 1]?.x;
     const PADDING_DAYS = 30;
     const padding = PADDING_DAYS * 24 * 60 * 60 * 1000;
 
+
     // --- 3. 圖表實例化與配置 ---
 
-    const chartInstance = new Chart(ctx, {
-        type: 'candlestick', // 基礎圖表類型
+    technicalAnalysisChartInstances[chartId] = new Chart(ctx, {
+        type: 'candlestick',
         data: {
             datasets: [
                 {
                     label: 'OHLC',
                     data: candlestickData,
                     yAxisID: 'yPrice',
-                    order: 0 // K 線在最上層
+                    color: { up: upColor, down: downColor, unchanged: '#999' },
+                    order: 0
                 },
                 {
                     type: 'line',
@@ -4945,7 +4966,7 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                     borderWidth: 2,
                     pointRadius: 0,
                     yAxisID: 'yPrice',
-                    order: 1 // 均線在 K 線之下
+                    order: 1
                 },
                 {
                     type: 'line',
@@ -4962,61 +4983,48 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                     label: 'Volume',
                     data: volumeData,
                     yAxisID: 'yVolume',
-                    backgroundColor: volumeOrangeColor, // 【顏色修正】直接在此為整個數據集設定顏色
-                    order: 2 // 成交量在最底層
+                    // ✨【修改二】: 在 dataset 層級直接設定 backgroundColor
+                    backgroundColor: volumeOrangeColor,
+                    order: 2
                 }
             ]
         },
         options: {
-            maintainAspectRatio: false,
+            // ... 其餘 options 設定保持不變
             animation: false,
             parsing: false,
             scales: {
                 x: {
                     type: 'time',
                     time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd' },
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                    ticks: { source: 'auto', maxRotation: 0, autoSkip: true },
-                    // ✨【跑版修正】: 設定X軸的初始顯示範圍，確保圖表載入時完整呈現所有數據
-                    min: firstDataPointX,
-                    max: lastDataPointX,
+                    title: { display: true, text: 'Date' },
+                    ticks: { source: 'auto' }
                 },
                 yPrice: {
                     type: 'linear',
                     position: 'left',
-                    title: { display: true, text: 'Stock Price' },
-                    grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    title: { display: true, text: 'Stock Price' }
                 },
                 yVolume: {
                     type: 'linear',
                     position: 'right',
                     title: { display: true, text: 'Volume' },
-                    grid: { drawOnChartArea: false },
-                    ticks: {
-                        callback: function(value) {
-                            if (value >= 1e9) return (value / 1e9).toFixed(1) + 'B';
-                            if (value >= 1e6) return (value / 1e6).toFixed(1) + 'M';
-                            if (value >= 1e3) return (value / 1e3).toFixed(1) + 'K';
-                            return value;
-                        }
-                    }
+                    grid: { drawOnChartArea: false }
                 }
             },
             plugins: {
                 legend: {
-                    position: 'top',
                     labels: {
                         generateLabels: function(chart) {
                             const defaultLabels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
                             defaultLabels.forEach(label => {
                                 if (label.text === 'OHLC') {
-                                    // 為了簡潔，這裡僅用方塊示意，複雜的K棒圖例可自行擴充
                                     label.fillStyle = upColor;
                                     label.strokeStyle = downColor;
                                     label.lineWidth = 1;
                                 }
                                 if (label.text === 'Volume') {
-                                    label.fillStyle = 'rgba(251, 146, 60, 1)'; // 圖例使用不透明的橘色
+                                    label.fillStyle = 'rgba(251, 146, 60, 1)';
                                 }
                             });
                             return defaultLabels;
@@ -5026,7 +5034,7 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                 decimation: {
                     enabled: true,
                     algorithm: 'lttb',
-                    samples: 250,
+                    samples: 100,
                 },
                 zoom: {
                     pan: { enabled: true, mode: 'x' },
@@ -5040,10 +5048,9 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                     },
                     limits: {
                         x: {
-                            // 限制用戶可以縮放/平移的最終邊界
                             min: firstDataPointX ? firstDataPointX - padding : undefined,
                             max: lastDataPointX ? lastDataPointX + padding : undefined,
-                            minRange: 60 * 60 * 1000 * 24 * 7 // 最小縮放範圍為7天
+                            minRange: 60 * 60 * 1000 * 24 * 30
                         },
                     },
                 },
@@ -5055,9 +5062,10 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                             const datasetLabel = context.dataset.label || '';
                             const datapoint = context.raw;
 
-                            if (context.dataset.type === 'candlestick' || datasetLabel === 'OHLC') {
+                            if (context.dataset.type === 'candlestick') {
                                 return `${datasetLabel}: O:${datapoint.o.toFixed(2)} H:${datapoint.h.toFixed(2)} L:${datapoint.l.toFixed(2)} C:${datapoint.c.toFixed(2)}`;
-                            } else if (typeof datapoint.y === 'number') {
+                            }
+                            else if (typeof datapoint.y === 'number') {
                                 if (datasetLabel.toLowerCase().includes('volume')) {
                                     return `${datasetLabel}: ${datapoint.y.toLocaleString()}`;
                                 }
@@ -5070,10 +5078,6 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
             }
         }
     });
-
-    // 將新創建的圖表實例儲存到全域物件中
-    // 這一步是讓外部的 "Reset Zoom" 按鈕能夠找到並控制這個圖表的關鍵
-    window.technicalAnalysisChartInstances[chartId] = chartInstance;
 }
 
 function calculatePEData(priceData, epsData) {
