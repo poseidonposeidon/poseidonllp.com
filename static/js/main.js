@@ -4797,9 +4797,16 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
         });
 }
 
-function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+/**
+ * 獲取所有技術分析數據，包括：歷史價格(OHLCV)、5日均線(MA5)、10日均線(MA10)。
+ * @param {string} stockSymbol - 股票代碼。
+ * @param {string} chartId - 圖表 canvas 元素的 ID。
+ * @param {string} yearRange - 使用者選擇的時間範圍。
+ */
+async function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 您的 API 金鑰
 
+    // 計算 API 請求所需的起訖日期 (與之前相同)
     const toDate = new Date();
     const fromDate = new Date();
     const years = parseInt(yearRange);
@@ -4822,54 +4829,79 @@ function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
     const fromDateString = formatDate(fromDate);
     const toDateString = formatDate(toDate);
 
-    const apiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=${fromDateString}&to=${toDateString}&apikey=${apiKey}`;
+    // --- ✨ 核心修改：準備三個 API 的 URL ---
+    const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=${fromDateString}&to=${toDateString}&apikey=${apiKey}`;
+    // 簡單移動平均線 (Simple Moving Average, SMA)
+    const ma5ApiUrl = `https://financialmodelingprep.com/api/v3/technical_indicator/daily/${stockSymbol}?period=5&type=SMA&from=${fromDateString}&to=${toDateString}&apikey=${apiKey}`;
+    const ma10ApiUrl = `https://financialmodelingprep.com/api/v3/technical_indicator/daily/${stockSymbol}?period=10&type=SMA&from=${fromDateString}&to=${toDateString}&apikey=${apiKey}`;
 
-    console.log(`Fetching technical data with new URL: ${apiUrl}`);
+    console.log("Fetching Price Data from:", priceApiUrl);
+    console.log("Fetching MA5 Data from:", ma5ApiUrl);
+    console.log("Fetching MA10 Data from:", ma10ApiUrl);
 
-    fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            const chartCanvas = document.getElementById(chartId);
-            if (!chartCanvas) {
-                console.error(`Canvas with ID ${chartId} not found.`);
-                return;
+    try {
+        // --- ✨ 核心修改：使用 Promise.all 並行獲取所有數據 ---
+        const responses = await Promise.all([
+            fetch(priceApiUrl),
+            fetch(ma5ApiUrl),
+            fetch(ma10ApiUrl)
+        ]);
+
+        // 檢查是否有任何請求失敗
+        for (const response of responses) {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
             }
+        }
 
-            if (data && data.historical && data.historical.length > 0) {
-                // ✨ 這一步非常重要，將數據從 新->舊 反轉為 舊->新
-                const historicalData = data.historical.reverse();
-                // 將反轉後的數據傳遞給新的 K 線圖函式
-                createTechnicalAnalysisChart(historicalData, chartId);
-            } else {
-                console.error('No historical price data found for this symbol.');
-                const container = chartCanvas.parentElement;
-                container.innerHTML = `<p>No technical analysis data available for "${stockSymbol}" in the selected range.</p>`;
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching technical analysis data:', error);
-        });
+        const [priceData, ma5Data, ma10Data] = await Promise.all(responses.map(res => res.json()));
+
+        const chartCanvas = document.getElementById(chartId);
+        if (!chartCanvas) {
+            console.error(`Canvas with ID ${chartId} not found.`);
+            return;
+        }
+
+        if (priceData && priceData.historical && priceData.historical.length > 0) {
+            // ✨ 核心修改：將所有獲取到的數據傳遞給圖表創建函式
+            // 注意：API 返回的數據都是從新到舊，我們需要反轉它們
+            createTechnicalAnalysisChart(
+                priceData.historical.reverse(),
+                ma5Data.reverse(),
+                ma10Data.reverse(),
+                chartId
+            );
+        } else {
+            console.error('No historical price data found for this symbol.');
+            const container = chartCanvas.parentElement;
+            container.innerHTML = `<p>No technical analysis data available for "${stockSymbol}" in the selected range.</p>`;
+        }
+
+    } catch (error) {
+        console.error('Error fetching technical analysis data:', error);
+    }
 }
 
 /**
- * 創建一個功能完整、性能優化且體驗良好的技術分析圖表。
- * 包含：K線圖、成交量圖、縮放/平移的精確邊界控制、以及針對大數據集的性能優化。
- * @param {Array} data - 從 API 獲取的、已經按日期升序排列 (從舊到新) 的歷史數據。
+ * 創建一個包含 K線圖、成交量、以及5日和10日移動平均線的技術分析圖表。
+ * @param {Array} priceHistory - 歷史價格數據 (OHLCV)，已按日期升序排列。
+ * @param {Array} ma5History - 5日均線數據，已按日期升序排列。
+ * @param {Array} ma10History - 10日均線數據，已按日期升序排列。
  * @param {string} chartId - 圖表 canvas 元素的 ID。
  */
-function createTechnicalAnalysisChart(data, chartId) {
+function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 如果圖表實例已存在，先銷毀，防止記憶體洩漏和渲染衝突
+    // 如果圖表實例已存在，先銷毀
     if (technicalAnalysisChartInstances[chartId]) {
         technicalAnalysisChartInstances[chartId].destroy();
     }
 
     // --- 1. 數據準備 ---
 
-    // 將 API 數據格式化為 K 線圖插件所需的格式 {x, o, h, l, c}
-    const candlestickData = data.map(entry => ({
-        x: new Date(entry.date).valueOf(), // 使用毫秒時間戳以獲得最佳性能
+    // 格式化 K 線圖數據
+    const candlestickData = priceHistory.map(entry => ({
+        x: new Date(entry.date).valueOf(),
         o: entry.open,
         h: entry.high,
         l: entry.low,
@@ -4877,68 +4909,98 @@ function createTechnicalAnalysisChart(data, chartId) {
     }));
 
     // 定義上漲與下跌的顏色
-    const upColor = 'rgba(8, 153, 129, 0.7)';      // 上漲顏色 (綠色，帶透明度)
-    const downColor = 'rgba(217, 83, 79, 0.7)';   // 下跌顏色 (紅色，帶透明度)
+    const upColor = 'rgba(8, 153, 129, 0.7)';
+    const downColor = 'rgba(217, 83, 79, 0.7)';
 
-    // 格式化成交量數據，並根據當日漲跌動態設定顏色
-    const volumeData = data.map(entry => ({
+    // 格式化成交量數據，並動態設定顏色
+    const volumeData = priceHistory.map(entry => ({
         x: new Date(entry.date).valueOf(),
         y: entry.volume,
         backgroundColor: entry.close >= entry.open ? upColor : downColor
     }));
 
+    // 格式化 5日均線數據
+    const ma5LineData = (ma5History && Array.isArray(ma5History)) ? ma5History.map(entry => ({
+        x: new Date(entry.date).valueOf(),
+        y: entry.sma // FMP API 返回的均線值欄位是 'sma'
+    })) : [];
+
+    // 格式化 10日均線數據
+    const ma10LineData = (ma10History && Array.isArray(ma10History)) ? ma10History.map(entry => ({
+        x: new Date(entry.date).valueOf(),
+        y: entry.sma
+    })) : [];
+
 
     // --- 2. 邊界與邊距計算 ---
 
-    // 獲取數據的第一個和最後一個時間點，用於設定邊界
-    // 使用 ?. 安全訪問，防止 data 為空時出錯
     const firstDataPointX = candlestickData[0]?.x;
     const lastDataPointX = candlestickData[candlestickData.length - 1]?.x;
-
-    // 在圖表前後增加 30 天的視覺邊距 (padding)，避免 K 棒緊貼邊緣
     const PADDING_DAYS = 30;
-    const padding = PADDING_DAYS * 24 * 60 * 60 * 1000; // 將天數轉換為毫秒
+    const padding = PADDING_DAYS * 24 * 60 * 60 * 1000;
 
 
     // --- 3. 圖表實例化與配置 ---
 
     technicalAnalysisChartInstances[chartId] = new Chart(ctx, {
-        // 圖表基礎類型設為 'candlestick'，這是正確渲染的關鍵
         type: 'candlestick',
         data: {
             datasets: [
+                // K 線圖數據集
                 {
                     label: 'OHLC',
                     data: candlestickData,
                     yAxisID: 'yPrice',
-                    // K 線本體的顏色 (使用不透明的顏色)
                     color: {
                         up: upColor.replace('0.7', '1'),
                         down: downColor.replace('0.7', '1'),
                         unchanged: '#999',
-                    }
+                    },
+                    // 讓 K 線顯示在最上層
+                    order: 0
                 },
+                // 5日均線數據集
                 {
-                    type: 'bar', // 明確指定此數據集為柱狀圖
+                    type: 'line',
+                    label: 'MA 5',
+                    data: ma5LineData,
+                    borderColor: 'rgba(239, 189, 108, 1)', // 黃色
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    yAxisID: 'yPrice',
+                    // 讓均線在 K 線之下
+                    order: 1
+                },
+                // 10日均線數據集
+                {
+                    type: 'line',
+                    label: 'MA 10',
+                    data: ma10LineData,
+                    borderColor: 'rgba(178, 151, 239, 1)', // 紫色
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    yAxisID: 'yPrice',
+                    order: 1
+                },
+                // 成交量數據集
+                {
+                    type: 'bar',
                     label: 'Volume',
                     data: volumeData,
                     yAxisID: 'yVolume',
-                    // 顏色已在數據準備階段動態綁定，此處無需設定
+                    // 讓成交量在最底層
+                    order: 2
                 }
             ]
         },
         options: {
-            // 關閉所有動畫和數據自動解析，最大化性能
             animation: false,
             parsing: false,
 
             scales: {
                 x: {
                     type: 'time',
-                    time: {
-                        unit: 'day',
-                        tooltipFormat: 'yyyy-MM-dd'
-                    },
+                    time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd' },
                     title: { display: true, text: 'Date' },
                     ticks: { source: 'auto' }
                 },
@@ -4951,60 +5013,55 @@ function createTechnicalAnalysisChart(data, chartId) {
                     type: 'linear',
                     position: 'right',
                     title: { display: true, text: 'Volume' },
-                    grid: { drawOnChartArea: false } // 不繪製成交量的網格線，保持主圖乾淨
+                    grid: { drawOnChartArea: false }
                 }
             },
             plugins: {
-                // 啟用數據抽取插件，解決大數據量下的卡頓問題
                 decimation: {
                     enabled: true,
-                    algorithm: 'lttb', // 使用性能和視覺效果俱佳的 LTTB 演算法
-                    samples: 100,      // 在一個視圖中最多顯示的樣本數
+                    algorithm: 'lttb',
+                    samples: 100,
                 },
-                // 縮放與平移插件的最終配置
                 zoom: {
-                    pan: {
-                        enabled: true,
-                        mode: 'x',
-                    },
+                    pan: { enabled: true, mode: 'x' },
                     zoom: {
-                        wheel: {
-                            enabled: true,
-                            speed: 0.1, // 控制滾輪縮放速度，可根據偏好微調
-                        },
-                        pinch: {
-                            enabled: true, // 支援觸控螢幕的手指縮放
-                        },
+                        wheel: { enabled: true, speed: 0.1 },
+                        pinch: { enabled: true },
                         mode: 'x',
-                        // 在每次縮放操作結束後，強制圖表進行一次無動畫的更新
-                        // 這有助於改善因 `limits` 限制而產生的視覺不連貫感
                         onZoomComplete: function({chart}) {
                             chart.update('none');
                         }
                     },
-                    // 使用 limits 來強制設定絕對的、不可逾越的縮放與平移邊界
                     limits: {
                         x: {
                             min: firstDataPointX ? firstDataPointX - padding : undefined,
                             max: lastDataPointX ? lastDataPointX + padding : undefined,
-                            // 可選：限制最小縮放範圍，防止縮放得過大 (例如至少顯示30天數據)
                             minRange: 60 * 60 * 1000 * 24 * 30
                         },
                     },
                 },
-                // Tooltip 配置，用於顯示詳細資訊
                 tooltip: {
                     mode: 'index',
                     intersect: false,
+                    // 為了讓均線的 tooltip 也能正常顯示，需要做一點小調整
                     callbacks: {
                         label: function(context) {
                             const datasetLabel = context.dataset.label || '';
+                            const datapoint = context.raw;
+
                             if (context.dataset.type === 'candlestick') {
-                                const datapoint = context.raw;
                                 return `${datasetLabel}: O:${datapoint.o.toFixed(2)} H:${datapoint.h.toFixed(2)} L:${datapoint.l.toFixed(2)} C:${datapoint.c.toFixed(2)}`;
-                            } else {
-                                return `${datasetLabel}: ${context.raw.y.toLocaleString()}`;
                             }
+                            // 對於線圖 (均線) 和柱狀圖 (成交量)
+                            else if (typeof datapoint.y === 'number') {
+                                // 如果是成交量，使用 toLocaleString 加上千分位
+                                if (datasetLabel.toLowerCase().includes('volume')) {
+                                    return `${datasetLabel}: ${datapoint.y.toLocaleString()}`;
+                                }
+                                // 如果是均線，保留兩位小數
+                                return `${datasetLabel}: ${datapoint.y.toFixed(2)}`;
+                            }
+                            return `${datasetLabel}: N/A`;
                         }
                     }
                 }
@@ -5012,7 +5069,6 @@ function createTechnicalAnalysisChart(data, chartId) {
         }
     });
 }
-
 
 function calculatePEData(priceData, epsData) {
     const peData = priceData.map(priceEntry => {
