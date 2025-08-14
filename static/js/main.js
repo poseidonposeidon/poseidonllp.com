@@ -4912,13 +4912,13 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
     const downColor = 'rgba(239, 68, 68, 1)';    // 清晰的紅色 (下跌)
     const ma5Color = 'rgba(60, 60, 60, 1)';      // 深灰色 (5日線，與背景對比強烈)
     const ma10Color = 'rgba(245, 158, 11, 1)';  // 亮橘黃色 (10日線)
-    const volumeColor = 'rgba(156, 163, 175, 0.5)'; // 中性灰色 (成交量，不干擾主圖)
+    const volumeOrangeColor = 'rgba(251, 146, 60, 0.6)'; // 明亮的橘色，60% 透明度
 
     // 在淺色背景下，成交量使用統一的中性色，避免視覺混亂
     const volumeData = priceHistory.map(entry => ({
         x: new Date(entry.date).valueOf(),
         y: entry.volume,
-        backgroundColor: volumeColor
+        backgroundColor: volumeOrangeColor
     }));
 
     const ma5LineData = (ma5History && Array.isArray(ma5History)) ? ma5History.map(entry => ({
@@ -5018,7 +5018,7 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                                     label.lineWidth = 1; // 顯示邊框
                                 }
                                 if (label.text === 'Volume') {
-                                    label.fillStyle = volumeColor;
+                                    label.fillStyle = 'rgba(251, 146, 60, 1)';
                                 }
                             });
                             return defaultLabels;
