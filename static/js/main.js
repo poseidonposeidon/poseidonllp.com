@@ -4712,8 +4712,12 @@ function fetchEUIncomeStatement() {
 function fetchKRIncomeStatement() {
     const stockSymbol = fetchKRStock();
     const period = document.getElementById('periodKR').value;
-    const yearRange = document.getElementById('yearRangeKR').value;  // 使用對應的年份範圍選擇器
+    const yearRange = document.getElementById('yearRangeKR').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
+
+    // 定義基礎 chartId，以便重用
+    const chartId = 'incomeStatementChartKR';
+    const operatingChartId = 'operatingChartKR';
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -4721,11 +4725,15 @@ function fetchKRIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', 'incomeStatementChartKR', 'operatingChartKR', period ,yearRange);
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', chartId, operatingChartId, period ,yearRange);
 
+    // 請求本益比河流圖的資料
     const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
     const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartKR');
+
+    // 使用與 displayIncomeStatement 中相同的邏輯來產生 peBandCanvasId
+    const peBandCanvasId = `peBandChart_${chartId}`;
+    fetchPEBandData(priceApiUrl, epsApiUrl, peBandCanvasId); // 傳入正確的 ID
 }
 
 function fetchHKIncomeStatement() {
