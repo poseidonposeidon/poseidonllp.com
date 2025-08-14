@@ -4852,21 +4852,18 @@ function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 }
 
 /**
- * 創建包含 K線圖 和 成交量 的技術分析圖表 (修正版)
+ * 創建包含 K線圖 和 成交量 的技術分析圖表 (性能與邊界修正版)
  * @param {Array} data - 從 API 獲取的、已經按日期升序排列的歷史數據。
  * @param {string} chartId - 圖表 canvas 元素的 ID。
  */
 function createTechnicalAnalysisChart(data, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 如果已有圖表實例，先銷毀
     if (technicalAnalysisChartInstances[chartId]) {
         technicalAnalysisChartInstances[chartId].destroy();
     }
 
-    // --- 數據準備 ---
-
-    // 1. K 線圖數據 (格式不變，依然正確)
+    // --- 數據準備 (與之前相同，無需修改) ---
     const candlestickData = data.map(entry => ({
         x: new Date(entry.date).valueOf(),
         o: entry.open,
@@ -4875,100 +4872,102 @@ function createTechnicalAnalysisChart(data, chartId) {
         c: entry.close
     }));
 
-    // ✨ --- 優化：準備帶有漲跌顏色的成交量數據 --- ✨
-    const upColor = 'rgba(8, 153, 129, 0.7)';      // 上漲顏色 (綠色，帶透明度)
-    const downColor = 'rgba(217, 83, 79, 0.7)';   // 下跌顏色 (紅色，帶透明度)
+    const upColor = 'rgba(8, 153, 129, 0.7)';
+    const downColor = 'rgba(217, 83, 79, 0.7)';
 
     const volumeData = data.map(entry => ({
         x: new Date(entry.date).valueOf(),
         y: entry.volume,
-        // 根據當天是漲還是跌，決定成交量柱的顏色
         backgroundColor: entry.close >= entry.open ? upColor : downColor
     }));
 
     // --- 圖表創建 ---
-
     technicalAnalysisChartInstances[chartId] = new Chart(ctx, {
-        // ✨ --- 核心修正：將基礎類型改為 'candlestick' --- ✨
         type: 'candlestick',
         data: {
             datasets: [
                 {
-                    // K 線圖數據集
                     label: 'OHLC',
                     data: candlestickData,
                     yAxisID: 'yPrice',
-                    // 設定 K 線本體的顏色
                     color: {
-                        up: upColor.replace('0.7', '1'),      // 使用不透明的顏色
+                        up: upColor.replace('0.7', '1'),
                         down: downColor.replace('0.7', '1'),
                         unchanged: '#999',
                     },
                 },
                 {
-                    // 成交量數據集 (明確指定 type 為 'bar')
-                    type: 'bar', // 確保這個數據集被渲染為柱狀圖
+                    type: 'bar',
                     label: 'Volume',
                     data: volumeData,
                     yAxisID: 'yVolume',
-                    // 注意：顏色現在由數據本身提供，所以這裡不需要設定 backgroundColor
                 }
             ]
         },
         options: {
             responsive: true,
-            // 座標軸和插件的設定保持不變，它們是正確的
+            // ✨ --- 新增修正 #1：關閉動畫以提升性能 --- ✨
+            animation: false,
+
             scales: {
+                // ... scales 設定保持不變 ...
                 x: {
                     type: 'time',
-                    time: {
-                        unit: 'day',
-                        tooltipFormat: 'yyyy-MM-dd'
-                    },
-                    title: {
-                        display: true,
-                        text: 'Date'
-                    },
-                    ticks: {
-                        source: 'auto',
-                    }
+                    time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd' },
+                    title: { display: true, text: 'Date' },
+                    ticks: { source: 'auto' }
                 },
                 yPrice: {
                     type: 'linear',
                     position: 'left',
-                    title: {
-                        display: true,
-                        text: 'Stock Price'
-                    }
+                    title: { display: true, text: 'Stock Price' }
                 },
                 yVolume: {
                     type: 'linear',
                     position: 'right',
-                    title: {
-                        display: true,
-                        text: 'Volume'
-                    },
-                    grid: {
-                        drawOnChartArea: false
-                    }
+                    title: { display: true, text: 'Volume' },
+                    grid: { drawOnChartArea: false }
                 }
             },
             plugins: {
-                zoom: {
-                    pan: { enabled: true, mode: 'x' },
-                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
+                // ✨ --- 新增修正 #2：啟用數據抽取插件以解決卡頓 --- ✨
+                decimation: {
+                    enabled: true,
+                    algorithm: 'lttb', // Largest-Triangle-Three-Buckets 演算法，性能和視覺效果俱佳
+                    samples: 100, // 在一個視圖中最多顯示的樣本數，可根據需要調整
                 },
+
+                // ✨ --- 新增修正 #3：為縮放/平移插件設定邊界 --- ✨
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                        // 設定平移的最小/最大範圍
+                        rangeMin: { x: candlestickData[0].x },
+                        rangeMax: { x: candlestickData[candlestickData.length - 1].x },
+                    },
+                    zoom: {
+                        wheel: { enabled: true },
+                        pinch: { enabled: true },
+                        mode: 'x',
+                        // 設定縮放的最小/最大範圍
+                        rangeMin: { x: candlestickData[0].x },
+                        rangeMax: { x: candlestickData[candlestickData.length - 1].x },
+                    }
+                },
+
+                // tooltip 設定保持不變
                 tooltip: {
                     mode: 'index',
                     intersect: false,
                     callbacks: {
                         label: function(context) {
+                            // ... callback 邏輯不變 ...
                             const datasetLabel = context.dataset.label || '';
                             if (context.dataset.type === 'candlestick') {
                                 const datapoint = context.raw;
                                 return `${datasetLabel}: O:${datapoint.o.toFixed(2)} H:${datapoint.h.toFixed(2)} L:${datapoint.l.toFixed(2)} C:${datapoint.c.toFixed(2)}`;
                             } else {
-                                // 對於成交量，我們直接顯示 y 值
                                 return `${datasetLabel}: ${context.raw.y.toLocaleString()}`;
                             }
                         }
