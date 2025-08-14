@@ -4797,52 +4797,35 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
         });
 }
 
-/**
- * @param {string} stockSymbol - The stock symbol (e.g., 'AAPL').
- * @param {string} chartId - The ID of the canvas element for the chart.
- * @param {string} yearRange - The selected range, e.g., "5", "10", or "all".
- */
 function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 您的 API 金鑰
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
-    // --- 這是新的核心邏輯 ---
-
-    // 1. 取得今天的日期作為結束日期 (to)
     const toDate = new Date();
-
-    // 2. 根據 yearRange 計算開始日期 (from)
     const fromDate = new Date();
     const years = parseInt(yearRange);
 
     if (yearRange === 'all') {
-        // 若選擇 "All"，我們設定一個較長的年限，例如 20 年前
         fromDate.setFullYear(fromDate.getFullYear() - 20);
     } else if (!isNaN(years)) {
-        // 若是數字，就從當前年份減去該數字
         fromDate.setFullYear(fromDate.getFullYear() - years);
     } else {
-        // 提供一個安全的預設值，例如 5 年
         fromDate.setFullYear(fromDate.getFullYear() - 5);
     }
 
-    // 3. 將日期格式化為 API 需要的 "YYYY-MM-DD" 格式
     const formatDate = (date) => {
         const yyyy = date.getFullYear();
-        const mm = String(date.getMonth() + 1).padStart(2, '0'); // 月份從0開始，所以+1，並補零
-        const dd = String(date.getDate()).padStart(2, '0');      // 日期補零
+        const mm = String(date.getMonth() + 1).padStart(2, '0');
+        const dd = String(date.getDate()).padStart(2, '0');
         return `${yyyy}-${mm}-${dd}`;
     };
 
     const fromDateString = formatDate(fromDate);
     const toDateString = formatDate(toDate);
 
-    // 4. 建立使用 from 和 to 參數的新 API URL
     const apiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?from=${fromDateString}&to=${toDateString}&apikey=${apiKey}`;
 
-    // 為了方便除錯，在主控台印出最終的 URL
     console.log(`Fetching technical data with new URL: ${apiUrl}`);
 
-    // --- 後續的 fetch 邏輯保持不變 ---
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
@@ -4853,7 +4836,9 @@ function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
             }
 
             if (data && data.historical && data.historical.length > 0) {
+                // ✨ 這一步非常重要，將數據從 新->舊 反轉為 舊->新
                 const historicalData = data.historical.reverse();
+                // 將反轉後的數據傳遞給新的 K 線圖函式
                 createTechnicalAnalysisChart(historicalData, chartId);
             } else {
                 console.error('No historical price data found for this symbol.');
@@ -4866,37 +4851,70 @@ function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
         });
 }
 
+/**
+ * 創建包含 K線圖 和 成交量 的技術分析圖表。
+ * @param {Array} data - 從 API 獲取的歷史數據 (無需反轉)。
+ * @param {string} chartId - 圖表 canvas 元素的 ID。
+ */
 function createTechnicalAnalysisChart(data, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 如果已有圖表實例，先銷毀，避免設定殘留
+    // 如果已有圖表實例，先銷毀
     if (technicalAnalysisChartInstances[chartId]) {
         technicalAnalysisChartInstances[chartId].destroy();
     }
 
-    const labels = data.map(entry => entry.date);
-    const closingPrices = data.map(entry => entry.close);
-    const volumes = data.map(entry => entry.volume);
+    // ✨ --- 修改核心：準備 K 線圖所需的數據格式 --- ✨
+    // chartjs-chart-financial 要求數據格式為 {x: date, o: open, h: high, l: low, c: close}
+    const candlestickData = data.map(entry => ({
+        x: new Date(entry.date).valueOf(), // 使用時間戳以獲得最佳性能
+        o: entry.open,
+        h: entry.high,
+        l: entry.low,
+        c: entry.close
+    }));
+
+    // ✨ --- 修改核心：準備成交量數據格式 --- ✨
+    const volumeData = data.map(entry => ({
+        x: new Date(entry.date).valueOf(),
+        y: entry.volume
+    }));
+
+    // ✨ --- 修改核心：定義 K 線顏色 --- ✨
+    const upColor = 'rgba(8, 153, 129, 1)';      // 上漲顏色 (綠色)
+    const downColor = 'rgba(217, 83, 79, 1)';   // 下跌顏色 (紅色)
 
     technicalAnalysisChartInstances[chartId] = new Chart(ctx, {
+        // ✨ 注意：這裡的 type 不再重要，因為我們在 dataset 中分別定義 type
         type: 'bar',
         data: {
-            labels: labels,
+            // 不再需要 labels，因為 x 軸是時間序列
+            // labels: labels,
             datasets: [
                 {
-                    type: 'line',
-                    label: 'Close Price',
-                    data: closingPrices,
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    // ✨ --- 新增：K 線圖數據集 --- ✨
+                    type: 'candlestick', // 指定圖表類型為 candlestick
+                    label: 'OHLC',
+                    data: candlestickData,
                     yAxisID: 'yPrice',
-                    tension: 0.1,
-                    pointRadius: 0
+                    // 設定 K 線的顏色
+                    color: {
+                        up: upColor,
+                        down: downColor,
+                        unchanged: '#999',
+                    },
+                    // 設定影線的顏色
+                    borderColor: {
+                        up: upColor,
+                        down: downColor,
+                        unchanged: '#999',
+                    }
                 },
                 {
+                    // ✨ --- 維持不變：成交量數據集 --- ✨
                     type: 'bar',
                     label: 'Volume',
-                    data: volumes,
+                    data: volumeData,
                     backgroundColor: 'rgba(255, 159, 64, 0.5)',
                     borderColor: 'rgba(255, 159, 64, 1)',
                     yAxisID: 'yVolume'
@@ -4905,39 +4923,21 @@ function createTechnicalAnalysisChart(data, chartId) {
         },
         options: {
             responsive: true,
-            // ✨ --- 新增/修改的部分從這裡開始 --- ✨
-            plugins: {
-                zoom: {
-                    // 平移功能的設定
-                    pan: {
-                        enabled: true,  // 啟用平移
-                        mode: 'x',      // 只允許在 x 軸（時間軸）上水平拖動
-                        modifierKey: null,
-                    },
-                    // 縮放功能的設定
-                    zoom: {
-                        // 滑鼠滾輪縮放
-                        wheel: {
-                            enabled: true, // 啟用滑鼠滾輪縮放
-                        },
-                        // 手指開合縮放 (適用於觸控螢幕)
-                        pinch: {
-                            enabled: true, // 啟用手指開合縮放
-                        },
-                        mode: 'x',      // 只允許在 x 軸（時間軸）上進行縮放
-                    }
-                },
-                // ✨ --- 新增/修改的部分到這裡結束 --- ✨
-                tooltip: {
-                    mode: 'index',
-                    intersect: false
-                }
-            },
+            // ✨ --- 修改核心：調整座標軸和插件 --- ✨
             scales: {
                 x: {
+                    type: 'time', // x 軸必須是時間序列類型
+                    time: {
+                        unit: 'day',
+                        tooltipFormat: 'yyyy-MM-dd' // Tooltip 中日期的格式
+                    },
                     title: {
                         display: true,
                         text: 'Date'
+                    },
+                    // 讓 K 線之間不要有太大間距
+                    ticks: {
+                        source: 'auto',
                     }
                 },
                 yPrice: {
@@ -4945,7 +4945,7 @@ function createTechnicalAnalysisChart(data, chartId) {
                     position: 'left',
                     title: {
                         display: true,
-                        text: 'Stock Price (USD)'
+                        text: 'Stock Price' // 貨幣單位可以從數據動態獲取，這裡簡化
                     }
                 },
                 yVolume: {
@@ -4956,7 +4956,37 @@ function createTechnicalAnalysisChart(data, chartId) {
                         text: 'Volume'
                     },
                     grid: {
-                        drawOnChartArea: false
+                        drawOnChartArea: false // 不在圖表區域繪製網格線
+                    }
+                }
+            },
+            plugins: {
+                // 縮放/平移插件配置保持不變
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                    },
+                    zoom: {
+                        wheel: { enabled: true },
+                        pinch: { enabled: true },
+                        mode: 'x',
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    callbacks: {
+                        // 自訂 Tooltip 顯示更多資訊
+                        label: function(context) {
+                            const datasetLabel = context.dataset.label || '';
+                            if (context.dataset.type === 'candlestick') {
+                                const datapoint = context.raw;
+                                return `${datasetLabel}: O:${datapoint.o.toFixed(2)} H:${datapoint.h.toFixed(2)} L:${datapoint.l.toFixed(2)} C:${datapoint.c.toFixed(2)}`;
+                            } else {
+                                return `${datasetLabel}: ${context.raw.y.toLocaleString()}`;
+                            }
+                        }
                     }
                 }
             }
