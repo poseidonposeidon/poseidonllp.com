@@ -5018,7 +5018,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
             updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange,techChartId);
 
             // 调用 displayIncomeStatement 并传入所有需要的参数
-            callback(data, container, chartId, operatingChartId, period, yearRange,techChartId);
+            // callback(data, container, chartId, operatingChartId, period, yearRange,techChartId);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
