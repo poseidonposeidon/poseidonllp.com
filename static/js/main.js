@@ -5026,7 +5026,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
         });
 }
 
-function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange) {
+function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange,techChartId) {
     const currentYear = new Date().getFullYear();
 
     // 過濾數據以包含多兩年的數據
@@ -5239,7 +5239,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     }, 500);
 
     const stockSymbol = data[0].symbol;
-    fetchTechnicalAnalysisData(stockSymbol, 'technicalAnalysisChart', yearRange);
+    fetchTechnicalAnalysisData(stockSymbol, techChartId, yearRange);
 
     // --- 修改後的事件綁定邏輯 ---
     setTimeout(() => {
