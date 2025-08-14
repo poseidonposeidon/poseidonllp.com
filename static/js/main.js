@@ -4852,79 +4852,148 @@ function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 }
 
 /**
- * 創建包含 K線圖 和 成交量 的技術分析圖表 (最終邊界與性能修正版)
- * @param {Array} data - 從 API 獲取的、已經按日期升序排列的歷史數據。
+ * 創建一個功能完整、性能優化且體驗良好的技術分析圖表。
+ * 包含：K線圖、成交量圖、縮放/平移的精確邊界控制、以及針對大數據集的性能優化。
+ * @param {Array} data - 從 API 獲取的、已經按日期升序排列 (從舊到新) 的歷史數據。
  * @param {string} chartId - 圖表 canvas 元素的 ID。
  */
 function createTechnicalAnalysisChart(data, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
 
+    // 如果圖表實例已存在，先銷毀，防止記憶體洩漏和渲染衝突
     if (technicalAnalysisChartInstances[chartId]) {
         technicalAnalysisChartInstances[chartId].destroy();
     }
 
-    // --- 數據準備 (不變) ---
+    // --- 1. 數據準備 ---
+
+    // 將 API 數據格式化為 K 線圖插件所需的格式 {x, o, h, l, c}
     const candlestickData = data.map(entry => ({
-        x: new Date(entry.date).valueOf(),
+        x: new Date(entry.date).valueOf(), // 使用毫秒時間戳以獲得最佳性能
         o: entry.open,
         h: entry.high,
         l: entry.low,
         c: entry.close
     }));
 
-    const upColor = 'rgba(8, 153, 129, 0.7)';
-    const downColor = 'rgba(217, 83, 79, 0.7)';
+    // 定義上漲與下跌的顏色
+    const upColor = 'rgba(8, 153, 129, 0.7)';      // 上漲顏色 (綠色，帶透明度)
+    const downColor = 'rgba(217, 83, 79, 0.7)';   // 下跌顏色 (紅色，帶透明度)
 
+    // 格式化成交量數據，並根據當日漲跌動態設定顏色
     const volumeData = data.map(entry => ({
         x: new Date(entry.date).valueOf(),
         y: entry.volume,
         backgroundColor: entry.close >= entry.open ? upColor : downColor
     }));
 
-    // --- 圖表創建 ---
 
-    // ✨ --- 新增修正：為邊界增加一點視覺邊距 --- ✨
-    const firstDataPointX = candlestickData[0].x;
-    const lastDataPointX = candlestickData[candlestickData.length - 1].x;
-    const PADDING_DAYS = 30; // 在前後各增加 30 天的邊距
-    const padding = PADDING_DAYS * 24 * 60 * 60 * 1000; // 轉換為毫秒
+    // --- 2. 邊界與邊距計算 ---
+
+    // 獲取數據的第一個和最後一個時間點，用於設定邊界
+    // 使用 ?. 安全訪問，防止 data 為空時出錯
+    const firstDataPointX = candlestickData[0]?.x;
+    const lastDataPointX = candlestickData[candlestickData.length - 1]?.x;
+
+    // 在圖表前後增加 30 天的視覺邊距 (padding)，避免 K 棒緊貼邊緣
+    const PADDING_DAYS = 30;
+    const padding = PADDING_DAYS * 24 * 60 * 60 * 1000; // 將天數轉換為毫秒
+
+
+    // --- 3. 圖表實例化與配置 ---
 
     technicalAnalysisChartInstances[chartId] = new Chart(ctx, {
+        // 圖表基礎類型設為 'candlestick'，這是正確渲染的關鍵
         type: 'candlestick',
-        data: { /* ... 數據部分不變 ... */
+        data: {
             datasets: [
                 {
                     label: 'OHLC',
                     data: candlestickData,
                     yAxisID: 'yPrice',
-                    color: { up: upColor.replace('0.7', '1'), down: downColor.replace('0.7', '1'), unchanged: '#999' }
+                    // K 線本體的顏色 (使用不透明的顏色)
+                    color: {
+                        up: upColor.replace('0.7', '1'),
+                        down: downColor.replace('0.7', '1'),
+                        unchanged: '#999',
+                    }
                 },
-                { type: 'bar', label: 'Volume', data: volumeData, yAxisID: 'yVolume' }
+                {
+                    type: 'bar', // 明確指定此數據集為柱狀圖
+                    label: 'Volume',
+                    data: volumeData,
+                    yAxisID: 'yVolume',
+                    // 顏色已在數據準備階段動態綁定，此處無需設定
+                }
             ]
         },
         options: {
+            // 關閉所有動畫和數據自動解析，最大化性能
             animation: false,
-            scales: { /* ... scales 部分不變 ... */
-                x: { type: 'time', time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd' }, title: { display: true, text: 'Date' }, ticks: { source: 'auto' } },
-                yPrice: { type: 'linear', position: 'left', title: { display: true, text: 'Stock Price' } },
-                yVolume: { type: 'linear', position: 'right', title: { display: true, text: 'Volume' }, grid: { drawOnChartArea: false } }
+            parsing: false,
+
+            scales: {
+                x: {
+                    type: 'time',
+                    time: {
+                        unit: 'day',
+                        tooltipFormat: 'yyyy-MM-dd'
+                    },
+                    title: { display: true, text: 'Date' },
+                    ticks: { source: 'auto' }
+                },
+                yPrice: {
+                    type: 'linear',
+                    position: 'left',
+                    title: { display: true, text: 'Stock Price' }
+                },
+                yVolume: {
+                    type: 'linear',
+                    position: 'right',
+                    title: { display: true, text: 'Volume' },
+                    grid: { drawOnChartArea: false } // 不繪製成交量的網格線，保持主圖乾淨
+                }
             },
             plugins: {
-                decimation: { enabled: true, algorithm: 'lttb', samples: 100 },
+                // 啟用數據抽取插件，解決大數據量下的卡頓問題
+                decimation: {
+                    enabled: true,
+                    algorithm: 'lttb', // 使用性能和視覺效果俱佳的 LTTB 演算法
+                    samples: 100,      // 在一個視圖中最多顯示的樣本數
+                },
+                // 縮放與平移插件的最終配置
                 zoom: {
-                    pan: { enabled: true, mode: 'x' },
-                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' },
-
-                    // ✨ --- 核心修正：使用 limits 來強制設定邊界 --- ✨
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                    },
+                    zoom: {
+                        wheel: {
+                            enabled: true,
+                            speed: 0.1, // 控制滾輪縮放速度，可根據偏好微調
+                        },
+                        pinch: {
+                            enabled: true, // 支援觸控螢幕的手指縮放
+                        },
+                        mode: 'x',
+                        // 在每次縮放操作結束後，強制圖表進行一次無動畫的更新
+                        // 這有助於改善因 `limits` 限制而產生的視覺不連貫感
+                        onZoomComplete: function({chart}) {
+                            chart.update('none');
+                        }
+                    },
+                    // 使用 limits 來強制設定絕對的、不可逾越的縮放與平移邊界
                     limits: {
                         x: {
-                            min: firstDataPointX - padding, // 設定最小邊界（含邊距）
-                            max: lastDataPointX + padding,  // 設定最大邊界（含邊距）
-                            minRange: 60 * 60 * 1000 * 24 * 7 // 可選：限制最小縮放範圍，例如至少顯示7天
+                            min: firstDataPointX ? firstDataPointX - padding : undefined,
+                            max: lastDataPointX ? lastDataPointX + padding : undefined,
+                            // 可選：限制最小縮放範圍，防止縮放得過大 (例如至少顯示30天數據)
+                            minRange: 60 * 60 * 1000 * 24 * 30
                         },
                     },
                 },
-                tooltip: { /* ... tooltip 部分不變 ... */
+                // Tooltip 配置，用於顯示詳細資訊
+                tooltip: {
                     mode: 'index',
                     intersect: false,
                     callbacks: {
@@ -4943,6 +5012,7 @@ function createTechnicalAnalysisChart(data, chartId) {
         }
     });
 }
+
 
 function calculatePEData(priceData, epsData) {
     const peData = priceData.map(priceEntry => {
