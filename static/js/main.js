@@ -4883,7 +4883,7 @@ async function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 }
 
 /**
- * 創建一個功能完整、採用專業配色且圖例顯示正確的技術分析圖表 (針對淺色主題優化)。
+ * 創建一個功能完整、採用專業配色且圖例顯示正確的技術分析圖表。
  * @param {Array} priceHistory - 歷史價格數據 (OHLCV)，已按日期升序排列。
  * @param {Array} ma5History - 5日均線數據，已按日期升序排列。
  * @param {Array} ma10History - 10日均線數據，已按日期升序排列。
@@ -4892,13 +4892,21 @@ async function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
 
-    // 如果圖表實例已存在，先銷毀
+    // 如果圖表實例已存在，先銷毀，防止記憶體洩漏和渲染衝突
     if (technicalAnalysisChartInstances[chartId]) {
         technicalAnalysisChartInstances[chartId].destroy();
     }
 
-    // --- 1. 數據準備與淺色主題配色方案 ---
+    // --- 1. 數據準備與【唯一】的配色方案 ---
 
+    // 為深色背景設計的統一配色方案
+    const upColor = 'rgba(16, 185, 129, 1)';     // 亮綠色 (上漲)
+    const downColor = 'rgba(239, 68, 68, 1)';     // 亮紅色 (下跌)
+    const ma5Color = 'rgba(255, 255, 255, 1)';   // 純白色 (5日線)
+    const ma10Color = 'rgba(250, 204, 21, 1)';   // 亮黃色 (10日線)
+    const volumeOrangeColor = 'rgba(251, 146, 60, 0.6)'; // 您指定的橘色 (60% 透明度)
+
+    // 格式化 K 線圖數據
     const candlestickData = priceHistory.map(entry => ({
         x: new Date(entry.date).valueOf(),
         o: entry.open,
@@ -4907,20 +4915,14 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
         c: entry.close
     }));
 
-    // 為淺色背景設計的高清晰度配色方案
-    const upColor = 'rgba(10, 179, 123, 1)';   // 清晰的綠色 (上漲)
-    const downColor = 'rgba(239, 68, 68, 1)';    // 清晰的紅色 (下跌)
-    const ma5Color = 'rgba(60, 60, 60, 1)';      // 深灰色 (5日線，與背景對比強烈)
-    const ma10Color = 'rgba(245, 158, 11, 1)';  // 亮橘黃色 (10日線)
-    const volumeOrangeColor = 'rgba(251, 146, 60, 0.6)'; // 明亮的橘色，60% 透明度
-
-    // 在淺色背景下，成交量使用統一的中性色，避免視覺混亂
+    // 直接將固定的橘色應用到所有成交量數據上
     const volumeData = priceHistory.map(entry => ({
         x: new Date(entry.date).valueOf(),
         y: entry.volume,
         backgroundColor: volumeOrangeColor
     }));
 
+    // 格式化均線數據
     const ma5LineData = (ma5History && Array.isArray(ma5History)) ? ma5History.map(entry => ({
         x: new Date(entry.date).valueOf(),
         y: entry.sma
@@ -4951,7 +4953,7 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                     data: candlestickData,
                     yAxisID: 'yPrice',
                     color: { up: upColor, down: downColor, unchanged: '#999' },
-                    order: 0
+                    order: 0 // K 線在最上層
                 },
                 {
                     type: 'line',
@@ -4961,7 +4963,7 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                     borderWidth: 2,
                     pointRadius: 0,
                     yAxisID: 'yPrice',
-                    order: 1
+                    order: 1 // 均線在 K 線之下
                 },
                 {
                     type: 'line',
@@ -4978,7 +4980,7 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                     label: 'Volume',
                     data: volumeData,
                     yAxisID: 'yVolume',
-                    order: 2
+                    order: 2 // 成交量在最底層
                 }
             ]
         },
@@ -5005,19 +5007,18 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                 }
             },
             plugins: {
-                // 修正圖例顏色顯示問題
                 legend: {
                     labels: {
                         generateLabels: function(chart) {
                             const defaultLabels = Chart.defaults.plugins.legend.labels.generateLabels(chart);
                             defaultLabels.forEach(label => {
                                 if (label.text === 'OHLC') {
-                                    // 讓 OHLC 圖例同時代表上漲和下跌顏色
                                     label.fillStyle = upColor;
                                     label.strokeStyle = downColor;
-                                    label.lineWidth = 1; // 顯示邊框
+                                    label.lineWidth = 1;
                                 }
                                 if (label.text === 'Volume') {
+                                    // 將圖例的顏色也更新為新的橘色 (使用不透明的版本)
                                     label.fillStyle = 'rgba(251, 146, 60, 1)';
                                 }
                             });
