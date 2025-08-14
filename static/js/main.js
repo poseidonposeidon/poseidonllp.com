@@ -5015,7 +5015,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
             }
 
             // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
-            updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange);
+            updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange,techChartId);
 
             // 调用 displayIncomeStatement 并传入所有需要的参数
             callback(data, container, chartId, operatingChartId, period, yearRange,techChartId);
