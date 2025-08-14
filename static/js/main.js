@@ -4603,13 +4603,13 @@ let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的�
 
 let peBandChartInstances = {};
 
-let technicalAnalysisChartInstance;
+let technicalAnalysisChartInstances = {};
 
 function fetchIncomeStatement() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
     const yearRange = document.getElementById('yearRange').value;
-    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf'; // 請替換為你的實際 API 密鑰
+    const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
         alert('Please enter a stock symbol.');
@@ -4617,8 +4617,8 @@ function fetchIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange);
-
+    // === 傳入美股的圖表 ID 'technicalAnalysisChart' ===
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange, 'technicalAnalysisChart');
 }
 
 // function fetchIncomeStatement() {
@@ -4677,7 +4677,7 @@ function fetchJPIncomeStatement() {
 async function fetchTWIncomeStatement() {
     const stockSymbol = await fetchTWStock();
     const period = document.getElementById('periodTW').value;
-    const yearRange = document.getElementById('yearRangeTW').value;  // 使用對應的年份範圍選擇器
+    const yearRange = document.getElementById('yearRangeTW').value;
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
 
     if (!stockSymbol) {
@@ -4686,11 +4686,8 @@ async function fetchTWIncomeStatement() {
     }
 
     const apiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?period=${period}&apikey=${apiKey}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period ,yearRange);
-
-    // const priceApiUrl = `https://financialmodelingprep.com/api/v3/historical-price-full/${stockSymbol}?timeseries=3650&apikey=${apiKey}`;
-    // const epsApiUrl = `https://financialmodelingprep.com/api/v3/income-statement/${stockSymbol}?limit=40&period=quarter&apikey=${apiKey}`;
-    // fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartTW');
+    // === 傳入一個新的、專屬於台股的圖表 ID 'technicalAnalysisChartTW' ===
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period, yearRange, 'technicalAnalysisChartTW');
 }
 
 function fetchEUIncomeStatement() {
@@ -4865,15 +4862,15 @@ function createTechnicalAnalysisChart(data, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
 
     // 如果已有圖表實例，先銷毀，避免設定殘留
-    if (technicalAnalysisChartInstance) {
-        technicalAnalysisChartInstance.destroy();
+    if (technicalAnalysisChartInstances[chartId]) {
+        technicalAnalysisChartInstances[chartId].destroy();
     }
 
     const labels = data.map(entry => entry.date);
     const closingPrices = data.map(entry => entry.close);
     const volumes = data.map(entry => entry.volume);
 
-    technicalAnalysisChartInstance = new Chart(ctx, {
+    technicalAnalysisChartInstances[chartId] = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
@@ -5001,7 +4998,7 @@ function resetState(chartId, containerId) {
     }
 }
 
-function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period, yearRange) {
+function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, operatingChartId, period, yearRange,techChartId) {
     const container = document.getElementById(containerId);
 
     // 重置状态和清理容器
@@ -5021,7 +5018,7 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
             updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange);
 
             // 调用 displayIncomeStatement 并传入所有需要的参数
-            callback(data, container, chartId, operatingChartId, period, yearRange);
+            callback(data, container, chartId, operatingChartId, period, yearRange,techChartId);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
@@ -5212,10 +5209,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             <button id="resetZoomBtn_PEBand_${peBandCanvasId}">Reset Zoom</button> 
             <canvas id="${peBandCanvasId}"></canvas>
         </div>
-        <div id="technicalAnalysisContainer" style="margin-top: 20px;">
+        <div id="technicalAnalysisContainer_${techChartId}" style="margin-top: 20px;">
             <h2>Technical Analysis (Price & Volume)</h2>
-            <button id="resetZoomBtn_Tech">Reset Zoom</button> 
-            <canvas id="technicalAnalysisChart"></canvas>
+            <button id="resetZoomBtn_Tech_${techChartId}">Reset Zoom</button> 
+            <canvas id="${techChartId}"></canvas> <!-- 使用傳入的 techChartId -->
         </div>
     `;
 
@@ -5277,11 +5274,12 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
 
         // 技術分析圖重設按鈕
-        const resetBtnTech = document.getElementById('resetZoomBtn_Tech');
+        const resetBtnTech = document.getElementById(`resetZoomBtn_Tech_${techChartId}`);
         if (resetBtnTech) {
             resetBtnTech.onclick = () => {
-                if (technicalAnalysisChartInstance) {
-                    technicalAnalysisChartInstance.resetZoom();
+                // 從物件中找到對應的圖表實例
+                if (technicalAnalysisChartInstances[techChartId]) {
+                    technicalAnalysisChartInstances[techChartId].resetZoom();
                 }
             };
         }
