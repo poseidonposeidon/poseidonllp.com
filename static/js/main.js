@@ -5614,32 +5614,26 @@ function fetchCNBalanceSheet() {
 
 function fetchData_BalanceSheet(apiUrl, callback, containerId, chartId, period, yearRange) {
     const container = document.getElementById(containerId);
-
-    // 重置状态和清理容器
-    resetState(chartId, containerId);
-
+    resetState(chartId, containerId); // 假設 resetState 已定義
     container.innerHTML = '<p>Loading...</p>';
 
     fetch(apiUrl)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error(`API 請求失敗，狀態碼: ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             if (!Array.isArray(data) || data.length === 0) {
                 container.innerHTML = '<p>No data found for this symbol.</p>';
                 return;
             }
 
-            console.log('Original Data Length:', data.length);
-            console.log('Year Range:', yearRange);
-
-            // 使用传入的 yearRange 参数，并调用 updateDisplayedYears
-            const filteredData = updateDisplayedYears_BS(data, container, chartId, period, yearRange);
-
-            // 调用 displayBalanceSheet 并传入所有需要的参数
-            callback(filteredData, container, chartId, period, yearRange);  // 传递过滤后的数据
+            // 直接將 API 傳回的完整 data 傳給 callback (displayBalanceSheet)
+            callback(data, container, chartId, period, yearRange);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
-            container.innerHTML = '<p>Error loading data. Please check the console for more details.</p>';
+            container.innerHTML = `<p>Error loading data: ${error.message}</p>`;
         });
 }
 
@@ -5832,10 +5826,15 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
             </div>
         </div>
         <div id="chartContainer" style="margin-top: 20px;">
+            
+            <!-- +++ 新增的部分 +++ -->
+            <button id="resetZoomBtn_BS_${chartId}">重設縮放</button> 
+            <!-- +++ 新增結束 +++ -->
+
             <canvas id="${chartId}"></canvas>
         </div>
         <div id="pieChartContainer" style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
-            <canvas id="${pieChartId}" width="600" height="600"></canvas> <!-- 修改寬高 -->
+            <canvas id="${pieChartId}" width="600" height="600"></canvas>
         </div>
     `;
 
@@ -5847,6 +5846,16 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
 
     // 綁定下載按鈕
     bindDownloadButton_BS(rows, data[0].symbol, downloadButtonId, "Balance Sheet");
+
+    // +++ 新增的部分：綁定重設縮放按鈕的事件 +++
+    const resetBtn = document.getElementById(`resetZoomBtn_BS_${chartId}`);
+    if (resetBtn) {
+        resetBtn.onclick = () => {
+            if (balanceSheetChartInstances[chartId]) {
+                balanceSheetChartInstances[chartId].resetZoom();
+            }
+        };
+    }
 }
 
 function bindDownloadButton_BS(rows, symbol, buttonId, sheetName) {
@@ -5885,103 +5894,130 @@ function downloadExcel_BS(rows, symbol, sheetName) {
     XLSX.writeFile(wb, `${symbol}_${sheetName.toLowerCase().replace(/ /g, '_')}.xlsx`);
 }
 
+/**
+ * 創建一個包含資產、負債、權益（條形圖）和負債資產率（折線圖）的組合圖表。
+ * 此版本已包含縮放 (zoom) 與平移 (pan) 功能。
+ * @param {Array} data - 用於圖表的已過濾和排序的資料陣列。
+ * @param {string} chartId - 要渲染圖表的 canvas 元素的 ID。
+ */
 function createCombinedBalanceSheetChart(data, chartId) {
     const canvas = document.getElementById(chartId);
 
+    // 安全檢查，確保 canvas 元素存在
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
-        console.error(`Canvas element with id ${chartId} not found or is not a canvas element.`);
+        console.error(`ID 為 ${chartId} 的 Canvas 元素未找到或不是一個 canvas 元素。`);
         return;
     }
 
     const ctx = canvas.getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
+    // 如果此 ID 已有圖表實例，先將其銷毀，以防止記憶體洩漏和渲染錯誤
     if (balanceSheetChartInstances[chartId]) {
         balanceSheetChartInstances[chartId].destroy();
     }
 
+    // 創建新的 Chart.js 圖表實例
     balanceSheetChartInstances[chartId] = new Chart(ctx, {
         data: {
             labels: data.map(entry => entry.date),
             datasets: [
                 {
                     type: 'bar',
-                    label: 'Total Assets',
+                    label: '總資產 (Total Assets)',
                     data: data.map(entry => entry.totalAssets),
                     borderColor: 'rgb(253,206,170,1)',
-                    backgroundColor: 'rgb(225,167,121,0.3)', //tw
-                    yAxisID: 'y',
+                    backgroundColor: 'rgb(225,167,121,0.3)',
+                    yAxisID: 'y', // 對應到左邊的 Y 軸
                     barPercentage: 0.8,
                     categoryPercentage: 0.8
                 },
                 {
                     type: 'bar',
-                    label: 'Total Liabilities',
+                    label: '總負債 (Total Liabilities)',
                     data: data.map(entry => entry.totalLiabilities),
-                    borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
-                    backgroundColor: 'rgba(102, 204, 204, 0.3)', // 半透明藍綠色
-                    yAxisID: 'y',
+                    borderColor: 'rgba(102, 204, 204, 1)',
+                    backgroundColor: 'rgba(102, 204, 204, 0.3)',
+                    yAxisID: 'y', // 對應到左邊的 Y 軸
                     barPercentage: 0.8,
                     categoryPercentage: 0.8
                 },
                 {
                     type: 'bar',
-                    label: 'Total Equity',
+                    label: '總權益 (Total Equity)',
                     data: data.map(entry => entry.totalEquity),
-                    borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
-                    backgroundColor: 'rgba(153, 204, 255, 0.3)', // 半透明淺藍色
-                    yAxisID: 'y',
+                    borderColor: 'rgba(153, 204, 255, 1)',
+                    backgroundColor: 'rgba(153, 204, 255, 0.3)',
+                    yAxisID: 'y', // 對應到左邊的 Y 軸
                     barPercentage: 0.8,
                     categoryPercentage: 0.8
                 },
                 {
                     type: 'line',
-                    label: 'Debt to Asset Rate',
+                    label: '負債資產率 (Debt to Asset Rate)',
                     data: data.map(entry => entry.debtToAssetRateValue),
-                    borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
-                    backgroundColor: 'rgba(255, 153, 0, 0.3)', // 半透明橙色
-                    yAxisID: 'y1',
+                    borderColor: 'rgba(255, 153, 0, 1)',
+                    backgroundColor: 'rgba(255, 153, 0, 0.3)',
+                    yAxisID: 'y1', // 對應到右邊的 Y 軸
                     borderWidth: 2,
-                    pointRadius: 3
+                    pointRadius: 3,
+                    tension: 0.1 // 讓線條稍微平滑
                 }
             ]
         },
         options: {
-            responsive: true,
+            responsive: true, // 圖表會自適應容器大小
             scales: {
                 x: {
                     title: {
                         display: true,
-                        text: 'Date'
+                        text: '日期 (Date)'
                     },
                     reverse: false
                 },
-                y: {
+                y: { // 左邊的 Y 軸 (數值)
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Value'
+                        text: '數值 (Value)'
                     },
                     position: 'left'
                 },
-                y1: {
+                y1: { // 右邊的 Y 軸 (百分比)
                     beginAtZero: true,
                     title: {
                         display: true,
-                        text: 'Percentage (%)'
+                        text: '百分比 (%)'
                     },
                     position: 'right',
                     grid: {
-                        drawOnChartArea: false
+                        drawOnChartArea: false // 不在圖表區域繪製此軸的網格線，避免混亂
                     }
                 }
             },
             plugins: {
+                // +++ 縮放與平移功能的設定 +++
+                zoom: {
+                    pan: {
+                        enabled: true,  // 啟用平移功能
+                        mode: 'x',      // 只允許在 x 軸（時間軸）上水平拖動
+                    },
+                    zoom: {
+                        wheel: {
+                            enabled: true, // 啟用滑鼠滾輪縮放
+                        },
+                        pinch: {
+                            enabled: true, // 啟用在觸控設備上的手指開合縮放
+                        },
+                        mode: 'x',      // 縮放也只作用於 x 軸
+                    }
+                },
+                // +++ 縮放設定結束 +++
                 tooltip: {
                     callbacks: {
                         label: function (tooltipItem) {
                             const value = tooltipItem.raw;
                             if (value !== null) {
+                                // 如果是負債率，則顯示百分比；否則，顯示千分位格式的數字
                                 return tooltipItem.dataset.label.includes('Rate')
                                     ? value.toFixed(2) + '%'
                                     : value.toLocaleString();
@@ -5989,10 +6025,10 @@ function createCombinedBalanceSheetChart(data, chartId) {
                             return 'No data';
                         }
                     },
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
-                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色字體
-                    borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'rgba(255, 255, 255, 1)',
+                    bodyColor: 'rgba(255, 255, 255, 1)',
+                    borderColor: 'rgba(255, 255, 255, 1)',
                     borderWidth: 1
                 }
             }
@@ -6000,94 +6036,112 @@ function createCombinedBalanceSheetChart(data, chartId) {
     });
 }
 
-function createPieChart(data, chartId, options = {}) {
+/**
+ * 根據最新的資產負債表數據，創建一個資產組成圓餅圖。
+ * 此圖表顯示總負債和總權益佔總資產的百分比。
+ * @param {Array} data - 包含多個時期資產負債表數據的陣列。
+ * @param {string} chartId - 要渲染圖表的 canvas 元素的 ID。
+ */
+function createPieChart(data, chartId) {
+    // 1. 獲取並驗證 Canvas 元素
     const canvas = document.getElementById(chartId);
-
     if (!canvas || !(canvas instanceof HTMLCanvasElement)) {
-        console.error(`Canvas element with id ${chartId} not found or is not a canvas element.`);
+        console.error(`ID 為 ${chartId} 的 Canvas 元素未找到或不是一個有效的 canvas 元素。`);
         return;
     }
 
     const ctx = canvas.getContext('2d');
 
-    // 銷毀現有圖表實例（如果存在）
+    // 2. 如果此 ID 已有圖表實例，先將其銷毀，以防止渲染錯誤
     if (balanceSheetChartInstances[chartId]) {
         balanceSheetChartInstances[chartId].destroy();
     }
 
-    // 設置 canvas 屬性（渲染大小）
-    canvas.width = 600;
-    canvas.height = 600;
-
-    // 確保數據按日期排序（升序，最舊日期在前）
+    // 3. 提取最新的數據點
+    // 先對數據副本進行排序，以確保拿到的是最新日期的資料
     const sortedData = [...data].sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    // 提取最新數據
     const latestData = sortedData[sortedData.length - 1];
+
+    // 如果沒有有效數據，則直接返回
     if (!latestData) {
-        console.error('No data available for the pie chart.');
+        console.error('沒有可用於圓餅圖的數據。');
         return;
     }
 
+    // 4. 計算數據並處理邊界情況
+    // 使用預設值 0 避免因 null 或 undefined 導致的錯誤
     const { totalAssets = 0, totalLiabilities = 0, totalEquity = 0 } = latestData;
+
+    // 如果總資產為 0，則無法計算比例，直接返回
     if (totalAssets === 0) {
-        console.error('Invalid data for the pie chart. Total Assets cannot be 0.');
+        console.error('總資產為零，無法創建圓餅圖。');
+        // 可選：在畫布上顯示提示訊息
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.font = '16px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('總資產為零，無法顯示圖表。', canvas.width / 2, canvas.height / 2);
         return;
     }
 
-    // 計算比率
-    const liabilityRatio = ((totalLiabilities / totalAssets) * 100).toFixed(2);
-    const equityRatio = ((totalEquity / totalAssets) * 100).toFixed(2);
-    const assetRatio = 100; // 總資產比固定為100%
+    // 計算負債和權益佔總資產的真實百分比
+    const liabilityPercentage = (totalLiabilities / totalAssets) * 100;
+    const equityPercentage = (totalEquity / totalAssets) * 100;
 
-    const defaultOptions = {
-        labels: ['Liabilities / Assets', 'Equity / Assets', 'Assets / Assets'],
-        colors: [
-            'rgb(253,206,170)', // Liabilities / Assets
-            'rgba(102, 204, 204, 0.3)', // Equity / Assets
-            'rgba(153, 204, 255, 0.3)'  // Assets / Assets
-        ],
-        borderColors: [
-            'rgb(225,167,121)', // Liabilities / Assets
-            'rgba(102, 204, 204, 1)',  // Equity / Assets
-            'rgba(153, 204, 255, 1)'   // Assets / Assets
-        ]
-    };
-
-    const chartOptions = { ...defaultOptions, ...options };
-
-    // 創建圖表
+    // 5. 創建新的 Chart.js 圖表實例
     balanceSheetChartInstances[chartId] = new Chart(ctx, {
-        type: 'pie',
+        type: 'pie', // 圖表類型為圓餅圖
         data: {
-            labels: chartOptions.labels,
-            datasets: [
-                {
-                    label: 'Balance Sheet Ratios',
-                    data: [liabilityRatio, equityRatio, assetRatio],
-                    backgroundColor: chartOptions.colors,
-                    borderColor: chartOptions.borderColors,
-                    borderWidth: 1
-                }
-            ]
+            // 標籤直接顯示項目和其百分比，更加直觀
+            labels: [
+                `總負債 (Liabilities): ${liabilityPercentage.toFixed(2)}%`,
+                `總權益 (Equity): ${equityPercentage.toFixed(2)}%`
+            ],
+            datasets: [{
+                label: '資產組成',
+                // 數據為計算出的百分比
+                data: [liabilityPercentage, equityPercentage],
+                // 為每個分片設定背景顏色
+                backgroundColor: [
+                    'rgba(253, 206, 170, 0.7)', // 負債的顏色 (淡橘色)
+                    'rgba(102, 204, 204, 0.7)'  // 權益的顏色 (淡藍綠色)
+                ],
+                // 為每個分片設定邊框顏色
+                borderColor: [
+                    'rgb(225, 167, 121)',
+                    'rgba(102, 204, 204, 1)'
+                ],
+                borderWidth: 1
+            }]
         },
         options: {
-            responsive: false,
-            maintainAspectRatio: false,
+            responsive: true, // 讓圖表自適應容器大小
+            maintainAspectRatio: false, // 搭配 responsive:true 使用，避免圖表變形
             plugins: {
-                legend: {
-                    position: 'top'
+                // 為圖表新增一個主標題
+                title: {
+                    display: true,
+                    text: `最新資產組成分析 (${latestData.date})`,
+                    font: {
+                        size: 18
+                    }
                 },
+                // 圖例設定
+                legend: {
+                    position: 'top', // 圖例顯示在頂部
+                },
+                // 提示框 (Tooltip) 設定
                 tooltip: {
                     callbacks: {
+                        // 自訂提示框顯示的內容
                         label: function (tooltipItem) {
-                            return `${tooltipItem.label}: ${tooltipItem.raw}%`;
+                            // 直接回傳標籤文字，因為我們已經將詳細資訊寫在標籤裡了
+                            return tooltipItem.label;
                         }
                     },
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
-                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色字體
-                    borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'rgba(255, 255, 255, 1)',
+                    bodyColor: 'rgba(255, 255, 255, 1)',
+                    borderColor: 'rgba(255, 255, 255, 1)',
                     borderWidth: 1
                 }
             }
