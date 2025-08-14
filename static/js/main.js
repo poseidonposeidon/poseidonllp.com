@@ -5327,7 +5327,7 @@ function downloadExcel(rows, symbol) {
     XLSX.writeFile(wb, `${symbol}_income_statement.xlsx`);
 }
 
-function updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange) {
+function updateDisplayedYears(data, container, chartId, operatingChartId, period, yearRange, techChartId) { // 1. 新增 techChartId 參數
     if (!data || !Array.isArray(data)) {
         console.error("Data is undefined or not an array");
         return;
@@ -5336,9 +5336,11 @@ function updateDisplayedYears(data, container, chartId, operatingChartId, period
     const currentYear = new Date().getFullYear();
     const filteredData = data.filter(entry => {
         const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= yearRange);
+        return yearRange === 'all' || (currentYear - entryYear <= parseInt(yearRange)); // 確保 yearRange 轉為數字比較
     });
-    displayIncomeStatement(filteredData, container, chartId, operatingChartId, period, yearRange);
+
+    // 2. 在呼叫時，將 techChartId 參數傳遞下去
+    displayIncomeStatement(filteredData, container, chartId, operatingChartId, period, yearRange, techChartId);
 }
 
 function createOperatingChart(data, chartId) {
