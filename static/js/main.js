@@ -4852,8 +4852,8 @@ function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 }
 
 /**
- * 創建包含 K線圖 和 成交量 的技術分析圖表。
- * @param {Array} data - 從 API 獲取的歷史數據 (無需反轉)。
+ * 創建包含 K線圖 和 成交量 的技術分析圖表 (修正版)
+ * @param {Array} data - 從 API 獲取的、已經按日期升序排列的歷史數據。
  * @param {string} chartId - 圖表 canvas 元素的 ID。
  */
 function createTechnicalAnalysisChart(data, chartId) {
@@ -4864,78 +4864,71 @@ function createTechnicalAnalysisChart(data, chartId) {
         technicalAnalysisChartInstances[chartId].destroy();
     }
 
-    // ✨ --- 修改核心：準備 K 線圖所需的數據格式 --- ✨
-    // chartjs-chart-financial 要求數據格式為 {x: date, o: open, h: high, l: low, c: close}
+    // --- 數據準備 ---
+
+    // 1. K 線圖數據 (格式不變，依然正確)
     const candlestickData = data.map(entry => ({
-        x: new Date(entry.date).valueOf(), // 使用時間戳以獲得最佳性能
+        x: new Date(entry.date).valueOf(),
         o: entry.open,
         h: entry.high,
         l: entry.low,
         c: entry.close
     }));
 
-    // ✨ --- 修改核心：準備成交量數據格式 --- ✨
+    // ✨ --- 優化：準備帶有漲跌顏色的成交量數據 --- ✨
+    const upColor = 'rgba(8, 153, 129, 0.7)';      // 上漲顏色 (綠色，帶透明度)
+    const downColor = 'rgba(217, 83, 79, 0.7)';   // 下跌顏色 (紅色，帶透明度)
+
     const volumeData = data.map(entry => ({
         x: new Date(entry.date).valueOf(),
-        y: entry.volume
+        y: entry.volume,
+        // 根據當天是漲還是跌，決定成交量柱的顏色
+        backgroundColor: entry.close >= entry.open ? upColor : downColor
     }));
 
-    // ✨ --- 修改核心：定義 K 線顏色 --- ✨
-    const upColor = 'rgba(8, 153, 129, 1)';      // 上漲顏色 (綠色)
-    const downColor = 'rgba(217, 83, 79, 1)';   // 下跌顏色 (紅色)
+    // --- 圖表創建 ---
 
     technicalAnalysisChartInstances[chartId] = new Chart(ctx, {
-        // ✨ 注意：這裡的 type 不再重要，因為我們在 dataset 中分別定義 type
-        type: 'bar',
+        // ✨ --- 核心修正：將基礎類型改為 'candlestick' --- ✨
+        type: 'candlestick',
         data: {
-            // 不再需要 labels，因為 x 軸是時間序列
-            // labels: labels,
             datasets: [
                 {
-                    // ✨ --- 新增：K 線圖數據集 --- ✨
-                    type: 'candlestick', // 指定圖表類型為 candlestick
+                    // K 線圖數據集
                     label: 'OHLC',
                     data: candlestickData,
                     yAxisID: 'yPrice',
-                    // 設定 K 線的顏色
+                    // 設定 K 線本體的顏色
                     color: {
-                        up: upColor,
-                        down: downColor,
+                        up: upColor.replace('0.7', '1'),      // 使用不透明的顏色
+                        down: downColor.replace('0.7', '1'),
                         unchanged: '#999',
                     },
-                    // 設定影線的顏色
-                    borderColor: {
-                        up: upColor,
-                        down: downColor,
-                        unchanged: '#999',
-                    }
                 },
                 {
-                    // ✨ --- 維持不變：成交量數據集 --- ✨
-                    type: 'bar',
+                    // 成交量數據集 (明確指定 type 為 'bar')
+                    type: 'bar', // 確保這個數據集被渲染為柱狀圖
                     label: 'Volume',
                     data: volumeData,
-                    backgroundColor: 'rgba(255, 159, 64, 0.5)',
-                    borderColor: 'rgba(255, 159, 64, 1)',
-                    yAxisID: 'yVolume'
+                    yAxisID: 'yVolume',
+                    // 注意：顏色現在由數據本身提供，所以這裡不需要設定 backgroundColor
                 }
             ]
         },
         options: {
             responsive: true,
-            // ✨ --- 修改核心：調整座標軸和插件 --- ✨
+            // 座標軸和插件的設定保持不變，它們是正確的
             scales: {
                 x: {
-                    type: 'time', // x 軸必須是時間序列類型
+                    type: 'time',
                     time: {
                         unit: 'day',
-                        tooltipFormat: 'yyyy-MM-dd' // Tooltip 中日期的格式
+                        tooltipFormat: 'yyyy-MM-dd'
                     },
                     title: {
                         display: true,
                         text: 'Date'
                     },
-                    // 讓 K 線之間不要有太大間距
                     ticks: {
                         source: 'auto',
                     }
@@ -4945,7 +4938,7 @@ function createTechnicalAnalysisChart(data, chartId) {
                     position: 'left',
                     title: {
                         display: true,
-                        text: 'Stock Price' // 貨幣單位可以從數據動態獲取，這裡簡化
+                        text: 'Stock Price'
                     }
                 },
                 yVolume: {
@@ -4956,34 +4949,26 @@ function createTechnicalAnalysisChart(data, chartId) {
                         text: 'Volume'
                     },
                     grid: {
-                        drawOnChartArea: false // 不在圖表區域繪製網格線
+                        drawOnChartArea: false
                     }
                 }
             },
             plugins: {
-                // 縮放/平移插件配置保持不變
                 zoom: {
-                    pan: {
-                        enabled: true,
-                        mode: 'x',
-                    },
-                    zoom: {
-                        wheel: { enabled: true },
-                        pinch: { enabled: true },
-                        mode: 'x',
-                    }
+                    pan: { enabled: true, mode: 'x' },
+                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
                 },
                 tooltip: {
                     mode: 'index',
                     intersect: false,
                     callbacks: {
-                        // 自訂 Tooltip 顯示更多資訊
                         label: function(context) {
                             const datasetLabel = context.dataset.label || '';
                             if (context.dataset.type === 'candlestick') {
                                 const datapoint = context.raw;
                                 return `${datasetLabel}: O:${datapoint.o.toFixed(2)} H:${datapoint.h.toFixed(2)} L:${datapoint.l.toFixed(2)} C:${datapoint.c.toFixed(2)}`;
                             } else {
+                                // 對於成交量，我們直接顯示 y 值
                                 return `${datasetLabel}: ${context.raw.y.toLocaleString()}`;
                             }
                         }
