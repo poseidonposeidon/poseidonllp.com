@@ -5292,18 +5292,33 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         }
     });
 
+    // let tableHtml = `
+    // <div style="display: flex; overflow-x: auto;">
+    //     <div class="fixed-header-column">
+    //         <table class="financial-table">
+    //             ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
+    //         </table>
+    //     </div>
+    //     <div class="scroll-right" style="overflow-x: auto;">
+    //         <table class="financial-table">
+    //             ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
+    //         </table>
+    //     </div>
+    // </div>
+    // `;
+
     let tableHtml = `
-    <div style="display: flex; overflow-x: auto;">
-        <div class="fixed-header-column">
-            <table class="financial-table"> 
-                ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
-            </table>
-        </div>
-        <div class="scroll-right" style="overflow-x: auto;">
-            <table class="financial-table"> 
-                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
-            </table>
-        </div>
+    <div class="table-scroll-wrapper">
+        <table class="financial-table">
+            <tbody>
+                ${Object.keys(rows).map(key => `
+                    <tr>
+                        <th>${rows[key][0]}</th>  <!-- 第一欄是 th 標題儲存格 -->
+                        ${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')} <!-- 後面是 td 數據儲存格 -->
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
     </div>
     `;
 
