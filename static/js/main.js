@@ -529,7 +529,7 @@ function loadSection(sectionId) {
         'income-statement': `
             <div class="section" id="income-statement">
                 <h2>Income Statement</h2>
-                <div class="content scroll-container-x">
+                <div class="content">  
                     <label for="period">Select Period:</label>
                     <select id="period">
                         <option value="annual">Annual</option>
