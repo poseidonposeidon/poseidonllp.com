@@ -2150,7 +2150,8 @@ function updateMarket(button) {
         loadIndustryData();
     } else if (currentMarket === "TW") {
         marketTitle.textContent = "台股市場焦點";
-        loadIndustryData()
+        // loadIndustryData();
+        loadTaiwanTreemap();
     }
 }
 
@@ -2405,6 +2406,136 @@ async function loadGlobalMarketHeatmap() {
 
 function getColorByPerformance(performance) {
     return performance >= 0 ? "#f28b82" : "#81c995"; // 紅色表示上漲，綠色表示下跌
+}
+
+async function fetchTaiwanMarketData() {
+    // 透過篩選器獲取所有在台灣證券交易所 (TWSE) 上市、有市值的公司
+    const url = `${BASE_URL}stock-screener?country=TW&exchange=TWSE&marketCapMoreThan=0&limit=2000&apikey=${API_KEY}`;
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`無法獲取台股市場數據: ${response.statusText}`);
+        }
+        const data = await response.json();
+        console.log("從 FMP API 獲取的台股原始數據:", data);
+        return data;
+    } catch (error) {
+        console.error("獲取台股數據失敗:", error);
+        return []; // 如果失敗，返回空陣列
+    }
+}
+
+function transformDataForTreemap(marketData) {
+    // 使用 Map 來高效地對產業進行分組
+    const industryMap = new Map();
+
+    marketData.forEach(stock => {
+        // 確保有產業名稱和市值數據
+        if (stock.industry && stock.marketCap) {
+            // 如果這個產業還沒在 Map 中，就初始化一個
+            if (!industryMap.has(stock.industry)) {
+                industryMap.set(stock.industry, {
+                    name: stock.industry,
+                    children: []
+                });
+            }
+
+            // 將股票資訊加入對應產業的 children 陣列中
+            industryMap.get(stock.industry).children.push({
+                name: stock.companyName, // 股票名稱
+                symbol: stock.symbol,    // 股票代碼
+                value: stock.marketCap,  // 方塊大小依據 -> 市值
+                change: stock.changesPercentage // 方塊顏色依據 -> 漲跌幅
+            });
+        }
+    });
+
+    // 將 Map 的 values 轉換為陣列，這就是 ECharts 需要的最終格式
+    return Array.from(industryMap.values());
+}
+
+async function loadTaiwanTreemap() {
+    const industryGrid = document.getElementById("industryGrid");
+    // 顯示載入中訊息
+    industryGrid.innerHTML = `<p>正在載入台股市場熱力圖...</p>`;
+
+    // 初始化 ECharts 實例，將其掛載到 industryGrid 這個 DOM 元素上
+    // 注意：要先清空容器，再初始化，避免重複掛載
+    const myChart = echarts.init(industryGrid);
+
+    try {
+        // 1. 獲取數據
+        const marketData = await fetchTaiwanMarketData();
+        if (marketData.length === 0) {
+            industryGrid.innerHTML = "<p>無法載入台股數據，請稍後再試。</p>";
+            return;
+        }
+
+        // 2. 轉換數據格式
+        const treemapData = transformDataForTreemap(marketData);
+        console.log("轉換後準備給 ECharts 的數據:", treemapData);
+
+        // 3. 設定 ECharts 的配置選項
+        const option = {
+            tooltip: { // 滑鼠懸浮時的提示框
+                formatter: function (info) {
+                    // info.data 包含了我們在上面傳入的個股資訊
+                    const data = info.data;
+                    if (data.symbol) { // 確保是個股，而不是產業
+                        return [
+                            `<strong>${data.name} (${data.symbol})</strong><br/>`,
+                            `市值: ${(data.value / 1e8).toFixed(2)} 億<br/>`,
+                            `漲跌幅: <span style="color: ${data.change >= 0 ? 'red' : 'green'};">${data.change.toFixed(2)}%</span>`
+                        ].join('');
+                    }
+                    return '';
+                }
+            },
+            series: [{
+                type: 'treemap',
+                data: treemapData, // 將我們處理好的數據放入
+                visibleMin: 300, // 當方塊太小時不顯示文字
+                label: { // 方塊上的文字設定
+                    show: true,
+                    formatter: '{b}', // b 代表 name
+                    color: '#fff',
+                    fontSize: 14
+                },
+                upperLabel: { // 父層級（產業）的文字設定
+                    show: true,
+                    height: 30,
+                    color: '#fff',
+                    fontSize: 16,
+                    fontWeight: 'bold'
+                },
+                itemStyle: { // 方塊樣式
+                    borderColor: '#333',
+                    borderWidth: 1,
+                    gapWidth: 1
+                },
+                // 視覺映射：根據漲跌幅（我們存放在 'change' 屬性中）來決定顏色
+                visualDimension: 'change',
+                visualMap: {
+                    type: 'piecewise', // 分段型
+                    pieces: [ // 自定義分段和顏色
+                        {min: 5, color: '#d94e5d'},   // 大漲 (深紅)
+                        {min: 0, max: 5, color: '#f28b82'}, // 漲 (淺紅)
+                        {min: -5, max: 0, color: '#81c995'},// 跌 (淺綠)
+                        {max: -5, color: '#2e8b57'}    // 大跌 (深綠)
+                    ],
+                    show: false // 不顯示顏色圖例
+                }
+            }]
+        };
+
+        // 使用配置項和數據顯示圖表
+        myChart.setOption(option);
+
+    } catch (error) {
+        console.error("渲染台股 Treemap 失敗:", error);
+        industryGrid.innerHTML = "<p>渲染圖表時發生錯誤。</p>";
+    }
 }
 //////////////////////////////////////////////////////////////////////////////
 
