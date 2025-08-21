@@ -6592,7 +6592,7 @@ function displayCashflow(data, containerId, chartId, period, yearRange) {
     </div>
     `;
 
-    // 創建容器結構，並綁定唯一的下載按鈕ID
+    // --- ✨ 修改處：在 HTML 結構中加入重設按鈕 ---
     const downloadButtonId = `downloadBtn_${chartId}`;
     container.innerHTML = `
         <button id="${downloadButtonId}">Download as Excel</button>
@@ -6602,6 +6602,7 @@ function displayCashflow(data, containerId, chartId, period, yearRange) {
             </div>
         </div>
         <div id="cashflowChartContainer" style="margin-top: 20px;">
+            <button id="resetZoomBtn_CF_${chartId}">重設縮放</button> 
             <canvas id="${chartId}"></canvas>
         </div>
     `;
@@ -6622,6 +6623,16 @@ function displayCashflow(data, containerId, chartId, period, yearRange) {
 
     // 清除舊的事件並綁定新的下載按鈕事件
     bindDownloadButton_CF(rows, data[0].symbol, downloadButtonId, "Cash Flow");
+
+    // --- ✨ 修改處：綁定重設縮放按鈕的點擊事件 ---
+    const resetBtn = document.getElementById(`resetZoomBtn_CF_${chartId}`);
+    if (resetBtn) {
+        resetBtn.onclick = () => {
+            if (cashflowChartInstances[chartId]) {
+                cashflowChartInstances[chartId].resetZoom();
+            }
+        };
+    }
 }
 
 function bindDownloadButton_CF(rows, symbol, buttonId, sheetName) {
@@ -6683,32 +6694,32 @@ function createCashflowChart(data, chartId) {
                     type: 'bar',
                     label: 'Operating Cash Flow',
                     data: data.map(entry => entry.operatingCashFlow),
-                    borderColor: 'rgb(253,206,170)', // 深藍 (#003366)
-                    backgroundColor: 'rgb(225,167,121)', // 半透明深藍
+                    borderColor: 'rgb(253,206,170)',
+                    backgroundColor: 'rgb(225,167,121)',
                     yAxisID: 'y'
                 },
                 {
                     type: 'bar',
                     label: 'Capital Expenditure',
                     data: data.map(entry => entry.capitalExpenditure),
-                    borderColor: 'rgba(102, 204, 204, 1)', // 藍綠色 (#66CCCC)
-                    backgroundColor: 'rgba(102, 204, 204, 0.3)', // 半透明藍綠色
+                    borderColor: 'rgba(102, 204, 204, 1)',
+                    backgroundColor: 'rgba(102, 204, 204, 0.3)',
                     yAxisID: 'y'
                 },
                 {
                     type: 'bar',
                     label: 'Free Cash Flow',
                     data: data.map(entry => entry.freeCashFlow),
-                    borderColor: 'rgba(153, 204, 255, 1)', // 淺藍色 (#99CCFF)
-                    backgroundColor: 'rgba(153, 204, 255, 0.3)', // 半透明淺藍色
+                    borderColor: 'rgba(153, 204, 255, 1)',
+                    backgroundColor: 'rgba(153, 204, 255, 0.3)',
                     yAxisID: 'y'
                 },
                 {
                     type: 'line',
                     label: 'Capex to Operating Cash Flow',
                     data: data.map(entry => entry.capexToOperatingCashFlowValue),
-                    borderColor: 'rgba(255, 153, 0, 1)', // 橙色 (#FF9900)
-                    backgroundColor: 'rgba(255, 153, 0, 0.3)', // 半透明橙色
+                    borderColor: 'rgba(255, 153, 0, 1)',
+                    backgroundColor: 'rgba(255, 153, 0, 0.3)',
                     yAxisID: 'y1'
                 }
             ]
@@ -6743,6 +6754,23 @@ function createCashflowChart(data, chartId) {
                 }
             },
             plugins: {
+                // --- ✨ 修改處：新增縮放與平移功能的設定 ---
+                zoom: {
+                    pan: {
+                        enabled: true,    // 啟用平移
+                        mode: 'x',        // 只在 x 軸上平移
+                    },
+                    zoom: {
+                        wheel: {
+                            enabled: true, // 啟用滾輪縮放
+                        },
+                        pinch: {
+                            enabled: true, // 啟用觸控縮放
+                        },
+                        mode: 'x',        // 只在 x 軸上縮放
+                    }
+                },
+                // --- 修改結束 ---
                 tooltip: {
                     callbacks: {
                         label: function (tooltipItem) {
@@ -6755,10 +6783,10 @@ function createCashflowChart(data, chartId) {
                             return 'No data';
                         }
                     },
-                    backgroundColor: 'rgba(0, 0, 0, 0.8)', // 深黑背景
-                    titleColor: 'rgba(255, 255, 255, 1)', // 白色標題
-                    bodyColor: 'rgba(255, 255, 255, 1)', // 白色字體
-                    borderColor: 'rgba(255, 255, 255, 1)', // 白色邊框
+                    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                    titleColor: 'rgba(255, 255, 255, 1)',
+                    bodyColor: 'rgba(255, 255, 255, 1)',
+                    borderColor: 'rgba(255, 255, 255, 1)',
                     borderWidth: 1
                 }
             }
