@@ -8424,46 +8424,42 @@ function fetchTextFileList(newTextFileName = null, isNewFile = false) {
         mode: 'cors',
         credentials: 'include'
     })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response is abnormal ' + response.statusText);
-            }
-            return response.json();
-        })
+        .then(response => response.json())
         .then(data => {
             console.log("Text file list successfully obtained:", data);
             const select = document.getElementById('textFileSelect');
-            if (!select) {
-                console.error('Element with ID "textFileSelect" not found');
-                return;
+            if (!select) return;
+            select.innerHTML = '';
+
+            // 【修改後】將所有檔案（包括新檔案和舊檔案）放在一個集合中，以防止重複
+            const allFiles = new Map();
+
+            // 如果有新檔案，先將它加入
+            if (newTextFileName && isNewFile) {
+                allFiles.set(newTextFileName, encodeURIComponent(newTextFileName));
             }
-            select.innerHTML = '';  // 清空之前的選項
 
-            if (Array.isArray(data.files) && data.files.length > 0) {
-                // Add the new file to the top if it exists
-                if (newTextFileName && isNewFile) {
-                    console.log(`Adding new file: ${newTextFileName}`);
-                    const newOption = document.createElement('option');
-                    const newFileNameWithTxt = newTextFileName.endsWith('.txt') ? newTextFileName : `${newTextFileName}.txt`;
-                    newOption.value = encodeURIComponent(newFileNameWithTxt);
-                    newOption.textContent = newFileNameWithTxt;
-                    select.appendChild(newOption);
-                }
-
-                // Add the rest of the files
+            // 將從伺服器獲取的檔案列表也加入
+            if (Array.isArray(data.files)) {
                 data.files.forEach(fileInfo => {
-                    const option = document.createElement('option');
+                    // 直接使用解碼後的原始檔名，不再猜測
                     const originalFileName = decodeURIComponent(fileInfo.original);
-                    const fileNameWithTxt = originalFileName.endsWith('.txt') ? originalFileName : `${originalFileName}.txt`;
-                    option.value = encodeURIComponent(fileNameWithTxt);
-                    option.textContent = fileNameWithTxt;
+                    allFiles.set(originalFileName, encodeURIComponent(originalFileName));
+                });
+            }
+
+            // 根據 Map 來生成下拉選單選項
+            if (allFiles.size > 0) {
+                allFiles.forEach((encodedName, originalName) => {
+                    const option = document.createElement('option');
+                    option.value = encodedName;
+                    option.textContent = originalName;
                     select.appendChild(option);
                 });
 
-                // Select the new file if it exists, otherwise select the first option
+                // 如果有新檔案，預設選中它
                 if (newTextFileName && isNewFile) {
-                    const newFileNameWithTxt = newTextFileName.endsWith('.txt') ? newTextFileName : `${newTextFileName}.txt`;
-                    select.value = encodeURIComponent(newFileNameWithTxt);
+                    select.value = encodeURIComponent(newTextFileName);
                 } else {
                     select.selectedIndex = 0;
                 }
@@ -8476,10 +8472,6 @@ function fetchTextFileList(newTextFileName = null, isNewFile = false) {
         })
         .catch(error => {
             console.error('獲取文字文件列表時出錯:', error);
-            const uploadResult = document.getElementById('upload-result');
-            if (uploadResult) {
-                uploadResult.innerText = 'An error occurred, please check the network connection or server status！\n' + error;
-            }
         });
 }
 
@@ -8632,30 +8624,24 @@ function startPolling(encodedFilename) {
                 return response.json();
             })
             .then(data => {
-                // 【核心修改在這裡】
                 if (data.status === 'completed') {
                     clearInterval(pollingInterval);
                     statusElement.textContent = 'Transcription completed';
 
-                    // 直接從 data 中獲取結果並顯示
-                    // 注意：後端回傳的結果在 data.result
-                    // 我們需要模擬 displayTranscription 函式期望的格式 { text: "..." }
                     if (data.result) {
-                        displayTranscription({ text: data.result }); // 將結果傳給顯示函式
-                        // 如果需要，也可以從 data.originalFilename 獲取原始檔名來更新文字檔列表
-                        fetchTextFileList(data.originalFilename, true);
+                        displayTranscription({ text: data.result });
+                        // 【修改後】直接使用後端回傳的、正確的逐字稿檔名 (transcriptFilename)
+                        // 這樣就能確保文字檔列表更新為正確的檔名 (例如 ...memo.txt)
+                        fetchTextFileList(data.transcriptFilename, true);
                     } else {
-                        // 處理雖然狀態是 completed 但沒有結果的情況
                         showAlert('Transcription completed, but no result was returned.');
                     }
 
                 } else if (data.status === 'in_progress') {
-                    // 'in_progress' 狀態下，後端目前沒有回傳進度百分比，所以顯示通用訊息
                     statusElement.textContent = 'Transcription in progress...';
                 } else if (data.status === 'queued') {
                     statusElement.textContent = 'The task is still in the queue, please wait....';
                 } else if (data.status === 'error') {
-                    // 處理後端回傳的錯誤狀態
                     clearInterval(pollingInterval);
                     const errorMessage = data.error || 'An unknown error occurred during transcription.';
                     statusElement.textContent = `Error: ${errorMessage}`;
