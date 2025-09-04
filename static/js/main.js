@@ -8383,12 +8383,14 @@ function fetchFileList(newFileName = null) {
             select.innerHTML = '';  // 清空之前的選項
 
             if (data.files && data.files.length > 0) {
-                // 將文件按最新時間排序
+
+                // ======== 核心修改在此 ========
+                // 使用 localeCompare 進行智能、語言感知的字串排序
+                // 這會自動處理 數字 -> 字母 -> 中文 的順序
                 const sortedFiles = data.files.sort((a, b) => {
-                    const dateA = extractDate(a.original);
-                    const dateB = extractDate(b.original);
-                    return dateB - dateA;
+                    return a.original.localeCompare(b.original, 'zh-Hant');
                 });
+                // ============================
 
                 sortedFiles.forEach(fileInfo => {
                     const encodedFileName = fileInfo.encoded;
@@ -8404,7 +8406,6 @@ function fetchFileList(newFileName = null) {
                     const newFileOption = Array.from(select.options).find(option => option.textContent === newFileName);
                     if (newFileOption) {
                         select.value = newFileOption.value;
-                        select.insertBefore(newFileOption, select.firstChild);
                     }
                 } else {
                     select.selectedIndex = 0;
