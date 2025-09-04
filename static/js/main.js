@@ -1406,64 +1406,67 @@ function loadSectionCN(sectionId) {
 function loadAIBoxSection(sectionId) {
     const sections = {
         'audio-transcription': `
-            <div class="section" id="audio-transcription">
-                <h2>Audio Transcription</h2>
-                <div class="content">
-                    <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
-                    
-                    <!-- 上傳與轉錄控制項 -->
+        <div class="section" id="audio-transcription">
+            <h2>Audio Transcription</h2>
+            <div class="content">
+                <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
+    
+                <!-- 操作區塊 1: 上傳與轉錄 -->
+                <div class="control-group" style="padding-bottom: 15px; margin-bottom: 15px; border-bottom: 1px solid #444;">
                     <div class="inline-container">
                         <input type="file" id="audioFile" accept="audio/*">
                         <button onclick="uploadToFTP()">Upload Audio File</button>
                     </div>
                     <div class="inline-container" style="margin-top: 10px;">
-                        <select id="ftpFileSelect">
+                        <select id="ftpFileSelect" style="flex-grow: 1;">
                             <option value="" disabled selected>Select a file to transcribe</option>
                         </select>
                         <button onclick="transcribeFromFTP()">Transcribe</button>
                     </div>
-
-                    <!-- 下載控制項 (預設隱藏) -->
-                    <div class="download-container" id="downloadControls" style="display: none; margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
-                        <div class="inline-container">
-                            <select id="textFileSelect">
-                                <option value="" disabled selected>Select a text file</option>
-                            </select>
-                            <button onclick="downloadTextFile()">Download TXT</button>
-                        </div>
-                        <div class="inline-container" style="margin-top: 10px;">
-                            <select id="pdfFileSelect">
-                                <option value="" disabled selected>Select a PDF report</option>
-                            </select>
-                            <button onclick="downloadPdfFile()">Download PDF</button>
-                        </div>
+                </div>
+    
+                <!-- 操作區塊 2: 下載 (常駐顯示) -->
+                <div class="download-container" id="downloadControls">
+                    <h4>Download Existing Files</h4>
+                    <div class="inline-container">
+                        <select id="textFileSelect" style="flex-grow: 1;">
+                            <option value="" disabled selected>Select a transcript (.txt)</option>
+                        </select>
+                        <button onclick="downloadTextFile()">Download TXT</button>
                     </div>
-                    
-                    <!-- 進度條與結果顯示區 (保持不變) -->
-                    <div id="upload-progress-container" style="display: none;">
-                        <div id="upload-progress-bar"></div>
-                    </div>
-                    <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">Uploading file...</p>
-                    <div id="transcription-progress-container" style="display: none; text-align: center;">
-                        <div>
-                            <div class="loader"></div>
-                            <p id="transcription-status">Transcribing...</p>
-                        </div>
-                    </div>
-                    <div class="scroll-container" id="transcriptionResult">
-                        <!-- Transcription results will be displayed here -->
-                    </div>
-                    <div id="buttonContainer" style="display: none; gap: 10px; margin-top: 10px;">
-                        <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
-                        <button id="readMoreBtn" onclick="toggleReadMore()">Read More</button>
-                        <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
-                    </div>
-                    <div id="alert-box" style="display: none;" class="alert">
-                        <span id="alert-message"></span>
-                        <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                    <div class="inline-container" style="margin-top: 10px;">
+                        <select id="pdfFileSelect" style="flex-grow: 1;">
+                            <option value="" disabled selected>Select a report (.pdf)</option>
+                        </select>
+                        <button onclick="downloadPdfFile()">Download PDF</button>
                     </div>
                 </div>
-            </div>`,
+    
+                <!-- 進度條與結果顯示區 (保持不變) -->
+                <div id="upload-progress-container" style="display: none;">
+                    <div id="upload-progress-bar"></div>
+                </div>
+                <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">Uploading file...</p>
+                <div id="transcription-progress-container" style="display: none; text-align: center;">
+                    <div>
+                        <div class="loader"></div>
+                        <p id="transcription-status">Transcribing...</p>
+                    </div>
+                </div>
+                <div class="scroll-container" id="transcriptionResult">
+                    <!-- Transcription results will be displayed here -->
+                </div>
+                <div id="buttonContainer" style="display: none; gap: 10px; margin-top: 10px;">
+                    <button id="copyBtn" onclick="copyToClipboard()">Copy</button>
+                    <button id="readMoreBtn" onclick="toggleReadMore()">Read More</button>
+                    <button id="readLessBtn" class="hidden" onclick="toggleReadMore()">Read Less</button>
+                </div>
+                <div id="alert-box" style="display: none;" class="alert">
+                    <span id="alert-message"></span>
+                    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>
+                </div>
+            </div>
+        </div>`,
         'chat-gpt': `
             <div class="section" id="chat-gpt-section">
                 <h2>Chat GPT</h2>
@@ -8703,10 +8706,8 @@ function displayTranscription(data) {
             copyToClipboard(data.text);
         };
 
-        // 显示按钮容器
         buttonContainer.style.display = 'flex';
 
-        // 检查文本高度以确定是否需要显示 "Read More" 或 "Read Less" 按钮
         if (container.scrollHeight > 200) {
             readMoreBtn.classList.remove('hidden');
             readLessBtn.classList.add('hidden');
@@ -8716,12 +8717,11 @@ function displayTranscription(data) {
         }
     } else {
         container.innerHTML = '<p>No transcription content</p>';
-        buttonContainer.style.display = 'none';  // 没有文本时隐藏按钮
+        buttonContainer.style.display = 'none';
     }
 
     document.getElementById('transcription-progress-container').style.display = 'none';
-    document.getElementById('downloadControls').style.display = 'block';
-    showAlert('Transcription completed');
+    // 注意：這裡已經沒有那行 .style.display = 'block' 的程式碼了
 }
 
 function toggleReadMore() {
