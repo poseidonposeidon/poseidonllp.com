@@ -1410,18 +1410,36 @@ function loadAIBoxSection(sectionId) {
                 <h2>Audio Transcription</h2>
                 <div class="content">
                     <p id="queueStatus">Current files in queue: <span id="queueLength">0</span></p>
+                    
+                    <!-- 上傳與轉錄控制項 -->
                     <div class="inline-container">
                         <input type="file" id="audioFile" accept="audio/*">
                         <button onclick="uploadToFTP()">Upload Audio File</button>
+                    </div>
+                    <div class="inline-container" style="margin-top: 10px;">
                         <select id="ftpFileSelect">
                             <option value="" disabled selected>Select a file to transcribe</option>
                         </select>
                         <button onclick="transcribeFromFTP()">Transcribe</button>
-                        <select id="textFileSelect">
-                            <option value="" disabled selected>Select a text file</option>
-                        </select>
-                        <button onclick="downloadTextFile()">Download Text File</button>
                     </div>
+
+                    <!-- 下載控制項 (預設隱藏) -->
+                    <div class="download-container" id="downloadControls" style="display: none; margin-top: 20px; border-top: 1px solid #444; padding-top: 20px;">
+                        <div class="inline-container">
+                            <select id="textFileSelect">
+                                <option value="" disabled selected>Select a text file</option>
+                            </select>
+                            <button onclick="downloadTextFile()">Download TXT</button>
+                        </div>
+                        <div class="inline-container" style="margin-top: 10px;">
+                            <select id="pdfFileSelect">
+                                <option value="" disabled selected>Select a PDF report</option>
+                            </select>
+                            <button onclick="downloadPdfFile()">Download PDF</button>
+                        </div>
+                    </div>
+                    
+                    <!-- 進度條與結果顯示區 (保持不變) -->
                     <div id="upload-progress-container" style="display: none;">
                         <div id="upload-progress-bar"></div>
                     </div>
@@ -1470,6 +1488,7 @@ function loadAIBoxSection(sectionId) {
     if (sectionId === 'audio-transcription') {
         fetchFileList();
         fetchTextFileList();
+        fetchPdfFileList();
         updateQueueLength();
         setInterval(updateQueueLength, 5000); // 每5秒更新一次排程長度
     }
@@ -8633,6 +8652,7 @@ function startPolling(encodedFilename) {
                         // 【修改後】直接使用後端回傳的、正確的逐字稿檔名 (transcriptFilename)
                         // 這樣就能確保文字檔列表更新為正確的檔名 (例如 ...memo.txt)
                         fetchTextFileList(data.transcriptFilename, true);
+                        fetchPdfFileList(data.pdfFilename);
                     } else {
                         showAlert('Transcription completed, but no result was returned.');
                     }
@@ -8700,6 +8720,7 @@ function displayTranscription(data) {
     }
 
     document.getElementById('transcription-progress-container').style.display = 'none';
+    document.getElementById('downloadControls').style.display = 'block';
     showAlert('Transcription completed');
 }
 
@@ -8793,4 +8814,57 @@ function updateQueueLength() {
         .catch(error => {
             // console.error('Error fetching queue length:', error);
         });
+}
+
+function fetchPdfFileList(newPdfFileName = null) {
+    console.log("Get a list of PDF files from the server...");
+    fetch(`${baseUrl}/list_pdf_files`)
+        .then(response => response.json())
+        .then(data => {
+            const select = document.getElementById('pdfFileSelect');
+            if (!select) return;
+            select.innerHTML = '';
+
+            if (data.files && data.files.length > 0) {
+                data.files.forEach(fileInfo => {
+                    const option = document.createElement('option');
+                    option.value = fileInfo.encoded;
+                    option.textContent = fileInfo.original;
+                    select.appendChild(option);
+                });
+
+                if (newPdfFileName) {
+                    const encodedName = encodeURIComponent(newPdfFileName);
+                    select.value = encodedName;
+                } else {
+                    select.selectedIndex = 0;
+                }
+            } else {
+                const option = document.createElement('option');
+                option.textContent = "No PDF reports available";
+                option.disabled = true;
+                select.appendChild(option);
+            }
+        })
+        .catch(error => console.error('Error getting PDF file list:', error));
+}
+
+function downloadPdfFile() {
+    const select = document.getElementById('pdfFileSelect');
+    const encodedFileName = select.value;
+    if (!encodedFileName) {
+        alert('Please select a PDF report!');
+        return;
+    }
+
+    const downloadUrl = `${baseUrl}/download_pdf_file/${encodedFileName}`;
+    console.log("Starting PDF download:", downloadUrl);
+
+    // 透過創建一個隱藏的連結來觸發下載
+    const downloadLink = document.createElement('a');
+    downloadLink.href = downloadUrl;
+    downloadLink.download = decodeURIComponent(encodedFileName); // 提示瀏覽器下載的檔名
+    document.body.appendChild(downloadLink);
+    downloadLink.click();
+    document.body.removeChild(downloadLink);
 }
