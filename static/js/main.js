@@ -1449,7 +1449,11 @@ function loadAIBoxSection(sectionId) {
                 <p id="upload-progress-text" style="text-align: center; margin-top: 10px; display: none;">Uploading file...</p>
                 <div id="transcription-progress-container" style="display: none; text-align: center;">
                     <div>
-                        <div class="loader"></div>
+                        <div class="loader">
+                          <div></div>
+                          <div></div>
+                          <div></div>
+                        </div>
                         <p id="transcription-status">Transcribing...</p>
                     </div>
                 </div>
