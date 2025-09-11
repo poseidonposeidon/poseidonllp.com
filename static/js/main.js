@@ -4755,6 +4755,15 @@ function displayCompanyPrice(data, container) {
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
+let chartSync = {};
+
+/**
+ * 創建一個功能完整、採用專業配色且圖例顯示正確的技術分析圖表。
+ * @param {Array} priceHistory - 歷史價格數據 (OHLCV)，已按日期升序排列。
+ * @param {Array} ma5History - 5日均線數據，已按日期升序排列。
+ * @param {Array} ma10History - 10日均線數據，已按日期升序排列。
+ * @param {string} chartId - 圖表 canvas 元素的 ID。
+ */
 
 let incomeStatementChartInstances = {}; // 使用對象來存儲不同國家的圖表實例
 
@@ -5040,136 +5049,71 @@ async function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 }
 
 /**
- * 創建一個功能完整、採用專業配色且圖例顯示正確的技術分析圖表。
- * @param {Array} priceHistory - 歷史價格數據 (OHLCV)，已按日期升序排列。
- * @param {Array} ma5History - 5日均線數據，已按日期升序排列。
- * @param {Array} ma10History - 10日均線數據，已按日期升序排列。
- * @param {string} chartId - 圖表 canvas 元素的 ID。
- */
+* =========================================================================
+* 主要函式：創建包含導航器的技術分析圖表
+* (請用此版本完全取代您現有的 createTechnicalAnalysisChart 函式)
+* =========================================================================
+* @param {Array} priceHistory - 歷史價格數據 (OHLCV)，已按日期升序排列。
+* @param {Array} ma5History - 5日均線數據，已按日期升序排列。
+* @param {Array} ma10History - 10日均線數據，已按日期升序排列。
+* @param {string} chartId - 主圖表 canvas 元素的 ID。
+*/
 function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
+    const navigatorId = `${chartId}_nav`; // 導航圖的 canvas ID
 
-    // 如果圖表實例已存在，先銷毀，防止記憶體洩漏和渲染衝突
-    if (window.technicalAnalysisChartInstances && window.technicalAnalysisChartInstances[chartId]) {
-        window.technicalAnalysisChartInstances[chartId].destroy();
+    // 1. 徹底清理舊的圖表實例，防止記憶體洩漏
+    if (technicalAnalysisChartInstances[chartId]) {
+        technicalAnalysisChartInstances[chartId].destroy();
     }
-    // 確保全局實例對象存在
-    if (!window.technicalAnalysisChartInstances) {
-        window.technicalAnalysisChartInstances = {};
+    if (technicalAnalysisChartInstances[navigatorId]) {
+        technicalAnalysisChartInstances[navigatorId].destroy();
     }
 
-    // --- 1. 數據準備與【唯一】的配色方案 ---
+    // 2. 數據準備
+    const upColor = 'rgba(16, 185, 129, 1)';
+    const downColor = 'rgba(239, 68, 68, 1)';
+    const ma5Color = 'rgba(255, 255, 255, 1)';
+    const ma10Color = 'rgba(250, 204, 21, 1)';
+    const volumeOrangeColor = 'rgba(251, 146, 60, 0.6)';
 
-    // 為深色背景設計的統一配色方案
-    const upColor = 'rgba(16, 185, 129, 1)';     // 亮綠色 (上漲)
-    const downColor = 'rgba(239, 68, 68, 1)';     // 亮紅色 (下跌)
-    const ma5Color = 'rgba(255, 255, 255, 1)';   // 純白色 (5日線)
-    const ma10Color = 'rgba(250, 204, 21, 1)';   // 亮黃色 (10日線)
-    const volumeOrangeColor = 'rgba(251, 146, 60, 0.6)'; // 您指定的橘色 (60% 透明度)
+    const candlestickData = priceHistory.map(entry => ({ x: new Date(entry.date).valueOf(), o: entry.open, h: entry.high, l: entry.low, c: entry.close }));
+    const volumeData = priceHistory.map(entry => ({ x: new Date(entry.date).valueOf(), y: entry.volume }));
+    const ma5LineData = (ma5History && Array.isArray(ma5History)) ? ma5History.map(entry => ({ x: new Date(entry.date).valueOf(), y: entry.sma })) : [];
+    const ma10LineData = (ma10History && Array.isArray(ma10History)) ? ma10History.map(entry => ({ x: new Date(entry.date).valueOf(), y: entry.sma })) : [];
 
-    // 格式化 K 線圖數據
-    const candlestickData = priceHistory.map(entry => ({
-        x: new Date(entry.date).valueOf(),
-        o: entry.open,
-        h: entry.high,
-        l: entry.low,
-        c: entry.close
-    }));
-
-    // ✨【修改一】: 簡化 volumeData 的準備，移除個別的顏色設定
-    const volumeData = priceHistory.map(entry => ({
-        x: new Date(entry.date).valueOf(),
-        y: entry.volume,
-    }));
-
-    // 格式化均線數據
-    const ma5LineData = (ma5History && Array.isArray(ma5History)) ? ma5History.map(entry => ({
-        x: new Date(entry.date).valueOf(),
-        y: entry.sma
-    })) : [];
-
-    const ma10LineData = (ma10History && Array.isArray(ma10History)) ? ma10History.map(entry => ({
-        x: new Date(entry.date).valueOf(),
-        y: entry.sma
-    })) : [];
-
-
-    // --- 2. 邊界與邊距計算 ---
-
+    // 邊界與邊距計算
     const firstDataPointX = candlestickData[0]?.x;
     const lastDataPointX = candlestickData[candlestickData.length - 1]?.x;
     const PADDING_DAYS = 30;
     const padding = PADDING_DAYS * 24 * 60 * 60 * 1000;
 
-
-    // --- 3. 圖表實例化與配置 ---
-
-    technicalAnalysisChartInstances[chartId] = new Chart(ctx, {
+    // 3. 創建主圖表 (Main Chart)
+    const mainChart = new Chart(ctx, {
         type: 'candlestick',
         data: {
             datasets: [
-                {
-                    label: 'OHLC',
-                    data: candlestickData,
-                    yAxisID: 'yPrice',
-                    color: { up: upColor, down: downColor, unchanged: '#999' },
-                    order: 0
-                },
-                {
-                    type: 'line',
-                    label: 'MA 5',
-                    data: ma5LineData,
-                    borderColor: ma5Color,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    yAxisID: 'yPrice',
-                    order: 1
-                },
-                {
-                    type: 'line',
-                    label: 'MA 10',
-                    data: ma10LineData,
-                    borderColor: ma10Color,
-                    borderWidth: 2,
-                    pointRadius: 0,
-                    yAxisID: 'yPrice',
-                    order: 1
-                },
-                {
-                    type: 'bar',
-                    label: 'Volume',
-                    data: volumeData,
-                    yAxisID: 'yVolume',
-                    // ✨【修改二】: 在 dataset 層級直接設定 backgroundColor
-                    backgroundColor: volumeOrangeColor,
-                    order: 2
-                }
+                { label: 'OHLC', data: candlestickData, yAxisID: 'yPrice', color: { up: upColor, down: downColor, unchanged: '#999' }, order: 0 },
+                { type: 'line', label: 'MA 5', data: ma5LineData, borderColor: ma5Color, borderWidth: 2, pointRadius: 0, yAxisID: 'yPrice', order: 1 },
+                { type: 'line', label: 'MA 10', data: ma10LineData, borderColor: ma10Color, borderWidth: 2, pointRadius: 0, yAxisID: 'yPrice', order: 1 },
+                { type: 'bar', label: 'Volume', data: volumeData, yAxisID: 'yVolume', backgroundColor: volumeOrangeColor, order: 2 }
             ]
         },
         options: {
-            // ... 其餘 options 設定保持不變
             animation: false,
             parsing: false,
             scales: {
                 x: {
                     type: 'time',
                     time: { unit: 'day', tooltipFormat: 'yyyy-MM-dd' },
-                    title: { display: true, text: 'Date' },
+                    title: { display: false },
                     ticks: { source: 'auto' }
                 },
-                yPrice: {
-                    type: 'linear',
-                    position: 'left',
-                    title: { display: true, text: 'Stock Price' }
-                },
-                yVolume: {
-                    type: 'linear',
-                    position: 'right',
-                    title: { display: true, text: 'Volume' },
-                    grid: { drawOnChartArea: false }
-                }
+                yPrice: { type: 'linear', position: 'left', title: { display: true, text: 'Stock Price' } },
+                yVolume: { type: 'linear', position: 'right', title: { display: true, text: 'Volume' }, grid: { drawOnChartArea: false } }
             },
             plugins: {
+                // <-- [已補上] 您原有的 legend (圖例) 設定 -->
                 legend: {
                     labels: {
                         generateLabels: function(chart) {
@@ -5188,29 +5132,7 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                         }
                     }
                 },
-                decimation: {
-                    enabled: true,
-                    algorithm: 'lttb',
-                    samples: 100,
-                },
-                zoom: {
-                    pan: { enabled: true, mode: 'x' },
-                    zoom: {
-                        wheel: { enabled: true, speed: 0.1 },
-                        pinch: { enabled: true },
-                        mode: 'x',
-                        onZoomComplete: function({chart}) {
-                            chart.update('none');
-                        }
-                    },
-                    limits: {
-                        x: {
-                            min: firstDataPointX ? firstDataPointX - padding : undefined,
-                            max: lastDataPointX ? lastDataPointX + padding : undefined,
-                            minRange: 60 * 60 * 1000 * 24 * 30
-                        },
-                    },
-                },
+                // <-- [已補上] 您原有的 tooltip (提示框) 設定 -->
                 tooltip: {
                     mode: 'index',
                     intersect: false,
@@ -5231,11 +5153,191 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                             return `${datasetLabel}: N/A`;
                         }
                     }
+                },
+                // <-- [已補上] 您原有的 decimation (數據抽稀) 設定 -->
+                decimation: {
+                    enabled: true,
+                    algorithm: 'lttb',
+                    samples: 100,
+                },
+                // <-- [已更新] 這是新的 zoom (縮放) 設定，用於同步導航器 -->
+                zoom: {
+                    pan: { enabled: true, mode: 'x' },
+                    zoom: { wheel: { enabled: true, speed: 0.1 }, pinch: { enabled: true }, mode: 'x' },
+                    limits: {
+                        x: {
+                            min: firstDataPointX ? firstDataPointX - padding : undefined,
+                            max: lastDataPointX ? lastDataPointX + padding : undefined,
+                            minRange: 60 * 60 * 1000 * 24 * 30
+                        },
+                    },
+                    onZoomComplete: ({chart}) => {
+                        updateNavigator(chart, chartSync[chart.id].navigator);
+                    },
+                    onPanComplete: ({chart}) => {
+                        updateNavigator(chart, chartSync[chart.id].navigator);
+                    }
+                },
+            }
+        }
+    });
+
+    // 4. 創建導航圖 (Navigator Chart)
+    const navigatorChart = createNavigatorChart(navigatorId, priceHistory);
+
+    // 5. 儲存圖表實例並建立同步關聯
+    technicalAnalysisChartInstances[chartId] = mainChart;
+    technicalAnalysisChartInstances[navigatorId] = navigatorChart;
+    chartSync[chartId] = { main: mainChart, navigator: navigatorChart };
+
+    // 6. 初始化導航圖，使其顯示主圖表的初始視圖範圍
+    updateNavigator(mainChart, navigatorChart);
+
+    // 7. 為導航圖添加拖曳平移的功能
+    addNavigatorDragHandlers(navigatorChart, mainChart);
+}
+
+/**
+ * ✨ 新增：創建導航器圖表
+ * @param {string} canvasId - 導航圖 canvas 的 ID
+ * @param {Array} priceHistory - 完整的歷史價格數據
+ */
+function createNavigatorChart(canvasId, priceHistory) {
+    const ctx = document.getElementById(canvasId).getContext('2d');
+    const closePriceData = priceHistory.map(p => ({ x: new Date(p.date).valueOf(), y: p.close }));
+
+    const navigatorChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'Price',
+                data: closePriceData,
+                borderColor: 'rgba(150, 150, 150, 1)',
+                backgroundColor: 'rgba(200, 200, 200, 0.3)',
+                borderWidth: 1,
+                pointRadius: 0,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false, // 允許高度變形
+            scales: {
+                x: {
+                    type: 'time',
+                    ticks: { display: false }, // 隱藏 X 軸刻度
+                    grid: { display: false }
+                },
+                y: {
+                    ticks: { display: false }, // 隱藏 Y 軸刻度
+                    grid: { display: false }
+                }
+            },
+            plugins: {
+                legend: { display: false }, // 隱藏圖例
+                tooltip: { enabled: false }, // 禁用提示
+                // ✨ 使用 annotation 插件來繪製選擇框
+                annotation: {
+                    annotations: {
+                        rangeBox: {
+                            type: 'box',
+                            xMin: closePriceData[0].x,
+                            xMax: closePriceData[closePriceData.length - 1].x,
+                            backgroundColor: 'rgba(135, 206, 250, 0.3)', // 淡藍色半透明
+                            borderColor: 'rgba(0, 123, 255, 0.7)',
+                            borderWidth: 1,
+                        }
+                    }
                 }
             }
         }
     });
+    return navigatorChart;
 }
+
+/**
+ * ✨ 新增：更新導航圖上的選擇框位置
+ * @param {Chart} mainChart - 主圖表實例
+ * @param {Chart} navigatorChart - 導航圖表實例
+ */
+function updateNavigator(mainChart, navigatorChart) {
+    if (!mainChart || !navigatorChart) return;
+
+    // 獲取主圖表當前可見的 X 軸範圍
+    const { min, max } = mainChart.scales.x;
+
+    // 更新導航圖上 annotation 的範圍
+    navigatorChart.options.plugins.annotation.annotations.rangeBox.xMin = min;
+    navigatorChart.options.plugins.annotation.annotations.rangeBox.xMax = max;
+
+    // 更新導航圖使其重繪
+    navigatorChart.update('none');
+}
+
+/**
+ * ✨ 新增：為導航圖添加拖曳平移的功能
+ * @param {Chart} navigatorChart
+ * @param {Chart} mainChart
+ */
+function addNavigatorDragHandlers(navigatorChart, mainChart) {
+    const canvas = navigatorChart.canvas;
+    let isDragging = false;
+    let dragStartX = null;
+    let initialMin = null;
+    let initialMax = null;
+
+    canvas.onmousedown = (e) => {
+        const rangeBox = navigatorChart.getElementsAtEventForMode(e, 'nearest', { intersect: true }, true)[0];
+        const annotation = navigatorChart.options.plugins.annotation.annotations.rangeBox;
+        const mouseX = e.offsetX;
+
+        // 判斷滑鼠是否點在選擇框內
+        const boxLeft = navigatorChart.scales.x.getPixelForValue(annotation.xMin);
+        const boxRight = navigatorChart.scales.x.getPixelForValue(annotation.xMax);
+
+        if (mouseX >= boxLeft && mouseX <= boxRight) {
+            isDragging = true;
+            dragStartX = mouseX;
+            initialMin = mainChart.scales.x.min;
+            initialMax = mainChart.scales.x.max;
+        }
+    };
+
+    canvas.onmousemove = (e) => {
+        if (!isDragging) return;
+
+        const mouseX = e.offsetX;
+        const dx = mouseX - dragStartX; // 滑鼠移動的像素距離
+
+        // 將像素距離轉換為時間單位的距離
+        const timePerPixel = (navigatorChart.scales.x.max - navigatorChart.scales.x.min) / navigatorChart.width;
+        const timeDelta = dx * timePerPixel;
+
+        // 計算新的主圖表範圍
+        const newMin = initialMin - timeDelta;
+        const newMax = initialMax - timeDelta;
+
+        // 更新主圖表
+        mainChart.options.scales.x.min = newMin;
+        mainChart.options.scales.x.max = newMax;
+        mainChart.update('none');
+
+        // 同步更新導航圖
+        updateNavigator(mainChart, navigatorChart);
+    };
+
+    window.onmouseup = () => { // 監聽 window 的 mouseup，防止滑鼠移出 canvas 後事件失效
+        if(isDragging) {
+            isDragging = false;
+            dragStartX = null;
+            initialMin = null;
+            initialMax = null;
+        }
+    };
+
+    canvas.style.cursor = 'grab'; // 改變滑鼠指標樣式
+}
+
 
 function calculatePEData(priceData, epsData) {
     const peData = priceData.map(priceEntry => {
@@ -5509,6 +5611,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             <h2>Technical Analysis (Price & Volume)</h2>
             <button id="resetZoomBtn_Tech_${techChartId}">Reset Zoom</button> 
             <canvas id="${techChartId}"></canvas> <!-- 使用傳入的 techChartId -->
+            
+            <div style="height: 80px; margin-top: 10px;">
+                 <canvas id="${techChartId}_nav"></canvas>
+            </div>
         </div>
     `;
 
