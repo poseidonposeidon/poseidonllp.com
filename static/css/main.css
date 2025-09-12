@@ -1592,15 +1592,6 @@ body.light-mode .chat-response {
 /*          財務報表表格樣式            */
 /* ================================== */
 
-/* 固定標題欄的容器樣式 (深色模式) */
-.fixed-header-column {
-    flex-shrink: 0;
-    background-color: #1e1e1e; /* 深色背景 */
-    z-index: 1;
-    border-right: 1px solid #000; /* 深色邊框 */
-}
-
-/* 統一的表格樣式 */
 .financial-table {
     border-collapse: collapse;
     width: 100%;
@@ -1608,41 +1599,53 @@ body.light-mode .chat-response {
 
 .financial-table th,
 .financial-table td {
-    border: 1px solid #444; /* 深色模式的儲存格邊框 */
+    /* [修改] 使用 CSS 變數來定義邊框顏色 */
+    border: 1px solid var(--border-color);
     padding: 8px 12px;
     text-align: left;
     white-space: nowrap;
 }
 
 .financial-table th {
+    /* [修改] 使用 CSS 變數來定義背景和文字顏色 */
     background-color: var(--bg-panel);
+    color: var(--text-secondary); /* 標題使用次要文字顏色 */
+    position: sticky;
+    left: 0;
 }
 
+/* ✨ [新增] 解決問題的關鍵：為 td 也明確指定文字顏色 ✨ */
+.financial-table td {
+    color: var(--text-primary); /* 數據使用主要文字顏色 */
+}
 
 
 /* ================================== */
 /*      白天模式 (Light Mode) 覆蓋樣式    */
 /* ================================== */
 
-body.light-mode .fixed-header-column {
-    background-color: #f8f9fa; /* 淺灰色背景 */
-    border-right: 1px solid #dee2e6; /* 淺色邊框 */
-}
-
-body.light-mode .financial-table th,
-body.light-mode .financial-table td {
-    border: 1px solid #dee2e6; /* 淺色模式的儲存格邊框 */
-}
-
-body.light-mode .financial-table th,
+/* 覆蓋固定標題欄的背景和邊框 */
 body.light-mode .fixed-header-column {
     background-color: var(--bg-panel);
+    border-right: 1px solid var(--border-color);
 }
 
-/* 如果需要，也可以為 td 指定白天模式的顏色 */
+/* 覆蓋 th 和 td 的邊框 */
+body.light-mode .financial-table th,
 body.light-mode .financial-table td {
-    color: #1c1c1c;
-    background-color: #ffffff;
+    border: 1px solid var(--border-color);
+}
+
+/* 覆蓋 th 的背景和文字顏色 */
+body.light-mode .financial-table th {
+    background-color: var(--bg-panel);
+    color: var(--text-secondary);
+}
+
+/* 覆蓋 td 的背景和文字顏色 */
+body.light-mode .financial-table td {
+    color: var(--text-primary);
+    background-color: var(--bg-panel);
 }
 
 /* ================================== */
