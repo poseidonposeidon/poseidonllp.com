@@ -202,11 +202,6 @@ div {
     transition: background-color 0.6s ease, transform 0.6s ease;
 }
 
-.section:hover, .compare:hover {
-    /*background-color: #2c2c2c;*/
-    transform: scale(1.009);
-}
-
 .section-content, .compare-content {
     transition: none;
     opacity: 1;
@@ -380,6 +375,8 @@ button:not(.info-input button):hover {
     margin: 10px 0;
 }
 
+.section,
+.compare,
 #companyProfileContainer,
 #companyProfileContainerJP,
 #companyProfileContainerTW,
@@ -394,12 +391,38 @@ button:not(.info-input button):hover {
 #PriceContainerKR,
 #PriceContainerHK,
 #PriceContainerCN {
-    text-align: center;
-    margin: 10px auto;
-    padding: 20px;
-    /*background-color: #1e1e1e;*/
-    border-radius: 5px;
-    max-width: 100%;
+    /* 1. [修復] 使用 CSS 變數重新賦予背景色 */
+    background-color: var(--bg-panel);
+
+    /* 2. [統一] 套用我們定義好的面板樣式 */
+    border: 1px solid var(--border-color);
+    border-radius: 12px; /* 統一圓角 */
+    padding: 24px; /* 統一內邊距 */
+    margin-bottom: 24px; /* 統一區塊間距 */
+    box-shadow: 0 4px 12px var(--shadow-color); /* 增加立體感 */
+
+    /* 3. [優化] 使用更平滑的 hover 動畫 */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.section:hover,
+.compare:hover,
+#companyProfileContainer:hover,
+#companyProfileContainerJP:hover,
+#companyProfileContainerTW:hover,
+#companyProfileContainerEU:hover,
+#companyProfileContainerKR:hover,
+#companyProfileContainerHK:hover,
+#companyProfileContainerCN:hover,
+#PriceContainer:hover,
+#PriceContainerJP:hover,
+#PriceContainerTW:hover,
+#PriceContainerEU:hover,
+#PriceContainerKR:hover,
+#PriceContainerHK:hover,
+#PriceContainerCN:hover {
+    transform: translateY(-4px); /* 向上微移，比放大更精緻 */
+    box-shadow: 0 8px 24px var(--shadow-color);
 }
 
 .info-content {
