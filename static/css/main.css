@@ -44,6 +44,11 @@ body.modal-open {
 
 body {
     background-color: var(--bg-main);
+    color: var(--text-primary); /* ✨ 新增：設定全域預設文字顏色 */
+    font-family: 'Arial', 'Helvetica', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    transition: filter 0.3s ease;
 }
 
 h1, h2 {
@@ -71,10 +76,10 @@ input:focus {
 }
 
 div {
-    background-color: #1e1e1e;
+    /* 移除 background-color, padding, border-radius */
     margin-top: 10px;
-    padding: 10px;
-    border-radius: 5px;
+    /* 背景和邊框等樣式應由具體的 class (如 .chart-panel) 來定義 */
+    /* 而不是強制應用於所有 div */
 }
 
 /* Navbar 基本樣式 */
@@ -1427,10 +1432,7 @@ button:not(.info-input button):hover {
 
 /* 當 body 有 .light-mode class 時，套用以下樣式 */
 
-body.light-mode {
-    background-color: #f0f2f5;
-    color: #1c1c1c;
-}
+
 
 body.light-mode h1,
 body.light-mode h2 {
