@@ -5596,35 +5596,57 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     // --- 修改後的 HTML 結構 ---
     container.innerHTML = `
-        <button id="${downloadButtonId}">Download as Excel</button>
-        <div class="scroll-container-x" id="${chartId}ScrollContainer">
-            <div id="${chartId}Container">
-                ${tableHtml}
+        <!-- 1. 新增一個主報告容器 -->
+        <div class="financial-report-section">
+    
+            <div class="report-header">
+                <button id="${downloadButtonId}">Download as Excel</button>
             </div>
-        </div>
-        <div id="operatingChartContainer" style="margin-top: 20px;">
-            <h2>Operating Performance</h2>
-            <button id="resetZoomBtn_Operating_${operatingChartId}">Reset Zoom</button> 
-            <canvas id="${operatingChartId}"></canvas>
-        </div>
-        <div id="chartContainer" style="margin-top: 20px;">
-            <h2>Profitability & Growth</h2>
-            <button id="resetZoomBtn_Income_${chartId}">Reset Zoom</button> 
-            <canvas id="${chartId}"></canvas>
-        </div>
-        <div id="peBandContainer" style="margin-top: 20px;">
-            <h2>P/E Ratio History</h2>
-            <button id="resetZoomBtn_PEBand_${peBandCanvasId}">Reset Zoom</button> 
-            <canvas id="${peBandCanvasId}"></canvas>
-        </div>
-        <div id="technicalAnalysisContainer_${techChartId}" style="margin-top: 20px;">
-            <h2>Technical Analysis (Price & Volume)</h2>
-            <button id="resetZoomBtn_Tech_${techChartId}">Reset Zoom</button> 
-            <canvas id="${techChartId}"></canvas> <!-- 使用傳入的 techChartId -->
-            
-            <div style="height: 80px; margin-top: 10px;">
-                 <canvas id="${techChartId}_nav"></canvas>
+    
+            <!-- 2. 為表格和每個圖表都套用 .chart-panel class -->
+            <div class="chart-panel">
+                <div class="scroll-container-x" id="${chartId}ScrollContainer">
+                    <div id="${chartId}Container">
+                        ${tableHtml}
+                    </div>
+                </div>
             </div>
+    
+            <div class="chart-panel" id="operatingChartContainer">
+                <div class="panel-header">
+                    <h2>Operating Performance</h2>
+                    <button id="resetZoomBtn_Operating_${operatingChartId}">Reset Zoom</button> 
+                </div>
+                <canvas id="${operatingChartId}"></canvas>
+            </div>
+    
+            <div class="chart-panel" id="chartContainer">
+                <div class="panel-header">
+                    <h2>Profitability & Growth</h2>
+                    <button id="resetZoomBtn_Income_${chartId}">Reset Zoom</button> 
+                </div>
+                <canvas id="${chartId}"></canvas>
+            </div>
+    
+            <div class="chart-panel" id="peBandContainer">
+                <div class="panel-header">
+                    <h2>P/E Ratio History</h2>
+                    <button id="resetZoomBtn_PEBand_${peBandCanvasId}">Reset Zoom</button> 
+                </div>
+                <canvas id="${peBandCanvasId}"></canvas>
+            </div>
+    
+            <div class="chart-panel" id="technicalAnalysisContainer_${techChartId}">
+                <div class="panel-header">
+                    <h2>Technical Analysis (Price & Volume)</h2>
+                    <button id="resetZoomBtn_Tech_${techChartId}">Reset Zoom</button> 
+                </div>
+                <canvas id="${techChartId}"></canvas>
+                <div class="navigator-container">
+                     <canvas id="${techChartId}_nav"></canvas>
+                </div>
+            </div>
+    
         </div>
     `;
 

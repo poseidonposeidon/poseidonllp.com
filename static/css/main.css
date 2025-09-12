@@ -43,12 +43,7 @@ body.modal-open {
 }
 
 body {
-    background-color: #121212;
-    color: #e0e0e0;
-    font-family: 'Arial', 'Helvetica', sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    transition: filter 0.3s ease;
+    background-color: var(--bg-main);
 }
 
 h1, h2 {
@@ -1620,11 +1615,9 @@ body.light-mode .chat-response {
 }
 
 .financial-table th {
-    background-color: #1e1e1e; /* 確保 th 也有背景色 */
-    color: #b0bec5;
-    position: sticky;
-    left: 0;
+    background-color: var(--bg-panel);
 }
+
 
 
 /* ================================== */
@@ -1641,9 +1634,9 @@ body.light-mode .financial-table td {
     border: 1px solid #dee2e6; /* 淺色模式的儲存格邊框 */
 }
 
-body.light-mode .financial-table th {
-    background-color: #f8f9fa; /* 淺色背景 */
-    color: #212529; /* 深色文字 */
+body.light-mode .financial-table th,
+body.light-mode .fixed-header-column {
+    background-color: var(--bg-panel);
 }
 
 /* 如果需要，也可以為 td 指定白天模式的顏色 */
@@ -1652,4 +1645,145 @@ body.light-mode .financial-table td {
     background-color: #ffffff;
 }
 
+/* ================================== */
+/*     1. [新增] 顏色變數 (主題管理)    */
+/* ================================== */
 
+/* :root 定義了預設 (深色) 模式的顏色 */
+:root {
+    --bg-main: #121212;
+    --bg-panel: #1e1e1e;
+    --text-primary: #e0e0e0;
+    --text-secondary: #b0bec5;
+    --border-color: #333;
+    --shadow-color: rgba(0, 0, 0, 0.2);
+    --scrollbar-track-bg: #2c2c2c;
+    --scrollbar-thumb-bg: #555;
+    --scrollbar-thumb-hover-bg: #777;
+}
+
+/* 當 body 有 .light-mode class 時，使用這些淺色變數 */
+body.light-mode {
+    --bg-main: #f0f2f5;
+    --bg-panel: #ffffff;
+    --text-primary: #1c1c1c;
+    --text-secondary: #333;
+    --border-color: #dee2e6;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --scrollbar-track-bg: #e9ecef;
+    --scrollbar-thumb-bg: #ced4da;
+    --scrollbar-thumb-hover-bg: #adb5bd;
+}
+
+
+/* ================================== */
+/*     2. [新增] 財務報告區塊優化       */
+/* ================================== */
+
+/* 主報告容器，用於控制整體佈局和間距 */
+.financial-report-section {
+    display: flex;
+    flex-direction: column;
+    gap: 24px; /* 控制每個面板之間的垂直間距 */
+    padding: 16px;
+    max-width: 1400px; /* 限制最大寬度，在大螢幕上更美觀 */
+    margin: 20px auto; /* 水平居中 */
+    background-color: transparent; /* 容器本身透明 */
+    box-shadow: none !important; /* 確保它沒有多餘的陰影 */
+}
+
+/* 報告頂部操作區 (如下載按鈕) */
+.report-header {
+    display: flex;
+    justify-content: flex-end; /* 按鈕靠右 */
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none !important;
+}
+
+/* 卡片式面板設計 (套用到表格和所有圖表) */
+.chart-panel {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-radius: 12px; /* 更大的圓角 */
+    padding: 24px;
+    box-shadow: 0 4px 12px var(--shadow-color);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.chart-panel:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 24px var(--shadow-color);
+}
+
+/* 面板標題容器 (h2 和 Reset Zoom 按鈕) */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none !important;
+}
+
+.panel-header h2 {
+    margin: 0; /* 移除 h2 預設的 margin */
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+}
+
+/* 重設縮放/下載按鈕的統一樣式 */
+.panel-header button, .report-header button {
+    background-color: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.panel-header button:hover, .report-header button:hover {
+    background-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* 導航圖容器 */
+.navigator-container {
+    height: 80px;
+    margin-top: 20px;
+    padding: 0;
+    background-color: transparent;
+    box-shadow: none !important;
+}
+
+
+/* ================================== */
+/*     3. [新增] 美化滾動條樣式        */
+/* ================================== */
+
+/* 適用於 Webkit 核心的瀏覽器 (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+/* 滾動條軌道 */
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-bg);
+    border-radius: 10px;
+}
+
+/* 滾動條滑塊 */
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-bg);
+    border-radius: 10px;
+    border: 2px solid var(--scrollbar-track-bg); /* 創造邊距效果 */
+}
+
+/* 滑塊在滑鼠懸停時的樣式 */
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover-bg);
+}
