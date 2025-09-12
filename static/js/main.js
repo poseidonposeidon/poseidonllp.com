@@ -5049,15 +5049,15 @@ async function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 }
 
 /**
-* =========================================================================
-* 主要函式：創建包含導航器的技術分析圖表
-* (請用此版本完全取代您現有的 createTechnicalAnalysisChart 函式)
-* =========================================================================
-* @param {Array} priceHistory - 歷史價格數據 (OHLCV)，已按日期升序排列。
-* @param {Array} ma5History - 5日均線數據，已按日期升序排列。
-* @param {Array} ma10History - 10日均線數據，已按日期升序排列。
-* @param {string} chartId - 主圖表 canvas 元素的 ID。
-*/
+ * =========================================================================
+ * 主要函式：創建包含「即時同步導航器」的技術分析圖表
+ * (此為最終版本，請用它完全取代您現有的 createTechnicalAnalysisChart 函式)
+ * =========================================================================
+ * @param {Array} priceHistory - 歷史價格數據 (OHLCV)，已按日期升序排列。
+ * @param {Array} ma5History - 5日均線數據，已按日期升序排列。
+ * @param {Array} ma10History - 10日均線數據，已按日期升序排列。
+ * @param {string} chartId - 主圖表 canvas 元素的 ID。
+ */
 function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, chartId) {
     const ctx = document.getElementById(chartId).getContext('2d');
     const navigatorId = `${chartId}_nav`; // 導航圖的 canvas ID
@@ -5113,7 +5113,6 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                 yVolume: { type: 'linear', position: 'right', title: { display: true, text: 'Volume' }, grid: { drawOnChartArea: false } }
             },
             plugins: {
-                // <-- [已補上] 您原有的 legend (圖例) 設定 -->
                 legend: {
                     labels: {
                         generateLabels: function(chart) {
@@ -5132,7 +5131,6 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                         }
                     }
                 },
-                // <-- [已補上] 您原有的 tooltip (提示框) 設定 -->
                 tooltip: {
                     mode: 'index',
                     intersect: false,
@@ -5154,16 +5152,28 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                         }
                     }
                 },
-                // <-- [已補上] 您原有的 decimation (數據抽稀) 設定 -->
                 decimation: {
                     enabled: true,
                     algorithm: 'lttb',
                     samples: 100,
                 },
-                // <-- [已更新] 這是新的 zoom (縮放) 設定，用於同步導航器 -->
+                // ✨ [最終更新]：新增 onPan 和 onZoom 事件以實現即時同步 ✨
                 zoom: {
-                    pan: { enabled: true, mode: 'x' },
-                    zoom: { wheel: { enabled: true, speed: 0.1 }, pinch: { enabled: true }, mode: 'x' },
+                    pan: {
+                        enabled: true,
+                        mode: 'x',
+                        onPan: ({chart}) => { // 在平移的每一刻都更新導航器
+                            updateNavigator(chart, chartSync[chart.id].navigator);
+                        }
+                    },
+                    zoom: {
+                        wheel: { enabled: true, speed: 0.1 },
+                        pinch: { enabled: true },
+                        mode: 'x',
+                        onZoom: ({chart}) => { // 在縮放的每一刻都更新導航器
+                            updateNavigator(chart, chartSync[chart.id].navigator);
+                        }
+                    },
                     limits: {
                         x: {
                             min: firstDataPointX ? firstDataPointX - padding : undefined,
@@ -5171,10 +5181,10 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                             minRange: 60 * 60 * 1000 * 24 * 30
                         },
                     },
-                    onZoomComplete: ({chart}) => {
+                    onPanComplete: ({chart}) => { // 保留 onComplete 以防萬一
                         updateNavigator(chart, chartSync[chart.id].navigator);
                     },
-                    onPanComplete: ({chart}) => {
+                    onZoomComplete: ({chart}) => {
                         updateNavigator(chart, chartSync[chart.id].navigator);
                     }
                 },
@@ -5182,7 +5192,7 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
         }
     });
 
-    // 4. 創建導航圖 (Navigator Chart)
+    // 4. 創建導航圖
     const navigatorChart = createNavigatorChart(navigatorId, priceHistory);
 
     // 5. 儲存圖表實例並建立同步關聯
@@ -5190,10 +5200,10 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
     technicalAnalysisChartInstances[navigatorId] = navigatorChart;
     chartSync[chartId] = { main: mainChart, navigator: navigatorChart };
 
-    // 6. 初始化導航圖，使其顯示主圖表的初始視圖範圍
+    // 6. 初始化導航圖
     updateNavigator(mainChart, navigatorChart);
 
-    // 7. 為導航圖添加拖曳平移的功能
+    // 7. 為導航圖添加拖曳功能
     addNavigatorDragHandlers(navigatorChart, mainChart);
 }
 
