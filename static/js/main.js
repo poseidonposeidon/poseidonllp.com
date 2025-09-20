@@ -5324,8 +5324,8 @@ function addNavigatorDragHandlers(navigatorChart, mainChart) {
         const timeDelta = dx * timePerPixel;
 
         // 計算新的主圖表範圍
-        const newMin = initialMin - timeDelta;
-        const newMax = initialMax - timeDelta;
+        const newMin = initialMin + timeDelta;
+        const newMax = initialMax + timeDelta;
 
         // 更新主圖表
         mainChart.options.scales.x.min = newMin;
