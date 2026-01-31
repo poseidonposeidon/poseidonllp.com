@@ -1881,11 +1881,11 @@ body.light-mode {
 
 /* --- 主要內容佈局 (Grid) --- */
 .dd-content {
-    flex: 1; /* ⚠️ 修改：自動填滿 Header 以外的剩餘空間 */
+    flex: 1;
     display: grid;
-    grid-template-columns: 40% 60%; /* 左文右圖 */
-    min-height: 0; /* ⚠️ 關鍵修復：防止 Grid 子元素撐爆父容器，讓內部滾動生效 */
-    overflow: hidden;
+    grid-template-columns: 40% 60%;
+    min-height: 0; /* ⚠️ 絕對關鍵：防止 Grid 撐破父容器，讓內部捲軸生效 */
+    overflow: hidden; /* 隱藏溢出，強制子元素自己處理捲軸 */
 }
 
 /* --- 左側：報告與聊天 --- */
@@ -1896,6 +1896,19 @@ body.light-mode {
     background-color: #252525;
     height: 100%; /* 確保佔滿高度 */
     overflow: hidden; /* 內部有自己的滾動區，這裡隱藏 */
+}
+
+.dd-right-panel {
+    height: 100%;       /* 填滿 dd-content 的高度 */
+    overflow-y: auto;   /* ⚠️ 開啟垂直捲軸 */
+    padding: 20px;
+    background-color: #1e1e1e;
+    box-sizing: border-box; /* 確保 padding 不會增加寬度 */
+
+    /* 讓內部的卡片垂直排列 */
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .dd-report-area {
@@ -1952,34 +1965,35 @@ body.light-mode {
     padding: 15px;
     border: 1px solid #444;
 
-    /* ⚠️ 關鍵修改 1：設定固定高度 */
-    height: 400px;       /* 您可以依需求調整這個數字，例如 350px 或 450px */
-    min-height: 400px;   /* 確保不會被壓縮 */
-    flex-shrink: 0;      /* 防止在滾動容器中變形 */
+    /* 固定高度設定 */
+    height: 420px;      /* 設定一個舒適的高度 */
+    min-height: 420px;  /* 鎖死最小高度，防止壓縮 */
+    flex-shrink: 0;     /* 禁止在 Flex 容器中被壓縮 */
 
-    /* ⚠️ 關鍵修改 2：使用 Flex 佈局管理內部元素 (標題 + 圖表) */
+    /* 內部佈局：讓標題和圖表垂直分開 */
     display: flex;
     flex-direction: column;
     position: relative;
     box-sizing: border-box;
 }
 
-/* 讓標題保持在頂部 */
+/* 4. 標題：固定在上方，不准壓縮 */
 .dd-chart-title {
     color: #aaa;
     font-size: 14px;
     margin-bottom: 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
-    flex-shrink: 0; /* 標題高度不可壓縮 */
+    flex: 0 0 auto; /* ⚠️ 高度由文字決定，不可伸縮 */
 }
 
 /* ⚠️ 關鍵修改 3：強制 Canvas 填滿卡片剩餘空間，但不准撐開 */
 .dd-chart-card canvas {
-    flex: 1;                 /* 自動填滿剩餘空間 */
+    flex: 1;                 /* 自動填滿卡片剩下的空間 */
+    min-height: 0;           /* 防止 Flex 子元素溢出 */
     width: 100% !important;  /* 強制寬度 */
-    height: 100% !important; /* 強制高度跟隨父容器 */
-    max-height: 100%;        /* 雙重保險 */
+    height: auto !important; /* 高度交給 flex 控制 */
+    display: block;
 }
 
 /* --- Loading 動畫 --- */
