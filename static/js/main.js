@@ -9083,7 +9083,7 @@ async function runDeepDive() {
         // 這裡我們直接在前端抓取繪圖所需的歷史數據 (因為圖表需要時間序列)
         await Promise.all([
             drawValuationChart(symbol),
-            drawInsiderChart(data.raw_data.insider_buys), // 使用後端回傳的精確籌碼數據
+            drawInsiderChart(data.raw_data.insider_transactions), // 使用後端回傳的精確籌碼數據
             drawMarginsChart(symbol)
         ]);
 
@@ -9171,22 +9171,50 @@ async function drawValuationChart(symbol) {
 
 // Chart 2: 內部人交易圖 (Bar Chart)
 function drawInsiderChart(insiderData) {
-    const ctx = document.getElementById('dd-insider-chart').getContext('2d');
-    if (deepDiveChartInstances['insider']) deepDiveChartInstances['insider'].destroy();
+    const canvas = document.getElementById('dd-insider-chart');
+    const ctx = canvas.getContext('2d');
 
-    // 如果沒有數據
+    // 銷毀舊圖表
+    if (deepDiveChartInstances['insider']) {
+        deepDiveChartInstances['insider'].destroy();
+    }
+
+    // --- 處理無數據的情況 ---
     if (!insiderData || insiderData.length === 0) {
-        // 可以繪製一個空的文字
+        // 清空畫布
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        // 繪製提示文字
+        ctx.save();
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.font = "16px Arial";
+        ctx.fillStyle = "#888";
+        ctx.fillText("No Recent Insider Trading Data (近期無內部人交易)", canvas.width / 2, canvas.height / 2);
+        ctx.restore();
         return;
     }
 
     // 整理數據 (反轉順序，讓最新的在右邊)
-    const sortedData = [...insiderData].reverse();
-    const labels = sortedData.map(d => d.transactionDate);
-    const values = sortedData.map(d => d.securitiesTransacted); // 股數
-    const backgroundColors = sortedData.map(d =>
-        d.transactionType.includes('Buy') ? '#00c853' : '#d50000' // 買綠賣紅
-    );
+    // 只取前 15 筆以免擁擠
+    const sortedData = [...insiderData].slice(0, 15).reverse();
+
+    const labels = sortedData.map(d => {
+        // 簡化日期顯示 (YYYY-MM-DD)
+        return d.transactionDate ? d.transactionDate.split(' ')[0] : 'N/A';
+    });
+
+    const values = sortedData.map(d => d.securitiesTransacted);
+
+    // 判斷顏色：買入為綠色，賣出為紅色
+    const backgroundColors = sortedData.map(d => {
+        const type = (d.transactionType || "").toLowerCase();
+        // 包含 Buy, Purchase, Award 等關鍵字視為正向/買入
+        if (type.includes('buy') || type.includes('purchase') || type.includes('award')) {
+            return '#00e676'; // 亮綠色
+        } else {
+            return '#ff5252'; // 亮紅色 (賣出)
+        }
+    });
 
     deepDiveChartInstances['insider'] = new Chart(ctx, {
         type: 'bar',
@@ -9196,17 +9224,41 @@ function drawInsiderChart(insiderData) {
                 label: 'Shares Transacted',
                 data: values,
                 backgroundColor: backgroundColors,
-                borderWidth: 0
+                borderWidth: 0,
+                borderRadius: 4 // 圓角柱狀圖，比較美觀
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                x: { ticks: { color: '#888', font: {size: 10} } },
-                y: { grid: { color: '#333' } }
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    callbacks: {
+                        // 讓 Tooltip 顯示交易人類型與名字
+                        title: (items) => {
+                            const index = items[0].dataIndex;
+                            const d = sortedData[index];
+                            return `${d.transactionDate} - ${d.transactionType}`;
+                        },
+                        label: (item) => {
+                            const index = item.dataIndex;
+                            const d = sortedData[index];
+                            return `${d.reportingName}: ${d.securitiesTransacted.toLocaleString()} shares`;
+                        }
+                    }
+                }
             },
-            plugins: { legend: { display: false } }
+            scales: {
+                x: {
+                    ticks: { color: '#888', font: {size: 10}, maxRotation: 45, minRotation: 45 },
+                    grid: { display: false }
+                },
+                y: {
+                    grid: { color: '#333' },
+                    ticks: { color: '#666' }
+                }
+            }
         }
     });
 }
