@@ -9074,7 +9074,7 @@ async function runDeepDive() {
 
         // 如果有 RAG 歷史，顯示提示
         if (data.rag_hit) {
-            alert("系統發現歷史分析紀錄！AI 已自動比較前後觀點變化。");
+            console.log("系統發現歷史分析紀錄，已自動比較前後觀點。");
         }
 
         // --- 階段 C: 繪製右側圖表 (平行處理) ---
