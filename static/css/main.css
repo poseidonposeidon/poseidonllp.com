@@ -1946,32 +1946,40 @@ body.light-mode {
 }
 
 /* --- 右側：圖表儀表板 --- */
-.dd-right-panel {
-    padding: 20px;
-    overflow-y: auto; /* ⚠️ 允許右側面板垂直滾動 */
-    background-color: #1e1e1e;
-    height: 100%; /* 確保佔滿高度 */
-    display: flex;       /* 改用 Flex Column 排列圖表卡片 */
-    flex-direction: column;
-    gap: 20px;
-}
-
 .dd-chart-card {
     background: #2a2a2a;
     border-radius: 8px;
     padding: 15px;
     border: 1px solid #444;
-    min-height: 350px; /* 稍微增加高度讓圖表更清楚 */
+
+    /* ⚠️ 關鍵修改 1：設定固定高度 */
+    height: 400px;       /* 您可以依需求調整這個數字，例如 350px 或 450px */
+    min-height: 400px;   /* 確保不會被壓縮 */
+    flex-shrink: 0;      /* 防止在滾動容器中變形 */
+
+    /* ⚠️ 關鍵修改 2：使用 Flex 佈局管理內部元素 (標題 + 圖表) */
+    display: flex;
+    flex-direction: column;
     position: relative;
-    flex-shrink: 0; /* 防止圖表卡片被壓縮 */
+    box-sizing: border-box;
 }
 
+/* 讓標題保持在頂部 */
 .dd-chart-title {
     color: #aaa;
     font-size: 14px;
     margin-bottom: 10px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    flex-shrink: 0; /* 標題高度不可壓縮 */
+}
+
+/* ⚠️ 關鍵修改 3：強制 Canvas 填滿卡片剩餘空間，但不准撐開 */
+.dd-chart-card canvas {
+    flex: 1;                 /* 自動填滿剩餘空間 */
+    width: 100% !important;  /* 強制寬度 */
+    height: 100% !important; /* 強制高度跟隨父容器 */
+    max-height: 100%;        /* 雙重保險 */
 }
 
 /* --- Loading 動畫 --- */
