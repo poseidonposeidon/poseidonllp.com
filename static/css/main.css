@@ -1816,7 +1816,7 @@ body.light-mode {
     background: var(--scrollbar-thumb-hover-bg);
 }
 
-/* Deep Dive Modal 專用樣式 */
+/* Deep Dive Modal 專用樣式 (修復滾動版) */
 #deep-dive-modal {
     display: none; /* 預設隱藏 */
     position: fixed;
@@ -1832,23 +1832,24 @@ body.light-mode {
 .dd-container {
     position: relative;
     width: 95%;
-    height: 90%;
-    margin: 2% auto;
+    height: 90vh; /* ⚠️ 修改：使用 vh 單位確保佔據視窗高度的 90% */
+    margin: 5vh auto; /* ⚠️ 修改：上下各 5vh 確保垂直置中 */
     background-color: #1e1e1e; /* 深灰底色 */
     border-radius: 12px;
     box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
     display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    flex-direction: column; /* 垂直排列：Header 在上，Content 在下 */
+    overflow: hidden; /* ⚠️ 關鍵：禁止整個大卡片出現滾動條 */
     border: 1px solid #333;
 }
 
 /* --- 頂部 Header --- */
 .dd-header {
+    flex: 0 0 70px; /* ⚠️ 修改：固定高度 70px，不允許壓縮或拉伸 */
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 15px 25px;
+    padding: 0 25px; /* 上下 padding 改由 flex align-items 控制 */
     background-color: #2c2c2c;
     border-bottom: 1px solid #444;
 }
@@ -1880,9 +1881,10 @@ body.light-mode {
 
 /* --- 主要內容佈局 (Grid) --- */
 .dd-content {
+    flex: 1; /* ⚠️ 修改：自動填滿 Header 以外的剩餘空間 */
     display: grid;
     grid-template-columns: 40% 60%; /* 左文右圖 */
-    flex: 1;
+    min-height: 0; /* ⚠️ 關鍵修復：防止 Grid 子元素撐爆父容器，讓內部滾動生效 */
     overflow: hidden;
 }
 
@@ -1892,12 +1894,14 @@ body.light-mode {
     flex-direction: column;
     border-right: 1px solid #444;
     background-color: #252525;
+    height: 100%; /* 確保佔滿高度 */
+    overflow: hidden; /* 內部有自己的滾動區，這裡隱藏 */
 }
 
 .dd-report-area {
     flex: 2; /* 報告佔上方 2/3 */
     padding: 20px;
-    overflow-y: auto;
+    overflow-y: auto; /* ⚠️ 允許報告區域垂直滾動 */
     color: #ddd;
     font-family: 'Segoe UI', sans-serif;
     line-height: 1.6;
@@ -1914,12 +1918,13 @@ body.light-mode {
     background-color: #1a1a1a;
     display: flex;
     flex-direction: column;
+    min-height: 0; /* 避免 flex 巢狀溢出 */
 }
 
 .dd-chat-messages {
     flex: 1;
     padding: 15px;
-    overflow-y: auto;
+    overflow-y: auto; /* ⚠️ 允許聊天訊息滾動 */
     font-size: 14px;
 }
 
@@ -1927,6 +1932,7 @@ body.light-mode {
     display: flex;
     padding: 10px;
     border-top: 1px solid #333;
+    flex-shrink: 0; /* 輸入框不允許被壓縮 */
 }
 
 .dd-chat-input-box input {
@@ -1942,10 +1948,11 @@ body.light-mode {
 /* --- 右側：圖表儀表板 --- */
 .dd-right-panel {
     padding: 20px;
-    overflow-y: auto;
+    overflow-y: auto; /* ⚠️ 允許右側面板垂直滾動 */
     background-color: #1e1e1e;
-    display: grid;
-    grid-template-columns: 1fr; /* 單欄垂直排列 */
+    height: 100%; /* 確保佔滿高度 */
+    display: flex;       /* 改用 Flex Column 排列圖表卡片 */
+    flex-direction: column;
     gap: 20px;
 }
 
@@ -1954,8 +1961,9 @@ body.light-mode {
     border-radius: 8px;
     padding: 15px;
     border: 1px solid #444;
-    min-height: 300px;
+    min-height: 350px; /* 稍微增加高度讓圖表更清楚 */
     position: relative;
+    flex-shrink: 0; /* 防止圖表卡片被壓縮 */
 }
 
 .dd-chart-title {
