@@ -9011,3 +9011,337 @@ function downloadPdfFile() {
     downloadLink.click();
     document.body.removeChild(downloadLink);
 }
+
+/* ==========================================================================
+   AI Deep Dive (深度個股透視) 模組
+   ========================================================================== */
+
+// 全局變數：用來暫存目前的分析數據，供聊天室使用 (RAG Context)
+let currentDeepDiveData = null;
+let currentReportContent = "";
+let deepDiveChartInstances = {}; // 儲存圖表實例以供銷毀
+
+// 1. Modal 開關控制
+function openDeepDiveModal() {
+    const modal = document.getElementById('deep-dive-modal');
+    modal.style.display = 'block';
+    document.body.style.overflow = 'hidden'; // 禁止背景滾動
+}
+
+function closeDeepDiveModal() {
+    const modal = document.getElementById('deep-dive-modal');
+    modal.style.display = 'none';
+    document.body.style.overflow = 'auto'; // 恢復背景滾動
+}
+
+// 2. 執行深度分析 (核心函式)
+async function runDeepDive() {
+    const symbolInput = document.getElementById('dd-stock-input');
+    const symbol = symbolInput.value.trim().toUpperCase();
+    const loadingScreen = document.getElementById('dd-loading-screen');
+    const loadingText = document.getElementById('dd-loading-text');
+    const reportContainer = document.getElementById('dd-report-container');
+
+    if (!symbol) {
+        alert("請輸入股票代碼！");
+        return;
+    }
+
+    // 啟動 Loading
+    loadingScreen.style.display = 'flex';
+    loadingText.innerText = "正在調用 FMP API 獲取：估值模型、內部人交易、法說會逐字稿...";
+    reportContainer.innerHTML = ""; // 清空舊報告
+
+    try {
+        // --- 階段 A: 呼叫後端生成 AI 報告 ---
+        const response = await fetch(`${baseUrl}/api/ai_deep_dive`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ symbol: symbol })
+        });
+
+        if (!response.ok) throw new Error("Analysis Failed");
+
+        const data = await response.json();
+
+        // 儲存 Context 供聊天室使用
+        currentDeepDiveData = data.raw_data;
+        currentReportContent = data.report;
+
+        // --- 階段 B: 渲染 AI 報告 ---
+        loadingText.innerText = "AI 正在排版分析報告...";
+        renderDeepDiveMarkdown(data.report, reportContainer);
+
+        // 如果有 RAG 歷史，顯示提示
+        if (data.rag_hit) {
+            alert("系統發現歷史分析紀錄！AI 已自動比較前後觀點變化。");
+        }
+
+        // --- 階段 C: 繪製右側圖表 (平行處理) ---
+        loadingText.innerText = "正在繪製視覺化圖表...";
+
+        // 這裡我們直接在前端抓取繪圖所需的歷史數據 (因為圖表需要時間序列)
+        await Promise.all([
+            drawValuationChart(symbol),
+            drawInsiderChart(data.raw_data.insider_buys), // 使用後端回傳的精確籌碼數據
+            drawMarginsChart(symbol)
+        ]);
+
+        // 初始化聊天室歡迎語
+        initDeepDiveChat();
+
+    } catch (error) {
+        console.error(error);
+        reportContainer.innerHTML = `<p style="color: red;">分析發生錯誤：${error.message}</p>`;
+    } finally {
+        // 關閉 Loading
+        loadingScreen.style.display = 'none';
+    }
+}
+
+// 3. 渲染 Markdown 報告 (簡單版)
+function renderDeepDiveMarkdown(text, container) {
+    // 將 Markdown 轉為 HTML (支援標題、粗體、列表)
+    let html = text
+        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
+        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
+        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
+        .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+        .replace(/^\- (.*$)/gim, '<ul><li>$1</li></ul>') // 簡單列表
+        .replace(/\n/g, '<br>');
+
+    // 修復列表標籤 (將連續的 ul 合併的簡單處理，或直接用 CSS 處理間距)
+    html = html.replace(/<\/ul><br><ul>/g, '');
+
+    container.innerHTML = html;
+}
+
+// 4. 圖表繪製函式集
+
+// Chart 1: 估值圖 (股價 vs PE Band) - 需要抓歷史數據
+async function drawValuationChart(symbol) {
+    const ctx = document.getElementById('dd-valuation-chart').getContext('2d');
+    if (deepDiveChartInstances['valuation']) deepDiveChartInstances['valuation'].destroy();
+
+    // 抓取過去 3 年股價
+    const prices = await fetchStockPriceHistory(symbol, 365 * 3);
+
+    // 簡單模擬：計算平均 PE 的隱含股價 (這裡簡化處理，實務上需抓取歷史 EPS)
+    // 為了演示效果，我們畫股價走勢 + 一條移動平均線代表「趨勢」
+    const labels = prices.map(p => p.date);
+    const closeData = prices.map(p => p.close);
+
+    // 計算簡單的「估值中樞」 (例如 200日均線)
+    const sma200 = calculateSMA(closeData, 200);
+
+    deepDiveChartInstances['valuation'] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Stock Price',
+                    data: closeData,
+                    borderColor: '#f0b90b',
+                    borderWidth: 1.5,
+                    pointRadius: 0
+                },
+                {
+                    label: '200 MA (Valuation Baseline)',
+                    data: sma200,
+                    borderColor: 'rgba(255, 255, 255, 0.5)',
+                    borderWidth: 1,
+                    borderDash: [5, 5],
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: { display: false }, // 隱藏 X 軸標籤以保持簡潔
+                y: { grid: { color: '#333' } }
+            },
+            plugins: { legend: { labels: { color: '#ccc' } } }
+        }
+    });
+}
+
+// Chart 2: 內部人交易圖 (Bar Chart)
+function drawInsiderChart(insiderData) {
+    const ctx = document.getElementById('dd-insider-chart').getContext('2d');
+    if (deepDiveChartInstances['insider']) deepDiveChartInstances['insider'].destroy();
+
+    // 如果沒有數據
+    if (!insiderData || insiderData.length === 0) {
+        // 可以繪製一個空的文字
+        return;
+    }
+
+    // 整理數據 (反轉順序，讓最新的在右邊)
+    const sortedData = [...insiderData].reverse();
+    const labels = sortedData.map(d => d.transactionDate);
+    const values = sortedData.map(d => d.securitiesTransacted); // 股數
+    const backgroundColors = sortedData.map(d =>
+        d.transactionType.includes('Buy') ? '#00c853' : '#d50000' // 買綠賣紅
+    );
+
+    deepDiveChartInstances['insider'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Shares Transacted',
+                data: values,
+                backgroundColor: backgroundColors,
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { ticks: { color: '#888', font: {size: 10} } },
+                y: { grid: { color: '#333' } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+}
+
+// Chart 3: 三率趨勢 (Margins) - 需要抓 Income Statement
+async function drawMarginsChart(symbol) {
+    const ctx = document.getElementById('dd-financial-chart').getContext('2d');
+    if (deepDiveChartInstances['financial']) deepDiveChartInstances['financial'].destroy();
+
+    // 使用您現有的 fetchIncomeStatement 邏輯，或直接 fetch
+    const response = await fetch(`${BASE_URL}income-statement/${symbol}?period=quarter&limit=12&apikey=${API_KEY}`);
+    const data = await response.json();
+    const sortedData = data.reverse(); // 舊到新
+
+    const labels = sortedData.map(d => d.date);
+    const grossMargin = sortedData.map(d => (d.grossProfit / d.revenue * 100));
+    const netMargin = sortedData.map(d => (d.netIncome / d.revenue * 100));
+
+    deepDiveChartInstances['financial'] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Gross Margin %',
+                    data: grossMargin,
+                    borderColor: '#00e676', // 綠色
+                    backgroundColor: 'rgba(0, 230, 118, 0.1)',
+                    fill: true,
+                    tension: 0.3
+                },
+                {
+                    label: 'Net Margin %',
+                    data: netMargin,
+                    borderColor: '#2979ff', // 藍色
+                    borderDash: [5, 5],
+                    tension: 0.3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { display: false },
+                y: { grid: { color: '#333' } }
+            },
+            plugins: { legend: { labels: { color: '#ccc' } } }
+        }
+    });
+}
+
+// 輔助：抓歷史股價
+async function fetchStockPriceHistory(symbol, limit) {
+    const url = `${BASE_URL}historical-price-full/${symbol}?timeseries=${limit}&apikey=${API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+    return data.historical.reverse(); // 轉為舊到新
+}
+
+// 輔助：計算 SMA
+function calculateSMA(data, window) {
+    let sma = [];
+    for (let i = 0; i < data.length; i++) {
+        if (i < window - 1) {
+            sma.push(null);
+            continue;
+        }
+        let sum = 0;
+        for (let j = 0; j < window; j++) {
+            sum += data[i - j];
+        }
+        sma.push(sum / window);
+    }
+    return sma;
+}
+
+// 5. 情境感知聊天室邏輯
+
+function initDeepDiveChat() {
+    const chatContainer = document.getElementById('dd-chat-messages');
+    chatContainer.innerHTML = `
+        <div class="chat-bubble ai">
+            您好，我是本報告的 AI 財務顧問。我已經閱讀了上方的數據與報告。<br>
+            您可以問我關於估值、風險、或未來成長的問題。
+        </div>
+    `;
+}
+
+function handleChatKey(event) {
+    if (event.key === 'Enter') sendChatQuestion();
+}
+
+async function sendChatQuestion() {
+    const input = document.getElementById('dd-chat-input');
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    // 1. 顯示用戶訊息
+    const chatContainer = document.getElementById('dd-chat-messages');
+    chatContainer.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
+    input.value = "";
+
+    // 滾動到底部
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    // 顯示 Loading
+    const loadingId = "chat-loading-" + Date.now();
+    chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble ai">思考中...</div>`;
+
+    try {
+        // 2. 發送給後端 (Context Aware)
+        const response = await fetch(`${baseUrl}/api/chat_with_context`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: msg,
+                context_data: currentDeepDiveData, // 附帶剛剛抓到的數據
+                report_content: currentReportContent // 附帶剛剛生成的報告
+            })
+        });
+
+        const data = await response.json();
+
+        // 移除 Loading
+        const loadingDiv = document.getElementById(loadingId);
+        if(loadingDiv) loadingDiv.remove();
+
+        // 3. 顯示 AI 回覆
+        chatContainer.innerHTML += `<div class="chat-bubble ai">${data.reply}</div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    } catch (error) {
+        console.error(error);
+        const loadingDiv = document.getElementById(loadingId);
+        if(loadingDiv) loadingDiv.innerText = "抱歉，連線發生錯誤。";
+    }
+}

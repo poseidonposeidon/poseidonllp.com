@@ -1815,3 +1815,187 @@ body.light-mode {
 ::-webkit-scrollbar-thumb:hover {
     background: var(--scrollbar-thumb-hover-bg);
 }
+
+/* Deep Dive Modal 專用樣式 */
+#deep-dive-modal {
+    display: none; /* 預設隱藏 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* 深色半透明背景 */
+    z-index: 2000; /* 確保在最上層 */
+    backdrop-filter: blur(5px);
+}
+
+.dd-container {
+    position: relative;
+    width: 95%;
+    height: 90%;
+    margin: 2% auto;
+    background-color: #1e1e1e; /* 深灰底色 */
+    border-radius: 12px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border: 1px solid #333;
+}
+
+/* --- 頂部 Header --- */
+.dd-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    background-color: #2c2c2c;
+    border-bottom: 1px solid #444;
+}
+
+.dd-search-box {
+    display: flex;
+    gap: 10px;
+}
+
+.dd-search-box input {
+    background: #111;
+    border: 1px solid #555;
+    color: #fff;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 16px;
+    text-transform: uppercase;
+}
+
+.dd-close-btn {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.dd-close-btn:hover { color: #fff; }
+
+/* --- 主要內容佈局 (Grid) --- */
+.dd-content {
+    display: grid;
+    grid-template-columns: 40% 60%; /* 左文右圖 */
+    flex: 1;
+    overflow: hidden;
+}
+
+/* --- 左側：報告與聊天 --- */
+.dd-left-panel {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid #444;
+    background-color: #252525;
+}
+
+.dd-report-area {
+    flex: 2; /* 報告佔上方 2/3 */
+    padding: 20px;
+    overflow-y: auto;
+    color: #ddd;
+    font-family: 'Segoe UI', sans-serif;
+    line-height: 1.6;
+}
+
+/* Markdown 樣式優化 */
+.dd-report-area h1, .dd-report-area h2, .dd-report-area h3 { color: #f0b90b; margin-top: 15px; }
+.dd-report-area strong { color: #fff; font-weight: bold; }
+.dd-report-area ul { padding-left: 20px; margin-bottom: 15px; }
+
+.dd-chat-area {
+    flex: 1; /* 聊天佔下方 1/3 */
+    border-top: 2px solid #f0b90b; /* 金色分隔線 */
+    background-color: #1a1a1a;
+    display: flex;
+    flex-direction: column;
+}
+
+.dd-chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    font-size: 14px;
+}
+
+.dd-chat-input-box {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #333;
+}
+
+.dd-chat-input-box input {
+    flex: 1;
+    background: #333;
+    border: none;
+    color: #fff;
+    padding: 10px;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+/* --- 右側：圖表儀表板 --- */
+.dd-right-panel {
+    padding: 20px;
+    overflow-y: auto;
+    background-color: #1e1e1e;
+    display: grid;
+    grid-template-columns: 1fr; /* 單欄垂直排列 */
+    gap: 20px;
+}
+
+.dd-chart-card {
+    background: #2a2a2a;
+    border-radius: 8px;
+    padding: 15px;
+    border: 1px solid #444;
+    min-height: 300px;
+    position: relative;
+}
+
+.dd-chart-title {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* --- Loading 動畫 --- */
+.dd-loading {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.9);
+    display: none; /* JS 控制顯示 */
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 10;
+    color: #f0b90b;
+}
+
+/* 聊天氣泡樣式 */
+.chat-bubble {
+    padding: 8px 12px;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    max-width: 85%;
+    word-wrap: break-word;
+}
+.chat-bubble.user {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end;
+    margin-left: auto;
+}
+.chat-bubble.ai {
+    background-color: #333;
+    color: #ddd;
+    align-self: flex-start;
+    border: 1px solid #555;
+}
