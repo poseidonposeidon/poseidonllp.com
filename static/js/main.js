@@ -9352,6 +9352,45 @@ function handleChatKey(event) {
     if (event.key === 'Enter') sendChatQuestion();
 }
 
+function formatChatContent(text) {
+    if (!text) return "";
+
+    // 1. 處理粗體 **text** -> <strong>text</strong>
+    let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // 2. 處理條列式清單
+    // 先將換行符號統一
+    let lines = html.split('\n');
+    let inList = false;
+    let result = '';
+
+    lines.forEach(line => {
+        line = line.trim();
+        // 檢查是否以 "- " 開頭
+        if (line.startsWith('- ')) {
+            if (!inList) {
+                result += '<ul class="chat-list">'; // 開始新的清單
+                inList = true;
+            }
+            // 移除開頭的 "- " 並包入 li
+            result += `<li>${line.substring(2)}</li>`;
+        } else {
+            if (inList) {
+                result += '</ul>'; // 結束清單
+                inList = false;
+            }
+            // 普通文字，如果不是空行則加上換行
+            if (line.length > 0) {
+                result += `<p>${line}</p>`;
+            }
+        }
+    });
+
+    if (inList) result += '</ul>'; // 收尾
+
+    return result;
+}
+
 async function sendChatQuestion() {
     const input = document.getElementById('dd-chat-input');
     const msg = input.value.trim();
@@ -9388,7 +9427,10 @@ async function sendChatQuestion() {
         if(loadingDiv) loadingDiv.remove();
 
         // 3. 顯示 AI 回覆
-        chatContainer.innerHTML += `<div class="chat-bubble ai">${data.reply}</div>`;
+        // === 修改開始 ===
+        const formattedReply = formatChatContent(data.reply); // 使用新的格式化函式
+        chatContainer.innerHTML += `<div class="chat-bubble ai">${formattedReply}</div>`;
+        // === 修改結束 ===
         chatContainer.scrollTop = chatContainer.scrollHeight;
 
     } catch (error) {
