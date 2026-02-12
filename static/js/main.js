@@ -9340,12 +9340,23 @@ function calculateSMA(data, window) {
 
 // 5. 情境感知聊天室邏輯
 
-function initDeepDiveChat() {
+function initDeepDiveChat(symbol) {
     const chatContainer = document.getElementById('dd-chat-messages');
+
+    // 預設顯示
+    const targetSymbol = symbol ? symbol : "該公司";
+
     chatContainer.innerHTML = `
         <div class="chat-bubble ai">
-            您好，我是本報告的 AI 財務顧問。我已經閱讀了上方的數據與報告。<br>
-            您可以問我關於估值、風險、或未來成長的問題。
+            <p>👋 您好，我是 <strong>${targetSymbol}</strong> 的專屬 AI 財務長 (CFO)。</p>
+            <p>我已完全掌握最新的深度分析報告，並具備<strong>連結資料庫與即時 API</strong> 的能力。</p>
+            <p>您可以嘗試問我以下類型的問題，讓我為您展示數據的力量：</p>
+            <ul class="chat-list">
+                <li><strong>📊 競品對決</strong>： "比較 ${targetSymbol} 與 NVDA 的本益比與成長率"</li>
+                <li><strong>⏳ 歷史回溯</strong>： "幫我查 2021 年 Q4 的毛利率與 EPS"</li>
+                <li><strong>🎙️ 法說會挖掘</strong>： "去年 Q3 管理層對於『庫存去化』是怎麼說的？"</li>
+                <li><strong>📉 估值風險</strong>： "目前的 PEG 顯示股價合理嗎？下檔風險在哪？"</li>
+            </ul>
         </div>
     `;
 }
