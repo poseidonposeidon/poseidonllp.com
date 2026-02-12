@@ -9590,48 +9590,89 @@ async function drawCashflowChart(symbol) {
 function debounce(func, delay) {
     let timeoutId;
     return function (...args) {
-        clearTimeout(timeoutId);
+        // 如果計時器還在跑，就把它清除（重置倒數）
+        if (timeoutId) {
+            clearTimeout(timeoutId);
+        }
+        // 設定新的計時器，時間到了才執行傳入的 func
         timeoutId = setTimeout(() => {
             func.apply(this, args);
         }, delay);
     };
 }
 
-// 2. 初始化搜尋建議功能
+/* ==========================================================================
+   2. 搜尋輸入框邏輯 (包含自動修正拼寫錯誤)
+   ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
+    // 取得 DOM 元素
     const input = document.getElementById('dd-stock-input');
     const suggestionsBox = document.getElementById('dd-suggestions');
 
+    // 安全檢查：如果找不到元素就跳出，避免報錯
     if (!input || !suggestionsBox) return;
 
-    // 監聽輸入事件 (延遲 300ms 觸發)
+    // --- 綁定 Input 事件 (使用 debounce 延遲 300ms) ---
     input.addEventListener('input', debounce(async (e) => {
-        const query = e.target.value.trim();
+        // 1. 取得輸入值，移除前後空白
+        // 注意：我們保留使用者的原始大小寫輸入，讓 API 自己去模糊比對
+        let query = e.target.value.trim();
 
-        if (query.length < 1) { // 至少輸入 1 個字才搜尋
+        // 2. 如果輸入被清空，則隱藏建議框並結束
+        if (query.length < 1) {
             suggestionsBox.classList.remove('active');
             suggestionsBox.innerHTML = '';
             return;
         }
 
-        // 呼叫 FMP Search API (請改為呼叫你的後端 Proxy 以保護 Key)
-        // 這裡為了演示方便直接寫前端 fetch，實際上建議透過後端轉發
-        // const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf"; // 注意：前面 main.js 已定義過 API_KEY
-
         try {
-            // 限制回傳 10 筆，並只搜尋 NASDAQ 與 NYSE (美股)
-            const url = `https://financialmodelingprep.com/api/v3/search?query=${query}&limit=10&exchange=NASDAQ,NYSE&apikey=${API_KEY}`;
+            // --- 定義內部的 API 請求函式 (避免重複寫 fetch) ---
+            const fetchSuggestions = async (searchQuery) => {
+                // 這裡的 API_KEY 來自你 main.js 最上方的全域變數
+                // 加上 exchange=NASDAQ,NYSE 鎖定美股，減少雜訊
+                const url = `https://financialmodelingprep.com/api/v3/search?query=${encodeURIComponent(searchQuery)}&limit=10&exchange=NASDAQ,NYSE&apikey=${API_KEY}`;
 
-            const response = await fetch(url);
-            const data = await response.json();
+                const response = await fetch(url);
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.status}`);
+                }
+                return await response.json();
+            };
 
+            // --- 步驟 A: 進行第一次搜尋 ---
+            let data = await fetchSuggestions(query);
+
+            // --- 步驟 B: 執行自動修正 (Fallback) 機制 ---
+            // 條件：如果第一次搜尋完全沒結果 (length === 0) 且 輸入長度大於 3 (避免誤判短代碼)
+            if (data.length === 0 && query.length > 3) {
+                console.log(`搜尋 "${query}" 無結果，啟動自動修正機制...`);
+
+                // 動作：砍掉最後一個字元 (例如 AAPLE -> AAPL)
+                const fallbackQuery = query.slice(0, -1);
+
+                // 再次呼叫 API
+                const fallbackData = await fetchSuggestions(fallbackQuery);
+
+                // 如果第二次搜尋有結果，就採用這些結果
+                if (fallbackData.length > 0) {
+                    console.log(`自動修正成功！使用 "${fallbackQuery}" 的搜尋結果。`);
+                    data = fallbackData;
+                }
+            }
+
+            // --- 步驟 C: 渲染建議列表 ---
+            // 注意：renderSuggestions 函式需要你在外部有定義 (如我上一則回答中的範例)
+            // 如果還沒定義，請確保下方有該函式
             renderSuggestions(data);
-        } catch (error) {
-            console.error("Search API Error:", error);
-        }
-    }, 300));
 
-    // 點擊頁面其他地方時關閉建議框
+        } catch (error) {
+            console.error("Search Suggestion Error:", error);
+            // 發生錯誤時，也可以選擇清空建議框
+            suggestionsBox.classList.remove('active');
+        }
+    }, 300)); // 300 毫秒的延遲
+
+    // --- 點擊外部關閉建議框的邏輯 ---
     document.addEventListener('click', (e) => {
         if (!input.contains(e.target) && !suggestionsBox.contains(e.target)) {
             suggestionsBox.classList.remove('active');
@@ -9639,7 +9680,9 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// 3. 渲染建議列表
+/* ==========================================================================
+   3. 渲染建議列表函式 (如果還沒寫，請補上這個)
+   ========================================================================== */
 function renderSuggestions(data) {
     const suggestionsBox = document.getElementById('dd-suggestions');
     suggestionsBox.innerHTML = '';
@@ -9653,19 +9696,19 @@ function renderSuggestions(data) {
         const div = document.createElement('div');
         div.className = 'dd-suggestion-item';
 
-        // 顯示格式： AAPL - Apple Inc.
+        // 顯示代碼與公司名稱
         div.innerHTML = `
             <span class="dd-suggestion-symbol">${item.symbol}</span>
             <span class="dd-suggestion-name">${item.name}</span>
         `;
 
-        // 點擊事件：填入代碼並關閉選單
+        // 點擊選項時的行為
         div.onclick = () => {
             const input = document.getElementById('dd-stock-input');
-            input.value = item.symbol; // 填入代碼 (例如 AAPL)
-            suggestionsBox.classList.remove('active');
+            input.value = item.symbol; // 填入正確的代碼
+            suggestionsBox.classList.remove('active'); // 關閉選單
 
-            // 可選：點擊後自動觸發分析
+            // 如果你想點擊後直接觸發分析，可以把下面這行註解打開：
             // runDeepDive();
         };
 
