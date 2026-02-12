@@ -367,9 +367,10 @@
         <div class="dd-header">
             <div style="display: flex; align-items: center; gap: 15px;">
                 <h2 style="color: #f0b90b; margin: 0;">AI Deep Dive <span style="font-size: 12px; color: #aaa; border: 1px solid #555; padding: 2px 6px; border-radius: 4px;">PRO</span></h2>
-                <div class="dd-search-box">
-                    <input type="text" id="dd-stock-input" placeholder="Enter Symbol (e.g. AAPL)">
+                <div class="dd-search-box" style="position: relative;"> <input type="text" id="dd-stock-input" placeholder="Enter Symbol (e.g. Apple or AAPL)" autocomplete="off">
                     <button onclick="runDeepDive()" style="background: #f0b90b; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">Analyze</button>
+
+                    <div id="dd-suggestions" class="dd-suggestions-list"></div>
                 </div>
             </div>
             <button class="dd-close-btn" onclick="closeDeepDiveModal()">×</button>

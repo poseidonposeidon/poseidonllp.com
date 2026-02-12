@@ -1972,6 +1972,56 @@ body.light-mode {
     display: block;
 }
 
+.dd-suggestions-list {
+    position: absolute;
+    top: 100%; /* 在輸入框正下方 */
+    left: 0;
+    width: 100%; /* 與輸入框同寬 */
+    background: #2a2a2a;
+    border: 1px solid #444;
+    border-radius: 0 0 6px 6px;
+    z-index: 1000;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none; /* 預設隱藏 */
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.dd-suggestions-list.active {
+    display: block;
+}
+
+.dd-suggestion-item {
+    padding: 10px;
+    cursor: pointer;
+    border-bottom: 1px solid #333;
+    color: #eee;
+    display: flex;
+    justify-content: space-between;
+}
+
+.dd-suggestion-item:last-child {
+    border-bottom: none;
+}
+
+.dd-suggestion-item:hover {
+    background-color: #3a3a3a;
+}
+
+.dd-suggestion-symbol {
+    font-weight: bold;
+    color: #f0b90b;
+}
+
+.dd-suggestion-name {
+    font-size: 0.9em;
+    color: #aaa;
+    margin-left: 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
 /* --- 其他通用樣式 --- */
 .dd-search-box { display: flex; gap: 10px; }
 .dd-search-box input { background: #111; border: 1px solid #555; color: #fff; padding: 8px 12px; border-radius: 6px; font-size: 16px; text-transform: uppercase; }

@@ -9585,3 +9585,92 @@ async function drawCashflowChart(symbol) {
         }
     });
 }
+
+// 1. Debounce 函式 (防止 API 呼叫過於頻繁)
+function debounce(func, delay) {
+    let timeoutId;
+    return function (...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+            func.apply(this, args);
+        }, delay);
+    };
+}
+
+// 2. 初始化搜尋建議功能
+document.addEventListener('DOMContentLoaded', () => {
+    const input = document.getElementById('dd-stock-input');
+    const suggestionsBox = document.getElementById('dd-suggestions');
+
+    if (!input || !suggestionsBox) return;
+
+    // 監聽輸入事件 (延遲 300ms 觸發)
+    input.addEventListener('input', debounce(async (e) => {
+        const query = e.target.value.trim();
+
+        if (query.length < 1) { // 至少輸入 1 個字才搜尋
+            suggestionsBox.classList.remove('active');
+            suggestionsBox.innerHTML = '';
+            return;
+        }
+
+        // 呼叫 FMP Search API (請改為呼叫你的後端 Proxy 以保護 Key)
+        // 這裡為了演示方便直接寫前端 fetch，實際上建議透過後端轉發
+        // const API_KEY = "GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf"; // 注意：前面 main.js 已定義過 API_KEY
+
+        try {
+            // 限制回傳 10 筆，並只搜尋 NASDAQ 與 NYSE (美股)
+            const url = `https://financialmodelingprep.com/api/v3/search?query=${query}&limit=10&exchange=NASDAQ,NYSE&apikey=${API_KEY}`;
+
+            const response = await fetch(url);
+            const data = await response.json();
+
+            renderSuggestions(data);
+        } catch (error) {
+            console.error("Search API Error:", error);
+        }
+    }, 300));
+
+    // 點擊頁面其他地方時關閉建議框
+    document.addEventListener('click', (e) => {
+        if (!input.contains(e.target) && !suggestionsBox.contains(e.target)) {
+            suggestionsBox.classList.remove('active');
+        }
+    });
+});
+
+// 3. 渲染建議列表
+function renderSuggestions(data) {
+    const suggestionsBox = document.getElementById('dd-suggestions');
+    suggestionsBox.innerHTML = '';
+
+    if (!data || data.length === 0) {
+        suggestionsBox.classList.remove('active');
+        return;
+    }
+
+    data.forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'dd-suggestion-item';
+
+        // 顯示格式： AAPL - Apple Inc.
+        div.innerHTML = `
+            <span class="dd-suggestion-symbol">${item.symbol}</span>
+            <span class="dd-suggestion-name">${item.name}</span>
+        `;
+
+        // 點擊事件：填入代碼並關閉選單
+        div.onclick = () => {
+            const input = document.getElementById('dd-stock-input');
+            input.value = item.symbol; // 填入代碼 (例如 AAPL)
+            suggestionsBox.classList.remove('active');
+
+            // 可選：點擊後自動觸發分析
+            // runDeepDive();
+        };
+
+        suggestionsBox.appendChild(div);
+    });
+
+    suggestionsBox.classList.add('active');
+}
