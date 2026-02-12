@@ -9084,7 +9084,9 @@ async function runDeepDive() {
         await Promise.all([
             drawValuationChart(symbol),
             drawInsiderChart(data.raw_data.insider_transactions), // 使用後端回傳的精確籌碼數據
-            drawMarginsChart(symbol)
+            drawMarginsChart(symbol),
+            drawGrowthChart(symbol),
+            drawCashflowChart(symbol)
         ]);
 
         // 初始化聊天室歡迎語
@@ -9415,7 +9417,7 @@ async function sendChatQuestion() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message: msg,
-                context_data: currentDeepDiveData, // 附帶剛剛抓到的數據
+                context_data: currentDeepDiveData, // 附帶剛剛抓到的數據 m
                 report_content: currentReportContent // 附帶剛剛生成的報告
             })
         });
@@ -9438,4 +9440,148 @@ async function sendChatQuestion() {
         const loadingDiv = document.getElementById(loadingId);
         if(loadingDiv) loadingDiv.innerText = "抱歉，連線發生錯誤。";
     }
+}
+
+async function drawGrowthChart(symbol) {
+    const ctx = document.getElementById('dd-growth-chart').getContext('2d');
+    if (deepDiveChartInstances['growth']) deepDiveChartInstances['growth'].destroy();
+
+    // 抓取年度損益表 (比較看長期趨勢)
+    const response = await fetch(`${BASE_URL}income-statement/${symbol}?period=annual&limit=10&apikey=${API_KEY}`);
+    const data = await response.json();
+    const sortedData = data.reverse(); // 舊到新
+
+    const labels = sortedData.map(d => d.calendarYear); // 使用年份
+    const revenue = sortedData.map(d => d.revenue);
+    const eps = sortedData.map(d => d.eps);
+
+    deepDiveChartInstances['growth'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Revenue (營收)',
+                    data: revenue,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)', // 藍色柱狀
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y',
+                    order: 2
+                },
+                {
+                    type: 'line',
+                    label: 'EPS (每股盈餘)',
+                    data: eps,
+                    borderColor: '#f0b90b', // 金黃色線條
+                    backgroundColor: '#f0b90b',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    yAxisID: 'y1', // 使用右側 Y 軸
+                    order: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#888' }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    grid: { color: '#333' },
+                    ticks: {
+                        color: '#888',
+                        callback: function(value) { return value / 1000000000 + 'B'; } // 簡化顯示為 Billion
+                    }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    grid: { drawOnChartArea: false }, // 不畫網格以免混亂
+                    ticks: { color: '#f0b90b' }
+                }
+            },
+            plugins: { legend: { labels: { color: '#ccc' } } }
+        }
+    });
+}
+
+// Chart 5: 現金流安全性 (OCF vs FCF)
+async function drawCashflowChart(symbol) {
+    const ctx = document.getElementById('dd-cashflow-chart').getContext('2d');
+    if (deepDiveChartInstances['cashflow']) deepDiveChartInstances['cashflow'].destroy();
+
+    // 抓取年度現金流量表
+    const response = await fetch(`${BASE_URL}cash-flow-statement/${symbol}?period=annual&limit=10&apikey=${API_KEY}`);
+    const data = await response.json();
+    const sortedData = data.reverse();
+
+    const labels = sortedData.map(d => d.calendarYear);
+    const ocf = sortedData.map(d => d.operatingCashFlow);
+    const fcf = sortedData.map(d => d.freeCashFlow);
+
+    deepDiveChartInstances['cashflow'] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Operating Cash Flow (營運現金流)',
+                    data: ocf,
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 青色
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Free Cash Flow (自由現金流)',
+                    data: fcf,
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 紫色
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#888' }
+                },
+                y: {
+                    grid: { color: '#333' },
+                    ticks: {
+                        color: '#888',
+                        callback: function(value) { return value / 1000000000 + 'B'; }
+                    }
+                }
+            },
+            plugins: {
+                legend: { labels: { color: '#ccc' } },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += (context.parsed.y / 1000000000).toFixed(2) + ' B';
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
 }
