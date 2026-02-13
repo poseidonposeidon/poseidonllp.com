@@ -9086,7 +9086,8 @@ async function runDeepDive() {
             drawInsiderChart(data.raw_data.insider_transactions), // 使用後端回傳的精確籌碼數據
             drawMarginsChart(symbol),
             drawGrowthChart(symbol),
-            drawCashflowChart(symbol)
+            drawCashflowChart(symbol),
+            drawTechChart(symbol)
         ]);
 
         // 初始化聊天室歡迎語
@@ -9780,4 +9781,128 @@ function initResizeHandle() {
             document.body.style.cursor = 'default';
         }
     });
+}
+
+async function drawTechChart(symbol) {
+    const ctx = document.getElementById('dd-tech-chart').getContext('2d');
+
+    // 清除舊圖表
+    if (deepDiveChartInstances['tech']) deepDiveChartInstances['tech'].destroy();
+
+    // 1. 抓取過去 1 年 (約 250 個交易日) 的日線數據
+    // 我們使用您原本就有的 fetchStockPriceHistory 函式
+    const rawData = await fetchStockPriceHistory(symbol, 250);
+
+    // 數據是由 舊 -> 新 排列
+    const labels = rawData.map(d => d.date);
+    const closePrice = rawData.map(d => d.close);
+    const volume = rawData.map(d => d.volume);
+
+    // 2. 計算 20日移動平均線 (MA20) - 短期趨勢線
+    const ma20 = calculateSMA(closePrice, 20);
+
+    deepDiveChartInstances['tech'] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    label: 'Stock Price (股價)',
+                    data: closePrice,
+                    borderColor: '#f0b90b', // 金色
+                    borderWidth: 2,
+                    pointRadius: 0, // 不顯示點，線條更滑順
+                    yAxisID: 'y', // 左軸
+                    order: 1
+                },
+                {
+                    label: '20 MA (月均線)',
+                    data: ma20,
+                    borderColor: 'rgba(255, 255, 255, 0.6)', // 半透明白
+                    borderWidth: 1,
+                    borderDash: [5, 5], // 虛線
+                    pointRadius: 0,
+                    yAxisID: 'y',
+                    order: 2
+                },
+                {
+                    type: 'bar',
+                    label: 'Volume (成交量)',
+                    data: volume,
+                    backgroundColor: 'rgba(54, 162, 235, 0.3)', // 淡藍色
+                    borderColor: 'rgba(54, 162, 235, 0)',
+                    yAxisID: 'y1', // 右軸
+                    order: 3
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: {
+                mode: 'index',
+                intersect: false,
+            },
+            scales: {
+                x: {
+                    display: false, // 隱藏 X 軸日期 (太擠)
+                    grid: { display: false }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right', // 股價軸放右邊 (符合看盤習慣)
+                    grid: { color: '#333' },
+                    ticks: { color: '#ccc' }
+                },
+                y1: {
+                    type: 'linear',
+                    display: false, // 隱藏成交量軸的刻度 (只看相對高低)
+                    position: 'left',
+                    min: 0,
+                    // 關鍵技巧：讓成交量最高點只佔畫面的 20%，避免擋住 K 線
+                    // 我們把 max 設為實際最大量的 5 倍
+                    suggestedMax: Math.max(...volume) * 5
+                }
+            },
+            plugins: {
+                legend: { labels: { color: '#ccc' } },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.parsed.y !== null) {
+                                // 如果是成交量，加千分位
+                                if (context.dataset.type === 'bar') {
+                                    return label + context.parsed.y.toLocaleString();
+                                }
+                                // 如果是股價，取小數點
+                                return label + context.parsed.y.toFixed(2);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+// 輔助函式：計算移動平均線 (SMA)
+// 如果你之前還沒加這個，請務必加上
+function calculateSMA(data, window) {
+    let sma = [];
+    for (let i = 0; i < data.length; i++) {
+        if (i < window - 1) {
+            sma.push(null); // 資料不足時補 null
+            continue;
+        }
+        let sum = 0;
+        for (let j = 0; j < window; j++) {
+            sum += data[i - j];
+        }
+        sma.push(sum / window);
+    }
+    return sma;
 }
