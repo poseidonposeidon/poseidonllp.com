@@ -383,6 +383,10 @@
             <div class="dd-left-panel" id="dd-left-panel">
 
                 <div id="dd-report-container" class="dd-report-area">
+                    <p style="color: #666; text-align: center; margin-top: 50px;">
+                        請在上方輸入股票代碼以開始深度分析。<br>
+                        AI 將結合 RAG 歷史記憶與即時 FMP 數據為您服務。
+                    </p>
                 </div>
 
                 <div id="dd-resize-handle" class="dd-resize-handle">
@@ -390,6 +394,17 @@
                 </div>
 
                 <div class="dd-chat-area">
+                    <div style="padding: 5px 15px; background: #222; color: #888; font-size: 12px; border-bottom: 1px solid #333;">
+                        Chat with CFO (Context-Aware)
+                    </div>
+
+                    <div id="dd-chat-messages" class="dd-chat-messages">
+                    </div>
+
+                    <div class="dd-chat-input-box">
+                        <input type="text" id="dd-chat-input" placeholder="Ask about Valuation, Risks, or Future Growth..." onkeypress="handleChatKey(event)">
+                        <button onclick="sendChatQuestion()" style="background: #444; color: #fff; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer;">Send</button>
+                    </div>
                 </div>
             </div>
 
