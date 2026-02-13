@@ -9728,3 +9728,56 @@ function renderSuggestions(data) {
 
     suggestionsBox.classList.add('active');
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    initResizeHandle();
+});
+
+function initResizeHandle() {
+    const handle = document.getElementById('dd-resize-handle');
+    const leftPanel = document.getElementById('dd-left-panel');
+    const reportArea = document.getElementById('dd-report-container');
+
+    // 安全檢查
+    if (!handle || !leftPanel || !reportArea) return;
+
+    let isResizing = false;
+
+    // 1. 滑鼠按下：開始拖拉
+    handle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        handle.classList.add('active'); // 改變顏色
+        document.body.style.cursor = 'row-resize'; // 強制全局游標
+        e.preventDefault(); // 防止選取文字
+    });
+
+    // 2. 滑鼠移動：計算高度
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+
+        // 取得 leftPanel 頂部距離視窗頂部的距離
+        const panelRect = leftPanel.getBoundingClientRect();
+        const panelTop = panelRect.top;
+
+        // 計算滑鼠當前位置相對於 panel 頂部的距離 = 新的報告區高度
+        // e.clientY 是滑鼠在視窗中的 Y 座標
+        let newHeight = e.clientY - panelTop;
+
+        // 限制範圍 (選擇性，因為 CSS min/max-height 也會擋，但 JS 擋更滑順)
+        const minHeight = 100;
+        const maxHeight = leftPanel.clientHeight - 150; // 留 150px 給聊天室
+
+        if (newHeight >= minHeight && newHeight <= maxHeight) {
+            reportArea.style.height = `${newHeight}px`;
+        }
+    });
+
+    // 3. 滑鼠放開：結束拖拉
+    document.addEventListener('mouseup', () => {
+        if (isResizing) {
+            isResizing = false;
+            handle.classList.remove('active');
+            document.body.style.cursor = 'default';
+        }
+    });
+}
