@@ -9093,6 +9093,7 @@ async function runDeepDive() {
             drawCashflowChart(symbol),
             drawTechChart(symbol)
         ]);
+        attachChartClickListeners();
 
         // 初始化聊天室歡迎語
         initDeepDiveChat();
@@ -9168,7 +9169,16 @@ async function drawValuationChart(symbol) {
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
             scales: {
-                x: { display: false }, // 隱藏 X 軸標籤以保持簡潔
+                x: {
+                    display: true,
+                    grid: { display: false },
+                    ticks: {
+                        color: '#888', // 灰色字體
+                        maxRotation: 45, // 稍微傾斜以免擠在一起
+                        minRotation: 45,
+                        maxTicksLimit: 12 // 限制最多顯示 12 個標籤
+                    }
+                },
                 y: { grid: { color: '#333' } }
             },
             plugins: { legend: { labels: { color: '#ccc' } } }
@@ -9909,4 +9919,82 @@ function calculateSMA(data, window) {
         sma.push(sum / window);
     }
     return sma;
+}
+
+// 全域變數，用來儲存彈出視窗中的圖表實例
+let popupChartInstance = null;
+
+// ✨ 綁定點擊事件到所有 Deep Dive 內的圖表
+function attachChartClickListeners() {
+    // 抓取所有圖表卡片內的 canvas
+    const chartCanvases = document.querySelectorAll('.dd-chart-card canvas');
+
+    chartCanvases.forEach(canvas => {
+        // 移除舊的監聽器避免重複綁定
+        canvas.removeEventListener('click', handleChartClick);
+        // 綁定新的點擊事件
+        canvas.addEventListener('click', handleChartClick);
+    });
+}
+
+function handleChartClick(event) {
+    const clickedCanvas = event.target;
+
+    // 取得原本圖表的標題 (從上方的 div 抓取)
+    const cardDiv = clickedCanvas.closest('.dd-chart-card');
+    const titleText = cardDiv.querySelector('.dd-chart-title').innerText;
+
+    // 呼叫放大函式
+    openChartPopup(clickedCanvas.id, titleText);
+}
+
+function openChartPopup(originalCanvasId, title) {
+    // 1. 取得原本的 Chart.js 實例 (Chart.js 內建方法)
+    const originalChart = Chart.getChart(originalCanvasId);
+    if (!originalChart) return;
+
+    // 2. 顯示彈出視窗
+    document.getElementById('chart-popup-modal').style.display = 'flex';
+    document.getElementById('chart-popup-title').innerText = title;
+
+    // 3. 取得彈出視窗的 canvas
+    const popupCanvas = document.getElementById('popup-canvas');
+
+    // 4. 如果之前已經有放大的圖表，先銷毀它，避免重疊
+    if (popupChartInstance) {
+        popupChartInstance.destroy();
+    }
+
+    // 5. 複製原本圖表的設定 (Data 和 Options)
+    // 注意：我們需要關閉動畫，讓彈出時瞬間顯示
+    const newConfig = {
+        type: originalChart.config.type,
+        data: originalChart.config.data, // 共用同一包資料
+        options: Object.assign({}, originalChart.options, {
+            responsive: true,
+            maintainAspectRatio: false, // 讓它填滿整個彈出視窗
+            animation: false, // 關閉動畫，體驗更好
+            plugins: {
+                ...originalChart.options.plugins,
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { color: '#ffffff', font: { size: 14 } }
+                }
+            }
+        })
+    };
+
+    // 6. 畫出新的放大版圖表
+    popupChartInstance = new Chart(popupCanvas, newConfig);
+}
+
+function closeChartPopup() {
+    // 隱藏視窗
+    document.getElementById('chart-popup-modal').style.display = 'none';
+    // 銷毀圖表釋放記憶體
+    if (popupChartInstance) {
+        popupChartInstance.destroy();
+        popupChartInstance = null;
+    }
 }

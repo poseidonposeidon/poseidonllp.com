@@ -2211,3 +2211,69 @@ body.light-mode {
     padding: 8px;
     text-align: left;
 }
+
+/* ✨ 讓原本的圖表看起來是可以點擊的 */
+.dd-chart-card canvas {
+    cursor: pointer; /* 滑鼠移上去變成手指 */
+    transition: opacity 0.2s ease-in-out;
+}
+.dd-chart-card canvas:hover {
+    opacity: 0.7; /* 滑鼠移上去時微微變暗，提示可點擊 */
+}
+
+/* ✨ 彈出視窗背景遮罩 */
+.chart-popup-overlay {
+    display: none; /* 預設隱藏 */
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(0, 0, 0, 0.85); /* 半透明黑背景 */
+    backdrop-filter: blur(5px); /* 背景模糊效果 */
+    z-index: 10000; /* 確保在最上層 */
+    justify-content: center;
+    align-items: center;
+}
+
+/* ✨ 彈出視窗主體 */
+.chart-popup-content {
+    background-color: #1e1e1e;
+    width: 90vw; /* 佔螢幕 90% 寬 */
+    height: 85vh; /* 佔螢幕 85% 高 */
+    border-radius: 12px;
+    border: 1px solid #444;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.chart-popup-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 10px;
+}
+
+.chart-popup-close-btn {
+    background: none;
+    border: none;
+    color: #aaa;
+    font-size: 30px;
+    cursor: pointer;
+    line-height: 1;
+}
+.chart-popup-close-btn:hover {
+    color: #fff;
+}
+
+.chart-popup-body {
+    flex-grow: 1;
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
