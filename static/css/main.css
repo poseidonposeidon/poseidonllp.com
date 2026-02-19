@@ -2105,22 +2105,33 @@ body.light-mode {
 
 /* 右欄：圖表 */
 .dd-charts-column {
-    flex: 1; /* 佔用 50% */
+    flex: 1;
+    /* ✨ 關鍵修復 1：打破 Flexbox 的最小寬度限制，允許它被壓縮 */
+    min-width: 0;
+
     display: flex;
     flex-direction: column;
     gap: 20px;
 }
 
-/* 圖表卡片樣式維持不變，但確保寬度 RWD */
+/* 單個圖表卡片 */
 .dd-chart-card {
     background: #2a2a2a;
     border-radius: 8px;
     padding: 15px;
     border: 1px solid #333;
-    width: 100%; /* 確保填滿欄位 */
+    width: 100%;
     box-sizing: border-box;
+
+    /* ✨ 關鍵修復 2：設定相對定位與隱藏溢出，把圖表鎖在框內 */
+    position: relative;
+    overflow: hidden;
 }
 
+.dd-chart-card canvas {
+    max-width: 100% !important;
+    /* 這裡不要去動 height，讓 Chart.js 自己維持比例 */
+}
 /* 3. 下半部：全寬聊天室 */
 .dd-bottom-chat-layout {
     margin-top: 20px;
