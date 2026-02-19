@@ -9252,16 +9252,29 @@ function drawInsiderChart(insiderData) {
                 legend: { display: false },
                 tooltip: {
                     callbacks: {
-                        // 讓 Tooltip 顯示交易人類型與名字
                         title: (items) => {
                             const index = items[0].dataIndex;
                             const d = sortedData[index];
-                            return `${d.transactionDate} - ${d.transactionType}`;
+                            return `${d.transactionDate} (${d.transactionType})`;
                         },
                         label: (item) => {
                             const index = item.dataIndex;
                             const d = sortedData[index];
-                            return `${d.reportingName}: ${d.securitiesTransacted.toLocaleString()} shares`;
+
+                            // 獲取數據 (確保有值，否則顯示 N/A)
+                            const shares = d.securitiesTransacted ? d.securitiesTransacted.toLocaleString() : 'N/A';
+                            // 假設 API 有回傳成交價 (price) 和交易後剩餘持股 (securitiesOwned)
+                            const price = d.price ? `$${d.price.toFixed(2)}` : 'N/A';
+                            const value = (d.securitiesTransacted && d.price) ? `$${((d.securitiesTransacted * d.price) / 1000000).toFixed(2)}M` : 'N/A';
+                            const owned = d.securitiesOwned ? d.securitiesOwned.toLocaleString() : '未知';
+
+                            // 回傳陣列，讓 Tooltip 顯示多行資訊
+                            return [
+                                `👤 ${d.reportingName}`,
+                                `📊 交易數量: ${shares} 股`,
+                                `💰 交易價位: ${price} (總值約 ${value})`,
+                                `🏦 剩餘持股: ${owned} 股`
+                            ];
                         }
                     }
                 }
