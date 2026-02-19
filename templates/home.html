@@ -377,70 +377,67 @@
         </div>
 
         <!-- 主要內容 -->
-        <div class="dd-content">
+        <div class="dd-content scrollable-content">
 
-            <!-- 左側：分析報告 + 聊天 -->
-            <div class="dd-left-panel" id="dd-left-panel">
+            <div class="dd-top-layout">
 
-                <div id="dd-report-container" class="dd-report-area">
-                    <p style="color: #666; text-align: center; margin-top: 50px;">
-                        請在上方輸入股票代碼以開始深度分析。<br>
-                        AI 將結合 RAG 歷史記憶與即時 FMP 數據為您服務。
-                    </p>
+                <div class="dd-report-column">
+                    <h3 style="color: #f0b90b; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px;">
+                        📄 投資分析報告
+                    </h3>
+                    <div id="dd-report-container" class="dd-report-area">
+                        <p style="color: #666; text-align: center; margin-top: 50px;">
+                            請在上方輸入股票代碼以開始深度分析。<br>
+                            AI 將結合 RAG 歷史記憶與即時 FMP 數據為您服務。
+                        </p>
+                    </div>
                 </div>
 
-                <div id="dd-resize-handle" class="dd-resize-handle">
-                    <span>&#9516;</span>
+                <div class="dd-charts-column">
+                    <div class="dd-chart-card">
+                        <div class="dd-chart-title">Valuation: PE Band (本益比河流圖)</div>
+                        <canvas id="dd-valuation-chart"></canvas>
+                    </div>
+                    <div class="dd-chart-card">
+                        <div class="dd-chart-title">Smart Money: Insider Trading (內部人交易)</div>
+                        <canvas id="dd-insider-chart"></canvas>
+                    </div>
+                    <div class="dd-chart-card">
+                        <div class="dd-chart-title">Quality: Margins Trend (三率趨勢)</div>
+                        <canvas id="dd-financial-chart"></canvas>
+                    </div>
+                    <div class="dd-chart-card">
+                        <div class="dd-chart-title">Growth: Revenue & EPS Trend (營收與獲利)</div>
+                        <canvas id="dd-growth-chart"></canvas>
+                    </div>
+                    <div class="dd-chart-card">
+                        <div class="dd-chart-title">Safety: Cash Flow Structure (現金流結構)</div>
+                        <canvas id="dd-cashflow-chart"></canvas>
+                    </div>
+                    <div class="dd-chart-card">
+                        <div class="dd-chart-title">Momentum: Price & Volume (量價趨勢)</div>
+                        <canvas id="dd-tech-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dd-bottom-chat-layout">
+                <div class="dd-chat-header">
+                    <h3>💬 與 CFO 對話 (Context-Aware)</h3>
+                    <span style="font-size: 13px; color: #888;">已閱讀完畢？現在可以針對上方的數據進行提問。</span>
                 </div>
 
-                <div class="dd-chat-area">
-                    <div style="padding: 5px 15px; background: #222; color: #888; font-size: 12px; border-bottom: 1px solid #333;">
-                        Chat with CFO (Context-Aware)
+                <div class="dd-wide-chat-interface">
+                    <div id="dd-chat-messages" class="dd-chat-messages-wide">
                     </div>
 
-                    <div id="dd-chat-messages" class="dd-chat-messages">
-                    </div>
-
-                    <div class="dd-chat-input-box">
+                    <div class="dd-chat-input-box-wide">
                         <input type="text" id="dd-chat-input" placeholder="Ask about Valuation, Risks, or Future Growth..." onkeypress="handleChatKey(event)">
-                        <button onclick="sendChatQuestion()" style="background: #444; color: #fff; border: none; padding: 0 15px; border-radius: 4px; cursor: pointer;">Send</button>
+                        <button onclick="sendChatQuestion()">Send</button>
                     </div>
                 </div>
             </div>
 
-            <!-- 右側：圖表儀表板 -->
-            <div class="dd-right-panel">
-
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Valuation: PE Band (本益比河流圖)</div>
-                    <canvas id="dd-valuation-chart"></canvas>
-                </div>
-
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Smart Money: Insider Trading (內部人交易)</div>
-                    <canvas id="dd-insider-chart"></canvas>
-                </div>
-
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Quality: Margins Trend (三率趨勢)</div>
-                    <canvas id="dd-financial-chart"></canvas>
-                </div>
-
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Growth: Revenue & EPS Trend (營收與獲利)</div>
-                    <canvas id="dd-growth-chart"></canvas>
-                </div>
-
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Safety: Cash Flow Structure (現金流結構)</div>
-                    <canvas id="dd-cashflow-chart"></canvas>
-                </div>
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Momentum: Price & Volume (量價趨勢)</div>
-                    <canvas id="dd-tech-chart"></canvas>
-                </div>
-
-            </div>
         </div>
     </div>
 </div>

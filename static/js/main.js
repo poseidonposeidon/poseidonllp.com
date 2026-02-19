@@ -9023,9 +9023,13 @@ let deepDiveChartInstances = {}; // 儲存圖表實例以供銷毀
 
 // 1. Modal 開關控制
 function openDeepDiveModal() {
-    const modal = document.getElementById('deep-dive-modal');
-    modal.style.display = 'block';
-    document.body.style.overflow = 'hidden'; // 禁止背景滾動
+    document.getElementById('deep-dive-modal').style.display = 'block';
+
+    // 重置捲軸到最上方
+    const contentDiv = document.querySelector('.dd-content.scrollable-content');
+    if (contentDiv) {
+        contentDiv.scrollTop = 0;
+    }
 }
 
 function closeDeepDiveModal() {
