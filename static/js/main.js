@@ -9353,7 +9353,7 @@ function initDeepDiveChat(symbol) {
 
     chatContainer.innerHTML = `
         <div class="chat-bubble ai">
-            <p>👋 您好，我是 <strong>${targetSymbol}</strong> 的專屬 AI 財務長 (CFO)。</p>
+            <p>👋 您好，我是 <strong>${targetSymbol}</strong> 的專屬 AI 投資長 (CIO)。</p>
             <p>我已完全掌握最新的深度分析報告，並具備<strong>連結資料庫與即時 API</strong> 的能力。</p>
             <p>您可以嘗試問我以下類型的問題，讓我為您展示數據的力量：</p>
             <ul class="chat-list">
