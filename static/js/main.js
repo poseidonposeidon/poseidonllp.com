@@ -9333,7 +9333,15 @@ async function drawMarginsChart(symbol) {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { display: false },
+                x: {
+                    display: true, // 開啟顯示
+                    grid: { display: false }, // 隱藏垂直網格線保持版面乾淨
+                    ticks: {
+                        color: '#888', // 灰色字體
+                        maxRotation: 45, // 文字傾斜 45 度
+                        minRotation: 45
+                    }
+                },
                 y: { grid: { color: '#333' } }
             },
             plugins: { legend: { labels: { color: '#ccc' } } }
@@ -9872,8 +9880,14 @@ async function drawTechChart(symbol) {
             },
             scales: {
                 x: {
-                    display: false, // 隱藏 X 軸日期 (太擠)
-                    grid: { display: false }
+                    display: true, // 開啟顯示
+                    grid: { display: false },
+                    ticks: {
+                        color: '#888',
+                        maxRotation: 45,
+                        minRotation: 45,
+                        maxTicksLimit: 12 // ✨ 關鍵：250天的資料，我們只顯示約12個月份節點，避免擠爆
+                    }
                 },
                 y: {
                     type: 'linear',
