@@ -351,113 +351,113 @@
 <!--    <div id="section-container-compare-multi" class="section-container" style="display: none;"></div>-->
 <!--</div>-->
 
-<div id="deep-dive-modal">
-    <div class="dd-container">
+<!--<div id="deep-dive-modal">-->
+<!--    <div class="dd-container">-->
 
-        <!-- Loading 遮罩 -->
-        <div id="dd-loading-screen" class="dd-loading">
-            <div class="loader">
-                <div></div><div></div><div></div>
-            </div>
-            <h3 style="margin-top: 20px;">AI 投資長正在分析財報、籌碼與法說會數據...</h3>
-            <p id="dd-loading-text" style="color: #aaa; font-size: 14px;">正在檢索 FMP 歷史數據...</p>
-        </div>
+<!--        &lt;!&ndash; Loading 遮罩 &ndash;&gt;-->
+<!--        <div id="dd-loading-screen" class="dd-loading">-->
+<!--            <div class="loader">-->
+<!--                <div></div><div></div><div></div>-->
+<!--            </div>-->
+<!--            <h3 style="margin-top: 20px;">AI 投資長正在分析財報、籌碼與法說會數據...</h3>-->
+<!--            <p id="dd-loading-text" style="color: #aaa; font-size: 14px;">正在檢索 FMP 歷史數據...</p>-->
+<!--        </div>-->
 
-        <!-- 頂部導航 -->
-        <div class="dd-header">
-            <div style="display: flex; align-items: center; gap: 15px;">
-                <h2 style="color: #f0b90b; margin: 0;">AI Deep Dive <span style="font-size: 12px; color: #aaa; border: 1px solid #555; padding: 2px 6px; border-radius: 4px;">PRO</span></h2>
-                <div class="dd-search-box" style="position: relative;"> <input type="text" id="dd-stock-input" placeholder="Enter Symbol (e.g. Apple or AAPL)" autocomplete="off">
-                    <button onclick="runDeepDive()" style="background: #f0b90b; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">Analyze</button>
+<!--        &lt;!&ndash; 頂部導航 &ndash;&gt;-->
+<!--        <div class="dd-header">-->
+<!--            <div style="display: flex; align-items: center; gap: 15px;">-->
+<!--                <h2 style="color: #f0b90b; margin: 0;">AI Deep Dive <span style="font-size: 12px; color: #aaa; border: 1px solid #555; padding: 2px 6px; border-radius: 4px;">PRO</span></h2>-->
+<!--                <div class="dd-search-box" style="position: relative;"> <input type="text" id="dd-stock-input" placeholder="Enter Symbol (e.g. Apple or AAPL)" autocomplete="off">-->
+<!--                    <button onclick="runDeepDive()" style="background: #f0b90b; border: none; padding: 8px 15px; border-radius: 6px; cursor: pointer; font-weight: bold;">Analyze</button>-->
 
-                    <div id="dd-suggestions" class="dd-suggestions-list"></div>
-                </div>
-            </div>
-            <button class="dd-close-btn" onclick="closeDeepDiveModal()">×</button>
-        </div>
+<!--                    <div id="dd-suggestions" class="dd-suggestions-list"></div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--            <button class="dd-close-btn" onclick="closeDeepDiveModal()">×</button>-->
+<!--        </div>-->
 
-        <!-- 主要內容 -->
-        <div class="dd-content scrollable-content">
+<!--        &lt;!&ndash; 主要內容 &ndash;&gt;-->
+<!--        <div class="dd-content scrollable-content">-->
 
-            <div class="dd-top-layout">
+<!--            <div class="dd-top-layout">-->
 
-                <div class="dd-report-column">
-                    <h3 style="color: #f0b90b; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px;">
-                        📄 投資分析報告
-                    </h3>
-                    <div id="dd-report-container" class="dd-report-area">
-                        <p style="color: #666; text-align: center; margin-top: 50px;">
-                            請在上方輸入股票代碼以開始深度分析。<br>
-                            AI 將結合 RAG 歷史記憶與即時 FMP 數據為您服務。
-                        </p>
-                    </div>
-                </div>
+<!--                <div class="dd-report-column">-->
+<!--                    <h3 style="color: #f0b90b; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px;">-->
+<!--                        📄 投資分析報告-->
+<!--                    </h3>-->
+<!--                    <div id="dd-report-container" class="dd-report-area">-->
+<!--                        <p style="color: #666; text-align: center; margin-top: 50px;">-->
+<!--                            請在上方輸入股票代碼以開始深度分析。<br>-->
+<!--                            AI 將結合 RAG 歷史記憶與即時 FMP 數據為您服務。-->
+<!--                        </p>-->
+<!--                    </div>-->
+<!--                </div>-->
 
-                <div class="dd-charts-column">
-                    <div class="dd-chart-card">
-                        <div class="dd-chart-title">Valuation: PE Band (本益比河流圖)</div>
-                        <div class="chart-wrapper">
-                            <canvas id="dd-valuation-chart"></canvas>
-                        </div>
-                    </div>
+<!--                <div class="dd-charts-column">-->
+<!--                    <div class="dd-chart-card">-->
+<!--                        <div class="dd-chart-title">Valuation: PE Band (本益比河流圖)</div>-->
+<!--                        <div class="chart-wrapper">-->
+<!--                            <canvas id="dd-valuation-chart"></canvas>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
-                    <div class="dd-chart-card">
-                        <div class="dd-chart-title">Smart Money: Insider Trading (內部人交易)</div>
-                        <div class="chart-wrapper">
-                            <canvas id="dd-insider-chart"></canvas>
-                        </div>
-                    </div>
+<!--                    <div class="dd-chart-card">-->
+<!--                        <div class="dd-chart-title">Smart Money: Insider Trading (內部人交易)</div>-->
+<!--                        <div class="chart-wrapper">-->
+<!--                            <canvas id="dd-insider-chart"></canvas>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
-                    <div class="dd-chart-card">
-                        <div class="dd-chart-title">Quality: Margins Trend (三率趨勢)</div>
-                        <div class="chart-wrapper">
-                            <canvas id="dd-financial-chart"></canvas>
-                        </div>
-                    </div>
+<!--                    <div class="dd-chart-card">-->
+<!--                        <div class="dd-chart-title">Quality: Margins Trend (三率趨勢)</div>-->
+<!--                        <div class="chart-wrapper">-->
+<!--                            <canvas id="dd-financial-chart"></canvas>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
-                    <div class="dd-chart-card">
-                        <div class="dd-chart-title">Growth: Revenue & EPS Trend (營收與獲利)</div>
-                        <div class="chart-wrapper">
-                            <canvas id="dd-growth-chart"></canvas>
-                        </div>
-                    </div>
+<!--                    <div class="dd-chart-card">-->
+<!--                        <div class="dd-chart-title">Growth: Revenue & EPS Trend (營收與獲利)</div>-->
+<!--                        <div class="chart-wrapper">-->
+<!--                            <canvas id="dd-growth-chart"></canvas>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
-                    <div class="dd-chart-card">
-                        <div class="dd-chart-title">Safety: Cash Flow Structure (現金流結構)</div>
-                        <div class="chart-wrapper">
-                            <canvas id="dd-cashflow-chart"></canvas>
-                        </div>
-                    </div>
+<!--                    <div class="dd-chart-card">-->
+<!--                        <div class="dd-chart-title">Safety: Cash Flow Structure (現金流結構)</div>-->
+<!--                        <div class="chart-wrapper">-->
+<!--                            <canvas id="dd-cashflow-chart"></canvas>-->
+<!--                        </div>-->
+<!--                    </div>-->
 
-                    <div class="dd-chart-card">
-                        <div class="dd-chart-title">Momentum: Price & Volume (量價趨勢)</div>
-                        <div class="chart-wrapper">
-                            <canvas id="dd-tech-chart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<!--                    <div class="dd-chart-card">-->
+<!--                        <div class="dd-chart-title">Momentum: Price & Volume (量價趨勢)</div>-->
+<!--                        <div class="chart-wrapper">-->
+<!--                            <canvas id="dd-tech-chart"></canvas>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
 
-            <div class="dd-bottom-chat-layout">
-                <div class="dd-chat-header">
-                    <h3>💬 與 CIO 對話 (Context-Aware)</h3>
-                    <span style="font-size: 13px; color: #888;">已閱讀完畢？現在可以針對上方的數據進行提問。</span>
-                </div>
+<!--            <div class="dd-bottom-chat-layout">-->
+<!--                <div class="dd-chat-header">-->
+<!--                    <h3>💬 與 CIO 對話 (Context-Aware)</h3>-->
+<!--                    <span style="font-size: 13px; color: #888;">已閱讀完畢？現在可以針對上方的數據進行提問。</span>-->
+<!--                </div>-->
 
-                <div class="dd-wide-chat-interface">
-                    <div id="dd-chat-messages" class="dd-chat-messages-wide">
-                    </div>
+<!--                <div class="dd-wide-chat-interface">-->
+<!--                    <div id="dd-chat-messages" class="dd-chat-messages-wide">-->
+<!--                    </div>-->
 
-                    <div class="dd-chat-input-box-wide">
-                        <input type="text" id="dd-chat-input" placeholder="Ask about Valuation, Risks, or Future Growth..." onkeypress="handleChatKey(event)">
-                        <button onclick="sendChatQuestion()">Send</button>
-                    </div>
-                </div>
-            </div>
+<!--                    <div class="dd-chat-input-box-wide">-->
+<!--                        <input type="text" id="dd-chat-input" placeholder="Ask about Valuation, Risks, or Future Growth..." onkeypress="handleChatKey(event)">-->
+<!--                        <button onclick="sendChatQuestion()">Send</button>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
 
-        </div>
-    </div>
-</div>
+<!--        </div>-->
+<!--    </div>-->
+<!--</div>-->
 
 
 
