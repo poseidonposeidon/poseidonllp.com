@@ -9020,6 +9020,7 @@ function downloadPdfFile() {
 let currentDeepDiveData = null;
 let currentReportContent = "";
 let deepDiveChartInstances = {}; // 儲存圖表實例以供銷毀
+let chatHistory = [];
 
 // 1. Modal 開關控制
 function openDeepDiveModal() {
@@ -9378,20 +9379,20 @@ function calculateSMA(data, window) {
 
 function initDeepDiveChat(symbol) {
     const chatContainer = document.getElementById('dd-chat-messages');
-
-    // 預設顯示
     const targetSymbol = symbol ? symbol : "該公司";
+
+    // ✨ 清空歷史記憶
+    chatHistory = [];
 
     chatContainer.innerHTML = `
         <div class="chat-bubble ai">
             <p>👋 您好，我是 <strong>${targetSymbol}</strong> 的專屬 AI 投資長 (CIO)。</p>
-            <p>我已完全掌握最新的深度分析報告，並具備<strong>連結資料庫與即時 API</strong> 的能力。</p>
             <p>您可以嘗試問我以下類型的問題，讓我為您展示數據的力量：</p>
             <ul class="chat-list">
                 <li><strong>📊 競品對決</strong>： "比較 ${targetSymbol} 與 NVDA 的本益比與成長率"</li>
                 <li><strong>⏳ 歷史回溯</strong>： "幫我查 2021 年 Q4 的毛利率與 EPS"</li>
-                <li><strong>🎙️ 法說會挖掘</strong>： "去年 Q3 管理層對於『庫存去化』是怎麼說的？"</li>
-                <li><strong>📉 估值風險</strong>： "目前的 PEG 顯示股價合理嗎？下檔風險在哪？"</li>
+                <li><strong>🎙️ 法說會挖掘</strong>： "最新法說會管理層說了什麼？"</li>
+                <li><strong>📰 最新動態</strong>： "這半年有什麼新產品或重要新聞？"</li>
             </ul>
         </div>
     `;
@@ -9445,47 +9446,48 @@ async function sendChatQuestion() {
     const msg = input.value.trim();
     if (!msg) return;
 
-    // 1. 顯示用戶訊息
     const chatContainer = document.getElementById('dd-chat-messages');
-    chatContainer.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
-    input.value = "";
 
-    // 滾動到底部
+    // 1. 顯示並儲存用戶訊息
+    chatContainer.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
+    chatHistory.push({ role: "user", content: msg }); // ✨ 將用戶對話加入記憶
+
+    input.value = "";
     chatContainer.scrollTop = chatContainer.scrollHeight;
 
-    // 顯示 Loading
     const loadingId = "chat-loading-" + Date.now();
-    chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble ai">思考中...</div>`;
+    chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble ai">CIO 正在檢索資料並思考中...</div>`;
 
     try {
-        // 2. 發送給後端 (Context Aware)
-        const response = await fetch(`${baseUrl}/api/chat_with_context`, {
+        // 2. 發送給後端 (包含記憶 history)
+        const response = await fetch('/api/chat_with_context', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message: msg,
-                context_data: currentDeepDiveData, // 附帶剛剛抓到的數據 m
-                report_content: currentReportContent // 附帶剛剛生成的報告
+                history: chatHistory, // ✨ 把整串對話紀錄送給 AI
+                context_data: currentDeepDiveData,
+                report_content: currentReportContent
             })
         });
 
         const data = await response.json();
-
-        // 移除 Loading
         const loadingDiv = document.getElementById(loadingId);
         if(loadingDiv) loadingDiv.remove();
 
-        // 3. 顯示 AI 回覆
-        // === 修改開始 ===
-        const formattedReply = formatChatContent(data.reply); // 使用新的格式化函式
+        // 3. 顯示 AI 回覆並儲存記憶
+        const aiReply = data.reply || "我沒有得出結論，請再問一次。";
+        chatHistory.push({ role: "assistant", content: aiReply }); // ✨ 將 AI 回答加入記憶
+
+        const formattedReply = formatChatContent(aiReply);
         chatContainer.innerHTML += `<div class="chat-bubble ai">${formattedReply}</div>`;
-        // === 修改結束 ===
         chatContainer.scrollTop = chatContainer.scrollHeight;
 
     } catch (error) {
         console.error(error);
         const loadingDiv = document.getElementById(loadingId);
-        if(loadingDiv) loadingDiv.innerText = "抱歉，連線發生錯誤。";
+        // ✨ 把紅字錯誤改成友善的提示
+        if(loadingDiv) loadingDiv.innerText = "⚠️ 伺服器處理時發生了一些問題，請稍後再試或換個方式提問。";
     }
 }
 
