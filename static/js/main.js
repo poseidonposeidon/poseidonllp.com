@@ -9017,6 +9017,7 @@ function downloadPdfFile() {
    ========================================================================== */
 
 // 全局變數：用來暫存目前的分析數據，供聊天室使用 (RAG Context)
+let currentDeepDiveData = null;
 let currentReportContent = "";
 let deepDiveChartInstances = {};
 let chatHistory = [];
@@ -9032,9 +9033,8 @@ function closeDeepDiveModal() {
     document.body.style.overflow = 'auto';
 }
 
-// ✅ 核心修正：接收 suffix 參數 (例如 '-main' 或 '')
+// ✅ 核心分析流程 (支援動態 ID)
 async function runDeepDive(inputId = 'dd-stock-input', reportId = 'dd-report-container') {
-    // 1. 直接使用傳入的 inputId 尋找輸入框
     const symbolInput = document.getElementById(inputId);
     if (!symbolInput) {
         console.error("找不到輸入框 ID: " + inputId);
@@ -9043,15 +9043,12 @@ async function runDeepDive(inputId = 'dd-stock-input', reportId = 'dd-report-con
 
     const symbol = symbolInput.value.trim().toUpperCase();
 
-    // 2. 對於 loading 畫面，我們試著去找帶有 -main 結尾的版本，如果沒有就找原本的
     const isMain = inputId.includes('-main');
     const loadingScreenId = isMain ? 'dd-loading-screen-main' : 'dd-loading-screen';
     const loadingTextId = isMain ? 'dd-loading-text-main' : 'dd-loading-text';
 
     const loadingScreen = document.getElementById(loadingScreenId);
     const loadingText = document.getElementById(loadingTextId);
-
-    // 3. 直接使用傳入的 reportId 尋找報告容器
     const reportContainer = document.getElementById(reportId);
 
     if (!symbol) {
@@ -9073,6 +9070,8 @@ async function runDeepDive(inputId = 'dd-stock-input', reportId = 'dd-report-con
         if (!response.ok) throw new Error("Analysis Failed");
 
         const data = await response.json();
+
+        // 賦值給全域變數 (因為最上面有宣告了，所以這裡絕對不會再報錯)
         currentDeepDiveData = data.raw_data;
         currentReportContent = data.report;
 
@@ -9081,7 +9080,6 @@ async function runDeepDive(inputId = 'dd-stock-input', reportId = 'dd-report-con
 
         if(loadingText) loadingText.innerText = "正在繪製視覺化圖表...";
 
-        // 4. 定義一個後綴，用來傳遞給繪圖函數（因為圖表的 canvas id 還是需要拼接）
         const suffix = isMain ? '-main' : '';
 
         await Promise.all([
@@ -9104,242 +9102,216 @@ async function runDeepDive(inputId = 'dd-stock-input', reportId = 'dd-report-con
     }
 }
 
-// 3. 渲染 Markdown 報告 (簡單版)
+// 渲染 Markdown 報告
 function renderDeepDiveMarkdown(text, container) {
-    // 將 Markdown 轉為 HTML (支援標題、粗體、列表)
+    if (!container) return;
     let html = text
         .replace(/^### (.*$)/gim, '<h3>$1</h3>')
         .replace(/^## (.*$)/gim, '<h2>$1</h2>')
         .replace(/^# (.*$)/gim, '<h1>$1</h1>')
         .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-        .replace(/^\- (.*$)/gim, '<ul><li>$1</li></ul>') // 簡單列表
+        .replace(/^\- (.*$)/gim, '<ul><li>$1</li></ul>')
         .replace(/\n/g, '<br>');
 
-    // 修復列表標籤 (將連續的 ul 合併的簡單處理，或直接用 CSS 處理間距)
     html = html.replace(/<\/ul><br><ul>/g, '');
-
     container.innerHTML = html;
 }
 
 // 4. 圖表繪製函式集
 
-// Chart 1: 估值圖 (股價 vs PE Band) - 需要抓歷史數據
-async function drawValuationChart(symbol) {
-    const ctx = document.getElementById('dd-valuation-chart').getContext('2d');
-    if (deepDiveChartInstances['valuation']) deepDiveChartInstances['valuation'].destroy();
+async function drawValuationChart(symbol, suffix = '') {
+    // ✅ 動態加上 suffix
+    const canvas = document.getElementById('dd-valuation-chart' + suffix);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
-    // 抓取過去 3 年股價
+    // ✅ 避免不同畫面的圖表實例互相打架
+    const instanceKey = 'valuation' + suffix;
+    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
+
     const prices = await fetchStockPriceHistory(symbol, 365 * 3);
-
-    // 簡單模擬：計算平均 PE 的隱含股價 (這裡簡化處理，實務上需抓取歷史 EPS)
-    // 為了演示效果，我們畫股價走勢 + 一條移動平均線代表「趨勢」
     const labels = prices.map(p => p.date);
     const closeData = prices.map(p => p.close);
-
-    // 計算簡單的「估值中樞」 (例如 200日均線)
     const sma200 = calculateSMA(closeData, 200);
 
-    deepDiveChartInstances['valuation'] = new Chart(ctx, {
+    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [
-                {
-                    label: 'Stock Price',
-                    data: closeData,
-                    borderColor: '#f0b90b',
-                    borderWidth: 1.5,
-                    pointRadius: 0
-                },
-                {
-                    label: '200 MA (Valuation Baseline)',
-                    data: sma200,
-                    borderColor: 'rgba(255, 255, 255, 0.5)',
-                    borderWidth: 1,
-                    borderDash: [5, 5],
-                    pointRadius: 0
-                }
+                { label: 'Stock Price', data: closeData, borderColor: '#f0b90b', borderWidth: 1.5, pointRadius: 0 },
+                { label: '200 MA (Valuation Baseline)', data: sma200, borderColor: 'rgba(255, 255, 255, 0.5)', borderWidth: 1, borderDash:, pointRadius: 0 }
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
+            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
+            scales: { x: { display: true, grid: { display: false }, ticks: { color: '#888', maxRotation: 45, minRotation: 45, maxTicksLimit: 12 } }, y: { grid: { color: '#333' } } },
+            plugins: { legend: { labels: { color: '#ccc' } } }
+        }
+    });
+}
+
+// Chart 2: 內部人交易圖
+function drawInsiderChart(insiderData, suffix = '') {
+    const canvas = document.getElementById('dd-insider-chart' + suffix);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const instanceKey = 'insider' + suffix;
+    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
+
+    if (!insiderData || insiderData.length === 0) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.save(); ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "16px Arial"; ctx.fillStyle = "#888";
+        ctx.fillText("No Recent Insider Trading Data (近期無內部人交易)", canvas.width / 2, canvas.height / 2);
+        ctx.restore();
+        return;
+    }
+
+    const sortedData = [...insiderData].slice(0, 15).reverse();
+    const labels = sortedData.map(d => d.transactionDate ? d.transactionDate.split(' ') : 'N/A');
+    const values = sortedData.map(d => d.securitiesTransacted);
+    const backgroundColors = sortedData.map(d => {
+        const type = (d.transactionType || "").toLowerCase();
+        return (type.includes('buy') || type.includes('purchase') || type.includes('award')) ? '#00e676' : '#ff5252';
+    });
+
+    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: labels, datasets: [{ label: 'Shares Transacted', data: values, backgroundColor: backgroundColors, borderWidth: 0, borderRadius: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#888', font: {size: 10}, maxRotation: 45, minRotation: 45 }, grid: { display: false } }, y: { grid: { color: '#333' }, ticks: { color: '#666' } } } }
+    });
+}
+
+// Chart 3: 三率趨勢
+async function drawMarginsChart(symbol, suffix = '') {
+    const canvas = document.getElementById('dd-financial-chart' + suffix);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const instanceKey = 'financial' + suffix;
+    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
+
+    const response = await fetch(`${BASE_URL}income-statement/${symbol}?period=quarter&limit=12&apikey=${API_KEY}`);
+    const data = await response.json();
+    const sortedData = data.reverse();
+
+    const labels = sortedData.map(d => d.date);
+    const grossMargin = sortedData.map(d => (d.grossProfit / d.revenue * 100));
+    const netMargin = sortedData.map(d => (d.netIncome / d.revenue * 100));
+
+    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Gross Margin %', data: grossMargin, borderColor: '#00e676', backgroundColor: 'rgba(0, 230, 118, 0.1)', fill: true, tension: 0.3 },
+                { label: 'Net Margin %', data: netMargin, borderColor: '#2979ff', borderDash:, tension: 0.3 }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: true, grid: { display: false }, ticks: { color: '#888', maxRotation: 45, minRotation: 45 } }, y: { grid: { color: '#333' } } }, plugins: { legend: { labels: { color: '#ccc' } } } }
+    });
+}
+
+// Chart 4: 營收與獲利
+async function drawGrowthChart(symbol, suffix = '') {
+    const canvas = document.getElementById('dd-growth-chart' + suffix);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const instanceKey = 'growth' + suffix;
+    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
+
+    const response = await fetch(`${BASE_URL}income-statement/${symbol}?period=annual&limit=10&apikey=${API_KEY}`);
+    const data = await response.json();
+    const sortedData = data.reverse();
+
+    const labels = sortedData.map(d => d.calendarYear);
+    const revenue = sortedData.map(d => d.revenue);
+    const eps = sortedData.map(d => d.eps);
+
+    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Revenue (營收)', data: revenue, backgroundColor: 'rgba(54, 162, 235, 0.5)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 1, yAxisID: 'y', order: 2 },
+                { type: 'line', label: 'EPS (每股盈餘)', data: eps, borderColor: '#f0b90b', backgroundColor: '#f0b90b', borderWidth: 2, pointRadius: 3, yAxisID: 'y1', order: 1 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
             scales: {
-                x: {
-                    display: true,
-                    grid: { display: false },
-                    ticks: {
-                        color: '#888', // 灰色字體
-                        maxRotation: 45, // 稍微傾斜以免擠在一起
-                        minRotation: 45,
-                        maxTicksLimit: 12 // 限制最多顯示 12 個標籤
-                    }
-                },
-                y: { grid: { color: '#333' } }
+                x: { grid: { display: false }, ticks: { color: '#888' } },
+                y: { type: 'linear', display: true, position: 'left', grid: { color: '#333' }, ticks: { color: '#888', callback: function(value) { return value / 1000000000 + 'B'; } } },
+                y1: { type: 'linear', display: true, position: 'right', grid: { drawOnChartArea: false }, ticks: { color: '#f0b90b' } }
             },
             plugins: { legend: { labels: { color: '#ccc' } } }
         }
     });
 }
 
-// Chart 2: 內部人交易圖 (Bar Chart)
-function drawInsiderChart(insiderData) {
-    const canvas = document.getElementById('dd-insider-chart');
+// Chart 5: 現金流
+async function drawCashflowChart(symbol, suffix = '') {
+    const canvas = document.getElementById('dd-cashflow-chart' + suffix);
+    if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    // 銷毀舊圖表
-    if (deepDiveChartInstances['insider']) {
-        deepDiveChartInstances['insider'].destroy();
-    }
+    const instanceKey = 'cashflow' + suffix;
+    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
 
-    // --- 處理無數據的情況 ---
-    if (!insiderData || insiderData.length === 0) {
-        // 清空畫布
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        // 繪製提示文字
-        ctx.save();
-        ctx.textAlign = "center";
-        ctx.textBaseline = "middle";
-        ctx.font = "16px Arial";
-        ctx.fillStyle = "#888";
-        ctx.fillText("No Recent Insider Trading Data (近期無內部人交易)", canvas.width / 2, canvas.height / 2);
-        ctx.restore();
-        return;
-    }
+    const response = await fetch(`${BASE_URL}cash-flow-statement/${symbol}?period=annual&limit=10&apikey=${API_KEY}`);
+    const data = await response.json();
+    const sortedData = data.reverse();
 
-    // 整理數據 (反轉順序，讓最新的在右邊)
-    // 只取前 15 筆以免擁擠
-    const sortedData = [...insiderData].slice(0, 15).reverse();
+    const labels = sortedData.map(d => d.calendarYear);
+    const ocf = sortedData.map(d => d.operatingCashFlow);
+    const fcf = sortedData.map(d => d.freeCashFlow);
 
-    const labels = sortedData.map(d => {
-        // 簡化日期顯示 (YYYY-MM-DD)
-        return d.transactionDate ? d.transactionDate.split(' ')[0] : 'N/A';
-    });
-
-    const values = sortedData.map(d => d.securitiesTransacted);
-
-    // 判斷顏色：買入為綠色，賣出為紅色
-    const backgroundColors = sortedData.map(d => {
-        const type = (d.transactionType || "").toLowerCase();
-        // 包含 Buy, Purchase, Award 等關鍵字視為正向/買入
-        if (type.includes('buy') || type.includes('purchase') || type.includes('award')) {
-            return '#00e676'; // 亮綠色
-        } else {
-            return '#ff5252'; // 亮紅色 (賣出)
-        }
-    });
-
-    deepDiveChartInstances['insider'] = new Chart(ctx, {
+    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
-            datasets: [{
-                label: 'Shares Transacted',
-                data: values,
-                backgroundColor: backgroundColors,
-                borderWidth: 0,
-                borderRadius: 4 // 圓角柱狀圖，比較美觀
-            }]
+            datasets: [
+                { label: 'Operating Cash Flow', data: ocf, backgroundColor: 'rgba(75, 192, 192, 0.6)', borderColor: 'rgba(75, 192, 192, 1)', borderWidth: 1 },
+                { label: 'Free Cash Flow', data: fcf, backgroundColor: 'rgba(153, 102, 255, 0.6)', borderColor: 'rgba(153, 102, 255, 1)', borderWidth: 1 }
+            ]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        title: (items) => {
-                            const index = items[0].dataIndex;
-                            const d = sortedData[index];
-                            return `${d.transactionDate} (${d.transactionType})`;
-                        },
-                        label: (item) => {
-                            const index = item.dataIndex;
-                            const d = sortedData[index];
-
-                            // 獲取數據 (確保有值，否則顯示 N/A)
-                            const shares = d.securitiesTransacted ? d.securitiesTransacted.toLocaleString() : 'N/A';
-                            // 假設 API 有回傳成交價 (price) 和交易後剩餘持股 (securitiesOwned)
-                            const price = d.price ? `$${d.price.toFixed(2)}` : 'N/A';
-                            const value = (d.securitiesTransacted && d.price) ? `$${((d.securitiesTransacted * d.price) / 1000000).toFixed(2)}M` : 'N/A';
-                            const owned = d.securitiesOwned ? d.securitiesOwned.toLocaleString() : '未知';
-
-                            // 回傳陣列，讓 Tooltip 顯示多行資訊
-                            return [
-                                `👤 ${d.reportingName}`,
-                                `📊 交易數量: ${shares} 股`,
-                                `💰 交易價位: ${price} (總值約 ${value})`,
-                                `🏦 剩餘持股: ${owned} 股`
-                            ];
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    ticks: { color: '#888', font: {size: 10}, maxRotation: 45, minRotation: 45 },
-                    grid: { display: false }
-                },
-                y: {
-                    grid: { color: '#333' },
-                    ticks: { color: '#666' }
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { x: { grid: { display: false }, ticks: { color: '#888' } }, y: { grid: { color: '#333' }, ticks: { color: '#888', callback: function(value) { return value / 1000000000 + 'B'; } } } }, plugins: { legend: { labels: { color: '#ccc' } } } }
     });
 }
 
-// Chart 3: 三率趨勢 (Margins) - 需要抓 Income Statement
-async function drawMarginsChart(symbol) {
-    const ctx = document.getElementById('dd-financial-chart').getContext('2d');
-    if (deepDiveChartInstances['financial']) deepDiveChartInstances['financial'].destroy();
+// Chart 6: 量價趨勢
+async function drawTechChart(symbol, suffix = '') {
+    const canvas = document.getElementById('dd-tech-chart' + suffix);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
 
-    // 使用您現有的 fetchIncomeStatement 邏輯，或直接 fetch
-    const response = await fetch(`${BASE_URL}income-statement/${symbol}?period=quarter&limit=12&apikey=${API_KEY}`);
-    const data = await response.json();
-    const sortedData = data.reverse(); // 舊到新
+    const instanceKey = 'tech' + suffix;
+    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
 
-    const labels = sortedData.map(d => d.date);
-    const grossMargin = sortedData.map(d => (d.grossProfit / d.revenue * 100));
-    const netMargin = sortedData.map(d => (d.netIncome / d.revenue * 100));
+    const rawData = await fetchStockPriceHistory(symbol, 250);
+    const labels = rawData.map(d => d.date);
+    const closePrice = rawData.map(d => d.close);
+    const volume = rawData.map(d => d.volume);
+    const ma20 = calculateSMA(closePrice, 20);
 
-    deepDiveChartInstances['financial'] = new Chart(ctx, {
+    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [
-                {
-                    label: 'Gross Margin %',
-                    data: grossMargin,
-                    borderColor: '#00e676', // 綠色
-                    backgroundColor: 'rgba(0, 230, 118, 0.1)',
-                    fill: true,
-                    tension: 0.3
-                },
-                {
-                    label: 'Net Margin %',
-                    data: netMargin,
-                    borderColor: '#2979ff', // 藍色
-                    borderDash: [5, 5],
-                    tension: 0.3
-                }
+                { label: 'Stock Price', data: closePrice, borderColor: '#f0b90b', borderWidth: 2, pointRadius: 0, yAxisID: 'y', order: 1 },
+                { label: '20 MA', data: ma20, borderColor: 'rgba(255, 255, 255, 0.6)', borderWidth: 1, borderDash:, pointRadius: 0, yAxisID: 'y', order: 2 },
+                { type: 'bar', label: 'Volume', data: volume, backgroundColor: 'rgba(54, 162, 235, 0.3)', borderColor: 'rgba(54, 162, 235, 0)', yAxisID: 'y1', order: 3 }
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
             scales: {
-                x: {
-                    display: true, // 開啟顯示
-                    grid: { display: false }, // 隱藏垂直網格線保持版面乾淨
-                    ticks: {
-                        color: '#888', // 灰色字體
-                        maxRotation: 45, // 文字傾斜 45 度
-                        minRotation: 45
-                    }
-                },
-                y: { grid: { color: '#333' } }
+                x: { display: true, grid: { display: false }, ticks: { color: '#888', maxRotation: 45, minRotation: 45, maxTicksLimit: 12 } },
+                y: { type: 'linear', display: true, position: 'right', grid: { color: '#333' }, ticks: { color: '#ccc' } },
+                y1: { type: 'linear', display: false, position: 'left', min: 0, suggestedMax: Math.max(...volume) * 5 }
             },
             plugins: { legend: { labels: { color: '#ccc' } } }
         }
@@ -9373,11 +9345,11 @@ function calculateSMA(data, window) {
 
 // 5. 情境感知聊天室邏輯
 
-function initDeepDiveChat(symbol) {
-    const chatContainer = document.getElementById('dd-chat-messages');
-    const targetSymbol = symbol ? symbol : "該公司";
+function initDeepDiveChat(symbol, suffix = '') {
+    const chatContainer = document.getElementById('dd-chat-messages' + suffix);
+    if (!chatContainer) return;
 
-    // ✨ 清空歷史記憶
+    const targetSymbol = symbol ? symbol : "該公司";
     chatHistory = [];
 
     chatContainer.innerHTML = `
@@ -9394,59 +9366,43 @@ function initDeepDiveChat(symbol) {
     `;
 }
 
-function handleChatKey(event) {
-    if (event.key === 'Enter') sendChatQuestion();
+// ✅ 加上 suffix 參數傳遞
+function handleChatKey(event, suffix = '') {
+    if (event.key === 'Enter') sendChatQuestion(suffix);
 }
 
 function formatChatContent(text) {
     if (!text) return "";
-
-    // 1. 處理粗體 **text** -> <strong>text</strong>
     let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
-
-    // 2. 處理條列式清單
-    // 先將換行符號統一
     let lines = html.split('\n');
     let inList = false;
     let result = '';
 
     lines.forEach(line => {
         line = line.trim();
-        // 檢查是否以 "- " 開頭
         if (line.startsWith('- ')) {
-            if (!inList) {
-                result += '<ul class="chat-list">'; // 開始新的清單
-                inList = true;
-            }
-            // 移除開頭的 "- " 並包入 li
+            if (!inList) { result += '<ul class="chat-list">'; inList = true; }
             result += `<li>${line.substring(2)}</li>`;
         } else {
-            if (inList) {
-                result += '</ul>'; // 結束清單
-                inList = false;
-            }
-            // 普通文字，如果不是空行則加上換行
-            if (line.length > 0) {
-                result += `<p>${line}</p>`;
-            }
+            if (inList) { result += '</ul>'; inList = false; }
+            if (line.length > 0) result += `<p>${line}</p>`;
         }
     });
-
-    if (inList) result += '</ul>'; // 收尾
-
+    if (inList) result += '</ul>';
     return result;
 }
 
-async function sendChatQuestion() {
-    const input = document.getElementById('dd-chat-input');
+async function sendChatQuestion(suffix = '') {
+    const input = document.getElementById('dd-chat-input' + suffix);
+    if (!input) return;
     const msg = input.value.trim();
     if (!msg) return;
 
-    const chatContainer = document.getElementById('dd-chat-messages');
+    const chatContainer = document.getElementById('dd-chat-messages' + suffix);
+    if (!chatContainer) return;
 
-    // 1. 顯示並儲存用戶訊息
     chatContainer.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
-    chatHistory.push({ role: "user", content: msg }); // ✨ 將用戶對話加入記憶
+    chatHistory.push({ role: "user", content: msg });
 
     input.value = "";
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -9455,13 +9411,12 @@ async function sendChatQuestion() {
     chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble ai">CIO 正在檢索資料並思考中...</div>`;
 
     try {
-        // 2. 發送給後端 (包含記憶 history)
         const response = await fetch('/api/chat_with_context', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message: msg,
-                history: chatHistory, // ✨ 把整串對話紀錄送給 AI
+                history: chatHistory,
                 context_data: currentDeepDiveData,
                 report_content: currentReportContent
             })
@@ -9471,9 +9426,8 @@ async function sendChatQuestion() {
         const loadingDiv = document.getElementById(loadingId);
         if(loadingDiv) loadingDiv.remove();
 
-        // 3. 顯示 AI 回覆並儲存記憶
         const aiReply = data.reply || "我沒有得出結論，請再問一次。";
-        chatHistory.push({ role: "assistant", content: aiReply }); // ✨ 將 AI 回答加入記憶
+        chatHistory.push({ role: "assistant", content: aiReply });
 
         const formattedReply = formatChatContent(aiReply);
         chatContainer.innerHTML += `<div class="chat-bubble ai">${formattedReply}</div>`;
@@ -9482,153 +9436,8 @@ async function sendChatQuestion() {
     } catch (error) {
         console.error(error);
         const loadingDiv = document.getElementById(loadingId);
-        // ✨ 把紅字錯誤改成友善的提示
         if(loadingDiv) loadingDiv.innerText = "⚠️ 伺服器處理時發生了一些問題，請稍後再試或換個方式提問。";
     }
-}
-
-async function drawGrowthChart(symbol) {
-    const ctx = document.getElementById('dd-growth-chart').getContext('2d');
-    if (deepDiveChartInstances['growth']) deepDiveChartInstances['growth'].destroy();
-
-    // 抓取年度損益表 (比較看長期趨勢)
-    const response = await fetch(`${BASE_URL}income-statement/${symbol}?period=annual&limit=10&apikey=${API_KEY}`);
-    const data = await response.json();
-    const sortedData = data.reverse(); // 舊到新
-
-    const labels = sortedData.map(d => d.calendarYear); // 使用年份
-    const revenue = sortedData.map(d => d.revenue);
-    const eps = sortedData.map(d => d.eps);
-
-    deepDiveChartInstances['growth'] = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Revenue (營收)',
-                    data: revenue,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)', // 藍色柱狀
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1,
-                    yAxisID: 'y',
-                    order: 2
-                },
-                {
-                    type: 'line',
-                    label: 'EPS (每股盈餘)',
-                    data: eps,
-                    borderColor: '#f0b90b', // 金黃色線條
-                    backgroundColor: '#f0b90b',
-                    borderWidth: 2,
-                    pointRadius: 3,
-                    yAxisID: 'y1', // 使用右側 Y 軸
-                    order: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { color: '#888' }
-                },
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    grid: { color: '#333' },
-                    ticks: {
-                        color: '#888',
-                        callback: function(value) { return value / 1000000000 + 'B'; } // 簡化顯示為 Billion
-                    }
-                },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    grid: { drawOnChartArea: false }, // 不畫網格以免混亂
-                    ticks: { color: '#f0b90b' }
-                }
-            },
-            plugins: { legend: { labels: { color: '#ccc' } } }
-        }
-    });
-}
-
-// Chart 5: 現金流安全性 (OCF vs FCF)
-async function drawCashflowChart(symbol) {
-    const ctx = document.getElementById('dd-cashflow-chart').getContext('2d');
-    if (deepDiveChartInstances['cashflow']) deepDiveChartInstances['cashflow'].destroy();
-
-    // 抓取年度現金流量表
-    const response = await fetch(`${BASE_URL}cash-flow-statement/${symbol}?period=annual&limit=10&apikey=${API_KEY}`);
-    const data = await response.json();
-    const sortedData = data.reverse();
-
-    const labels = sortedData.map(d => d.calendarYear);
-    const ocf = sortedData.map(d => d.operatingCashFlow);
-    const fcf = sortedData.map(d => d.freeCashFlow);
-
-    deepDiveChartInstances['cashflow'] = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Operating Cash Flow (營運現金流)',
-                    data: ocf,
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)', // 青色
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Free Cash Flow (自由現金流)',
-                    data: fcf,
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)', // 紫色
-                    borderColor: 'rgba(153, 102, 255, 1)',
-                    borderWidth: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { color: '#888' }
-                },
-                y: {
-                    grid: { color: '#333' },
-                    ticks: {
-                        color: '#888',
-                        callback: function(value) { return value / 1000000000 + 'B'; }
-                    }
-                }
-            },
-            plugins: {
-                legend: { labels: { color: '#ccc' } },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) {
-                                label += ': ';
-                            }
-                            if (context.parsed.y !== null) {
-                                label += (context.parsed.y / 1000000000).toFixed(2) + ' B';
-                            }
-                            return label;
-                        }
-                    }
-                }
-            }
-        }
-    });
 }
 
 // 1. Debounce 函式 (防止 API 呼叫過於頻繁)
@@ -9650,88 +9459,57 @@ function debounce(func, delay) {
    2. 搜尋輸入框邏輯 (包含自動修正拼寫錯誤)
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
-    // 取得 DOM 元素
-    const input = document.getElementById('dd-stock-input');
-    const suggestionsBox = document.getElementById('dd-suggestions');
+    // 抓取畫面上所有的 deep dive 搜尋框 (透過 class 綁定，完美兼容 Modal 與主畫面)
+    const searchInputs = document.querySelectorAll('.dd-search-input');
 
-    // 安全檢查：如果找不到元素就跳出，避免報錯
-    if (!input || !suggestionsBox) return;
+    searchInputs.forEach(input => {
+        input.addEventListener('input', debounce(async (e) => {
+            let query = e.target.value.trim().toUpperCase();
 
-    // --- 綁定 Input 事件 (使用 debounce 延遲 300ms) ---
-    input.addEventListener('input', debounce(async (e) => {
-        // 1. 取得輸入值，移除前後空白
-        // 注意：我們保留使用者的原始大小寫輸入，讓 API 自己去模糊比對
-        let query = e.target.value.trim();
+            // 自動尋找目前輸入框旁邊的建議清單容器
+            const suggestionsBox = e.target.parentElement.querySelector('.dd-suggestions-list');
+            if (!suggestionsBox) return;
 
-        // 2. 如果輸入被清空，則隱藏建議框並結束
-        if (query.length < 1) {
-            suggestionsBox.classList.remove('active');
-            suggestionsBox.innerHTML = '';
-            return;
-        }
-
-        try {
-            // --- 定義內部的 API 請求函式 (避免重複寫 fetch) ---
-            const fetchSuggestions = async (searchQuery) => {
-                // 這裡的 API_KEY 來自你 main.js 最上方的全域變數
-                // 加上 exchange=NASDAQ,NYSE 鎖定美股，減少雜訊
-                const url = `https://financialmodelingprep.com/api/v3/search?query=${encodeURIComponent(searchQuery)}&limit=10&exchange=NASDAQ,NYSE&apikey=${API_KEY}`;
-
-                const response = await fetch(url);
-                if (!response.ok) {
-                    throw new Error(`API Error: ${response.status}`);
-                }
-                return await response.json();
-            };
-
-            // --- 步驟 A: 進行第一次搜尋 ---
-            let data = await fetchSuggestions(query);
-
-            // --- 步驟 B: 執行自動修正 (Fallback) 機制 ---
-            // 條件：如果第一次搜尋完全沒結果 (length === 0) 且 輸入長度大於 3 (避免誤判短代碼)
-            if (data.length === 0 && query.length > 3) {
-                console.log(`搜尋 "${query}" 無結果，啟動自動修正機制...`);
-
-                // 動作：砍掉最後一個字元 (例如 AAPLE -> AAPL)
-                const fallbackQuery = query.slice(0, -1);
-
-                // 再次呼叫 API
-                const fallbackData = await fetchSuggestions(fallbackQuery);
-
-                // 如果第二次搜尋有結果，就採用這些結果
-                if (fallbackData.length > 0) {
-                    console.log(`自動修正成功！使用 "${fallbackQuery}" 的搜尋結果。`);
-                    data = fallbackData;
-                }
+            // 如果被清空，就收起推薦框
+            if (query.length < 1) {
+                suggestionsBox.classList.remove('active');
+                suggestionsBox.innerHTML = '';
+                return;
             }
 
-            // --- 步驟 C: 渲染建議列表 ---
-            // 注意：renderSuggestions 函式需要你在外部有定義 (如我上一則回答中的範例)
-            // 如果還沒定義，請確保下方有該函式
-            renderSuggestions(data);
+            try {
+                // 顯示 Loading
+                suggestionsBox.innerHTML = '<div style="padding:10px; color:#aaa;">Loading...</div>';
+                suggestionsBox.classList.add('active');
 
-        } catch (error) {
-            console.error("Search Suggestion Error:", error);
-            // 發生錯誤時，也可以選擇清空建議框
-            suggestionsBox.classList.remove('active');
-        }
-    }, 300)); // 300 毫秒的延遲
+                // 呼叫 FMP API 抓取資料
+                const url = `https://financialmodelingprep.com/api/v3/search?query=${encodeURIComponent(query)}&limit=10&exchange=NASDAQ,NYSE&apikey=${API_KEY}`;
+                const response = await fetch(url);
+                if (!response.ok) throw new Error("API Error");
+                const data = await response.json();
 
-    // --- 點擊外部關閉建議框的邏輯 ---
+                // 渲染推薦選單
+                renderDDSuggestions(data, suggestionsBox, e.target);
+            } catch (error) {
+                console.error("Search Suggestion Error:", error);
+                suggestionsBox.classList.remove('active');
+            }
+        }, 300)); // 延遲 300 毫秒避免 API 呼叫過度頻繁
+    });
+
+    // 點擊畫面其他空白處時，關閉所有的推薦框
     document.addEventListener('click', (e) => {
-        if (!input.contains(e.target) && !suggestionsBox.contains(e.target)) {
-            suggestionsBox.classList.remove('active');
-        }
+        document.querySelectorAll('.dd-suggestions-list').forEach(box => {
+            if (!box.contains(e.target) && !e.target.classList.contains('dd-search-input')) {
+                box.classList.remove('active');
+            }
+        });
     });
 });
 
-/* ==========================================================================
-   3. 渲染建議列表函式 (如果還沒寫，請補上這個)
-   ========================================================================== */
-function renderSuggestions(data) {
-    const suggestionsBox = document.getElementById('dd-suggestions');
+// 負責將推薦資料畫到 HTML 上的函數
+function renderDDSuggestions(data, suggestionsBox, inputElement) {
     suggestionsBox.innerHTML = '';
-
     if (!data || data.length === 0) {
         suggestionsBox.classList.remove('active');
         return;
@@ -9740,27 +9518,17 @@ function renderSuggestions(data) {
     data.forEach(item => {
         const div = document.createElement('div');
         div.className = 'dd-suggestion-item';
+        // 顯示出 代碼 與 公司全名
+        div.innerHTML = `<span class="dd-suggestion-symbol">${item.symbol}</span> <span class="dd-suggestion-name">${item.name}</span>`;
 
-        // 顯示代碼與公司名稱
-        div.innerHTML = `
-            <span class="dd-suggestion-symbol">${item.symbol}</span>
-            <span class="dd-suggestion-name">${item.name}</span>
-        `;
-
-        // 點擊選項時的行為
+        // 點擊選項時的動作
         div.onclick = () => {
-            const input = document.getElementById('dd-stock-input');
-            input.value = item.symbol; // 填入正確的代碼
-            suggestionsBox.classList.remove('active'); // 關閉選單
-
-            // 如果你想點擊後直接觸發分析，可以把下面這行註解打開：
-            // runDeepDive();
+            inputElement.value = item.symbol; // 填入正確的代碼
+            suggestionsBox.classList.remove('active'); // 隱藏推薦框
         };
 
         suggestionsBox.appendChild(div);
     });
-
-    suggestionsBox.classList.add('active');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -9816,117 +9584,6 @@ function initResizeHandle() {
     });
 }
 
-async function drawTechChart(symbol) {
-    const ctx = document.getElementById('dd-tech-chart').getContext('2d');
-
-    // 清除舊圖表
-    if (deepDiveChartInstances['tech']) deepDiveChartInstances['tech'].destroy();
-
-    // 1. 抓取過去 1 年 (約 250 個交易日) 的日線數據
-    // 我們使用您原本就有的 fetchStockPriceHistory 函式
-    const rawData = await fetchStockPriceHistory(symbol, 250);
-
-    // 數據是由 舊 -> 新 排列
-    const labels = rawData.map(d => d.date);
-    const closePrice = rawData.map(d => d.close);
-    const volume = rawData.map(d => d.volume);
-
-    // 2. 計算 20日移動平均線 (MA20) - 短期趨勢線
-    const ma20 = calculateSMA(closePrice, 20);
-
-    deepDiveChartInstances['tech'] = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    label: 'Stock Price (股價)',
-                    data: closePrice,
-                    borderColor: '#f0b90b', // 金色
-                    borderWidth: 2,
-                    pointRadius: 0, // 不顯示點，線條更滑順
-                    yAxisID: 'y', // 左軸
-                    order: 1
-                },
-                {
-                    label: '20 MA (月均線)',
-                    data: ma20,
-                    borderColor: 'rgba(255, 255, 255, 0.6)', // 半透明白
-                    borderWidth: 1,
-                    borderDash: [5, 5], // 虛線
-                    pointRadius: 0,
-                    yAxisID: 'y',
-                    order: 2
-                },
-                {
-                    type: 'bar',
-                    label: 'Volume (成交量)',
-                    data: volume,
-                    backgroundColor: 'rgba(54, 162, 235, 0.3)', // 淡藍色
-                    borderColor: 'rgba(54, 162, 235, 0)',
-                    yAxisID: 'y1', // 右軸
-                    order: 3
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: {
-                mode: 'index',
-                intersect: false,
-            },
-            scales: {
-                x: {
-                    display: true, // 開啟顯示
-                    grid: { display: false },
-                    ticks: {
-                        color: '#888',
-                        maxRotation: 45,
-                        minRotation: 45,
-                        maxTicksLimit: 12 // ✨ 關鍵：250天的資料，我們只顯示約12個月份節點，避免擠爆
-                    }
-                },
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right', // 股價軸放右邊 (符合看盤習慣)
-                    grid: { color: '#333' },
-                    ticks: { color: '#ccc' }
-                },
-                y1: {
-                    type: 'linear',
-                    display: false, // 隱藏成交量軸的刻度 (只看相對高低)
-                    position: 'left',
-                    min: 0,
-                    // 關鍵技巧：讓成交量最高點只佔畫面的 20%，避免擋住 K 線
-                    // 我們把 max 設為實際最大量的 5 倍
-                    suggestedMax: Math.max(...volume) * 5
-                }
-            },
-            plugins: {
-                legend: { labels: { color: '#ccc' } },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) label += ': ';
-                            if (context.parsed.y !== null) {
-                                // 如果是成交量，加千分位
-                                if (context.dataset.type === 'bar') {
-                                    return label + context.parsed.y.toLocaleString();
-                                }
-                                // 如果是股價，取小數點
-                                return label + context.parsed.y.toFixed(2);
-                            }
-                            return label;
-                        }
-                    }
-                }
-            }
-        }
-    });
-}
 
 // 輔助函式：計算移動平均線 (SMA)
 // 如果你之前還沒加這個，請務必加上
