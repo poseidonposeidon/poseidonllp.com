@@ -1858,12 +1858,11 @@ body.light-mode {
 
 /* 4. 內容區：Grid 佈局，強制不准溢出 */
 .dd-content {
-    flex: 1; /* 填滿剩餘高度 */
-    display: grid;
-    grid-template-columns: 40% 60%;
-    height: 100%; /* 確保繼承高度 */
-    min-height: 0; /* 關鍵：防止 Grid 子元素撐爆 */
-    overflow: hidden;
+    display: block;
+    height: auto; /* 讓內容自然往下長 */
+    min-height: 80vh;
+    padding: 0; /* 移除多餘 padding，外層已經有了 */
+    background-color: transparent;
 }
 
 /* --- 左側面板 --- */
@@ -2064,14 +2063,14 @@ body.light-mode {
 .dd-report-area li { margin-bottom: 5px; }
 
 /* 1. 讓內容區域整體可以捲動 */
-.dd-content.scrollable-content {
-    display: block; /* 取消原本的 flex */
-    overflow-y: auto; /* 垂直捲動 */
-    height: calc(100vh - 100px); /* 扣除 Header 高度 */
-    padding: 20px 40px;
-    background-color: #1e1e1e;
-    box-sizing: border-box;
-}
+/*.dd-content.scrollable-content {*/
+/*    display: block; !* 取消原本的 flex *!*/
+/*    overflow-y: auto; !* 垂直捲動 *!*/
+/*    height: calc(100vh - 100px); !* 扣除 Header 高度 *!*/
+/*    padding: 20px 40px;*/
+/*    background-color: #1e1e1e;*/
+/*    box-sizing: border-box;*/
+/*}*/
 
 /* 2. 上半部佈局：左右並排 (Flexbox) */
 .dd-top-layout {
@@ -2129,10 +2128,10 @@ body.light-mode {
 }
 /* 3. 下半部：全寬聊天室 */
 .dd-bottom-chat-layout {
-    margin-top: 20px;
+    margin-top: 40px;
     border-top: 2px solid #444;
     padding-top: 30px;
-    padding-bottom: 50px; /* 底部留白 */
+    padding-bottom: 50px;
 }
 
 .dd-chat-header {
