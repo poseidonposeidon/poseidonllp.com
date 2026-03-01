@@ -51,43 +51,39 @@ let isUsingAlternateSource = false; //
 const NEWS_PER_PAGE = 10; // 每頁新聞數量
 const MAX_VISIBLE_PAGES = 5;
 
-document.getElementById("toggle-news-source").addEventListener("click", async () => {
-    isUsingAlternateSource = !isUsingAlternateSource;
+const toggleNewsSourceBtn = document.getElementById("toggle-news-source");
+if (toggleNewsSourceBtn) {
+    toggleNewsSourceBtn.addEventListener("click", async () => {
+        isUsingAlternateSource = !isUsingAlternateSource;
 
-    await loadNews();
+        await loadNews();
 
-    const filterInputs = document.querySelector(".filter-inputs");
-    const toggleButton = document.getElementById("toggle-news-source");
-    const messageId = 'fmp-login-message'; // 給我們的訊息一個專屬的 ID，方便尋找
+        const filterInputs = document.querySelector(".filter-inputs");
+        const toggleButton = document.getElementById("toggle-news-source");
+        const messageId = 'fmp-login-message';
 
-    if (isUsingAlternateSource) {
-        // --- 切換到 FMP 來源 ---
-        filterInputs.style.display = "none";
-        toggleButton.textContent = "切換至 原始 新聞來源";
+        if (isUsingAlternateSource) {
+            filterInputs.style.display = "none";
+            toggleButton.textContent = "切換至 原始 新聞來源";
 
-        // 先檢查頁面上是不是已經有這個訊息了
-        if (!document.getElementById(messageId)) {
-            // 如果沒有，才建立並加上去
-            const message = document.createElement("div");
-            message.id = messageId; // 記得要給它 ID！
-            message.textContent = "帳號 : poseidon@poseidonllp.com  密碼 : poseidon52369168";
-            message.style.marginTop = "10px";
-            toggleButton.insertAdjacentElement("afterend", message);
+            if (!document.getElementById(messageId)) {
+                const message = document.createElement("div");
+                message.id = messageId;
+                message.textContent = "帳號 : poseidon@poseidonllp.com  密碼 : poseidon52369168";
+                message.style.marginTop = "10px";
+                toggleButton.insertAdjacentElement("afterend", message);
+            }
+        } else {
+            filterInputs.style.display = "flex";
+            toggleButton.textContent = "切換至 FMP 新聞來源";
+
+            const existingMessage = document.getElementById(messageId);
+            if (existingMessage) {
+                existingMessage.remove();
+            }
         }
-
-    } else {
-        // --- 切換回原始來源 ---
-        filterInputs.style.display = "flex"; // 建議用 flex，比 block 好
-        toggleButton.textContent = "切換至 FMP 新聞來源";
-
-        // 找到那個訊息元素
-        const existingMessage = document.getElementById(messageId);
-        if (existingMessage) {
-            // 如果找到了，就把它從頁面上移除！
-            existingMessage.remove();
-        }
-    }
-});
+    });
+}
 
 async function fetchStockNews(category = "all", symbol = "", date = "") {
     let url;
@@ -221,6 +217,9 @@ function displayNews(newsList, currentPage = 1) {
 // 生成分頁按鈕
 function generatePagination(newsList, currentPage) {
     const paginationContainer = document.getElementById('pagination-container');
+
+    if (!paginationContainer) return;
+
     paginationContainer.innerHTML = ''; // 清空舊按鈕
 
     const totalPages = Math.ceil(newsList.length / NEWS_PER_PAGE);
@@ -9034,18 +9033,26 @@ function closeDeepDiveModal() {
 }
 
 // ✅ 核心修正：接收 suffix 參數 (例如 '-main' 或 '')
-async function runDeepDive(suffix = '') {
-    // 使用動態 ID 尋找正確的輸入框
-    const symbolInput = document.getElementById('dd-stock-input' + suffix);
+async function runDeepDive(inputId = 'dd-stock-input', reportId = 'dd-report-container') {
+    // 1. 直接使用傳入的 inputId 尋找輸入框
+    const symbolInput = document.getElementById(inputId);
     if (!symbolInput) {
-        console.error("找不到輸入框 ID: dd-stock-input" + suffix);
+        console.error("找不到輸入框 ID: " + inputId);
         return;
     }
 
     const symbol = symbolInput.value.trim().toUpperCase();
-    const loadingScreen = document.getElementById('dd-loading-screen' + suffix);
-    const loadingText = document.getElementById('dd-loading-text' + suffix);
-    const reportContainer = document.getElementById('dd-report-container' + suffix);
+
+    // 2. 對於 loading 畫面，我們試著去找帶有 -main 結尾的版本，如果沒有就找原本的
+    const isMain = inputId.includes('-main');
+    const loadingScreenId = isMain ? 'dd-loading-screen-main' : 'dd-loading-screen';
+    const loadingTextId = isMain ? 'dd-loading-text-main' : 'dd-loading-text';
+
+    const loadingScreen = document.getElementById(loadingScreenId);
+    const loadingText = document.getElementById(loadingTextId);
+
+    // 3. 直接使用傳入的 reportId 尋找報告容器
+    const reportContainer = document.getElementById(reportId);
 
     if (!symbol) {
         alert("請輸入股票代碼！");
@@ -9074,7 +9081,9 @@ async function runDeepDive(suffix = '') {
 
         if(loadingText) loadingText.innerText = "正在繪製視覺化圖表...";
 
-        // ✅ 把 suffix 傳給所有的畫圖函數，讓它們畫在正確的地方
+        // 4. 定義一個後綴，用來傳遞給繪圖函數（因為圖表的 canvas id 還是需要拼接）
+        const suffix = isMain ? '-main' : '';
+
         await Promise.all([
             drawValuationChart(symbol, suffix),
             drawInsiderChart(data.raw_data.insider_transactions, suffix),
