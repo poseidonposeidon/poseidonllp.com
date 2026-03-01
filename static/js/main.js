@@ -186,7 +186,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 // 顯示新聞
 function displayNews(newsList, currentPage = 1) {
     const newsContainer = document.getElementById('news-container');
-    if (!container) return;
+    // ✅ 修正點：原本寫 !container 會報錯，改為 !newsContainer
+    if (!newsContainer) return;
+
     newsContainer.innerHTML = '';
 
     const startIndex = (currentPage - 1) * NEWS_PER_PAGE;
@@ -201,8 +203,7 @@ function displayNews(newsList, currentPage = 1) {
     paginatedNews.forEach(news => {
         const newsItem = document.createElement('div');
         newsItem.classList.add('news-item');
-
-        const imageUrl = news.image || 'placeholder.jpg'; // 如果沒有圖片，使用預設圖片
+        const imageUrl = news.image || 'placeholder.jpg';
 
         newsItem.innerHTML = `
             <img src="${imageUrl}" alt="${news.title}" class="news-image">
@@ -213,7 +214,6 @@ function displayNews(newsList, currentPage = 1) {
                 <span>${new Date(news.publishedDate).toLocaleString()}</span>
             </div>
         `;
-
         newsContainer.appendChild(newsItem);
     });
 }
@@ -9018,48 +9018,45 @@ function downloadPdfFile() {
    ========================================================================== */
 
 // 全局變數：用來暫存目前的分析數據，供聊天室使用 (RAG Context)
-let currentDeepDiveData = null;
 let currentReportContent = "";
-let deepDiveChartInstances = {}; // 儲存圖表實例以供銷毀
+let deepDiveChartInstances = {};
 let chatHistory = [];
 
-// 1. Modal 開關控制
 function openDeepDiveModal() {
     document.getElementById('deep-dive-modal').style.display = 'block';
-
-    // 重置捲軸到最上方
     const contentDiv = document.querySelector('.dd-content.scrollable-content');
-    if (contentDiv) {
-        contentDiv.scrollTop = 0;
-    }
+    if (contentDiv) contentDiv.scrollTop = 0;
 }
 
 function closeDeepDiveModal() {
-    const modal = document.getElementById('deep-dive-modal');
-    modal.style.display = 'none';
-    document.body.style.overflow = 'auto'; // 恢復背景滾動
+    document.getElementById('deep-dive-modal').style.display = 'none';
+    document.body.style.overflow = 'auto';
 }
 
-// 2. 執行深度分析 (核心函式)
-async function runDeepDive() {
-    const symbolInput = document.getElementById('dd-stock-input');
+// ✅ 核心修正：接收 suffix 參數 (例如 '-main' 或 '')
+async function runDeepDive(suffix = '') {
+    // 使用動態 ID 尋找正確的輸入框
+    const symbolInput = document.getElementById('dd-stock-input' + suffix);
+    if (!symbolInput) {
+        console.error("找不到輸入框 ID: dd-stock-input" + suffix);
+        return;
+    }
+
     const symbol = symbolInput.value.trim().toUpperCase();
-    const loadingScreen = document.getElementById('dd-loading-screen');
-    const loadingText = document.getElementById('dd-loading-text');
-    const reportContainer = document.getElementById('dd-report-container');
+    const loadingScreen = document.getElementById('dd-loading-screen' + suffix);
+    const loadingText = document.getElementById('dd-loading-text' + suffix);
+    const reportContainer = document.getElementById('dd-report-container' + suffix);
 
     if (!symbol) {
         alert("請輸入股票代碼！");
         return;
     }
 
-    // 啟動 Loading
-    loadingScreen.style.display = 'flex';
-    loadingText.innerText = "正在調用 FMP API 獲取：估值模型、內部人交易、法說會逐字稿...";
-    reportContainer.innerHTML = ""; // 清空舊報告
+    if(loadingScreen) loadingScreen.style.display = 'flex';
+    if(loadingText) loadingText.innerText = "正在調用 FMP API 獲取：估值模型、內部人交易、法說會逐字稿...";
+    if(reportContainer) reportContainer.innerHTML = "";
 
     try {
-        // --- 階段 A: 呼叫後端生成 AI 報告 ---
         const response = await fetch(`${baseUrl}/api/ai_deep_dive`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -9069,43 +9066,32 @@ async function runDeepDive() {
         if (!response.ok) throw new Error("Analysis Failed");
 
         const data = await response.json();
-
-        // 儲存 Context 供聊天室使用
         currentDeepDiveData = data.raw_data;
         currentReportContent = data.report;
 
-        // --- 階段 B: 渲染 AI 報告 ---
-        loadingText.innerText = "AI 正在排版分析報告...";
+        if(loadingText) loadingText.innerText = "AI 正在排版分析報告...";
         renderDeepDiveMarkdown(data.report, reportContainer);
 
-        // 如果有 RAG 歷史，顯示提示
-        if (data.rag_hit) {
-            console.log("系統發現歷史分析紀錄，已自動比較前後觀點。");
-        }
+        if(loadingText) loadingText.innerText = "正在繪製視覺化圖表...";
 
-        // --- 階段 C: 繪製右側圖表 (平行處理) ---
-        loadingText.innerText = "正在繪製視覺化圖表...";
-
-        // 這裡我們直接在前端抓取繪圖所需的歷史數據 (因為圖表需要時間序列)
+        // ✅ 把 suffix 傳給所有的畫圖函數，讓它們畫在正確的地方
         await Promise.all([
-            drawValuationChart(symbol),
-            drawInsiderChart(data.raw_data.insider_transactions), // 使用後端回傳的精確籌碼數據
-            drawMarginsChart(symbol),
-            drawGrowthChart(symbol),
-            drawCashflowChart(symbol),
-            drawTechChart(symbol)
+            drawValuationChart(symbol, suffix),
+            drawInsiderChart(data.raw_data.insider_transactions, suffix),
+            drawMarginsChart(symbol, suffix),
+            drawGrowthChart(symbol, suffix),
+            drawCashflowChart(symbol, suffix),
+            drawTechChart(symbol, suffix)
         ]);
-        attachChartClickListeners();
 
-        // 初始化聊天室歡迎語
-        initDeepDiveChat();
+        attachChartClickListeners();
+        initDeepDiveChat(symbol, suffix);
 
     } catch (error) {
         console.error(error);
-        reportContainer.innerHTML = `<p style="color: red;">分析發生錯誤：${error.message}</p>`;
+        if(reportContainer) reportContainer.innerHTML = `<p style="color: red;">分析發生錯誤：${error.message}</p>`;
     } finally {
-        // 關閉 Loading
-        loadingScreen.style.display = 'none';
+        if(loadingScreen) loadingScreen.style.display = 'none';
     }
 }
 
