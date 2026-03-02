@@ -151,10 +151,13 @@ async function loadNews() {
     displayNews(newsList, 1);
     generatePagination(newsList, 1);
 
-    // **更新按鈕文字**
-    document.getElementById("toggle-news-source").textContent = isUsingAlternateSource
-        ? "切換至 原始 新聞來源"
-        : "切換至 FMP 新聞來源";
+    // **更新按鈕文字 (加入安全檢查)**
+    const toggleBtn = document.getElementById("toggle-news-source");
+    if (toggleBtn) {
+        toggleBtn.textContent = isUsingAlternateSource
+            ? "切換至 原始 新聞來源"
+            : "切換至 FMP 新聞來源";
+    }
 }
 
 async function handleStockSearch(event) {
@@ -378,33 +381,33 @@ function initSearchInput() {
     stockInput.addEventListener('keyup', handleStockSearch);
 }
 
-document.getElementById("filter-by-date").addEventListener("click", async () => {
-    const selectedDate = document.getElementById("news-date").value;
-    const stockInput = document.getElementById("stock-input").value.trim().toUpperCase(); // 取得輸入的股票代號（如果有）
-
-    if (!selectedDate) {
-        alert("請選擇日期");
-        return;
-    }
-
-    // **確保 selectedDate 為 undefined 時不傳遞**
-    const newsList = await fetchStockNews("all", stockInput || "", selectedDate ? selectedDate : undefined);
-    displayNews(newsList, 1);
-    generatePagination(newsList, 1);
-});
-
-document.getElementById('stock-input').addEventListener('input', function (event) {
-    event.target.value = event.target.value.toUpperCase(); // 轉換為大寫
-});
-
-document.getElementById('stock-input').addEventListener('keydown', function (event) {
-    if (event.key === 'Enter') {
-        // 獲取建議框容器
-        const suggestionsContainer = document.getElementById('suggestions-container');
-        // 執行清空建議框的操作
-        clearSuggestions();
-    }
-});
+// document.getElementById("filter-by-date").addEventListener("click", async () => {
+//     const selectedDate = document.getElementById("news-date").value;
+//     const stockInput = document.getElementById("stock-input").value.trim().toUpperCase(); // 取得輸入的股票代號（如果有）
+//
+//     if (!selectedDate) {
+//         alert("請選擇日期");
+//         return;
+//     }
+//
+//     // **確保 selectedDate 為 undefined 時不傳遞**
+//     const newsList = await fetchStockNews("all", stockInput || "", selectedDate ? selectedDate : undefined);
+//     displayNews(newsList, 1);
+//     generatePagination(newsList, 1);
+// });
+//
+// document.getElementById('stock-input').addEventListener('input', function (event) {
+//     event.target.value = event.target.value.toUpperCase(); // 轉換為大寫
+// });
+//
+// document.getElementById('stock-input').addEventListener('keydown', function (event) {
+//     if (event.key === 'Enter') {
+//         // 獲取建議框容器
+//         const suggestionsContainer = document.getElementById('suggestions-container');
+//         // 執行清空建議框的操作
+//         clearSuggestions();
+//     }
+// });
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -9071,9 +9074,9 @@ async function runDeepDive(inputId = 'dd-stock-input', reportId = 'dd-report-con
 
         const data = await response.json();
 
-        // 賦值給全域變數 (因為最上面有宣告了，所以這裡絕對不會再報錯)
-        currentDeepDiveData = data.raw_data;
-        currentReportContent = data.report;
+        // 確保我們存取的是全域物件 (window) 上的變數，避開區塊變數衝突
+        window.currentDeepDiveData = data.raw_data || null;
+        window.currentReportContent = data.report || "";
 
         if(loadingText) loadingText.innerText = "AI 正在排版分析報告...";
         renderDeepDiveMarkdown(data.report, reportContainer);
