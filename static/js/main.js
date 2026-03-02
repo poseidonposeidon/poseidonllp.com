@@ -9051,10 +9051,10 @@ function downloadPdfFile() {
    ========================================================================== */
 
 // 全局變數：用來暫存目前的分析數據，供聊天室使用 (RAG Context)
-let currentDeepDiveData = null;
-let currentReportContent = "";
-let deepDiveChartInstances = {};
-let chatHistory = [];
+window.currentDeepDiveData = null;
+window.currentReportContent = "";
+window.deepDiveChartInstances = {};
+window.chatHistory = [];
 
 function openDeepDiveModal() {
     document.getElementById('deep-dive-modal').style.display = 'block';
@@ -9067,9 +9067,11 @@ function closeDeepDiveModal() {
     document.body.style.overflow = 'auto';
 }
 
-// ✅ 核心分析流程 (支援動態 ID)
-async function runDeepDive(inputId = 'dd-stock-input', reportId = 'dd-report-container') {
+// ✅ 支援 suffix 參數 (例如 '-main')
+async function runDeepDive(suffix = '') {
+    const inputId = 'dd-stock-input' + suffix;
     const symbolInput = document.getElementById(inputId);
+
     if (!symbolInput) {
         console.error("找不到輸入框 ID: " + inputId);
         return;
@@ -9077,9 +9079,9 @@ async function runDeepDive(inputId = 'dd-stock-input', reportId = 'dd-report-con
 
     const symbol = symbolInput.value.trim().toUpperCase();
 
-    const isMain = inputId.includes('-main');
-    const loadingScreenId = isMain ? 'dd-loading-screen-main' : 'dd-loading-screen';
-    const loadingTextId = isMain ? 'dd-loading-text-main' : 'dd-loading-text';
+    const loadingScreenId = suffix === '-main' ? 'dd-loading-screen-main' : 'dd-loading-screen';
+    const loadingTextId = suffix === '-main' ? 'dd-loading-text-main' : 'dd-loading-text';
+    const reportId = 'dd-report-container' + suffix;
 
     const loadingScreen = document.getElementById(loadingScreenId);
     const loadingText = document.getElementById(loadingTextId);
@@ -9105,17 +9107,16 @@ async function runDeepDive(inputId = 'dd-stock-input', reportId = 'dd-report-con
 
         const data = await response.json();
 
-        // 確保我們存取的是全域物件 (window) 上的變數，避開區塊變數衝突
-        window.currentDeepDiveData = data.raw_data || null;
-        window.currentReportContent = data.report || "";
+        // ✅ 使用 window. 賦值
+        window.currentDeepDiveData = data.raw_data;
+        window.currentReportContent = data.report;
 
         if(loadingText) loadingText.innerText = "AI 正在排版分析報告...";
         renderDeepDiveMarkdown(data.report, reportContainer);
 
         if(loadingText) loadingText.innerText = "正在繪製視覺化圖表...";
 
-        const suffix = isMain ? '-main' : '';
-
+        // ✅ 傳遞 suffix 給所有圖表
         await Promise.all([
             drawValuationChart(symbol, suffix),
             drawInsiderChart(data.raw_data.insider_transactions, suffix),
@@ -9151,30 +9152,28 @@ function renderDeepDiveMarkdown(text, container) {
     container.innerHTML = html;
 }
 
-// 4. 圖表繪製函式集
+// ================= 圖表繪製函式集 (全部加上 suffix) =================
 
 async function drawValuationChart(symbol, suffix = '') {
-    // ✅ 動態加上 suffix
     const canvas = document.getElementById('dd-valuation-chart' + suffix);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
-    // ✅ 避免不同畫面的圖表實例互相打架
     const instanceKey = 'valuation' + suffix;
-    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
+    if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
     const prices = await fetchStockPriceHistory(symbol, 365 * 3);
     const labels = prices.map(p => p.date);
     const closeData = prices.map(p => p.close);
     const sma200 = calculateSMA(closeData, 200);
 
-    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+    window.deepDiveChartInstances[instanceKey] = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [
                 { label: 'Stock Price', data: closeData, borderColor: '#f0b90b', borderWidth: 1.5, pointRadius: 0 },
-                { label: '200 MA (Valuation Baseline)', data: sma200, borderColor: 'rgba(255, 255, 255, 0.5)', borderWidth: 1, pointRadius: 0 }
+                { label: '200 MA (Valuation Baseline)', data: sma200, borderColor: 'rgba(255, 255, 255, 0.5)', borderWidth: 1, borderDash:'', pointRadius: 0 }
             ]
         },
         options: {
@@ -9185,14 +9184,13 @@ async function drawValuationChart(symbol, suffix = '') {
     });
 }
 
-// Chart 2: 內部人交易圖
 function drawInsiderChart(insiderData, suffix = '') {
     const canvas = document.getElementById('dd-insider-chart' + suffix);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     const instanceKey = 'insider' + suffix;
-    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
+    if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
     if (!insiderData || insiderData.length === 0) {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -9210,21 +9208,20 @@ function drawInsiderChart(insiderData, suffix = '') {
         return (type.includes('buy') || type.includes('purchase') || type.includes('award')) ? '#00e676' : '#ff5252';
     });
 
-    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+    window.deepDiveChartInstances[instanceKey] = new Chart(ctx, {
         type: 'bar',
         data: { labels: labels, datasets: [{ label: 'Shares Transacted', data: values, backgroundColor: backgroundColors, borderWidth: 0, borderRadius: 4 }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#888', font: {size: 10}, maxRotation: 45, minRotation: 45 }, grid: { display: false } }, y: { grid: { color: '#333' }, ticks: { color: '#666' } } } }
     });
 }
 
-// Chart 3: 三率趨勢
 async function drawMarginsChart(symbol, suffix = '') {
     const canvas = document.getElementById('dd-financial-chart' + suffix);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     const instanceKey = 'financial' + suffix;
-    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
+    if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
     const response = await fetch(`${BASE_URL}income-statement/${symbol}?period=quarter&limit=12&apikey=${API_KEY}`);
     const data = await response.json();
@@ -9234,27 +9231,26 @@ async function drawMarginsChart(symbol, suffix = '') {
     const grossMargin = sortedData.map(d => (d.grossProfit / d.revenue * 100));
     const netMargin = sortedData.map(d => (d.netIncome / d.revenue * 100));
 
-    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+    window.deepDiveChartInstances[instanceKey] = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [
                 { label: 'Gross Margin %', data: grossMargin, borderColor: '#00e676', backgroundColor: 'rgba(0, 230, 118, 0.1)', fill: true, tension: 0.3 },
-                { label: 'Net Margin %', data: netMargin, borderColor: '#2979ff', tension: 0.3 }
+                { label: 'Net Margin %', data: netMargin, borderColor: '#2979ff', borderDash:'', tension: 0.3 }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: true, grid: { display: false }, ticks: { color: '#888', maxRotation: 45, minRotation: 45 } }, y: { grid: { color: '#333' } } }, plugins: { legend: { labels: { color: '#ccc' } } } }
     });
 }
 
-// Chart 4: 營收與獲利
 async function drawGrowthChart(symbol, suffix = '') {
     const canvas = document.getElementById('dd-growth-chart' + suffix);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     const instanceKey = 'growth' + suffix;
-    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
+    if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
     const response = await fetch(`${BASE_URL}income-statement/${symbol}?period=annual&limit=10&apikey=${API_KEY}`);
     const data = await response.json();
@@ -9264,7 +9260,7 @@ async function drawGrowthChart(symbol, suffix = '') {
     const revenue = sortedData.map(d => d.revenue);
     const eps = sortedData.map(d => d.eps);
 
-    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+    window.deepDiveChartInstances[instanceKey] = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
@@ -9285,14 +9281,13 @@ async function drawGrowthChart(symbol, suffix = '') {
     });
 }
 
-// Chart 5: 現金流
 async function drawCashflowChart(symbol, suffix = '') {
     const canvas = document.getElementById('dd-cashflow-chart' + suffix);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     const instanceKey = 'cashflow' + suffix;
-    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
+    if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
     const response = await fetch(`${BASE_URL}cash-flow-statement/${symbol}?period=annual&limit=10&apikey=${API_KEY}`);
     const data = await response.json();
@@ -9302,7 +9297,7 @@ async function drawCashflowChart(symbol, suffix = '') {
     const ocf = sortedData.map(d => d.operatingCashFlow);
     const fcf = sortedData.map(d => d.freeCashFlow);
 
-    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+    window.deepDiveChartInstances[instanceKey] = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: labels,
@@ -9315,14 +9310,13 @@ async function drawCashflowChart(symbol, suffix = '') {
     });
 }
 
-// Chart 6: 量價趨勢
 async function drawTechChart(symbol, suffix = '') {
     const canvas = document.getElementById('dd-tech-chart' + suffix);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
 
     const instanceKey = 'tech' + suffix;
-    if (deepDiveChartInstances[instanceKey]) deepDiveChartInstances[instanceKey].destroy();
+    if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
     const rawData = await fetchStockPriceHistory(symbol, 250);
     const labels = rawData.map(d => d.date);
@@ -9330,13 +9324,13 @@ async function drawTechChart(symbol, suffix = '') {
     const volume = rawData.map(d => d.volume);
     const ma20 = calculateSMA(closePrice, 20);
 
-    deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+    window.deepDiveChartInstances[instanceKey] = new Chart(ctx, {
         type: 'line',
         data: {
             labels: labels,
             datasets: [
                 { label: 'Stock Price', data: closePrice, borderColor: '#f0b90b', borderWidth: 2, pointRadius: 0, yAxisID: 'y', order: 1 },
-                { label: '20 MA', data: ma20, borderColor: 'rgba(255, 255, 255, 0.6)', borderWidth: 1,  pointRadius: 0, yAxisID: 'y', order: 2 },
+                { label: '20 MA', data: ma20, borderColor: 'rgba(255, 255, 255, 0.6)', borderWidth: 1, borderDash:'', pointRadius: 0, yAxisID: 'y', order: 2 },
                 { type: 'bar', label: 'Volume', data: volume, backgroundColor: 'rgba(54, 162, 235, 0.3)', borderColor: 'rgba(54, 162, 235, 0)', yAxisID: 'y1', order: 3 }
             ]
         },
@@ -9352,26 +9346,20 @@ async function drawTechChart(symbol, suffix = '') {
     });
 }
 
-// 輔助：抓歷史股價
+// 輔助函式
 async function fetchStockPriceHistory(symbol, limit) {
     const url = `${BASE_URL}historical-price-full/${symbol}?timeseries=${limit}&apikey=${API_KEY}`;
     const res = await fetch(url);
     const data = await res.json();
-    return data.historical.reverse(); // 轉為舊到新
+    return data.historical.reverse();
 }
 
-// 輔助：計算 SMA
 function calculateSMA(data, window) {
     let sma = [];
     for (let i = 0; i < data.length; i++) {
-        if (i < window - 1) {
-            sma.push(null);
-            continue;
-        }
+        if (i < window - 1) { sma.push(null); continue; }
         let sum = 0;
-        for (let j = 0; j < window; j++) {
-            sum += data[i - j];
-        }
+        for (let j = 0; j < window; j++) sum += data[i - j];
         sma.push(sum / window);
     }
     return sma;
@@ -9401,8 +9389,54 @@ function initDeepDiveChat(symbol, suffix = '') {
 }
 
 // ✅ 加上 suffix 參數傳遞
-function handleChatKey(event, suffix = '') {
-    if (event.key === 'Enter') sendChatQuestion(suffix);
+async function sendChatQuestion(suffix = '') {
+    const input = document.getElementById('dd-chat-input' + suffix);
+    if (!input) return;
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    const chatContainer = document.getElementById('dd-chat-messages' + suffix);
+    if (!chatContainer) return;
+
+    chatContainer.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
+
+    // ✅ 呼叫全域的 chatHistory
+    window.chatHistory.push({ role: "user", content: msg });
+
+    input.value = "";
+    chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    const loadingId = "chat-loading-" + Date.now();
+    chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble ai">CIO 正在檢索資料並思考中...</div>`;
+
+    try {
+        const response = await fetch('/api/chat_with_context', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                message: msg,
+                history: window.chatHistory, // ✅ 呼叫全域
+                context_data: window.currentDeepDiveData, // ✅ 呼叫全域
+                report_content: window.currentReportContent // ✅ 呼叫全域
+            })
+        });
+
+        const data = await response.json();
+        const loadingDiv = document.getElementById(loadingId);
+        if(loadingDiv) loadingDiv.remove();
+
+        const aiReply = data.reply || "我沒有得出結論，請再問一次。";
+        window.chatHistory.push({ role: "assistant", content: aiReply });
+
+        const formattedReply = formatChatContent(aiReply);
+        chatContainer.innerHTML += `<div class="chat-bubble ai">${formattedReply}</div>`;
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+
+    } catch (error) {
+        console.error(error);
+        const loadingDiv = document.getElementById(loadingId);
+        if(loadingDiv) loadingDiv.innerText = "⚠️ 伺服器處理時發生了一些問題，請稍後再試或換個方式提問。";
+    }
 }
 
 function formatChatContent(text) {
@@ -9645,77 +9679,86 @@ function calculateSMA(data, window) {
 // 全域變數，用來儲存彈出視窗中的圖表實例
 let popupChartInstance = null;
 
-// ✨ 綁定點擊事件到所有 Deep Dive 內的圖表
 function attachChartClickListeners() {
-    // 抓取所有圖表卡片內的 canvas
     const chartCanvases = document.querySelectorAll('.dd-chart-card canvas');
-
     chartCanvases.forEach(canvas => {
-        // 移除舊的監聽器避免重複綁定
         canvas.removeEventListener('click', handleChartClick);
-        // 綁定新的點擊事件
         canvas.addEventListener('click', handleChartClick);
     });
 }
 
 function handleChartClick(event) {
     const clickedCanvas = event.target;
-
-    // 取得原本圖表的標題 (從上方的 div 抓取)
     const cardDiv = clickedCanvas.closest('.dd-chart-card');
     const titleText = cardDiv.querySelector('.dd-chart-title').innerText;
-
-    // 呼叫放大函式
     openChartPopup(clickedCanvas.id, titleText);
 }
 
 function openChartPopup(originalCanvasId, title) {
-    // 1. 取得原本的 Chart.js 實例 (Chart.js 內建方法)
     const originalChart = Chart.getChart(originalCanvasId);
     if (!originalChart) return;
 
-    // 2. 顯示彈出視窗
     document.getElementById('chart-popup-modal').style.display = 'flex';
     document.getElementById('chart-popup-title').innerText = title;
-
-    // 3. 取得彈出視窗的 canvas
     const popupCanvas = document.getElementById('popup-canvas');
 
-    // 4. 如果之前已經有放大的圖表，先銷毀它，避免重疊
-    if (popupChartInstance) {
-        popupChartInstance.destroy();
-    }
+    if (popupChartInstance) popupChartInstance.destroy();
 
-    // 5. 複製原本圖表的設定 (Data 和 Options)
-    // 注意：我們需要關閉動畫，讓彈出時瞬間顯示
     const newConfig = {
         type: originalChart.config.type,
-        data: originalChart.config.data, // 共用同一包資料
+        data: originalChart.config.data,
         options: Object.assign({}, originalChart.options, {
-            responsive: true,
-            maintainAspectRatio: false, // 讓它填滿整個彈出視窗
-            animation: false, // 關閉動畫，體驗更好
-            plugins: {
-                ...originalChart.options.plugins,
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: { color: '#ffffff', font: { size: 14 } }
-                }
-            }
+            responsive: true, maintainAspectRatio: false, animation: false,
+            plugins: { ...originalChart.options.plugins, legend: { display: true, position: 'top', labels: { color: '#ffffff', font: { size: 14 } } } }
         })
     };
-
-    // 6. 畫出新的放大版圖表
     popupChartInstance = new Chart(popupCanvas, newConfig);
 }
 
 function closeChartPopup() {
-    // 隱藏視窗
     document.getElementById('chart-popup-modal').style.display = 'none';
-    // 銷毀圖表釋放記憶體
     if (popupChartInstance) {
         popupChartInstance.destroy();
         popupChartInstance = null;
     }
+}
+
+// 拖拉調整高度功能
+document.addEventListener('DOMContentLoaded', () => {
+    initResizeHandle();
+});
+
+function initResizeHandle() {
+    const handle = document.getElementById('dd-resize-handle');
+    const leftPanel = document.getElementById('dd-left-panel');
+    const reportArea = document.getElementById('dd-report-container');
+
+    if (!handle || !leftPanel || !reportArea) return;
+
+    let isResizing = false;
+
+    handle.addEventListener('mousedown', (e) => {
+        isResizing = true;
+        handle.classList.add('active');
+        document.body.style.cursor = 'row-resize';
+        e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+        if (!isResizing) return;
+        const panelRect = leftPanel.getBoundingClientRect();
+        const panelTop = panelRect.top;
+        let newHeight = e.clientY - panelTop;
+        const minHeight = 100;
+        const maxHeight = leftPanel.clientHeight - 150;
+        if (newHeight >= minHeight && newHeight <= maxHeight) reportArea.style.height = `${newHeight}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+        if (isResizing) {
+            isResizing = false;
+            handle.classList.remove('active');
+            document.body.style.cursor = 'default';
+        }
+    });
 }
