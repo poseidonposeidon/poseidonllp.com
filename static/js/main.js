@@ -9489,7 +9489,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 suggestionsBox.innerHTML = '<div style="padding:10px; color:#aaa;">Loading...</div>';
                 suggestionsBox.classList.add('active');
 
-                // 呼叫 FMP API 抓取資料
+                // 呼叫 FMP API 抓取資料 (請確保 API_KEY 在全域有宣告)
                 const url = `https://financialmodelingprep.com/api/v3/search?query=${encodeURIComponent(query)}&limit=10&exchange=NASDAQ,NYSE&apikey=${API_KEY}`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error("API Error");
@@ -9525,6 +9525,7 @@ function renderDDSuggestions(data, suggestionsBox, inputElement) {
     data.forEach(item => {
         const div = document.createElement('div');
         div.className = 'dd-suggestion-item';
+
         // 顯示出 代碼 與 公司全名
         div.innerHTML = `<span class="dd-suggestion-symbol">${item.symbol}</span> <span class="dd-suggestion-name">${item.name}</span>`;
 
