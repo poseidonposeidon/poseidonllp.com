@@ -9353,7 +9353,7 @@ function initDeepDiveChat(symbol, suffix = '') {
     if (!chatContainer) return;
 
     const targetSymbol = symbol ? symbol : "該公司";
-    chatHistory = [];
+    window.chatHistory = [];
 
     chatContainer.innerHTML = `
         <div class="chat-bubble ai">
@@ -9405,7 +9405,9 @@ async function sendChatQuestion(suffix = '') {
     if (!chatContainer) return;
 
     chatContainer.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
-    chatHistory.push({ role: "user", content: msg });
+
+    // ✅ 加上 window.
+    window.chatHistory.push({ role: "user", content: msg });
 
     input.value = "";
     chatContainer.scrollTop = chatContainer.scrollHeight;
@@ -9419,9 +9421,9 @@ async function sendChatQuestion(suffix = '') {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message: msg,
-                history: chatHistory,
-                context_data: currentDeepDiveData,
-                report_content: currentReportContent
+                history: window.chatHistory, // ✅ 加上 window.
+                context_data: window.currentDeepDiveData,
+                report_content: window.currentReportContent
             })
         });
 
@@ -9430,7 +9432,9 @@ async function sendChatQuestion(suffix = '') {
         if(loadingDiv) loadingDiv.remove();
 
         const aiReply = data.reply || "我沒有得出結論，請再問一次。";
-        chatHistory.push({ role: "assistant", content: aiReply });
+
+        // ✅ 加上 window.
+        window.chatHistory.push({ role: "assistant", content: aiReply });
 
         const formattedReply = formatChatContent(aiReply);
         chatContainer.innerHTML += `<div class="chat-bubble ai">${formattedReply}</div>`;
