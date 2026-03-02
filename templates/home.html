@@ -485,7 +485,7 @@
             <h2 style="color: #f0b90b; margin: 0;">AI Deep Dive 目前上有錯誤 修復中... <span style="font-size: 12px; color: #aaa; border: 1px solid #555; padding: 2px 6px; border-radius: 4px;">PRO</span></h2>
             <div class="dd-search-box" style="position: relative; flex-grow: 1; max-width: 500px;">
                 <input type="text" id="dd-stock-input-main" class="dd-search-input" placeholder="Enter Symbol (e.g. Apple or AAPL)" autocomplete="off" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #222; color: white;">
-                <button onclick="runDeepDive('dd-stock-input-main', 'dd-report-container-main')" style="position: absolute; right: 5px; top: 5px; background: #f0b90b; border: none; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Analyze</button>
+                <button onclick="runDeepDive('-main')" style="position: absolute; right: 5px; top: 5px; background: #f0b90b; border: none; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Analyze</button>
                 <div id="dd-suggestions-main" class="dd-suggestions-list"></div>
             </div>
         </div>
@@ -542,8 +542,8 @@
             <div class="dd-wide-chat-interface">
                 <div id="dd-chat-messages-main" class="dd-chat-messages-wide"></div>
                 <div class="dd-chat-input-box-wide">
-                    <input type="text" id="dd-chat-input-main" placeholder="Ask about Valuation, Risks, or Future Growth..." onkeypress="handleChatKey(event, 'main')">
-                    <button onclick="sendChatQuestion('main')">Send</button>
+                    <input type="text" id="dd-chat-input-main" placeholder="Ask about Valuation, Risks, or Future Growth..." onkeypress="handleChatKey(event, '-main')">
+                    <button onclick="sendChatQuestion('-main')">Send</button>
                 </div>
             </div>
         </div>
@@ -563,9 +563,17 @@
 </div>
 
 <script src="/static/js/main.js">
-    document.getElementById('stockSymbol').addEventListener('keydown', function (event) {
-        if (event.key === 'Enter') {
-            clearSuggestions(); // 按下 Enter 時執行 clearSuggestions()
+    document.addEventListener('DOMContentLoaded', () => {
+        const stockInput = document.getElementById('stockSymbol');
+        if (stockInput) { // 安全防護，確保元素存在才加監聽器
+            stockInput.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    // 確保 clearSuggestions 函式在 main.js 裡有被定義
+                    if (typeof clearSuggestions === 'function') {
+                        clearSuggestions();
+                    }
+                }
+            });
         }
     });
 
