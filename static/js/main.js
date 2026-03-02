@@ -3253,36 +3253,42 @@ function displaySuggestions(suggestions, suggestionsContainer, inputId) {
 }
 
 // 美股
-document.getElementById('stockSymbol').addEventListener('input', debounce(async function() {
-    const stockSymbol = this.value.trim().toUpperCase();
-    const suggestionsContainer = document.getElementById('suggestions');
+const stockSymbolInput = document.getElementById('stockSymbol');
+if (stockSymbolInput) {
+    stockSymbolInput.addEventListener('input', debounce(async function() {
+        const stockSymbol = this.value.trim().toUpperCase();
+        const suggestionsContainer = document.getElementById('suggestions');
 
-    if (stockSymbol.length > 0) {
-        showLoadingSuggestions(suggestionsContainer);
-        const stockData = await fetchStockSuggestions(stockSymbol);
-        if (this.value.trim().toUpperCase() === stockSymbol) {
-            displaySuggestions(stockData, suggestionsContainer, 'stockSymbol');
+        if (stockSymbol.length > 0) {
+            showLoadingSuggestions(suggestionsContainer);
+            const stockData = await fetchStockSuggestions(stockSymbol);
+            if (this.value.trim().toUpperCase() === stockSymbol) {
+                displaySuggestions(stockData, suggestionsContainer, 'stockSymbol');
+            }
+        } else {
+            clearSuggestions(suggestionsContainer);
         }
-    } else {
-        clearSuggestions(suggestionsContainer);
-    }
-}, 100));
+    }, 100));
+}
 
-document.getElementById('stock-input').addEventListener('input', debounce(async function () {
-    const query = this.value.trim().toUpperCase(); // 獲取輸入值並轉為大寫
-    const suggestionsContainer = document.getElementById('suggestions-container'); // 獲取建議框容器
+const stockInputGeneral = document.getElementById('stock-input');
+if (stockInputGeneral) {
+    stockInputGeneral.addEventListener('input', debounce(async function () {
+        const query = this.value.trim().toUpperCase();
+        const suggestionsContainer = document.getElementById('suggestions-container');
 
-    if (query.length > 0) {
-        suggestionsContainer.innerHTML = '<div>Loading...</div>'; // 顯示 "Loading..."
-        suggestionsContainer.classList.add('active');
-        const suggestions = await fetchStockSuggestions(query); // 獲取建議數據
-        if (this.value.trim().toUpperCase() === query) {
-            displaySuggestions(suggestions, suggestionsContainer, 'stock-input'); // 顯示建議
+        if (query.length > 0) {
+            suggestionsContainer.innerHTML = '<div>Loading...</div>';
+            suggestionsContainer.classList.add('active');
+            const suggestions = await fetchStockSuggestions(query);
+            if (this.value.trim().toUpperCase() === query) {
+                displaySuggestions(suggestions, suggestionsContainer, 'stock-input');
+            }
+        } else {
+            clearSuggestions(suggestionsContainer);
         }
-    } else {
-        clearSuggestions(suggestionsContainer); // 如果輸入框為空，清空建議
-    }
-}, 300));
+    }, 300));
+}
 
 document.addEventListener('input', debounce(async function (event) {
     // 確認事件目標是美股的輸入框
@@ -3326,20 +3332,24 @@ async function fetchStockSuggestions(stockSymbol) {
 }
 
 // 歐股
-document.getElementById('euStockSymbol').addEventListener('input', debounce(async function() {
-    const stockSymbol = this.value.trim().toUpperCase();
-    const suggestionsContainerEU = document.getElementById('suggestionsEU');
+const euStockSymbolInput = document.getElementById('euStockSymbol');
 
-    if (stockSymbol.length > 0) {
-        showLoadingSuggestions(suggestionsContainerEU);
-        const stockData = await fetchStockSuggestionsEU(stockSymbol);
-        if (this.value.trim().toUpperCase() === stockSymbol) {
-            displaySuggestions(stockData, suggestionsContainerEU, 'euStockSymbol');
+if (euStockSymbolInput) {
+    euStockSymbolInput.addEventListener('input', debounce(async function() {
+        const stockSymbol = this.value.trim().toUpperCase();
+        const suggestionsContainerEU = document.getElementById('suggestionsEU');
+
+        if (stockSymbol.length > 0) {
+            showLoadingSuggestions(suggestionsContainerEU);
+            const stockData = await fetchStockSuggestionsEU(stockSymbol);
+            if (this.value.trim().toUpperCase() === stockSymbol) {
+                displaySuggestions(stockData, suggestionsContainerEU, 'euStockSymbol');
+            }
+        } else {
+            clearSuggestions(suggestionsContainerEU);
         }
-    } else {
-        clearSuggestions(suggestionsContainerEU);
-    }
-}, 100));
+    }, 100));
+}
 
 document.addEventListener('input', debounce(async function (event) {
     // 確認事件目標是歐股的輸入框
@@ -3382,20 +3392,24 @@ async function fetchStockSuggestionsEU(stockSymbol) {
 }
 
 // 日股
-document.getElementById('jpStockSymbol').addEventListener('input', debounce(async function() {
-    const stockSymbol = this.value.trim().toUpperCase();
-    const suggestionsContainerJP = document.getElementById('suggestionsJP');
+const jpStockSymbolInput = document.getElementById('jpStockSymbol');
 
-    if (stockSymbol.length > 0) {
-        showLoadingSuggestions(suggestionsContainerJP);
-        const stockData = await fetchStockSuggestionsJP(stockSymbol);
-        if (this.value.trim().toUpperCase() === stockSymbol) {
-            displaySuggestions(stockData, suggestionsContainerJP, 'jpStockSymbol');
+if (jpStockSymbolInput) {
+    jpStockSymbolInput.addEventListener('input', debounce(async function() {
+        const stockSymbol = this.value.trim().toUpperCase();
+        const suggestionsContainerJP = document.getElementById('suggestionsJP');
+
+        if (stockSymbol.length > 0) {
+            showLoadingSuggestions(suggestionsContainerJP);
+            const stockData = await fetchStockSuggestionsJP(stockSymbol);
+            if (this.value.trim().toUpperCase() === stockSymbol) {
+                displaySuggestions(stockData, suggestionsContainerJP, 'jpStockSymbol');
+            }
+        } else {
+            clearSuggestions(suggestionsContainerJP);
         }
-    } else {
-        clearSuggestions(suggestionsContainerJP);
-    }
-}, 100));
+    }, 100));
+}
 
 async function fetchStockSuggestionsJP(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
@@ -3415,20 +3429,25 @@ async function fetchStockSuggestionsJP(stockSymbol) {
 }
 
 // 台股
-document.getElementById('twStockSymbol').addEventListener('input', debounce(async function() {
-    const stockSymbol = this.value.trim().toUpperCase();
-    const suggestionsContainerTW = document.getElementById('suggestionsTW');
+const twStockSymbolInput = document.getElementById('twStockSymbol');
 
-    if (stockSymbol.length > 0) {
-        showLoadingSuggestions(suggestionsContainerTW);
-        const stockData = await fetchStockSuggestionsTW(stockSymbol);
-        if (this.value.trim().toUpperCase() === stockSymbol) {
-            displaySuggestions(stockData, suggestionsContainerTW, 'twStockSymbol');
+if (twStockSymbolInput) {
+    twStockSymbolInput.addEventListener('input', debounce(async function() {
+        const stockSymbol = this.value.trim().toUpperCase();
+        const suggestionsContainerTW = document.getElementById('suggestionsTW');
+
+        if (stockSymbol.length > 0) {
+            showLoadingSuggestions(suggestionsContainerTW);
+            const stockData = await fetchStockSuggestionsTW(stockSymbol);
+            if (this.value.trim().toUpperCase() === stockSymbol) {
+                displaySuggestions(stockData, suggestionsContainerTW, 'twStockSymbol');
+            }
+        } else {
+            clearSuggestions(suggestionsContainerTW);
         }
-    } else {
-        clearSuggestions(suggestionsContainerTW);
-    }
-}, 100));
+    }, 100));
+}
+
 
 async function fetchStockSuggestionsTW(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
@@ -3449,20 +3468,24 @@ async function fetchStockSuggestionsTW(stockSymbol) {
 }
 
 // 韓股
-document.getElementById('krStockSymbol').addEventListener('input', debounce(async function() {
-    const stockSymbol = this.value.trim().toUpperCase();
-    const suggestionsContainerKR = document.getElementById('suggestionsKR');
+const krStockSymbolInput = document.getElementById('krStockSymbol');
 
-    if (stockSymbol.length > 0) {
-        showLoadingSuggestions(suggestionsContainerKR);
-        const stockData = await fetchStockSuggestionsKR(stockSymbol);
-        if (this.value.trim().toUpperCase() === stockSymbol) {
-            displaySuggestions(stockData, suggestionsContainerKR, 'krStockSymbol');
+if (krStockSymbolInput) {
+    krStockSymbolInput.addEventListener('input', debounce(async function() {
+        const stockSymbol = this.value.trim().toUpperCase();
+        const suggestionsContainerKR = document.getElementById('suggestionsKR');
+
+        if (stockSymbol.length > 0) {
+            showLoadingSuggestions(suggestionsContainerKR);
+            const stockData = await fetchStockSuggestionsKR(stockSymbol);
+            if (this.value.trim().toUpperCase() === stockSymbol) {
+                displaySuggestions(stockData, suggestionsContainerKR, 'krStockSymbol');
+            }
+        } else {
+            clearSuggestions(suggestionsContainerKR);
         }
-    } else {
-        clearSuggestions(suggestionsContainerKR);
-    }
-}, 100));
+    }, 100));
+}
 
 async function fetchStockSuggestionsKR(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
@@ -3482,20 +3505,24 @@ async function fetchStockSuggestionsKR(stockSymbol) {
 }
 
 // 港股
-document.getElementById('hkStockSymbol').addEventListener('input', debounce(async function() {
-    const stockSymbol = this.value.trim().toUpperCase();
-    const suggestionsContainerHK = document.getElementById('suggestionsHK');
+const hkStockSymbolInput = document.getElementById('hkStockSymbol');
 
-    if (stockSymbol.length > 0) {
-        showLoadingSuggestions(suggestionsContainerHK);
-        const stockData = await fetchStockSuggestionsHK(stockSymbol);
-        if (this.value.trim().toUpperCase() === stockSymbol) {
-            displaySuggestions(stockData, suggestionsContainerHK, 'hkStockSymbol');
+if (hkStockSymbolInput) {
+    hkStockSymbolInput.addEventListener('input', debounce(async function() {
+        const stockSymbol = this.value.trim().toUpperCase();
+        const suggestionsContainerHK = document.getElementById('suggestionsHK');
+
+        if (stockSymbol.length > 0) {
+            showLoadingSuggestions(suggestionsContainerHK);
+            const stockData = await fetchStockSuggestionsHK(stockSymbol);
+            if (this.value.trim().toUpperCase() === stockSymbol) {
+                displaySuggestions(stockData, suggestionsContainerHK, 'hkStockSymbol');
+            }
+        } else {
+            clearSuggestions(suggestionsContainerHK);
         }
-    } else {
-        clearSuggestions(suggestionsContainerHK);
-    }
-}, 100));
+    }, 100));
+}
 
 async function fetchStockSuggestionsHK(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
@@ -3515,20 +3542,24 @@ async function fetchStockSuggestionsHK(stockSymbol) {
 }
 
 // 中國股
-document.getElementById('cnStockSymbol').addEventListener('input', debounce(async function() {
-    const stockSymbol = this.value.trim().toUpperCase();
-    const suggestionsContainerCN = document.getElementById('suggestionsCN');
+const cnStockSymbolInput = document.getElementById('cnStockSymbol');
 
-    if (stockSymbol.length > 0) {
-        showLoadingSuggestions(suggestionsContainerCN);
-        const stockData = await fetchStockSuggestionsCN(stockSymbol);
-        if (this.value.trim().toUpperCase() === stockSymbol) {
-            displaySuggestions(stockData, suggestionsContainerCN, 'cnStockSymbol');
+if (cnStockSymbolInput) {
+    cnStockSymbolInput.addEventListener('input', debounce(async function() {
+        const stockSymbol = this.value.trim().toUpperCase();
+        const suggestionsContainerCN = document.getElementById('suggestionsCN');
+
+        if (stockSymbol.length > 0) {
+            showLoadingSuggestions(suggestionsContainerCN);
+            const stockData = await fetchStockSuggestionsCN(stockSymbol);
+            if (this.value.trim().toUpperCase() === stockSymbol) {
+                displaySuggestions(stockData, suggestionsContainerCN, 'cnStockSymbol');
+            }
+        } else {
+            clearSuggestions(suggestionsContainerCN);
         }
-    } else {
-        clearSuggestions(suggestionsContainerCN);
-    }
-}, 100));
+    }, 100));
+}
 
 async function fetchStockSuggestionsCN(stockSymbol) {
     const apiKey = 'GXqcokYeRt6rTqe8cpcUxGPiJhnTIzkf';
