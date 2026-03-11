@@ -9161,7 +9161,7 @@ async function drawValuationChart(symbol, suffix = '') {
             labels: labels,
             datasets: [
                 { label: 'Stock Price', data: closeData, borderColor: '#f0b90b', borderWidth: 1.5, pointRadius: 0 },
-                { label: '200 MA (Valuation Baseline)', data: sma200, borderColor: 'rgba(255, 255, 255, 0.5)', borderWidth: 1, borderDash:'', pointRadius: 0 }
+                { label: '200 MA (Valuation Baseline)', data: sma200, borderColor: 'rgba(255, 255, 255, 0.5)', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
             ]
         },
         options: {
@@ -9225,7 +9225,7 @@ async function drawMarginsChart(symbol, suffix = '') {
             labels: labels,
             datasets: [
                 { label: 'Gross Margin %', data: grossMargin, borderColor: '#00e676', backgroundColor: 'rgba(0, 230, 118, 0.1)', fill: true, tension: 0.3 },
-                { label: 'Net Margin %', data: netMargin, borderColor: '#2979ff', borderDash:'', tension: 0.3 }
+                { label: 'Net Margin %', data: netMargin, borderColor: '#2979ff', borderDash: [5, 5], tension: 0.3 }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: true, grid: { display: false }, ticks: { color: '#888', maxRotation: 45, minRotation: 45 } }, y: { grid: { color: '#333' } } }, plugins: { legend: { labels: { color: '#ccc' } } } }
@@ -9318,7 +9318,7 @@ async function drawTechChart(symbol, suffix = '') {
             labels: labels,
             datasets: [
                 { label: 'Stock Price', data: closePrice, borderColor: '#f0b90b', borderWidth: 2, pointRadius: 0, yAxisID: 'y', order: 1 },
-                { label: '20 MA', data: ma20, borderColor: 'rgba(255, 255, 255, 0.6)', borderWidth: 1, borderDash:'', pointRadius: 0, yAxisID: 'y', order: 2 },
+                { label: '20 MA', data: ma20, borderColor: 'rgba(255, 255, 255, 0.6)', borderWidth: 1, borderDash: [5, 5], pointRadius: 0, yAxisID: 'y', order: 2 },
                 { type: 'bar', label: 'Volume', data: volume, backgroundColor: 'rgba(54, 162, 235, 0.3)', borderColor: 'rgba(54, 162, 235, 0)', yAxisID: 'y1', order: 3 }
             ]
         },
