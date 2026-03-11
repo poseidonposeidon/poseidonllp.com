@@ -9364,14 +9364,17 @@ function initDeepDiveChat(symbol, suffix = '') {
 
     chatContainer.innerHTML = `
         <div class="chat-bubble ai">
-            <p>👋 您好，我是 <strong>${targetSymbol}</strong> 的專屬 AI 投資長 (CIO)。</p>
-            <p>您可以嘗試問我以下類型的問題，讓我為您展示數據的力量：</p>
+            <p>👋 您好，我是**海川 AI 投資長 (CIO)**，您專屬的 <strong>${targetSymbol}</strong> 深度分析智囊。</p>
+            <p>我已為您整合了最新的財報、法說會、內部人動向與即時新聞。您可以這樣問我，讓我為您梳理投資邏輯：</p>
             <ul class="chat-list">
-                <li><strong>📊 競品對決</strong>： "比較 ${targetSymbol} 與 NVDA 的本益比與成長率"</li>
-                <li><strong>⏳ 歷史回溯</strong>： "幫我查 2021 年 Q4 的毛利率與 EPS"</li>
-                <li><strong>🎙️ 法說會挖掘</strong>： "最新法說會管理層說了什麼？"</li>
-                <li><strong>📰 最新動態</strong>： "這半年有什麼新產品或重要新聞？"</li>
+                <li><strong>💰 估值與潛力</strong>："目前的股價算合理嗎？請結合本益比與 DCF 模型幫我評估。"</li>
+                <li><strong>📊 競品對決</strong>："比較 ${targetSymbol} 與 NVDA 的利潤率與營收成長動能。"</li>
+                <li><strong>🛡️ 風險與護城河</strong>："這家公司目前最大的營運風險是什麼？護城河還在嗎？"</li>
+                <li><strong>👀 籌碼與高層動向</strong>："最近半年，公司高層或內部人有在大量倒貨或加碼嗎？"</li>
+                <li><strong>🎙️ 法說會解碼</strong>："最新法說會中，分析師最擔心的問題是什麼？管理層怎麼回應？"</li>
+                <li><strong>🔮 前瞻指引</strong>："根據最新數據與新聞，下半年的營收成長催化劑有哪些？"</li>
             </ul>
+            <p>👉 <i>或者，您也可以直接問我：「給我一份 ${targetSymbol} 的多空情境分析報告。」</i></p>
         </div>
     `;
 }
