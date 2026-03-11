@@ -9022,7 +9022,7 @@ function fetchPdfFileList(newPdfFileName = null) {
                 option.disabled = true;
                 select.appendChild(option);
             }
-        })
+        })/**/
         .catch(error => console.error('Error getting PDF file list:', error));
 }
 
@@ -9068,24 +9068,14 @@ function closeDeepDiveModal() {
 }
 
 // ✅ 支援 suffix 參數 (例如 '-main')
-async function runDeepDive(suffix = '') {
-    const inputId = 'dd-stock-input' + suffix;
-    const symbolInput = document.getElementById(inputId);
-
-    if (!symbolInput) {
-        console.error("找不到輸入框 ID: " + inputId);
-        return;
-    }
+async function runDeepDive() {
+    const symbolInput = document.getElementById('dd-stock-input');
+    if (!symbolInput) return;
 
     const symbol = symbolInput.value.trim().toUpperCase();
-
-    const loadingScreenId = suffix === '-main' ? 'dd-loading-screen-main' : 'dd-loading-screen';
-    const loadingTextId = suffix === '-main' ? 'dd-loading-text-main' : 'dd-loading-text';
-    const reportId = 'dd-report-container' + suffix;
-
-    const loadingScreen = document.getElementById(loadingScreenId);
-    const loadingText = document.getElementById(loadingTextId);
-    const reportContainer = document.getElementById(reportId);
+    const loadingScreen = document.getElementById('dd-loading-screen');
+    const loadingText = document.getElementById('dd-loading-text');
+    const reportContainer = document.getElementById('dd-report-container');
 
     if (!symbol) {
         alert("請輸入股票代碼！");
@@ -9097,17 +9087,15 @@ async function runDeepDive(suffix = '') {
     if(reportContainer) reportContainer.innerHTML = "";
 
     try {
-        const response = await fetch(`${baseUrl}/api/ai_deep_dive`, {
+        const response = await fetch(`${baseUrl}/api/ai_deep_dive`, { // 確保 baseUrl 有定義，或直接寫 '/api/ai_deep_dive'
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ symbol: symbol })
         });
 
         if (!response.ok) throw new Error("Analysis Failed");
-
         const data = await response.json();
 
-        // ✅ 使用 window. 賦值
         window.currentDeepDiveData = data.raw_data;
         window.currentReportContent = data.report;
 
@@ -9116,18 +9104,18 @@ async function runDeepDive(suffix = '') {
 
         if(loadingText) loadingText.innerText = "正在繪製視覺化圖表...";
 
-        // ✅ 傳遞 suffix 給所有圖表
+        // 移除 suffix
         await Promise.all([
-            drawValuationChart(symbol, suffix),
-            drawInsiderChart(data.raw_data.insider_transactions, suffix),
-            drawMarginsChart(symbol, suffix),
-            drawGrowthChart(symbol, suffix),
-            drawCashflowChart(symbol, suffix),
-            drawTechChart(symbol, suffix)
+            drawValuationChart(symbol),
+            drawInsiderChart(data.raw_data.insider_transactions),
+            drawMarginsChart(symbol),
+            drawGrowthChart(symbol),
+            drawCashflowChart(symbol),
+            drawTechChart(symbol)
         ]);
 
         attachChartClickListeners();
-        initDeepDiveChat(symbol, suffix);
+        initDeepDiveChat(symbol);
 
     } catch (error) {
         console.error(error);
@@ -9135,7 +9123,7 @@ async function runDeepDive(suffix = '') {
     } finally {
         if(loadingScreen) loadingScreen.style.display = 'none';
     }
-}
+}/**/
 
 // 渲染 Markdown 報告
 function renderDeepDiveMarkdown(text, container) {
@@ -9368,7 +9356,7 @@ function calculateSMA(data, window) {
 // 5. 情境感知聊天室邏輯
 
 function initDeepDiveChat(symbol, suffix = '') {
-    const chatContainer = document.getElementById('dd-chat-messages' + suffix);
+    const chatContainer = document.getElementById('dd-chat-messages' );
     if (!chatContainer) return;
 
     const targetSymbol = symbol ? symbol : "該公司";
@@ -9390,12 +9378,12 @@ function initDeepDiveChat(symbol, suffix = '') {
 
 // ✅ 加上 suffix 參數傳遞
 async function sendChatQuestion(suffix = '') {
-    const input = document.getElementById('dd-chat-input' + suffix);
+    const input = document.getElementById('dd-chat-input' );
     if (!input) return;
     const msg = input.value.trim();
     if (!msg) return;
 
-    const chatContainer = document.getElementById('dd-chat-messages' + suffix);
+    const chatContainer = document.getElementById('dd-chat-messages' );
     if (!chatContainer) return;
 
     chatContainer.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
