@@ -9376,19 +9376,20 @@ function initDeepDiveChat(symbol, suffix = '') {
     `;
 }
 
-// ✅ 加上 suffix 參數傳遞
+
+// ✅ 加上 suffix 參數傳遞，並修復了 fetch URL 的反引號問題
 async function sendChatQuestion(suffix = '') {
-    const input = document.getElementById('dd-chat-input' );
+    const input = document.getElementById('dd-chat-input' + suffix);
     if (!input) return;
     const msg = input.value.trim();
     if (!msg) return;
 
-    const chatContainer = document.getElementById('dd-chat-messages' );
+    const chatContainer = document.getElementById('dd-chat-messages' + suffix);
     if (!chatContainer) return;
 
     chatContainer.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
 
-    // ✅ 呼叫全域的 chatHistory
+    // 儲存對話歷史
     window.chatHistory.push({ role: "user", content: msg });
 
     input.value = "";
@@ -9398,22 +9399,32 @@ async function sendChatQuestion(suffix = '') {
     chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble ai">CIO 正在檢索資料並思考中...</div>`;
 
     try {
-        const response = await fetch('/api/chat_with_context', {
+        // 🚨 這裡務必使用「反引號 ( ` )」 (鍵盤左上角 Esc 下面那顆)，才能正確解析變數！
+        // 並且加上了 typeof 檢查，避免 baseUrl 未定義時報錯
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/chat_with_context` : '/api/chat_with_context';
+
+        const response = await fetch(targetUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 message: msg,
-                history: window.chatHistory, // ✅ 呼叫全域
-                context_data: window.currentDeepDiveData, // ✅ 呼叫全域
-                report_content: window.currentReportContent // ✅ 呼叫全域
+                history: window.chatHistory,
+                context_data: window.currentDeepDiveData,
+                report_content: window.currentReportContent
             })
         });
+
+        // 預防伺服器回傳 HTML (例如 500 或 404 錯誤)
+        if (!response.ok) {
+            throw new Error(`伺服器回應異常，狀態碼: ${response.status}`);
+        }
 
         const data = await response.json();
         const loadingDiv = document.getElementById(loadingId);
         if(loadingDiv) loadingDiv.remove();
 
         const aiReply = data.reply || "我沒有得出結論，請再問一次。";
+
         window.chatHistory.push({ role: "assistant", content: aiReply });
 
         const formattedReply = formatChatContent(aiReply);
@@ -9421,11 +9432,11 @@ async function sendChatQuestion(suffix = '') {
         chatContainer.scrollTop = chatContainer.scrollHeight;
 
     } catch (error) {
-        console.error(error);
+        console.error("Chat Error:", error);
         const loadingDiv = document.getElementById(loadingId);
-        if(loadingDiv) loadingDiv.innerText = "⚠️ 伺服器處理時發生了一些問題，請稍後再試或換個方式提問。";
+        if(loadingDiv) loadingDiv.innerText = "⚠️ 伺服器處理時發生了一些問題，請檢查網路連線或稍後再試。";
     }
-}
+}/**/
 
 function formatChatContent(text) {
     if (!text) return "";
@@ -9448,57 +9459,6 @@ function formatChatContent(text) {
     return result;
 }
 
-async function sendChatQuestion(suffix = '') {
-    const input = document.getElementById('dd-chat-input' + suffix);
-    if (!input) return;
-    const msg = input.value.trim();
-    if (!msg) return;
-
-    const chatContainer = document.getElementById('dd-chat-messages' + suffix);
-    if (!chatContainer) return;
-
-    chatContainer.innerHTML += `<div class="chat-bubble user">${msg}</div>`;
-
-    // ✅ 加上 window.
-    window.chatHistory.push({ role: "user", content: msg });
-
-    input.value = "";
-    chatContainer.scrollTop = chatContainer.scrollHeight;
-
-    const loadingId = "chat-loading-" + Date.now();
-    chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble ai">CIO 正在檢索資料並思考中...</div>`;
-
-    try {
-        const response = await fetch('/api/chat_with_context', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                message: msg,
-                history: window.chatHistory, // ✅ 加上 window.
-                context_data: window.currentDeepDiveData,
-                report_content: window.currentReportContent
-            })
-        });
-
-        const data = await response.json();
-        const loadingDiv = document.getElementById(loadingId);
-        if(loadingDiv) loadingDiv.remove();
-
-        const aiReply = data.reply || "我沒有得出結論，請再問一次。";
-
-        // ✅ 加上 window.
-        window.chatHistory.push({ role: "assistant", content: aiReply });
-
-        const formattedReply = formatChatContent(aiReply);
-        chatContainer.innerHTML += `<div class="chat-bubble ai">${formattedReply}</div>`;
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-
-    } catch (error) {
-        console.error(error);
-        const loadingDiv = document.getElementById(loadingId);
-        if(loadingDiv) loadingDiv.innerText = "⚠️ 伺服器處理時發生了一些問題，請稍後再試或換個方式提問。";
-    }
-}
 
 // 1. Debounce 函式 (防止 API 呼叫過於頻繁)
 function debounce(func, delay) {
@@ -9591,7 +9551,7 @@ function renderDDSuggestions(data, suggestionsBox, inputElement) {
         suggestionsBox.appendChild(div);
     });
 }
-
+/**/
 document.addEventListener('DOMContentLoaded', () => {
     initResizeHandle();
 });
