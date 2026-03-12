@@ -500,11 +500,72 @@
             <p style="color: #888; font-size: 16px; max-width: 600px; margin: 0 auto 30px auto; line-height: 1.6;">
                 輸入股票代碼，讓海川 AI 投資長為您即時抓取 FMP 財務數據、內部人交易，並結合 RAG 技術深度解析法說會與最新新聞。
             </p>
-            <div class="suggested-tags">
-                <span style="color: #666; font-size: 14px;">Try:</span>
-                <button onclick="document.getElementById('dd-stock-input').value='NVDA'; runDeepDive();" style="background: #2a2a2a; border: 1px solid #444; color: #ccc; padding: 6px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s;">NVDA</button>
-                <button onclick="document.getElementById('dd-stock-input').value='TSLA'; runDeepDive();" style="background: #2a2a2a; border: 1px solid #444; color: #ccc; padding: 6px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s;">TSLA</button>
-                <button onclick="document.getElementById('dd-stock-input').value='AAPL'; runDeepDive();" style="background: #2a2a2a; border: 1px solid #444; color: #ccc; padding: 6px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s;">AAPL</button>
+            <div class="sector-explorer">
+                <span class="explorer-label">探索美股板塊:</span>
+
+                <div class="sector-dropdown">
+                    <button class="sector-btn">💻 科技巨頭 (Tech)</button>
+                    <div class="sector-dropdown-content">
+                        <a href="#" onclick="triggerAnalysis('NVDA')"><strong>NVDA</strong> 輝達</a>
+                        <a href="#" onclick="triggerAnalysis('AAPL')"><strong>AAPL</strong> 蘋果</a>
+                        <a href="#" onclick="triggerAnalysis('MSFT')"><strong>MSFT</strong> 微軟</a>
+                        <a href="#" onclick="triggerAnalysis('GOOGL')"><strong>GOOGL</strong> 谷歌</a>
+                        <a href="#" onclick="triggerAnalysis('META')"><strong>META</strong> 臉書</a>
+                        <a href="#" onclick="triggerAnalysis('AVGO')"><strong>AVGO</strong> 博通</a>
+                        <a href="#" onclick="triggerAnalysis('TSM')"><strong>TSM</strong> 台積電 ADR</a>
+                        <a href="#" onclick="triggerAnalysis('AMD')"><strong>AMD</strong> 超微</a>
+                        <a href="#" onclick="triggerAnalysis('ORCL')"><strong>ORCL</strong> 甲骨文</a>
+                        <a href="#" onclick="triggerAnalysis('CRM')"><strong>CRM</strong> 賽富時</a>
+                    </div>
+                </div>
+
+                <div class="sector-dropdown">
+                    <button class="sector-btn">🛒 消費零售 (Consumer)</button>
+                    <div class="sector-dropdown-content">
+                        <a href="#" onclick="triggerAnalysis('AMZN')"><strong>AMZN</strong> 亞馬遜</a>
+                        <a href="#" onclick="triggerAnalysis('TSLA')"><strong>TSLA</strong> 特斯拉</a>
+                        <a href="#" onclick="triggerAnalysis('WMT')"><strong>WMT</strong> 沃爾瑪</a>
+                        <a href="#" onclick="triggerAnalysis('COST')"><strong>COST</strong> 好市多</a>
+                        <a href="#" onclick="triggerAnalysis('PG')"><strong>PG</strong> 寶僑</a>
+                        <a href="#" onclick="triggerAnalysis('HD')"><strong>HD</strong> 家得寶</a>
+                        <a href="#" onclick="triggerAnalysis('KO')"><strong>KO</strong> 可口可樂</a>
+                        <a href="#" onclick="triggerAnalysis('MCD')"><strong>MCD</strong> 麥當勞</a>
+                        <a href="#" onclick="triggerAnalysis('NKE')"><strong>NKE</strong> 耐吉</a>
+                        <a href="#" onclick="triggerAnalysis('SBUX')"><strong>SBUX</strong> 星巴克</a>
+                    </div>
+                </div>
+
+                <div class="sector-dropdown">
+                    <button class="sector-btn">🧬 生技醫療 (Healthcare)</button>
+                    <div class="sector-dropdown-content">
+                        <a href="#" onclick="triggerAnalysis('LLY')"><strong>LLY</strong> 禮來</a>
+                        <a href="#" onclick="triggerAnalysis('UNH')"><strong>UNH</strong> 聯合健康</a>
+                        <a href="#" onclick="triggerAnalysis('JNJ')"><strong>JNJ</strong> 嬌生</a>
+                        <a href="#" onclick="triggerAnalysis('MRK')"><strong>MRK</strong> 默克</a>
+                        <a href="#" onclick="triggerAnalysis('ABBV')"><strong>ABBV</strong> 艾伯維</a>
+                        <a href="#" onclick="triggerAnalysis('TMO')"><strong>TMO</strong> 賽默飛</a>
+                        <a href="#" onclick="triggerAnalysis('ISRG')"><strong>ISRG</strong> 賽默飛世爾</a>
+                        <a href="#" onclick="triggerAnalysis('PFE')"><strong>PFE</strong> 輝瑞</a>
+                        <a href="#" onclick="triggerAnalysis('SYK')"><strong>SYK</strong> 直覺外科</a>
+                        <a href="#" onclick="triggerAnalysis('VRTX')"><strong>VRTX</strong> 福泰製藥</a>
+                    </div>
+                </div>
+
+                <div class="sector-dropdown">
+                    <button class="sector-btn">🏦 金融支付 (Financial)</button>
+                    <div class="sector-dropdown-content">
+                        <a href="#" onclick="triggerAnalysis('JPM')"><strong>JPM</strong> 摩根大通</a>
+                        <a href="#" onclick="triggerAnalysis('V')"><strong>V</strong> Visa</a>
+                        <a href="#" onclick="triggerAnalysis('MA')"><strong>MA</strong> 萬事達卡</a>
+                        <a href="#" onclick="triggerAnalysis('BAC')"><strong>BAC</strong> 美國銀行</a>
+                        <a href="#" onclick="triggerAnalysis('WFC')"><strong>WFC</strong> 富國銀行</a>
+                        <a href="#" onclick="triggerAnalysis('MS')"><strong>MS</strong> 摩根士丹利</a>
+                        <a href="#" onclick="triggerAnalysis('GS')"><strong>GS</strong> 高盛</a>
+                        <a href="#" onclick="triggerAnalysis('AXP')"><strong>AXP</strong> 美國運通</a>
+                        <a href="#" onclick="triggerAnalysis('BLK')"><strong>BLK</strong> 貝萊德</a>
+                        <a href="#" onclick="triggerAnalysis('SCHW')"><strong>SCHW</strong> 嘉信理財</a>
+                    </div>
+                </div>
             </div>
         </div>
 

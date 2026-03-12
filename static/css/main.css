@@ -2397,3 +2397,107 @@ body.light-mode {
     background-color: #3a3a3a;
     transition: background-color 0.2s ease;
 }
+
+/* ================================== */
+/* 產業探索選單 (Sector Explorer) 樣式 */
+/* ================================== */
+.sector-explorer {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+}
+
+.explorer-label {
+    color: #888;
+    font-size: 15px;
+    letter-spacing: 1px;
+}
+
+/* 下拉選單外層容器 */
+.sector-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+/* 產業按鈕本體 */
+.sector-btn {
+    background: #2a2a2a;
+    border: 1px solid #444;
+    color: #ccc;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.sector-dropdown:hover .sector-btn {
+    background: #f0b90b; /* 金色高亮 */
+    color: #000;
+    border-color: #f0b90b;
+    box-shadow: 0 0 15px rgba(240, 185, 11, 0.4);
+}
+
+/* 下拉名單內容 (預設隱藏) */
+.sector-dropdown-content {
+    display: none; /* 隱藏 */
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: rgba(30, 30, 30, 0.95); /* 帶點透明的玻璃感 */
+    backdrop-filter: blur(10px);
+    min-width: 220px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.7);
+    border: 1px solid #444;
+    border-radius: 12px;
+    z-index: 100;
+    padding: 10px 0;
+    margin-top: 15px; /* 留一點空隙 */
+    max-height: 300px;
+    overflow-y: auto; /* 超過10個自動滾動 */
+}
+
+/* 滑鼠懸停時顯示，並加上滑動動畫 */
+.sector-dropdown:hover .sector-dropdown-content {
+    display: block;
+    animation: dropDownAnime 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* 個股選項樣式 */
+.sector-dropdown-content a {
+    color: #ccc;
+    padding: 12px 20px;
+    text-decoration: none;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 14px;
+    transition: background 0.2s, color 0.2s;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.sector-dropdown-content a:last-child {
+    border-bottom: none;
+}
+
+.sector-dropdown-content a strong {
+    color: #f0b90b; /* 股票代碼金色 */
+    font-family: monospace;
+    font-size: 15px;
+}
+
+.sector-dropdown-content a:hover {
+    background-color: rgba(240, 185, 11, 0.15); /* 移上去有淡淡的金色底 */
+    color: #fff;
+}
+
+/* 漂亮的下拉動畫 */
+@keyframes dropDownAnime {
+    from { opacity: 0; transform: translate(-50%, -15px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
