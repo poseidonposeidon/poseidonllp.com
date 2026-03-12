@@ -9439,11 +9439,17 @@ async function sendChatQuestion(suffix = '') {
         const loadingDiv = document.getElementById(loadingId);
         if(loadingDiv) loadingDiv.innerText = "⚠️ 伺服器處理時發生了一些問題，請檢查網路連線或稍後再試。";
     }
-}/**/
+}
 
 function formatChatContent(text) {
     if (!text) return "";
+
+    // 1. 處理粗體
     let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+    // 👇 2. 新增這行：處理 Markdown 超連結 [文字](網址)，並設定開新分頁 (target="_blank")
+    html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/g, '<a href="$2" target="_blank" style="color: #4da6ff; text-decoration: underline;">$1</a>');
+
     let lines = html.split('\n');
     let inList = false;
     let result = '';
