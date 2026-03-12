@@ -492,6 +492,21 @@
     </div>
 
     <div class="dd-content">
+
+        <div id="dd-empty-state" class="dd-empty-state">
+            <div class="empty-state-icon">✨</div>
+            <h1 style="color: #f0b90b; margin-bottom: 10px;">Welcome to AI Deep Dive PRO</h1>
+            <p style="color: #888; font-size: 16px; max-width: 600px; margin: 0 auto 30px auto; line-height: 1.6;">
+                輸入股票代碼，讓海川 AI 投資長為您即時抓取 FMP 財務數據、內部人交易，並結合 RAG 技術深度解析法說會與最新新聞。
+            </p>
+            <div class="suggested-tags">
+                <span>Try:</span>
+                <button onclick="document.getElementById('dd-stock-input').value='NVDA'; runDeepDive();">NVDA</button>
+                <button onclick="document.getElementById('dd-stock-input').value='TSLA'; runDeepDive();">TSLA</button>
+                <button onclick="document.getElementById('dd-stock-input').value='AAPL'; runDeepDive();">AAPL</button>
+            </div>
+        </div>
+
         <div class="dd-top-layout">
             <div class="dd-report-column">
                 <h3 style="color: #f0b90b; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px;">
@@ -504,6 +519,8 @@
                     </p>
                 </div>
             </div>
+
+            <div id="dd-main-content" style="display: none;">
 
             <div class="dd-charts-column">
                 <div class="dd-chart-card">
@@ -546,7 +563,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div></div>
 </div>
 
 <div id="chart-popup-modal" class="chart-popup-overlay" onclick="closeChartPopup()">
@@ -561,13 +578,14 @@
     </div>
 </div>
 
-<script src="/static/js/main.js">
+<script src="/static/js/main.js"></script>
+
+<script>
     document.addEventListener('DOMContentLoaded', () => {
         const stockInput = document.getElementById('stockSymbol');
-        if (stockInput) { // 安全防護，確保元素存在才加監聽器
+        if (stockInput) {
             stockInput.addEventListener('keydown', function (event) {
                 if (event.key === 'Enter') {
-                    // 確保 clearSuggestions 函式在 main.js 裡有被定義
                     if (typeof clearSuggestions === 'function') {
                         clearSuggestions();
                     }
@@ -575,8 +593,6 @@
             });
         }
     });
-
-
 </script>
 
 </body>

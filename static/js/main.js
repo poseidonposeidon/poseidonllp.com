@@ -9082,6 +9082,11 @@ async function runDeepDive() {
         return;
     }
 
+    const emptyState = document.getElementById('dd-empty-state');
+    const mainContent = document.getElementById('dd-main-content');
+    if (emptyState) emptyState.style.display = 'none';
+    if (mainContent) mainContent.style.display = 'block';
+
     if(loadingScreen) loadingScreen.style.display = 'flex';
     if(loadingText) loadingText.innerText = "正在調用 FMP API 獲取：估值模型、內部人交易、法說會逐字稿...";
     if(reportContainer) reportContainer.innerHTML = "";
