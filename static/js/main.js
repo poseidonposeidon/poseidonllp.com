@@ -9442,31 +9442,18 @@ async function sendChatQuestion(suffix = '') {
     }
 }
 
+// 升級版：使用 marked.js 完美解析聊天室內容 (包含表格、粗體與超連結)
 function formatChatContent(text) {
     if (!text) return "";
 
-    // 1. 處理粗體
-    let html = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    // 1. 讓 marked.js 幫我們把 Markdown 轉換成標準的 HTML
+    let html = marked.parse(text);
 
-    // 👇 2. 新增這行：處理 Markdown 超連結 [文字](網址)，並設定開新分頁 (target="_blank")
-    html = html.replace(/\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)/g, '<a href="$2" target="_blank" style="color: #4da6ff; text-decoration: underline;">$1</a>');
+    // 2. 為了讓使用者點擊連結時不會離開你的系統，我們要強制把所有 <a> 標籤加上 target="_blank"
+    // 同時給它漂亮的藍色底線樣式
+    html = html.replace(/<a href="/g, '<a target="_blank" style="color: #4da6ff; text-decoration: underline;" href="');
 
-    let lines = html.split('\n');
-    let inList = false;
-    let result = '';
-
-    lines.forEach(line => {
-        line = line.trim();
-        if (line.startsWith('- ')) {
-            if (!inList) { result += '<ul class="chat-list">'; inList = true; }
-            result += `<li>${line.substring(2)}</li>`;
-        } else {
-            if (inList) { result += '</ul>'; inList = false; }
-            if (line.length > 0) result += `<p>${line}</p>`;
-        }
-    });
-    if (inList) result += '</ul>';
-    return result;
+    return html;
 }
 
 
@@ -9719,4 +9706,11 @@ function initResizeHandle() {
             document.body.style.cursor = 'default';
         }
     });
+}
+
+function handleChatKey(event) {
+    if (event.key === 'Enter') {
+        event.preventDefault(); // 防止預設行為
+        sendChatQuestion();     // 觸發發送訊息
+    }
 }
