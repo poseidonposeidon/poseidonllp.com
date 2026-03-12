@@ -500,70 +500,46 @@
                 輸入股票代碼，讓海川 AI 投資長為您即時抓取 FMP 財務數據、內部人交易，並結合 RAG 技術深度解析法說會與最新新聞。
             </p>
             <div class="suggested-tags">
-                <span>Try:</span>
-                <button onclick="document.getElementById('dd-stock-input').value='NVDA'; runDeepDive();">NVDA</button>
-                <button onclick="document.getElementById('dd-stock-input').value='TSLA'; runDeepDive();">TSLA</button>
-                <button onclick="document.getElementById('dd-stock-input').value='AAPL'; runDeepDive();">AAPL</button>
+                <span style="color: #666; font-size: 14px;">Try:</span>
+                <button onclick="document.getElementById('dd-stock-input').value='NVDA'; runDeepDive();" style="background: #2a2a2a; border: 1px solid #444; color: #ccc; padding: 6px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s;">NVDA</button>
+                <button onclick="document.getElementById('dd-stock-input').value='TSLA'; runDeepDive();" style="background: #2a2a2a; border: 1px solid #444; color: #ccc; padding: 6px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s;">TSLA</button>
+                <button onclick="document.getElementById('dd-stock-input').value='AAPL'; runDeepDive();" style="background: #2a2a2a; border: 1px solid #444; color: #ccc; padding: 6px 15px; border-radius: 20px; cursor: pointer; transition: 0.3s;">AAPL</button>
             </div>
         </div>
 
-        <div class="dd-top-layout">
-            <div class="dd-report-column">
-                <h3 style="color: #f0b90b; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px;">
-                    📄 投資分析報告
-                </h3>
-                <div id="dd-report-container" class="dd-report-area">
-                    <p style="color: #666; text-align: center; margin-top: 50px;">
-                        請在上方輸入股票代碼以開始深度分析。<br>
-                        AI 將結合 RAG 歷史記憶與即時 FMP 數據為您服務。
-                    </p>
+        <div id="dd-main-content" style="display: none;">
+
+            <div class="dd-top-layout">
+                <div class="dd-report-column">
+                    <h3 style="color: #f0b90b; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px;">📄 投資分析報告</h3>
+                    <div id="dd-report-container" class="dd-report-area"></div>
+                </div>
+
+                <div class="dd-charts-column">
+                    <div class="dd-chart-card"><div class="dd-chart-title">Valuation: PE Band</div><div class="chart-wrapper"><canvas id="dd-valuation-chart"></canvas></div></div>
+                    <div class="dd-chart-card"><div class="dd-chart-title">Smart Money: Insider Trading</div><div class="chart-wrapper"><canvas id="dd-insider-chart"></canvas></div></div>
+                    <div class="dd-chart-card"><div class="dd-chart-title">Quality: Margins Trend</div><div class="chart-wrapper"><canvas id="dd-financial-chart"></canvas></div></div>
+                    <div class="dd-chart-card"><div class="dd-chart-title">Growth: Revenue & EPS Trend</div><div class="chart-wrapper"><canvas id="dd-growth-chart"></canvas></div></div>
+                    <div class="dd-chart-card"><div class="dd-chart-title">Safety: Cash Flow Structure</div><div class="chart-wrapper"><canvas id="dd-cashflow-chart"></canvas></div></div>
+                    <div class="dd-chart-card"><div class="dd-chart-title">Momentum: Price & Volume</div><div class="chart-wrapper"><canvas id="dd-tech-chart"></canvas></div></div>
+                </div>
+            </div>
+            <div class="dd-bottom-chat-layout">
+                <div class="dd-chat-header">
+                    <h3>💬 與 CIO 對話 (Context-Aware)</h3>
+                    <span style="font-size: 13px; color: #888;">已閱讀完畢？現在可以針對上方的數據進行提問。</span>
+                </div>
+                <div class="dd-wide-chat-interface">
+                    <div id="dd-chat-messages" class="dd-chat-messages-wide"></div>
+                    <div class="dd-chat-input-box-wide">
+                        <input type="text" id="dd-chat-input" placeholder="Ask about Valuation, Risks, or Future Growth..." onkeypress="handleChatKey(event)">
+                        <button onclick="sendChatQuestion()">Send</button>
+                    </div>
                 </div>
             </div>
 
-            <div id="dd-main-content" style="display: none;">
-
-            <div class="dd-charts-column">
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Valuation: PE Band (本益比河流圖)</div>
-                    <div class="chart-wrapper"><canvas id="dd-valuation-chart"></canvas></div>
-                </div>
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Smart Money: Insider Trading (內部人交易)</div>
-                    <div class="chart-wrapper"><canvas id="dd-insider-chart"></canvas></div>
-                </div>
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Quality: Margins Trend (三率趨勢)</div>
-                    <div class="chart-wrapper"><canvas id="dd-financial-chart"></canvas></div>
-                </div>
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Growth: Revenue & EPS Trend (營收與獲利)</div>
-                    <div class="chart-wrapper"><canvas id="dd-growth-chart"></canvas></div>
-                </div>
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Safety: Cash Flow Structure (現金流結構)</div>
-                    <div class="chart-wrapper"><canvas id="dd-cashflow-chart"></canvas></div>
-                </div>
-                <div class="dd-chart-card">
-                    <div class="dd-chart-title">Momentum: Price & Volume (量價趨勢)</div>
-                    <div class="chart-wrapper"><canvas id="dd-tech-chart"></canvas></div>
-                </div>
-            </div>
         </div>
-
-        <div class="dd-bottom-chat-layout">
-            <div class="dd-chat-header">
-                <h3>💬 與 CIO 對話 (Context-Aware)</h3>
-                <span style="font-size: 13px; color: #888;">已閱讀完畢？現在可以針對上方的數據進行提問。</span>
-            </div>
-            <div class="dd-wide-chat-interface">
-                <div id="dd-chat-messages" class="dd-chat-messages-wide"></div>
-                <div class="dd-chat-input-box-wide">
-                    <input type="text" id="dd-chat-input" placeholder="Ask about Valuation, Risks, or Future Growth..." onkeypress="handleChatKey(event)">
-                    <button onclick="sendChatQuestion()">Send</button>
-                </div>
-            </div>
-        </div>
-    </div></div>
+    </div>
 </div>
 
 <div id="chart-popup-modal" class="chart-popup-overlay" onclick="closeChartPopup()">
