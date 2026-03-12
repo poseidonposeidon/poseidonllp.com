@@ -9130,18 +9130,14 @@ async function runDeepDive() {
     }
 }/**/
 
-// 渲染 Markdown 報告
+// 渲染 Markdown 報告 (升級版：支援表格與複雜排版)
 function renderDeepDiveMarkdown(text, container) {
     if (!container) return;
-    let html = text
-        .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-        .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-        .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-        .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
-        .replace(/^\- (.*$)/gim, '<ul><li>$1</li></ul>')
-        .replace(/\n/g, '<br>');
 
-    html = html.replace(/<\/ul><br><ul>/g, '');
+    // 使用 marked.js 直接將 Markdown 轉換為完美的 HTML 結構
+    // 同時移除把 \n 強制轉成 <br> 的舊邏輯，因為 marked 會自動處理段落 <p>
+    const html = marked.parse(text);
+
     container.innerHTML = html;
 }
 

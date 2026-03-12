@@ -2336,3 +2336,64 @@ body.light-mode {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* ================================== */
+/* AI 報告區塊內的 Markdown 樣式優化  */
+/* ================================== */
+
+/* 基礎文字設定 */
+.dd-report-area {
+    color: #e0e0e0;
+    line-height: 1.8;
+    font-size: 15px;
+}
+
+/* 標題優化 */
+.dd-report-area h1 { color: #f0b90b; font-size: 22px; margin: 20px 0 10px 0; }
+.dd-report-area h2 { color: #fff; font-size: 18px; margin: 25px 0 12px 0; border-left: 4px solid #f0b90b; padding-left: 10px; }
+.dd-report-area h3 { color: #ccc; font-size: 16px; margin: 15px 0 8px 0; }
+
+/* 段落與清單 */
+.dd-report-area p { margin-bottom: 15px; }
+.dd-report-area ul { padding-left: 20px; margin-bottom: 15px; }
+.dd-report-area li { margin-bottom: 8px; }
+
+/* ✨ 重頭戲：科技感金融表格設計 */
+.dd-report-area table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    background-color: #1e1e1e; /* 表格底色 */
+    border-radius: 8px;
+    overflow: hidden; /* 讓表格的圓角生效 */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* 表格標題列 */
+.dd-report-area th {
+    background-color: #2c2c2c;
+    color: #f0b90b; /* 金黃色標題字 */
+    font-weight: bold;
+    text-align: left;
+    padding: 12px 15px;
+    border-bottom: 2px solid #444;
+}
+
+/* 表格資料格 */
+.dd-report-area td {
+    padding: 12px 15px;
+    border-bottom: 1px solid #333;
+    color: #ccc;
+    vertical-align: top;
+}
+
+/* 斑馬紋效果 (雙數行顏色不同) */
+.dd-report-area tr:nth-child(even) {
+    background-color: #252525;
+}
+
+/* 滑鼠懸停時高亮該行 (讓閱讀數據更方便) */
+.dd-report-area tr:hover {
+    background-color: #3a3a3a;
+    transition: background-color 0.2s ease;
+}
