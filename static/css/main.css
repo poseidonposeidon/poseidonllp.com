@@ -2444,12 +2444,13 @@ body.light-mode {
 
 /* 下拉名單內容 (預設隱藏) */
 .sector-dropdown-content {
-    display: none; /* 隱藏 */
+    display: none;
     position: absolute;
-    top: 100%;
+    /* 👇 1. 將原本的 top: 100%; 改成這樣，保持視覺上的空隙 */
+    top: calc(100% + 15px);
     left: 50%;
     transform: translateX(-50%);
-    background-color: rgba(30, 30, 30, 0.95); /* 帶點透明的玻璃感 */
+    background-color: rgba(30, 30, 30, 0.95);
     backdrop-filter: blur(10px);
     min-width: 220px;
     box-shadow: 0 15px 30px rgba(0,0,0,0.7);
@@ -2457,9 +2458,19 @@ body.light-mode {
     border-radius: 12px;
     z-index: 100;
     padding: 10px 0;
-    margin-top: 15px; /* 留一點空隙 */
+    /* 🚨 2. 刪除 margin-top: 15px; 這行！(或是把它改成 margin-top: 0;) */
     max-height: 300px;
-    overflow-y: auto; /* 超過10個自動滾動 */
+    overflow-y: auto;
+}
+
+.sector-dropdown-content::before {
+    content: '';
+    position: absolute;
+    top: -20px; /* 向上延伸，填滿按鈕與選單之間的空隙 */
+    left: 0;
+    width: 100%;
+    height: 20px;
+    background: transparent; /* 完全透明，看不見但滑鼠摸得到 */
 }
 
 /* 滑鼠懸停時顯示，並加上滑動動畫 */
