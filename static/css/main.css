@@ -2422,6 +2422,17 @@ body.light-mode {
     display: inline-block;
 }
 
+.sector-dropdown::after {
+    content: '';
+    position: absolute;
+    top: 100%;        /* 從按鈕底部開始 */
+    left: -20%;       /* 向左延伸，防止往左下斜滑掉出邊界 */
+    width: 140%;      /* 向右延伸，加寬保護區 */
+    height: 35px;     /* 往下加厚，完全覆蓋按鈕到選單的距離 */
+    background: transparent;
+    z-index: 99;      /* 確保在底層之上 */
+}
+
 /* 產業按鈕本體 */
 .sector-btn {
     background: #2a2a2a;
@@ -2446,8 +2457,7 @@ body.light-mode {
 .sector-dropdown-content {
     display: none;
     position: absolute;
-    /* 👇 1. 將原本的 top: 100%; 改成這樣，保持視覺上的空隙 */
-    top: calc(100% + 15px);
+    top: calc(100% + 15px); /* 保持漂亮的視覺空隙 */
     left: 50%;
     transform: translateX(-50%);
     background-color: rgba(30, 30, 30, 0.95);
@@ -2456,9 +2466,8 @@ body.light-mode {
     box-shadow: 0 15px 30px rgba(0,0,0,0.7);
     border: 1px solid #444;
     border-radius: 12px;
-    z-index: 100;
+    z-index: 100;     /* 確保選單在最上層 */
     padding: 10px 0;
-    /* 🚨 2. 刪除 margin-top: 15px; 這行！(或是把它改成 margin-top: 0;) */
     max-height: 300px;
     overflow-y: auto;
 }
