@@ -9069,6 +9069,10 @@ function closeDeepDiveModal() {
 
 // ✅ 支援 suffix 參數 (例如 '-main')
 async function runDeepDive() {
+    if (event) {
+        event.preventDefault();
+    }
+
     const symbolInput = document.getElementById('dd-stock-input');
     if (!symbolInput) return;
 
@@ -9717,10 +9721,15 @@ function handleChatKey(event) {
     }
 }
 
-function triggerAnalysis(symbol) {
+function triggerAnalysis(symbol, event) {
+    // 💡 阻止 <a> 標籤或 <button> 的預設跳轉/重整行為
+    if (event) {
+        event.preventDefault();
+    }
+
     const input = document.getElementById('dd-stock-input');
     if (input) {
         input.value = symbol; // 自動把股票代碼填入上方搜尋框
-        runDeepDive();        // 觸發深度分析流程
+        runDeepDive(event);   // 把 event 傳遞下去
     }
 }
