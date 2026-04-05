@@ -9092,7 +9092,9 @@ async function runDeepDive() {
     if(reportContainer) reportContainer.innerHTML = "";
 
     try {
-        const response = await fetch(`${baseUrl}/api/ai_deep_dive`, { // 確保 baseUrl 有定義，或直接寫 '/api/ai_deep_dive'
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/ai_deep_dive` : '/api/ai_deep_dive';
+
+        const response = await fetch(targetUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ symbol: symbol })
