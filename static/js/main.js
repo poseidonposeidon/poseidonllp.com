@@ -9094,6 +9094,7 @@ async function runDeepDive() {
     try {
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/ai_deep_dive` : '/api/ai_deep_dive';
 
+        console.log("👉 目前準備發送請求的網址是：", targetUrl);
         const response = await fetch(targetUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
