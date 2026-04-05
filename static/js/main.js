@@ -9092,12 +9092,11 @@ async function runDeepDive() {
     if(reportContainer) reportContainer.innerHTML = "";
 
     try {
-        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/ai_deep_dive` : '/api/ai_deep_dive';
-
-        console.log("👉 目前準備發送請求的網址是：", targetUrl);
-        const response = await fetch(targetUrl, {
+        const response = await fetch(`${baseUrl}/api/ai_deep_dive`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ symbol: symbol })
         });
 
