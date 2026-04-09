@@ -9733,3 +9733,51 @@ function triggerAnalysis(symbol, event) {
         runDeepDive(event);   // 把 event 傳遞下去
     }
 }
+
+// ✨ 新增：觸發後端生成 Excel 的函式
+async function triggerExcelDownload(event) {
+    if (event) event.preventDefault();
+
+    const symbolInput = document.getElementById('dd-stock-input');
+    if (!symbolInput) return;
+
+    const symbol = symbolInput.value.trim().toUpperCase();
+    if (!symbol) {
+        alert("請先輸入要抓取的股票代碼！");
+        return;
+    }
+
+    // 改變按鈕狀態，避免使用者重複連點
+    const btn = event.currentTarget;
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "⏳ 伺服器抓取中...";
+    btn.style.background = "#555";
+    btn.disabled = true;
+
+    try {
+        // 設定 API 路由
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/export_excel` : '/api/export_excel';
+
+        const response = await fetch(targetUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ symbol: symbol })
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            alert(`🎉 抓取成功！\n${symbol} 的 20 年財務數據與逐字稿已存入伺服器：\n📁 ${data.file_path}`);
+        } else {
+            alert(`❌ 抓取失敗：${data.error}`);
+        }
+    } catch (error) {
+        console.error("Excel Export Error:", error);
+        alert("連線到伺服器失敗，請檢查後端是否正常運作。");
+    } finally {
+        // 恢復按鈕狀態
+        btn.innerHTML = originalText;
+        btn.style.background = "#27ae60";
+        btn.disabled = false;
+    }
+}

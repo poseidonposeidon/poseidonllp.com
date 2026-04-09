@@ -487,6 +487,9 @@
             <div class="dd-search-box" style="position: relative; flex-grow: 1; max-width: 500px;">
                 <input type="text" id="dd-stock-input" class="dd-search-input" placeholder="Enter Symbol (e.g. Apple or AAPL)" autocomplete="off" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #222; color: white;">
                 <button onclick="runDeepDive()" style="position: absolute; right: 5px; top: 5px; background: #f0b90b; border: none; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Analyze</button>
+                <button onclick="triggerExcelDownload(event)" style="background: #27ae60; color: white; border: none; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; white-space: nowrap; transition: background 0.2s;">
+                    📥 下載 Excel
+                </button>
                 <div id="dd-suggestions" class="dd-suggestions-list"></div>
             </div>
         </div>
