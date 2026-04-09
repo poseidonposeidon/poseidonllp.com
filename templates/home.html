@@ -482,15 +482,27 @@
     </div>
 
     <div class="dd-header" style="background: #1e1e1e; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #333;">
-        <div style="display: flex; align-items: center; gap: 15px;">
-            <h2 style="color: #f0b90b; margin: 0;">AI Deep Dive <span style="font-size: 12px; color: #aaa; border: 1px solid #555; padding: 2px 6px; border-radius: 4px;">PRO</span></h2>
-            <div class="dd-search-box" style="position: relative; flex-grow: 1; max-width: 500px;">
-                <input type="text" id="dd-stock-input" class="dd-search-input" placeholder="Enter Symbol (e.g. Apple or AAPL)" autocomplete="off" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #444; background: #222; color: white;">
-                <button onclick="runDeepDive()" style="position: absolute; right: 5px; top: 5px; background: #f0b90b; border: none; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight: bold;">Analyze</button>
-                <button onclick="triggerExcelDownload(event)" style="background: #27ae60; color: white; border: none; padding: 6px 15px; border-radius: 4px; cursor: pointer; font-weight: bold; white-space: nowrap; transition: background 0.2s;">
-                    📥 下載 Excel
+        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+
+            <h2 style="color: #f0b90b; margin: 0; white-space: nowrap;">
+                AI Deep Dive <span style="font-size: 12px; color: #aaa; border: 1px solid #555; padding: 2px 6px; border-radius: 4px;">PRO</span>
+            </h2>
+
+            <div style="display: flex; flex-grow: 1; gap: 10px; max-width: 650px;">
+
+                <div class="dd-search-box" style="position: relative; flex-grow: 1;">
+                    <input type="text" id="dd-stock-input" class="dd-search-input" placeholder="ENTER SYMBOL (E.G. AAPL)" autocomplete="off" style="width: 100%; box-sizing: border-box; padding: 10px 15px; border-radius: 6px; border: 1px solid #444; background: #222; color: white; outline: none; font-size: 15px;">
+                    <div id="dd-suggestions" class="dd-suggestions-list" style="position: absolute; top: calc(100% + 5px); left: 0; width: 100%; z-index: 100;"></div>
+                </div>
+
+                <button onclick="runDeepDive()" style="background: #f0b90b; color: #1e1e1e; border: none; padding: 0 20px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap; font-size: 15px; transition: background 0.2s;">
+                    Analyze
                 </button>
-                <div id="dd-suggestions" class="dd-suggestions-list"></div>
+
+                <button onclick="triggerExcelDownload(event)" style="background: #27ae60; color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap; transition: background 0.2s; display: flex; align-items: center; gap: 6px; font-size: 15px;">
+                    <span style="font-size: 16px;">📥</span> Excel
+                </button>
+
             </div>
         </div>
     </div>
