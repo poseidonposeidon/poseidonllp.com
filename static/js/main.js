@@ -9870,7 +9870,7 @@ async function runSemanticScreener() {
 
     try {
         // 呼叫後端新開的 /api/semantic_screener 路由
-        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/semantic_screener` : '/api/semantic_screener';
+        const targetUrl = '/api/semantic_screener';
 
         const response = await fetch(targetUrl, {
             method: 'POST',
