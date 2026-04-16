@@ -9781,3 +9781,144 @@ async function triggerExcelDownload(event) {
         btn.disabled = false;
     }
 }
+
+/* ==========================================================================
+   ✨ 語意選股器 (Semantic Screener) 專屬邏輯
+   ========================================================================== */
+
+// 1. 切換選股器與單股分析面板的 UX 邏輯
+function toggleScreener() {
+    const emptyState = document.getElementById('dd-empty-state');
+    const mainContent = document.getElementById('dd-main-content');
+    const screenerContent = document.getElementById('dd-screener-content');
+    const toggleBtn = document.getElementById('screener-toggle-btn');
+
+    // 獲取頂部搜尋列的元素，準備進行防呆鎖定
+    const searchInput = document.getElementById('dd-stock-input');
+    const analyzeBtn = document.querySelector('button[onclick="runDeepDive()"]');
+
+    if (screenerContent.style.display === 'none' || screenerContent.style.display === '') {
+        // --- 進入【語意選股模式】 ---
+        if(emptyState) emptyState.style.display = 'none';
+        if(mainContent) mainContent.style.display = 'none';
+        screenerContent.style.display = 'block';
+
+        // 改變按鈕樣式提示使用者如何返回
+        toggleBtn.innerHTML = '<span style="font-size: 16px;">🔍</span> 回單股分析';
+        toggleBtn.style.background = '#f0b90b';
+        toggleBtn.style.color = '#1e1e1e';
+
+        // 鎖定頂部單股搜尋框，避免使用者搞混操作邏輯
+        if (searchInput) {
+            searchInput.disabled = true;
+            searchInput.placeholder = "請在下方選股器面板輸入主題...";
+            searchInput.style.opacity = '0.5';
+        }
+        if (analyzeBtn) {
+            analyzeBtn.disabled = true;
+            analyzeBtn.style.opacity = '0.5';
+        }
+    } else {
+        // --- 回到【單股分析模式】 ---
+        screenerContent.style.display = 'none';
+
+        // 判斷要顯示歡迎畫面還是先前查好的報告
+        if(window.currentReportContent && window.currentReportContent !== "") {
+            if(mainContent) mainContent.style.display = 'block';
+        } else {
+            if(emptyState) emptyState.style.display = 'block';
+        }
+
+        // 恢復按鈕樣式
+        toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
+        toggleBtn.style.background = '#3498db';
+        toggleBtn.style.color = 'white';
+
+        // 解除頂部搜尋框鎖定
+        if (searchInput) {
+            searchInput.disabled = false;
+            searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)";
+            searchInput.style.opacity = '1';
+        }
+        if (analyzeBtn) {
+            analyzeBtn.disabled = false;
+            analyzeBtn.style.opacity = '1';
+        }
+    }
+}
+
+// 2. 呼叫後端選股 API 並渲染表格
+async function runSemanticScreener() {
+    const inputField = document.getElementById('screener-input');
+    const query = inputField.value.trim();
+
+    if (!query) {
+        alert("請輸入您想尋找的投資主題或條件！");
+        return;
+    }
+
+    const resultsContainer = document.getElementById('screener-results-container');
+    const loadingText = document.getElementById('screener-loading');
+    const tbody = document.getElementById('screener-table-body');
+    const table = document.getElementById('screener-table');
+
+    // UI 狀態切換
+    resultsContainer.style.display = 'block';
+    loadingText.style.display = 'block';
+    table.style.display = 'none';
+    tbody.innerHTML = '';
+
+    try {
+        // 呼叫後端新開的 /api/semantic_screener 路由
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/semantic_screener` : '/api/semantic_screener';
+
+        const response = await fetch(targetUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query: query })
+        });
+
+        if (!response.ok) throw new Error(`API 錯誤: ${response.status}`);
+        const data = await response.json();
+
+        loadingText.style.display = 'none';
+        table.style.display = 'table';
+
+        // 確保後端有回傳 results 陣列
+        if (data.results && data.results.length > 0) {
+            data.results.forEach(item => {
+                // 生成安全的 HTML 結構 (支援點擊標的直接跳轉單股分析)
+                tbody.innerHTML += `
+                    <tr style="border-bottom: 1px solid #333; transition: background 0.2s;" onmouseover="this.style.background='#2a2a2a'" onmouseout="this.style.background='transparent'">
+                        <td style="padding: 15px; font-weight: bold; vertical-align: top;">
+                            <a href="#" onclick="toggleScreener(); triggerAnalysis('${item.symbol}', event);" style="color: #f0b90b; text-decoration: none; font-size: 18px; display: block; margin-bottom: 4px;">${item.symbol}</a>
+                            <span style="color: #888; font-size: 13px;">${item.companyName || ''}</span>
+                        </td>
+                        <td style="padding: 15px; vertical-align: top; color: #ddd;">
+                            ${item.metrics || 'N/A'}
+                        </td>
+                        <td style="padding: 15px; vertical-align: top;">
+                            <span style="background: rgba(52, 152, 219, 0.2); color: #3498db; padding: 4px 8px; border-radius: 4px; font-size: 13px;">
+                                ${item.intensity || '相關'}
+                            </span>
+                        </td>
+                        <td style="padding: 15px; vertical-align: top; line-height: 1.6;">
+                            <div style="color: #ccc; margin-bottom: 8px;">"${item.snippet}"</div>
+                            <a href="${item.source_url}" target="_blank" style="color: #3498db; text-decoration: none; font-size: 13px; display: inline-flex; align-items: center; gap: 4px;">
+                                <span>🔗</span> 查看原始法說會/新聞出處
+                            </a>
+                        </td>
+                    </tr>
+                `;
+            });
+        } else {
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px; color: #888;">根據您的條件，查無完全符合的標的。請嘗試放寬量化標準。</td></tr>`;
+        }
+
+    } catch (error) {
+        console.error("Screener Error:", error);
+        loadingText.style.display = 'none';
+        table.style.display = 'table';
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px; color: #ff5252;">伺服器處理時發生錯誤，請稍後再試。</td></tr>`;
+    }
+}

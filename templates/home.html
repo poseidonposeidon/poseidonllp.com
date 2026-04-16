@@ -502,6 +502,9 @@
                 <button onclick="triggerExcelDownload(event)" style="background: #27ae60; color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap; transition: background 0.2s; display: flex; align-items: center; gap: 6px; font-size: 15px;">
                     <span style="font-size: 16px;">📥</span> Excel
                 </button>
+                <button onclick="toggleScreener()" id="screener-toggle-btn" style="background: #3498db; color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap; transition: background 0.2s; display: flex; align-items: center; gap: 6px; font-size: 15px;">
+                    <span style="font-size: 16px;">✨</span> 語意選股
+                </button>
 
             </div>
         </div>
@@ -615,6 +618,46 @@
                 </div>
             </div>
 
+        </div>
+        <div id="dd-screener-content" style="display: none; padding-top: 10px;">
+            <div style="background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #333; margin-bottom: 20px;">
+                <h3 style="color: #3498db; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                    ✨ AI 語意與主題選股器 (Semantic Screener)
+                </h3>
+                <p style="color: #888; font-size: 15px; margin-bottom: 20px; line-height: 1.6;">
+                    跳脫傳統數字篩選。請用自然語言描述您的投資主題，AI 將自動為您交叉比對 FMP 財務數據與近期法說會、新聞的非結構化語意。
+                </p>
+                <div style="display: flex; gap: 15px;">
+                    <input type="text" id="screener-input" placeholder="例如：找出 P/E < 20，且近期法說會頻繁提及『液冷散熱』或『AI 伺服器擴張』的標普 500 公司" style="flex-grow: 1; padding: 15px; border-radius: 6px; border: 1px solid #444; background: #222; color: white; outline: none; font-size: 15px; font-family: inherit;">
+                    <button onclick="runSemanticScreener()" style="background: #3498db; color: white; border: none; padding: 0 30px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; transition: background 0.2s;">
+                        開始篩選
+                    </button>
+                </div>
+            </div>
+
+            <div id="screener-results-container" style="display: none; background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #333;">
+                <h4 style="color: #f0b90b; margin-top: 0; margin-bottom: 20px; font-size: 18px;">📊 主題篩選結果與證據驗證</h4>
+
+                <div id="screener-loading" style="display: none; color: #aaa; text-align: center; padding: 40px 20px;">
+                    <div class="loader" style="margin: 0 auto 15px auto;"><div></div><div></div><div></div></div>
+                    AI 正在為您檢索向量資料庫並調用 FMP 估值 API...
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table id="screener-table" style="width: 100%; border-collapse: collapse; color: #ddd; text-align: left; font-size: 15px;">
+                        <thead>
+                        <tr style="border-bottom: 2px solid #444; background: #252525;">
+                            <th style="padding: 15px; color: #aaa; width: 12%;">股票標的</th>
+                            <th style="padding: 15px; color: #aaa; width: 20%;">量化條件 (FMP)</th>
+                            <th style="padding: 15px; color: #aaa; width: 15%;">匹配強度</th>
+                            <th style="padding: 15px; color: #aaa; width: 53%;">關鍵字摘錄與溯源連結 (Source of Truth)</th>
+                        </tr>
+                        </thead>
+                        <tbody id="screener-table-body">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
