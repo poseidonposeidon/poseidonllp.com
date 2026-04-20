@@ -9922,3 +9922,25 @@ async function runSemanticScreener() {
         tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; padding: 30px; color: #ff5252;">伺服器處理時發生錯誤，請稍後再試。</td></tr>`;
     }
 }
+
+function fillPrompt(promptText) {
+    // 精準抓取你的 screener-input
+    const inputField = document.getElementById('screener-input');
+
+    if (inputField) {
+        // 1. 將文字填入輸入框
+        inputField.value = promptText;
+
+        // 2. 輸入框特效 (閃爍一下提醒使用者)
+        inputField.style.transition = "background-color 0.3s";
+        inputField.style.backgroundColor = "rgba(52, 152, 219, 0.3)"; // 使用你的藍色 #3498db
+        setTimeout(() => {
+            inputField.style.backgroundColor = "#222"; // 恢復你原本的深色背景
+        }, 300);
+
+        // 3. 自動觸發搜尋！(讓體驗極致流暢，使用者點完就直接看結果)
+        setTimeout(() => {
+            runSemanticScreener();
+        }, 350);
+    }
+}

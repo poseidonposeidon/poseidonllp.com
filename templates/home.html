@@ -628,9 +628,23 @@
                     跳脫傳統數字篩選。請用自然語言描述您的投資主題，AI 將自動為您交叉比對 FMP 財務數據與近期法說會、新聞的非結構化語意。
                 </p>
                 <div style="display: flex; gap: 15px;">
-                    <input type="text" id="screener-input" placeholder="例如：找出 P/E < 20，且近期法說會頻繁提及『液冷散熱』或『AI 伺服器擴張』的標普 500 公司" style="flex-grow: 1; padding: 15px; border-radius: 6px; border: 1px solid #444; background: #222; color: white; outline: none; font-size: 15px; font-family: inherit;">
-                    <button onclick="runSemanticScreener()" style="background: #3498db; color: white; border: none; padding: 0 30px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; transition: background 0.2s;">
-                        開始篩選
+                    <input type="text" id="screener-input" placeholder="例如：找出 P/E < 20..." style="...">
+                    <button onclick="runSemanticScreener()" style="...">開始篩選</button>
+                </div>
+
+                <div class="prompt-chips-container">
+                    <span class="chip-label">💡 快速探索：</span>
+                    <button class="prompt-chip" onclick="fillPrompt('市值 > 50000000000 且 ROE > 0.2 的穩健巨頭')">
+                        高 ROE 價值股
+                    </button>
+                    <button class="prompt-chip" onclick="fillPrompt('PEG < 1.5 且 毛利率 > 0.4，近期提到 AI 或資料中心')">
+                        被低估的 AI 黑馬
+                    </button>
+                    <button class="prompt-chip" onclick="fillPrompt('負債權益比 < 1 且 股息殖利率 > 0.04，展望樂觀的防禦股')">
+                        高配息安全牌
+                    </button>
+                    <button class="prompt-chip" onclick="fillPrompt('過去四季 EPS > 5 且 財報驚喜度 > 10% 的飆股')">
+                        高獲利財報驚喜
                     </button>
                 </div>
             </div>
