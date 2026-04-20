@@ -2521,3 +2521,28 @@ body.light-mode {
     from { opacity: 0; transform: translate(-50%, -15px); }
     to { opacity: 1; transform: translate(-50%, 0); }
 }
+
+.prompt-chip {
+    background-color: #2d3748;
+    color: #e2e8f0;
+    border: 1px solid #4a5568;
+    border-radius: 9999px; /* 如果字太長，可以改成 20px 變成圓角矩形 */
+    padding: 8px 18px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    /* 👇 新增這三行，保護長句子的排版 👇 */
+    white-space: normal; /* 允許長文字自動換行 */
+    text-align: left;    /* 讓句子靠左對齊，閱讀更順暢 */
+    line-height: 1.5;    /* 增加一點行高，避免文字擠在一起 */
+}
+
+/* 懸停效果維持不變 */
+.prompt-chip:hover {
+    background-color: #3182ce;
+    color: #ffffff;
+    border-color: #3182ce;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
