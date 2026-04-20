@@ -624,9 +624,13 @@
                 <h3 style="color: #3498db; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
                     ✨ AI 語意與主題選股器 (Semantic Screener)
                 </h3>
-                <p style="color: #888; font-size: 15px; margin-bottom: 20px; line-height: 1.6;">
-                    跳脫傳統數字篩選。請用自然語言描述您的投資主題，AI 將自動為您交叉比對 FMP 財務數據與近期法說會、新聞的非結構化語意。
-                </p>
+                <div style="color: #888; font-size: 15px; margin-bottom: 20px; line-height: 1.6;">
+                    結合「量化過濾」與「質化檢索」的雙核心引擎，跳脫傳統選股框架。
+                    <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; color: #a0aec0;">
+                        <li style="margin-bottom: 4px;"><strong>🎯 涵蓋標的：</strong>嚴選 S&P 500、NASDAQ 100、道瓊 (DJIA) 與費城半導體 (SOXX) 等頂尖美股。</li>
+                        <li><strong>💡 如何使用：</strong>請用自然語言輸入。您可以設定嚴格的財報邊界（如：<code>EPS > 5 且 PEG < 1.5</code>），並疊加近期新聞或法說會的熱門題材（如：<code>且頻繁提及「AI 伺服器」或「庫存去化」</code>）。</li>
+                    </ul>
+                </div>
                 <div style="display: flex; gap: 15px;">
                     <input type="text" id="screener-input" placeholder="例如：找出 P/E < 20..." style="...">
                     <button onclick="runSemanticScreener()" style="...">開始篩選</button>
