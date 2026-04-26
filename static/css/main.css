@@ -2522,27 +2522,44 @@ body.light-mode {
     to { opacity: 1; transform: translate(-50%, 0); }
 }
 
+/* 膠囊按鈕容器 */
+.prompt-chips-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;       /* 增加標籤之間的間距，讓畫面有呼吸感 */
+    margin-top: 25px;
+    align-items: flex-start;
+}
+
+/* 前方的提示文字 */
+.chip-label {
+    color: #f0b90b; /* 改用你主題的金色，讓重點更突出 */
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin-top: 8px; /* 微調高度，讓它跟旁邊的按鈕對齊 */
+    white-space: nowrap; /* 確保這幾個字不會被擠到換行 */
+}
+
+/* 膠囊按鈕本體 - 輕量化科技風 */
 .prompt-chip {
-    background-color: #2d3748;
-    color: #e2e8f0;
-    border: 1px solid #4a5568;
-    border-radius: 9999px; /* 如果字太長，可以改成 20px 變成圓角矩形 */
+    background-color: rgba(52, 152, 219, 0.08); /* 極淡的透明藍色底，取代原本沉重的灰色 */
+    color: #90cdf4;            /* 清爽的淺藍色字體 */
+    border: 1px solid rgba(52, 152, 219, 0.3); /* 細緻的藍色邊框 */
+    border-radius: 24px;       /* 完美的流線型圓角 */
     padding: 8px 18px;
     font-size: 0.85rem;
     cursor: pointer;
-    transition: all 0.2s ease;
-
-    /* 👇 新增這三行，保護長句子的排版 👇 */
-    white-space: normal; /* 允許長文字自動換行 */
-    text-align: left;    /* 讓句子靠左對齊，閱讀更順暢 */
-    line-height: 1.5;    /* 增加一點行高，避免文字擠在一起 */
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); /* 讓動畫更絲滑 */
+    white-space: normal;
+    text-align: left;
+    line-height: 1.6;
 }
 
-/* 懸停效果維持不變 */
+/* 懸停效果 (Hover) - 科技感發光 */
 .prompt-chip:hover {
-    background-color: #3182ce;
-    color: #ffffff;
-    border-color: #3182ce;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    background-color: rgba(52, 152, 219, 0.2); /* 滑鼠游標移過去時，底色稍微加深 */
+    color: #ffffff;            /* 文字亮起變純白 */
+    border-color: #3498db;     /* 邊框變成明亮的實體藍色 */
+    transform: translateY(-2px); /* 輕微上浮 */
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25); /* 加上淡淡的藍色光暈陰影 */
 }

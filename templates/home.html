@@ -632,8 +632,11 @@
                     </ul>
                 </div>
                 <div style="display: flex; gap: 15px;">
-                    <input type="text" id="screener-input" placeholder="例如：找出 P/E < 20..." style="...">
-                    <button onclick="runSemanticScreener()" style="...">開始篩選</button>
+                    <input type="text" id="screener-input" placeholder="例如：找出 P/E < 20，且近期法說會頻繁提及『液冷散熱』或『AI 伺服器擴張』的標普 500 公司" style="flex-grow: 1; padding: 15px; border-radius: 6px; border: 1px solid #444; background: #222; color: white; outline: none; font-size: 15px; font-family: inherit;">
+
+                    <button onclick="runSemanticScreener()" style="background: #3498db; color: white; border: none; padding: 0 30px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; transition: background 0.2s;">
+                        開始篩選
+                    </button>
                 </div>
 
                 <div class="prompt-chips-container">
