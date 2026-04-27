@@ -27,6 +27,25 @@
     <title>Poseidon Capital</title>
 </head>
 
+<style>
+    /* 強制覆蓋的科技風膠囊樣式 */
+    .prompt-chips-container { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 25px; align-items: flex-start; }
+    .chip-label { color: #f0b90b !important; font-size: 0.95rem; font-weight: 600; margin-top: 8px; white-space: nowrap; }
+    .prompt-chip {
+        background-color: rgba(52, 152, 219, 0.08) !important;
+        color: #90cdf4 !important;
+        border: 1px solid rgba(52, 152, 219, 0.3) !important;
+        border-radius: 24px !important;
+        padding: 8px 18px !important;
+        font-size: 0.85rem; cursor: pointer; transition: all 0.3s ease;
+        white-space: normal; text-align: left; line-height: 1.6;
+    }
+    .prompt-chip:hover {
+        background-color: rgba(52, 152, 219, 0.2) !important;
+        color: #ffffff !important; border-color: #3498db !important;
+        transform: translateY(-2px); box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25);
+    }
+</style>
 
 <body>
 <div class="overlay"></div> <!-- 添加遮罩層 -->
