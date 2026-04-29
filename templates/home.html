@@ -710,49 +710,50 @@
                 </div>
             </div>
         </div>
+        <div id="dd-trump-content" style="display: none; padding-top: 10px;">
+
+            <div style="background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #c0392b; margin-bottom: 20px; position: relative; overflow: hidden;">
+
+                <div style="position: absolute; top: -20px; right: -20px; font-size: 150px; opacity: 0.03; pointer-events: none;">🦅</div>
+
+                <h3 style="color: #e74c3c; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                    🦅 總經雷達：川普交易 (The Trump Trade)
+                </h3>
+                <p style="color: #888; font-size: 15px; margin-bottom: 20px; line-height: 1.6;">
+                    此模組雙核心檢索：同時掃描「美國優先、關稅壁壘」等總經政策，並交叉比對「個股財報護城河」。<br>
+                    <span style="color: #a0aec0;">💡 <strong>系統狀態：</strong>引擎 B 已載入近期重大政策新聞與聯準會動態。</span>
+                </p>
+
+                <div class="prompt-chips-container" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 25px; align-items: flex-start;">
+                    <span class="chip-label" style="color: #e74c3c !important; font-size: 0.95rem; font-weight: 600; margin-top: 8px; white-space: nowrap;">🔥 啟動策略：</span>
+
+                    <button class="prompt-chip" style="background-color: rgba(231, 76, 60, 0.1) !important; color: #ffcccc !important; border: 1px solid rgba(231, 76, 60, 0.4) !important; border-radius: 24px; padding: 8px 18px; cursor: pointer; transition: all 0.3s;" onclick="runTrumpStrategy('金融去監管')" onmouseover="this.style.backgroundColor='rgba(231, 76, 60, 0.3)'" onmouseout="this.style.backgroundColor='rgba(231, 76, 60, 0.1)'">
+                        🏦 金融去監管
+                    </button>
+
+                    <button class="prompt-chip" style="background-color: rgba(231, 76, 60, 0.1) !important; color: #ffcccc !important; border: 1px solid rgba(231, 76, 60, 0.4) !important; border-radius: 24px; padding: 8px 18px; cursor: pointer; transition: all 0.3s;" onclick="runTrumpStrategy('傳統能源')" onmouseover="this.style.backgroundColor='rgba(231, 76, 60, 0.3)'" onmouseout="this.style.backgroundColor='rgba(231, 76, 60, 0.1)'">
+                        🛢️ 傳統能源重返榮耀
+                    </button>
+
+                    <button class="prompt-chip" style="background-color: rgba(231, 76, 60, 0.1) !important; color: #ffcccc !important; border: 1px solid rgba(231, 76, 60, 0.4) !important; border-radius: 24px; padding: 8px 18px; cursor: pointer; transition: all 0.3s;" onclick="runTrumpStrategy('本土製造')" onmouseover="this.style.backgroundColor='rgba(231, 76, 60, 0.3)'" onmouseout="this.style.backgroundColor='rgba(231, 76, 60, 0.1)'">
+                        🏭 關稅保護與本土製造
+                    </button>
+
+                    <button class="prompt-chip" style="background-color: rgba(231, 76, 60, 0.1) !important; color: #ffcccc !important; border: 1px solid rgba(231, 76, 60, 0.4) !important; border-radius: 24px; padding: 8px 18px; cursor: pointer; transition: all 0.3s;" onclick="runTrumpStrategy('國防軍工')" onmouseover="this.style.backgroundColor='rgba(231, 76, 60, 0.3)'" onmouseout="this.style.backgroundColor='rgba(231, 76, 60, 0.1)'">
+                        🛡️ 國防軍工擴張
+                    </button>
+                </div>
+            </div>
+
+            <div id="trump-results-container" style="display: none; background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #333;">
+                <div id="trump-loading" style="display: none; color: #e74c3c; text-align: center; padding: 40px 20px; font-weight: bold;">
+                </div>
+            </div>
+
+        </div>
     </div>
 
-    <div id="dd-trump-content" style="display: none; padding-top: 10px;">
 
-        <div style="background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #c0392b; margin-bottom: 20px; position: relative; overflow: hidden;">
-
-            <div style="position: absolute; top: -20px; right: -20px; font-size: 150px; opacity: 0.03; pointer-events: none;">🦅</div>
-
-            <h3 style="color: #e74c3c; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                🦅 總經雷達：川普交易 (The Trump Trade)
-            </h3>
-            <p style="color: #888; font-size: 15px; margin-bottom: 20px; line-height: 1.6;">
-                此模組雙核心檢索：同時掃描「美國優先、關稅壁壘」等總經政策，並交叉比對「個股財報護城河」。<br>
-                <span style="color: #a0aec0;">💡 <strong>系統狀態：</strong>引擎 B 已載入近期重大政策新聞與聯準會動態。</span>
-            </p>
-
-            <div class="prompt-chips-container" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 25px; align-items: flex-start;">
-                <span class="chip-label" style="color: #e74c3c !important; font-size: 0.95rem; font-weight: 600; margin-top: 8px; white-space: nowrap;">🔥 啟動策略：</span>
-
-                <button class="prompt-chip" style="background-color: rgba(231, 76, 60, 0.1) !important; color: #ffcccc !important; border: 1px solid rgba(231, 76, 60, 0.4) !important; border-radius: 24px; padding: 8px 18px; cursor: pointer; transition: all 0.3s;" onclick="runTrumpStrategy('金融去監管')" onmouseover="this.style.backgroundColor='rgba(231, 76, 60, 0.3)'" onmouseout="this.style.backgroundColor='rgba(231, 76, 60, 0.1)'">
-                    🏦 金融去監管
-                </button>
-
-                <button class="prompt-chip" style="background-color: rgba(231, 76, 60, 0.1) !important; color: #ffcccc !important; border: 1px solid rgba(231, 76, 60, 0.4) !important; border-radius: 24px; padding: 8px 18px; cursor: pointer; transition: all 0.3s;" onclick="runTrumpStrategy('傳統能源')" onmouseover="this.style.backgroundColor='rgba(231, 76, 60, 0.3)'" onmouseout="this.style.backgroundColor='rgba(231, 76, 60, 0.1)'">
-                    🛢️ 傳統能源重返榮耀
-                </button>
-
-                <button class="prompt-chip" style="background-color: rgba(231, 76, 60, 0.1) !important; color: #ffcccc !important; border: 1px solid rgba(231, 76, 60, 0.4) !important; border-radius: 24px; padding: 8px 18px; cursor: pointer; transition: all 0.3s;" onclick="runTrumpStrategy('本土製造')" onmouseover="this.style.backgroundColor='rgba(231, 76, 60, 0.3)'" onmouseout="this.style.backgroundColor='rgba(231, 76, 60, 0.1)'">
-                    🏭 關稅保護與本土製造
-                </button>
-
-                <button class="prompt-chip" style="background-color: rgba(231, 76, 60, 0.1) !important; color: #ffcccc !important; border: 1px solid rgba(231, 76, 60, 0.4) !important; border-radius: 24px; padding: 8px 18px; cursor: pointer; transition: all 0.3s;" onclick="runTrumpStrategy('國防軍工')" onmouseover="this.style.backgroundColor='rgba(231, 76, 60, 0.3)'" onmouseout="this.style.backgroundColor='rgba(231, 76, 60, 0.1)'">
-                    🛡️ 國防軍工擴張
-                </button>
-            </div>
-        </div>
-
-        <div id="trump-results-container" style="display: none; background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #333;">
-            <div id="trump-loading" style="display: none; color: #e74c3c; text-align: center; padding: 40px 20px; font-weight: bold;">
-            </div>
-        </div>
-
-    </div>
 </div>
 
 <div id="chart-popup-modal" class="chart-popup-overlay" onclick="closeChartPopup()">
