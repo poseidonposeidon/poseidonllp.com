@@ -9944,3 +9944,62 @@ function fillPrompt(promptText) {
         }, 350);
     }
 }
+
+async function runTrumpStrategy(strategyName) {
+    const resultsContainer = document.getElementById('trump-results-container');
+    const loading = document.getElementById('trump-loading');
+
+    // 確保這裡有一個對應的 tbody 用來放表格 (你在 HTML 中可以加入 <tbody id="trump-table-body">)
+    const tableBody = document.getElementById('trump-table-body');
+    if(tableBody) tableBody.innerHTML = '';
+
+    resultsContainer.style.display = 'block';
+    loading.style.display = 'block';
+    loading.innerHTML = '<div class="loader" style="margin: 0 auto 15px auto;"><div></div><div></div><div></div></div>' +
+        `啟動雙大腦引擎！正在為您交叉比對 <b>[${strategyName}]</b> 政策與財報護城河...`;
+
+    try {
+        const response = await fetch('/api/trump_screener', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ strategy: strategyName })
+        });
+
+        const data = await response.json();
+        loading.style.display = 'none';
+
+        if (response.ok && data.results) {
+            let tableHTML = `<table style="width: 100%; border-collapse: collapse; color: #ddd; text-align: left; font-size: 15px;">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid #e74c3c; background: #252525;">
+                                        <th style="padding: 15px; color: #e74c3c;">股票標的</th>
+                                        <th style="padding: 15px; color: #e74c3c;">量化條件 (FMP)</th>
+                                        <th style="padding: 15px; color: #e74c3c;">雙引擎策略解析 (Macro + Micro)</th>
+                                    </tr>
+                                </thead><tbody>`;
+
+            data.results.forEach(item => {
+                tableHTML += `
+                <tr style="border-bottom: 1px solid #333; transition: background 0.2s;" onmouseover="this.style.background='#2c2c2c'" onmouseout="this.style.background='transparent'">
+                    <td style="padding: 15px; vertical-align: top;">
+                        <strong style="color: #e74c3c; font-size: 18px;">${item.symbol}</strong><br>
+                        <span style="font-size: 12px; color: #888;">${item.companyName}</span>
+                    </td>
+                    <td style="padding: 15px; vertical-align: top; line-height: 1.5;">${item.metrics}</td>
+                    <td style="padding: 15px; vertical-align: top; line-height: 1.6; color: #ccc;">
+                        ${item.snippet}<br>
+                        <a href="${item.source_url}" target="_blank" style="color: #3498db; text-decoration: none; font-size: 13px; display: inline-block; margin-top: 8px;">🔗 查看原始情報出處</a>
+                    </td>
+                </tr>`;
+            });
+
+            tableHTML += `</tbody></table>`;
+            resultsContainer.innerHTML = `<h4 style="color: #e74c3c; margin-top: 0; margin-bottom: 20px; font-size: 18px;">🦅 【${strategyName}】戰情篩選結果</h4>` + tableHTML;
+        } else {
+            resultsContainer.innerHTML = `<p style="color: #e74c3c;">查詢失敗: ${data.error || "未知錯誤"}</p>`;
+        }
+    } catch (error) {
+        loading.style.display = 'none';
+        resultsContainer.innerHTML = `<p style="color: #e74c3c;">連線失敗: ${error}</p>`;
+    }
+}
