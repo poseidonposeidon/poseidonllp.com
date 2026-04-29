@@ -10003,3 +10003,84 @@ async function runTrumpStrategy(strategyName) {
         resultsContainer.innerHTML = `<p style="color: #e74c3c;">連線失敗: ${error}</p>`;
     }
 }
+
+// 1. 啟動川普面板
+function toggleTrumpScreener() {
+    // 隱藏其他面板
+    if(document.getElementById('dd-main-content')) document.getElementById('dd-main-content').style.display = 'none';
+    if(document.getElementById('dd-screener-content')) document.getElementById('dd-screener-content').style.display = 'none';
+    if(document.getElementById('dd-empty-state')) document.getElementById('dd-empty-state').style.display = 'none';
+
+    // 顯示川普面板
+    const trumpContent = document.getElementById('dd-trump-content');
+    if(trumpContent) trumpContent.style.display = 'block';
+}
+
+// 2. 修改原本的語意選股切換邏輯 (確保它會把川普面板關掉)
+function toggleScreener() {
+    if(document.getElementById('dd-main-content')) document.getElementById('dd-main-content').style.display = 'none';
+    if(document.getElementById('dd-trump-content')) document.getElementById('dd-trump-content').style.display = 'none'; // 關閉川普面板
+    if(document.getElementById('dd-empty-state')) document.getElementById('dd-empty-state').style.display = 'none';
+
+    const screenerContent = document.getElementById('dd-screener-content');
+    if(screenerContent) screenerContent.style.display = 'block';
+}
+
+// 3. 執行川普策略 (呼叫後端 API)
+async function runTrumpStrategy(strategyName) {
+    const resultsContainer = document.getElementById('trump-results-container');
+    const loading = document.getElementById('trump-loading');
+
+    // 確保有預留表格的位置並清空
+    const tableBody = document.getElementById('trump-table-body');
+    if(tableBody) tableBody.innerHTML = '';
+
+    resultsContainer.style.display = 'block';
+    loading.style.display = 'block';
+    loading.innerHTML = `<div style="margin: 0 auto 15px auto;">⏳</div>啟動雙大腦引擎！正在為您交叉比對 <b>[${strategyName}]</b> 政策與財報護城河...`;
+
+    try {
+        const response = await fetch('/api/trump_screener', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ strategy: strategyName })
+        });
+
+        const data = await response.json();
+        loading.style.display = 'none';
+
+        if (response.ok && data.results) {
+            let tableHTML = `<table style="width: 100%; border-collapse: collapse; color: #ddd; text-align: left; font-size: 15px;">
+                                <thead>
+                                    <tr style="border-bottom: 2px solid #e74c3c; background: #252525;">
+                                        <th style="padding: 15px; color: #e74c3c;">股票標的</th>
+                                        <th style="padding: 15px; color: #e74c3c;">量化條件 (FMP)</th>
+                                        <th style="padding: 15px; color: #e74c3c;">雙引擎策略解析 (Macro + Micro)</th>
+                                    </tr>
+                                </thead><tbody>`;
+
+            data.results.forEach(item => {
+                tableHTML += `
+                <tr style="border-bottom: 1px solid #333; transition: background 0.2s;" onmouseover="this.style.background='#2c2c2c'" onmouseout="this.style.background='transparent'">
+                    <td style="padding: 15px; vertical-align: top;">
+                        <strong style="color: #e74c3c; font-size: 18px;">${item.symbol}</strong><br>
+                        <span style="font-size: 12px; color: #888;">${item.companyName}</span>
+                    </td>
+                    <td style="padding: 15px; vertical-align: top; line-height: 1.5;">${item.metrics}</td>
+                    <td style="padding: 15px; vertical-align: top; line-height: 1.6; color: #ccc;">
+                        ${item.snippet}<br>
+                        <a href="${item.source_url}" target="_blank" style="color: #3498db; text-decoration: none; font-size: 13px; display: inline-block; margin-top: 8px;">🔗 查看原始情報出處</a>
+                    </td>
+                </tr>`;
+            });
+
+            tableHTML += `</tbody></table>`;
+            resultsContainer.innerHTML = `<h4 style="color: #e74c3c; margin-top: 0; margin-bottom: 20px; font-size: 18px;">🦅 【${strategyName}】戰情篩選結果</h4>` + tableHTML;
+        } else {
+            resultsContainer.innerHTML = `<p style="color: #e74c3c;">查詢失敗: ${data.error || "未知錯誤"}</p>`;
+        }
+    } catch (error) {
+        loading.style.display = 'none';
+        resultsContainer.innerHTML = `<p style="color: #e74c3c;">連線失敗: ${error}</p>`;
+    }
+}
