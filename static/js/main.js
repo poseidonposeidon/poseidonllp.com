@@ -9923,69 +9923,79 @@ async function runSemanticScreener() {
     }
 }
 
+// ==========================================
+// AI 語意選股器 - 自動填寫提示詞
+// ==========================================
 function fillPrompt(promptText) {
-    // 精準抓取你的 screener-input
     const inputField = document.getElementById('screener-input');
-
     if (inputField) {
-        // 1. 將文字填入輸入框
         inputField.value = promptText;
-
-        // 2. 輸入框特效 (閃爍一下提醒使用者)
         inputField.style.transition = "background-color 0.3s";
-        inputField.style.backgroundColor = "rgba(52, 152, 219, 0.3)"; // 使用你的藍色 #3498db
+        inputField.style.backgroundColor = "rgba(52, 152, 219, 0.3)";
         setTimeout(() => {
-            inputField.style.backgroundColor = "#222"; // 恢復你原本的深色背景
+            inputField.style.backgroundColor = "#222";
         }, 300);
-
-        // 3. 自動觸發搜尋！(讓體驗極致流暢，使用者點完就直接看結果)
         setTimeout(() => {
             runSemanticScreener();
         }, 350);
     }
 }
 
+// ==========================================
+// 雙核心面板切換邏輯
+// ==========================================
+// 1. 啟動川普面板
+function toggleTrumpScreener() {
+    if(document.getElementById('dd-main-content')) document.getElementById('dd-main-content').style.display = 'none';
+    if(document.getElementById('dd-screener-content')) document.getElementById('dd-screener-content').style.display = 'none';
+    if(document.getElementById('dd-empty-state')) document.getElementById('dd-empty-state').style.display = 'none';
+
+    const trumpContent = document.getElementById('dd-trump-content');
+    if(trumpContent) trumpContent.style.display = 'block';
+}
+
+// 2. 啟動語意選股面板 (關閉川普面板)
+function toggleScreener() {
+    if(document.getElementById('dd-main-content')) document.getElementById('dd-main-content').style.display = 'none';
+    if(document.getElementById('dd-trump-content')) document.getElementById('dd-trump-content').style.display = 'none';
+    if(document.getElementById('dd-empty-state')) document.getElementById('dd-empty-state').style.display = 'none';
+
+    const screenerContent = document.getElementById('dd-screener-content');
+    if(screenerContent) screenerContent.style.display = 'block';
+}
+
+// ==========================================
+// 川普大腦策略執行 (終極防呆版)
+// ==========================================
 async function runTrumpStrategy(strategyName) {
     const resultsContainer = document.getElementById('trump-results-container');
     const loading = document.getElementById('trump-loading');
-    const tableBody = document.getElementById('trump-table-body');
 
-    // 🛡️ 防呆機制 1：如果找不到容器，直接報錯在 Console 並停止，避免整個網頁當機
-    if (!resultsContainer) {
-        alert("⚠️ 系統找不到 'trump-results-container'，請確認 HTML 已經正確存檔並重新整理頁面！");
-        console.error("Missing DOM Element: trump-results-container");
-        return;
-    }
-    if (!loading) {
-        alert("⚠️ 系統找不到 'trump-loading'！");
-        console.error("Missing DOM Element: trump-loading");
+    if (!resultsContainer || !loading) {
+        alert("⚠️ 系統找不到對應的 HTML 容器！請確認 home.html 是否正確存檔。");
         return;
     }
 
-    // 初始化狀態
-    if(tableBody) tableBody.innerHTML = '';
     resultsContainer.style.display = 'block';
     loading.style.display = 'block';
+    resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
 
-    // 放入 Loading 動畫
     loading.innerHTML = `<div class="loader" style="margin: 0 auto 15px auto;"><div></div><div></div><div></div></div>啟動雙大腦引擎！正在為您交叉比對 <b>[${strategyName}]</b> 政策與財報護城河...`;
 
     try {
-        // 呼叫後端 API
         const response = await fetch('/api/trump_screener', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ strategy: strategyName })
         });
 
-        // 🛡️ 防呆機制 2：確保後端回傳的是 JSON
+        // 檢查後端是不是回傳 JSON
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.indexOf("application/json") !== -1) {
             const data = await response.json();
-            loading.style.display = 'none'; // 隱藏 Loading
+            loading.style.display = 'none';
 
             if (response.ok && data.results) {
-                // 產生表格 HTML
                 let tableHTML = `<table style="width: 100%; border-collapse: collapse; color: #ddd; text-align: left; font-size: 15px;">
                                     <thead>
                                         <tr style="border-bottom: 2px solid #e74c3c; background: #252525;">
@@ -9993,7 +10003,7 @@ async function runTrumpStrategy(strategyName) {
                                             <th style="padding: 15px; color: #e74c3c; width: 25%;">量化條件 (FMP)</th>
                                             <th style="padding: 15px; color: #e74c3c; width: 63%;">雙引擎策略解析 (Macro + Micro)</th>
                                         </tr>
-                                    </thead><tbody id="trump-table-body">`;
+                                    </thead><tbody>`;
 
                 data.results.forEach(item => {
                     tableHTML += `
@@ -10011,104 +10021,21 @@ async function runTrumpStrategy(strategyName) {
                 });
 
                 tableHTML += `</tbody></table>`;
-
-                // 將表格塞入容器
                 resultsContainer.innerHTML = `<h4 style="color: #e74c3c; margin-top: 0; margin-bottom: 20px; font-size: 18px;">🦅 【${strategyName}】戰情篩選結果</h4>` + tableHTML;
-
             } else {
                 resultsContainer.innerHTML = `<p style="color: #e74c3c;">查詢失敗: ${data.error || "未知錯誤"}</p>`;
             }
         } else {
-            // 後端當機，回傳了 HTML 錯誤頁面 (處理你剛剛遇到的 Unexpected token '<' 錯誤)
-            const text = await response.text();
+            // 🚨 後端當機了！精準捕捉 HTML 錯誤，不再報 SyntaxError
             loading.style.display = 'none';
-            console.error("後端發生錯誤，回傳內容:", text);
-            resultsContainer.innerHTML = `<p style="color: #e74c3c; font-weight: bold;">⚠️ 伺服器內部發生錯誤 (500 Internal Server Error)。請檢查 PyCharm 終端機內的錯誤代碼！</p>`;
+            resultsContainer.innerHTML = `<div style="background: #331111; padding: 20px; border-left: 4px solid #e74c3c; border-radius: 4px;">
+                <h4 style="color: #e74c3c; margin-top: 0;">⚠️ 伺服器後端發生錯誤 (500 Python Crash)</h4>
+                <p style="color: #ccc; margin-bottom: 0;">請立刻打開您的 <b>PyCharm 終端機</b>，尋找紅色的 <code>Traceback</code> 錯誤！</p>
+            </div>`;
         }
 
     } catch (error) {
         loading.style.display = 'none';
         resultsContainer.innerHTML = `<p style="color: #e74c3c; font-weight: bold;">⚠️ 網路連線失敗: ${error.message}</p>`;
-    }
-}
-
-// 1. 啟動川普面板
-function toggleTrumpScreener() {
-    // 隱藏其他面板
-    if(document.getElementById('dd-main-content')) document.getElementById('dd-main-content').style.display = 'none';
-    if(document.getElementById('dd-screener-content')) document.getElementById('dd-screener-content').style.display = 'none';
-    if(document.getElementById('dd-empty-state')) document.getElementById('dd-empty-state').style.display = 'none';
-
-    // 顯示川普面板
-    const trumpContent = document.getElementById('dd-trump-content');
-    if(trumpContent) trumpContent.style.display = 'block';
-}
-
-// 2. 修改原本的語意選股切換邏輯 (確保它會把川普面板關掉)
-function toggleScreener() {
-    if(document.getElementById('dd-main-content')) document.getElementById('dd-main-content').style.display = 'none';
-    if(document.getElementById('dd-trump-content')) document.getElementById('dd-trump-content').style.display = 'none'; // 關閉川普面板
-    if(document.getElementById('dd-empty-state')) document.getElementById('dd-empty-state').style.display = 'none';
-
-    const screenerContent = document.getElementById('dd-screener-content');
-    if(screenerContent) screenerContent.style.display = 'block';
-}
-
-// 3. 執行川普策略 (呼叫後端 API)
-async function runTrumpStrategy(strategyName) {
-    const resultsContainer = document.getElementById('trump-results-container');
-    const loading = document.getElementById('trump-loading');
-
-    // 確保有預留表格的位置並清空
-    const tableBody = document.getElementById('trump-table-body');
-    if(tableBody) tableBody.innerHTML = '';
-
-    resultsContainer.style.display = 'block';
-    loading.style.display = 'block';
-    loading.innerHTML = `<div style="margin: 0 auto 15px auto;">⏳</div>啟動雙大腦引擎！正在為您交叉比對 <b>[${strategyName}]</b> 政策與財報護城河...`;
-
-    try {
-        const response = await fetch('/api/trump_screener', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ strategy: strategyName })
-        });
-
-        const data = await response.json();
-        loading.style.display = 'none';
-
-        if (response.ok && data.results) {
-            let tableHTML = `<table style="width: 100%; border-collapse: collapse; color: #ddd; text-align: left; font-size: 15px;">
-                                <thead>
-                                    <tr style="border-bottom: 2px solid #e74c3c; background: #252525;">
-                                        <th style="padding: 15px; color: #e74c3c;">股票標的</th>
-                                        <th style="padding: 15px; color: #e74c3c;">量化條件 (FMP)</th>
-                                        <th style="padding: 15px; color: #e74c3c;">雙引擎策略解析 (Macro + Micro)</th>
-                                    </tr>
-                                </thead><tbody>`;
-
-            data.results.forEach(item => {
-                tableHTML += `
-                <tr style="border-bottom: 1px solid #333; transition: background 0.2s;" onmouseover="this.style.background='#2c2c2c'" onmouseout="this.style.background='transparent'">
-                    <td style="padding: 15px; vertical-align: top;">
-                        <strong style="color: #e74c3c; font-size: 18px;">${item.symbol}</strong><br>
-                        <span style="font-size: 12px; color: #888;">${item.companyName}</span>
-                    </td>
-                    <td style="padding: 15px; vertical-align: top; line-height: 1.5;">${item.metrics}</td>
-                    <td style="padding: 15px; vertical-align: top; line-height: 1.6; color: #ccc;">
-                        ${item.snippet}<br>
-                        <a href="${item.source_url}" target="_blank" style="color: #3498db; text-decoration: none; font-size: 13px; display: inline-block; margin-top: 8px;">🔗 查看原始情報出處</a>
-                    </td>
-                </tr>`;
-            });
-
-            tableHTML += `</tbody></table>`;
-            resultsContainer.innerHTML = `<h4 style="color: #e74c3c; margin-top: 0; margin-bottom: 20px; font-size: 18px;">🦅 【${strategyName}】戰情篩選結果</h4>` + tableHTML;
-        } else {
-            resultsContainer.innerHTML = `<p style="color: #e74c3c;">查詢失敗: ${data.error || "未知錯誤"}</p>`;
-        }
-    } catch (error) {
-        loading.style.display = 'none';
-        resultsContainer.innerHTML = `<p style="color: #e74c3c;">連線失敗: ${error}</p>`;
     }
 }
