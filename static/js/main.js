@@ -9990,12 +9990,15 @@ function toggleTrumpScreener() {
 async function runTrumpStrategy(strategyName) {
     const resultsContainer = document.getElementById('trump-results-container');
     const loading = document.getElementById('trump-loading');
+    const tableWrapper = document.getElementById('trump-table-wrapper'); // ✨ 新增：抓取專門放表格的容器
 
-    if (!resultsContainer || !loading) {
+    if (!resultsContainer || !loading || !tableWrapper) {
         alert("⚠️ 系統找不到對應的 HTML 容器！請確認 home.html 是否正確存檔。");
         return;
     }
 
+    // 每次執行前，先清空舊的表格，並顯示外層容器與 Loading
+    tableWrapper.innerHTML = '';
     resultsContainer.style.display = 'block';
     loading.style.display = 'block';
     resultsContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -10009,11 +10012,10 @@ async function runTrumpStrategy(strategyName) {
             body: JSON.stringify({ strategy: strategyName })
         });
 
-        // 檢查後端是不是回傳 JSON
         const contentType = response.headers.get("content-type");
         if (contentType && contentType.indexOf("application/json") !== -1) {
             const data = await response.json();
-            loading.style.display = 'none';
+            loading.style.display = 'none'; // 隱藏 loading
 
             if (response.ok && data.results) {
                 let tableHTML = `<table style="width: 100%; border-collapse: collapse; color: #ddd; text-align: left; font-size: 15px;">
@@ -10041,14 +10043,16 @@ async function runTrumpStrategy(strategyName) {
                 });
 
                 tableHTML += `</tbody></table>`;
-                resultsContainer.innerHTML = `<h4 style="color: #e74c3c; margin-top: 0; margin-bottom: 20px; font-size: 18px;">🦅 【${strategyName}】戰情篩選結果</h4>` + tableHTML;
+
+                // ✨ 修正點：將內容寫入 wrapper，而不是覆蓋整個 Container！
+                tableWrapper.innerHTML = `<h4 style="color: #e74c3c; margin-top: 0; margin-bottom: 20px; font-size: 18px;">🦅 【${strategyName}】戰情篩選結果</h4>` + tableHTML;
             } else {
-                resultsContainer.innerHTML = `<p style="color: #e74c3c;">查詢失敗: ${data.error || "未知錯誤"}</p>`;
+                tableWrapper.innerHTML = `<p style="color: #e74c3c;">查詢失敗: ${data.error || "未知錯誤"}</p>`;
             }
         } else {
-            // 🚨 後端當機了！精準捕捉 HTML 錯誤，不再報 SyntaxError
             loading.style.display = 'none';
-            resultsContainer.innerHTML = `<div style="background: #331111; padding: 20px; border-left: 4px solid #e74c3c; border-radius: 4px;">
+            // ✨ 修正點：將 500 錯誤也寫入 wrapper
+            tableWrapper.innerHTML = `<div style="background: #331111; padding: 20px; border-left: 4px solid #e74c3c; border-radius: 4px;">
                 <h4 style="color: #e74c3c; margin-top: 0;">⚠️ 伺服器後端發生錯誤 (500 Python Crash)</h4>
                 <p style="color: #ccc; margin-bottom: 0;">請立刻打開您的 <b>PyCharm 終端機</b>，尋找紅色的 <code>Traceback</code> 錯誤！</p>
             </div>`;
@@ -10056,6 +10060,7 @@ async function runTrumpStrategy(strategyName) {
 
     } catch (error) {
         loading.style.display = 'none';
-        resultsContainer.innerHTML = `<p style="color: #e74c3c; font-weight: bold;">⚠️ 網路連線失敗: ${error.message}</p>`;
+        // ✨ 修正點：將網路錯誤也寫入 wrapper
+        tableWrapper.innerHTML = `<p style="color: #e74c3c; font-weight: bold;">⚠️ 網路連線失敗: ${error.message}</p>`;
     }
 }

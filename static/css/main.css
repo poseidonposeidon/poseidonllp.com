@@ -2563,3 +2563,23 @@ body.light-mode {
     transform: translateY(-2px); /* 輕微上浮 */
     box-shadow: 0 4px 12px rgba(52, 152, 219, 0.25); /* 加上淡淡的藍色光暈陰影 */
 }
+
+/* 川普因子專屬按鈕樣式 */
+.trump-chip {
+    background-color: rgba(231, 76, 60, 0.1) !important;
+    color: #ffcccc !important;
+    border: 1px solid rgba(231, 76, 60, 0.4) !important;
+    border-radius: 24px !important;
+    padding: 8px 18px !important;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+/* Hover 狀態：在這裡使用 !important 覆蓋原本的顏色 */
+.trump-chip:hover {
+    background-color: rgba(231, 76, 60, 0.3) !important;
+    color: #ffffff !important;
+    border-color: #e74c3c !important;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.25);
+}
