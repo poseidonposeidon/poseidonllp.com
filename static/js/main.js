@@ -9786,11 +9786,11 @@ async function triggerExcelDownload(event) {
    ✨ 語意選股器 (Semantic Screener) 專屬邏輯
    ========================================================================== */
 
-// 1. 切換選股器與單股分析面板的 UX 邏輯
 function toggleScreener() {
     const emptyState = document.getElementById('dd-empty-state');
     const mainContent = document.getElementById('dd-main-content');
     const screenerContent = document.getElementById('dd-screener-content');
+    const trumpContent = document.getElementById('dd-trump-content'); // 👈 新增：抓取川普面板
     const toggleBtn = document.getElementById('screener-toggle-btn');
 
     // 獲取頂部搜尋列的元素，準備進行防呆鎖定
@@ -9801,12 +9801,15 @@ function toggleScreener() {
         // --- 進入【語意選股模式】 ---
         if(emptyState) emptyState.style.display = 'none';
         if(mainContent) mainContent.style.display = 'none';
+        if(trumpContent) trumpContent.style.display = 'none'; // 👈 新增：確保川普面板被關閉
         screenerContent.style.display = 'block';
 
         // 改變按鈕樣式提示使用者如何返回
-        toggleBtn.innerHTML = '<span style="font-size: 16px;">🔍</span> 回單股分析';
-        toggleBtn.style.background = '#f0b90b';
-        toggleBtn.style.color = '#1e1e1e';
+        if(toggleBtn) {
+            toggleBtn.innerHTML = '<span style="font-size: 16px;">🔍</span> 回單股分析';
+            toggleBtn.style.background = '#f0b90b';
+            toggleBtn.style.color = '#1e1e1e';
+        }
 
         // 鎖定頂部單股搜尋框，避免使用者搞混操作邏輯
         if (searchInput) {
@@ -9821,6 +9824,7 @@ function toggleScreener() {
     } else {
         // --- 回到【單股分析模式】 ---
         screenerContent.style.display = 'none';
+        if(trumpContent) trumpContent.style.display = 'none'; // 👈 新增：確保川普面板被關閉
 
         // 判斷要顯示歡迎畫面還是先前查好的報告
         if(window.currentReportContent && window.currentReportContent !== "") {
@@ -9830,9 +9834,11 @@ function toggleScreener() {
         }
 
         // 恢復按鈕樣式
-        toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
-        toggleBtn.style.background = '#3498db';
-        toggleBtn.style.color = 'white';
+        if(toggleBtn) {
+            toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
+            toggleBtn.style.background = '#3498db';
+            toggleBtn.style.color = 'white';
+        }
 
         // 解除頂部搜尋框鎖定
         if (searchInput) {
@@ -9946,23 +9952,37 @@ function fillPrompt(promptText) {
 // ==========================================
 // 1. 啟動川普面板
 function toggleTrumpScreener() {
+    // 隱藏其他所有面板
     if(document.getElementById('dd-main-content')) document.getElementById('dd-main-content').style.display = 'none';
     if(document.getElementById('dd-screener-content')) document.getElementById('dd-screener-content').style.display = 'none';
     if(document.getElementById('dd-empty-state')) document.getElementById('dd-empty-state').style.display = 'none';
 
+    // 顯示川普面板
     const trumpContent = document.getElementById('dd-trump-content');
     if(trumpContent) trumpContent.style.display = 'block';
+
+    // 🛡️ 防呆：將語意選股按鈕與搜尋列恢復原狀
+    const toggleBtn = document.getElementById('screener-toggle-btn');
+    const searchInput = document.getElementById('dd-stock-input');
+    const analyzeBtn = document.querySelector('button[onclick="runDeepDive()"]');
+
+    if(toggleBtn) {
+        toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
+        toggleBtn.style.background = '#3498db';
+        toggleBtn.style.color = 'white';
+    }
+    if (searchInput) {
+        searchInput.disabled = false;
+        searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)";
+        searchInput.style.opacity = '1';
+    }
+    if (analyzeBtn) {
+        analyzeBtn.disabled = false;
+        analyzeBtn.style.opacity = '1';
+    }
 }
 
-// 2. 啟動語意選股面板 (關閉川普面板)
-function toggleScreener() {
-    if(document.getElementById('dd-main-content')) document.getElementById('dd-main-content').style.display = 'none';
-    if(document.getElementById('dd-trump-content')) document.getElementById('dd-trump-content').style.display = 'none';
-    if(document.getElementById('dd-empty-state')) document.getElementById('dd-empty-state').style.display = 'none';
 
-    const screenerContent = document.getElementById('dd-screener-content');
-    if(screenerContent) screenerContent.style.display = 'block';
-}
 
 // ==========================================
 // 川普大腦策略執行 (終極防呆版)
