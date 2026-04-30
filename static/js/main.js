@@ -10006,7 +10006,9 @@ async function runTrumpStrategy(strategyName) {
     loading.innerHTML = `<div class="loader" style="margin: 0 auto 15px auto;"><div></div><div></div><div></div></div>啟動雙大腦引擎！正在為您交叉比對 <b>[${strategyName}]</b> 政策與財報護城河...`;
 
     try {
-        const response = await fetch('/api/trump_screener', {
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/trump_screener` : '/api/trump_screener';
+
+        const response = await fetch(targetUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ strategy: strategyName })
