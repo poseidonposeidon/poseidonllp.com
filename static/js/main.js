@@ -10188,40 +10188,52 @@ function initScenarioModeling(currentEps, currentPrice) {
 }
 
 // 取得 AI 評論
-async function getScenarioAiComment(cagr, pe) {
+function getScenarioAiComment(cagr, pe) {
     const commentBox = document.getElementById('scenario-ai-comment');
     if (!commentBox) return;
 
-    commentBox.innerHTML = `<span style="color: #888;">CIO 正在審核您的假設...</span>`;
+    // 1. 顯示 "Loading..." 提示 (符合你的風格)
+    commentBox.innerHTML = '<span style="color: #888;">CIO 正在審核您的假設...</span>';
 
-    try {
-        const symbolInput = document.getElementById('dd-stock-input');
-        const symbol = symbolInput ? symbolInput.value.trim().toUpperCase() : "";
+    // 2. 獲取股票代碼
+    const symbolInput = document.getElementById('dd-stock-input');
+    const stockSymbol = symbolInput ? symbolInput.value.trim().toUpperCase() : "";
 
-        // 🌟 採用專案標準的 URL 動態判斷寫法
-        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/scenario_comment` : '/api/scenario_comment';
+    // 3. 設定 API URL
+    const apiUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/scenario_comment` : '/api/scenario_comment';
 
-        const response = await fetch(targetUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                symbol: symbol,
-                cagr: cagr,
-                pe: pe,
-                context: window.currentReportContent // 給 AI 之前的背景
-            })
+    // 4. 使用 fetch 進行 POST 請求，並套用你習慣的 Promise 鏈式寫法
+    fetch(apiUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            symbol: stockSymbol,
+            cagr: cagr,
+            pe: pe,
+            context: window.currentReportContent // 給 AI 之前的背景
+        })
+    })
+        .then(response => {
+            // 嚴格的網路狀態檢查 (與你的 fetchData_2 相同)
+            if (!response.ok) {
+                throw new Error(`Network response was not ok (Status: ${response.status})`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('AI Comment data received:', data); // 查看原始返回數據
+
+            // 確保 data 存在且包含 comment
+            if (data && data.comment) {
+                commentBox.innerHTML = `🦅 <strong>CIO:</strong> <span style="color: #ccc;">${data.comment}</span>`;
+            } else {
+                commentBox.innerHTML = '<p>No comment data found for this scenario.</p>';
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching AI comment: ', error);
+            commentBox.innerHTML = `<span style="color: #e74c3c;">⚠️ Error loading data: ${error.message}. Please check the console for more details.</span>`;
         });
-
-        // 🌟 採用專案標準的嚴格錯誤防堵
-        if (!response.ok) {
-            throw new Error(`API 錯誤: ${response.status}`);
-        }
-
-        const data = await response.json();
-        commentBox.innerHTML = `🦅 <strong>CIO:</strong> <span style="color: #ccc;">${data.comment}</span>`;
-
-    } catch (error) {
-        console.error("Scenario Comment Error:", error);
-        commentBox.innerHTML = `<span style="color: #e74c3c;">⚠️ 連線異常，CIO 暫時無法給出評論。</span>`;
-    }
 }
