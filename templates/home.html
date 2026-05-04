@@ -614,6 +614,39 @@
             <div class="dd-top-layout">
                 <div class="dd-report-column">
                     <h3 style="color: #f0b90b; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px;">📄 投資分析報告</h3>
+                    <div id="scenario-panel" style="background: #1a1a1a; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #3498db; box-shadow: 0 0 15px rgba(52, 152, 219, 0.2);">
+                        <h3 style="color: #3498db; margin-top: 0; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                            🎛️ CIO 模擬沙盤：5 年後價值推演
+                        </h3>
+
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                            <div>
+                                <div style="display: flex; justify-content: space-between; color: #ccc; font-size: 13px; margin-bottom: 8px;">
+                                    <span>預估營收年複合成長 (CAGR)</span>
+                                    <span id="cagr-val" style="color: #f0b90b; font-weight: bold;">15%</span>
+                                </div>
+                                <input type="range" id="slider-cagr" min="0" max="50" value="15" style="width: 100%; cursor: pointer;">
+                            </div>
+
+                            <div>
+                                <div style="display: flex; justify-content: space-between; color: #ccc; font-size: 13px; margin-bottom: 8px;">
+                                    <span>預估 5 年後合理 P/E</span>
+                                    <span id="pe-val" style="color: #f0b90b; font-weight: bold;">20x</span>
+                                </div>
+                                <input type="range" id="slider-pe" min="5" max="60" value="20" style="width: 100%; cursor: pointer;">
+                            </div>
+                        </div>
+
+                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; display: flex; align-items: center; justify-content: space-between;">
+                            <div>
+                                <span style="color: #888; font-size: 12px;">5 年後推演目標價</span><br>
+                                <strong id="target-price-val" style="color: #27ae60; font-size: 24px;">$0.00</strong>
+                            </div>
+                            <div id="scenario-ai-comment" style="flex: 1; margin-left: 20px; background: #222; padding: 10px; border-radius: 6px; font-size: 13px; color: #aaa; font-style: italic; border-left: 3px solid #f0b90b;">
+                                💡 調整滑桿，聽聽 CIO 的毒舌評論...
+                            </div>
+                        </div>
+                    </div>
                     <div id="dd-report-container" class="dd-report-area"></div>
                 </div>
 

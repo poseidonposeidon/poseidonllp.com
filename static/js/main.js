@@ -9086,14 +9086,13 @@ async function runDeepDive(event) {
         return;
     }
 
-    // UI 切換：顯示主畫面，隱藏空狀態
     const emptyState = document.getElementById('dd-empty-state');
     const mainContent = document.getElementById('dd-main-content');
     if (emptyState) emptyState.style.display = 'none';
     if (mainContent) mainContent.style.display = 'block';
 
     if(loadingScreen) loadingScreen.style.display = 'flex';
-    if(loadingText) loadingText.innerText = "正在調用 FMP API 獲取：估值模型、內部人交易、法說會逐字稿...";
+    if(loadingText) loadingText.innerText = "正在調用 FMP API 獲取數據...";
     if(reportContainer) reportContainer.innerHTML = "";
 
     try {
@@ -9101,33 +9100,35 @@ async function runDeepDive(event) {
 
         const response = await fetch(targetUrl, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ symbol: symbol })
         });
 
         if (!response.ok) throw new Error("Analysis Failed");
         const data = await response.json();
 
-        // 儲存至全域變數供後續 Chat 使用
         window.currentDeepDiveData = data.raw_data;
         window.currentReportContent = data.report;
 
         if(loadingText) loadingText.innerText = "AI 正在排版分析報告與財務雷達...";
 
-        // 🌟 關鍵升級：將 raw_data 一併傳入，用來畫雷達徽章
+        // 1. 先渲染報告與財報防禦雷達
         renderDeepDiveMarkdown(data.report, reportContainer, data.raw_data);
+
+        // 🌟 【新增：動態沙盤初始化】
+        // 放在這裡，確保報告出來後立刻啟動滑桿邏輯
+        const currentEps = data.raw_data.financials?.[0]?.eps || 0;
+        const currentPrice = data.raw_data.price || 1;
+        initScenarioModeling(currentEps, currentPrice);
 
         if(loadingText) loadingText.innerText = "正在繪製視覺化圖表...";
 
-        // 確保全域圖表實例物件存在
         window.deepDiveChartInstances = window.deepDiveChartInstances || {};
 
-        // 平行處理所有圖表繪製
+        // 2. 繪製圖表
         await Promise.all([
             drawValuationChart(symbol),
-            drawInsiderChart(data.raw_data.insider_transactions),/**/
+            drawInsiderChart(data.raw_data.insider_transactions),
             drawMarginsChart(symbol),
             drawGrowthChart(symbol),
             drawCashflowChart(symbol),
@@ -9139,7 +9140,7 @@ async function runDeepDive(event) {
 
     } catch (error) {
         console.error(error);
-        if(reportContainer) reportContainer.innerHTML = `<p style="color: #e74c3c; font-weight: bold; background: #331111; padding: 15px; border-radius: 8px;">分析發生錯誤：${error.message}</p>`;
+        if(reportContainer) reportContainer.innerHTML = `<p style="color: #e74c3c;">分析發生錯誤：${error.message}</p>`;
     } finally {
         if(loadingScreen) loadingScreen.style.display = 'none';
     }
@@ -10124,5 +10125,72 @@ async function runTrumpStrategy(strategyName) {
         loading.style.display = 'none';
         // ✨ 修正點：將網路錯誤也寫入 wrapper
         tableWrapper.innerHTML = `<p style="color: #e74c3c; font-weight: bold;">⚠️ 網路連線失敗: ${error.message}</p>`;
+    }
+}
+
+// 啟動沙盤監聽
+function initScenarioModeling(currentEps, currentPrice) {
+    const cagrSlider = document.getElementById('slider-cagr');
+    const peSlider = document.getElementById('slider-pe');
+    const cagrVal = document.getElementById('cagr-val');
+    const peVal = document.getElementById('pe-val');
+    const targetPriceVal = document.getElementById('target-price-val');
+
+    const updateCalc = () => {
+        const cagr = parseFloat(cagrSlider.value) / 100;
+        const pe = parseFloat(peSlider.value);
+
+        cagrVal.innerText = (cagr * 100).toFixed(0) + '%';
+        peVal.innerText = pe + 'x';
+
+        // 核心公式：5 年後 EPS = 現在 EPS * (1 + CAGR)^5
+        // 5 年後目標價 = 5 年後 EPS * 目標 PE
+        if (currentEps && currentEps !== "N/A") {
+            const futureEps = currentEps * Math.pow((1 + cagr), 5);
+            const targetPrice = futureEps * pe;
+            targetPriceVal.innerText = '$' + targetPrice.toFixed(2);
+
+            // 根據預期回報改變顏色
+            const totalReturn = (targetPrice / currentPrice) - 1;
+            targetPriceVal.style.color = totalReturn > 0.5 ? "#27ae60" : (totalReturn < 0 ? "#e74c3c" : "#f0b90b");
+        }
+    };
+
+    cagrSlider.oninput = updateCalc;
+    peSlider.oninput = updateCalc;
+
+    // 當使用者停止拖動時，觸發 AI 評論 (防手震延遲)
+    let timeout;
+    const triggerAi = () => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => getScenarioAiComment(cagrSlider.value, peSlider.value), 800);
+    };
+    cagrSlider.onchange = triggerAi;
+    peSlider.onchange = triggerAi;
+
+    updateCalc(); // 初始計算一次
+}
+
+// 取得 AI 評論
+async function getScenarioAiComment(cagr, pe) {
+    const commentBox = document.getElementById('scenario-ai-comment');
+    commentBox.innerText = "CIO 正在審核您的假設...";
+
+    try {
+        const symbol = document.getElementById('dd-stock-input').value.toUpperCase();
+        const response = await fetch('/api/scenario_comment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                symbol: symbol,
+                cagr: cagr,
+                pe: pe,
+                context: window.currentReportContent // 給 AI 之前的背景
+            })
+        });
+        const data = await response.json();
+        commentBox.innerHTML = `🦅 <strong>CIO:</strong> ${data.comment}`;
+    } catch (e) {
+        commentBox.innerText = "連線超時，CIO 暫時不想理你。";
     }
 }
