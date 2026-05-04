@@ -9069,6 +9069,7 @@ function closeDeepDiveModal() {
 
 // ✅ 支援 suffix 參數 (例如 '-main')
 async function runDeepDive(event) {
+    // 1. 防止表單重整與基礎檢查
     if (event) {
         event.preventDefault();
     }
@@ -9077,56 +9078,63 @@ async function runDeepDive(event) {
     if (!symbolInput) return;
 
     const symbol = symbolInput.value.trim().toUpperCase();
-    const loadingScreen = document.getElementById('dd-loading-screen');
-    const loadingText = document.getElementById('dd-loading-text');
-    const reportContainer = document.getElementById('dd-report-container');
-
     if (!symbol) {
         alert("請輸入股票代碼！");
         return;
     }
 
+    // 2. 取得 DOM 元素並切換 UI 狀態
+    const loadingScreen = document.getElementById('dd-loading-screen');
+    const loadingText = document.getElementById('dd-loading-text');
+    const reportContainer = document.getElementById('dd-report-container');
     const emptyState = document.getElementById('dd-empty-state');
     const mainContent = document.getElementById('dd-main-content');
+
     if (emptyState) emptyState.style.display = 'none';
     if (mainContent) mainContent.style.display = 'block';
 
-    if(loadingScreen) loadingScreen.style.display = 'flex';
-    if(loadingText) loadingText.innerText = "正在調用 FMP API 獲取數據...";
-    if(reportContainer) reportContainer.innerHTML = "";
+    if (loadingScreen) loadingScreen.style.display = 'flex';
+    if (loadingText) loadingText.innerText = "正在調用 FMP API 獲取：估值模型、內部人交易、法說會逐字稿...";
+    if (reportContainer) reportContainer.innerHTML = "";
 
     try {
+        // 3. 呼叫後端 API (支援環境變數 baseUrl 防呆)
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/ai_deep_dive` : '/api/ai_deep_dive';
 
         const response = await fetch(targetUrl, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({ symbol: symbol })
         });
 
-        if (!response.ok) throw new Error("Analysis Failed");
+        if (!response.ok) throw new Error(`Analysis Failed: 伺服器狀態碼 ${response.status}`);
         const data = await response.json();
 
+        // 4. 儲存至全域變數供後續 Chat 或沙盤使用
         window.currentDeepDiveData = data.raw_data;
         window.currentReportContent = data.report;
 
-        if(loadingText) loadingText.innerText = "AI 正在排版分析報告與財務雷達...";
+        if (loadingText) loadingText.innerText = "AI 正在排版分析報告與財務雷達...";
 
-        // 1. 先渲染報告與財報防禦雷達
+        // 5. 渲染報告與財報防禦雷達徽章
         renderDeepDiveMarkdown(data.report, reportContainer, data.raw_data);
 
-        // 🌟 【新增：動態沙盤初始化】
-        // 放在這裡，確保報告出來後立刻啟動滑桿邏輯
+        // ==========================================
+        // 🌟 6. 動態推演沙盤：數據抓取與初始化
+        // ==========================================
+        // 尋找 EPS (涵蓋 FMP 常見的幾種資料結構，防止找不到資料)
         let currentEps = 0;
         if (data.raw_data.quote && data.raw_data.quote.length > 0 && data.raw_data.quote[0].eps) {
             currentEps = data.raw_data.quote[0].eps;
         } else if (data.raw_data.income_statement && data.raw_data.income_statement.length > 0) {
             currentEps = data.raw_data.income_statement[0].eps;
         } else {
-            currentEps = data.raw_data.eps || 1; // 避免為0導致算不出東西
+            currentEps = data.raw_data.eps || 1; // 給定底線值，避免乘法歸零
         }
 
-        // 🌟 尋找當前股價
+        // 尋找當前股價
         let currentPrice = 1;
         if (data.raw_data.quote && data.raw_data.quote.length > 0 && data.raw_data.quote[0].price) {
             currentPrice = data.raw_data.quote[0].price;
@@ -9134,14 +9142,23 @@ async function runDeepDive(event) {
             currentPrice = data.raw_data.price || 1;
         }
 
-        console.log(`[沙盤初始化] 抓到 EPS: ${currentEps}, 股價: ${currentPrice}`);
-        initScenarioModeling(currentEps, currentPrice);
+        // 算出當前 P/E (防呆：如果 EPS 是負數，P/E 標記為 N/A)
+        let currentPe = (currentEps > 0) ? (currentPrice / currentEps).toFixed(1) : "N/A";
 
-        if(loadingText) loadingText.innerText = "正在繪製視覺化圖表...";
+        console.log(`[沙盤初始化] 抓到 EPS: ${currentEps}, 股價: ${currentPrice}, P/E: ${currentPe}`);
 
+        // 將基準資料傳入沙盤並啟動監聽器
+        if (typeof initScenarioModeling === 'function') {
+            initScenarioModeling(currentEps, currentPrice, currentPe);
+        }
+        // ==========================================
+
+        if (loadingText) loadingText.innerText = "正在繪製視覺化圖表...";
+
+        // 確保全域圖表實例物件存在，避免重繪疊影
         window.deepDiveChartInstances = window.deepDiveChartInstances || {};
 
-        // 2. 繪製圖表
+        // 7. 平行處理所有圖表繪製 (大幅提升渲染速度)
         await Promise.all([
             drawValuationChart(symbol),
             drawInsiderChart(data.raw_data.insider_transactions),
@@ -9151,14 +9168,18 @@ async function runDeepDive(event) {
             drawTechChart(symbol)
         ]);
 
-        attachChartClickListeners();
+        // 8. 綁定其他交互功能
+        if (typeof attachChartClickListeners === 'function') attachChartClickListeners();
         initDeepDiveChat(symbol);
 
     } catch (error) {
-        console.error(error);
-        if(reportContainer) reportContainer.innerHTML = `<p style="color: #e74c3c;">分析發生錯誤：${error.message}</p>`;
+        console.error("Deep Dive Error:", error);
+        if (reportContainer) {
+            reportContainer.innerHTML = `<p style="color: #e74c3c; font-weight: bold; background: #331111; padding: 15px; border-radius: 8px;">⚠️ 分析發生錯誤：${error.message}</p>`;
+        }
     } finally {
-        if(loadingScreen) loadingScreen.style.display = 'none';
+        // 9. 無論成功或失敗，最終一定要隱藏 Loading 畫面
+        if (loadingScreen) loadingScreen.style.display = 'none';
     }
 }
 
@@ -10145,12 +10166,30 @@ async function runTrumpStrategy(strategyName) {
 }
 
 // 啟動沙盤監聽
-function initScenarioModeling(currentEps, currentPrice) {
+function initScenarioModeling(currentEps, currentPrice, currentPe) {
     const cagrSlider = document.getElementById('slider-cagr');
     const peSlider = document.getElementById('slider-pe');
     const cagrVal = document.getElementById('cagr-val');
     const peVal = document.getElementById('pe-val');
     const targetPriceVal = document.getElementById('target-price-val');
+
+    // 👇 1. 將當前基準數據寫入 UI 👇
+    const baselinePriceEl = document.getElementById('baseline-price');
+    const baselineEpsEl = document.getElementById('baseline-eps');
+    const baselinePeEl = document.getElementById('baseline-pe');
+
+    if (baselinePriceEl) baselinePriceEl.innerText = `$${currentPrice.toFixed(2)}`;
+    if (baselineEpsEl) baselineEpsEl.innerText = `$${currentEps.toFixed(2)}`;
+    if (baselinePeEl) baselinePeEl.innerText = (currentPe === "N/A") ? "N/A" : `${currentPe}x`;
+
+    // 👇 2. 智慧預設：將 P/E 滑桿的初始值設定為當前 P/E (若為負數則預設 15) 👇
+    if (currentPe !== "N/A") {
+        // 確保不要超出滑桿的 5~60 範圍
+        let safeSliderPe = Math.min(Math.max(Math.round(currentPe), 5), 60);
+        peSlider.value = safeSliderPe;
+    } else {
+        peSlider.value = 15;
+    }
 
     const updateCalc = () => {
         const cagr = parseFloat(cagrSlider.value) / 100;
@@ -10160,10 +10199,12 @@ function initScenarioModeling(currentEps, currentPrice) {
         peVal.innerText = pe + 'x';
 
         // 核心公式：5 年後 EPS = 現在 EPS * (1 + CAGR)^5
-        // 5 年後目標價 = 5 年後 EPS * 目標 PE
         if (currentEps && currentEps !== "N/A") {
-            const futureEps = currentEps * Math.pow((1 + cagr), 5);
+            // 如果 EPS 是負的，給個防呆計算 (假設它能轉虧為盈)
+            const baseEps = currentEps > 0 ? currentEps : 0.5;
+            const futureEps = baseEps * Math.pow((1 + cagr), 5);
             const targetPrice = futureEps * pe;
+
             targetPriceVal.innerText = '$' + targetPrice.toFixed(2);
 
             // 根據預期回報改變顏色
