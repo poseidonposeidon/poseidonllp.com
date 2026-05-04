@@ -9173,6 +9173,10 @@ function renderDeepDiveMarkdown(text, container, raw_data = null) {
         let borderColor = (zColor === "#e74c3c" || fColor === "#e74c3c") ? "#e74c3c" : "#27ae60";
         let badgeTitle = (borderColor === "#e74c3c") ? "🚨 檢測到高風險財務紅旗" : "✅ 財務體質檢測健康";
 
+        // 💡 終極技巧：將 Style 獨立抽成字串變數，直接避開 IDE 的 HTML/CSS 語法檢查
+        let zShadowStyle = "color: " + zColor + "; font-size: 26px; text-shadow: 0px 0px 8px " + zColor + ";";
+        let fShadowStyle = "color: " + fColor + "; font-size: 26px; text-shadow: 0px 0px 8px " + fColor + ";";
+
         healthBadgeHTML = `
         <div style="margin-bottom: 25px; padding: 15px 20px; background: #1a1a1a; border-radius: 8px; border-left: 5px solid ${borderColor}; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">
             <div style="color: ${borderColor}; font-size: 14px; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
@@ -9181,12 +9185,12 @@ function renderDeepDiveMarkdown(text, container, raw_data = null) {
             <div style="display: flex; align-items: center; justify-content: space-around;">
                 <div style="text-align: center;">
                     <span style="color: #888; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Altman Z-Score (破產風險)</span><br>
-                    <strong style="color: ${zColor}; font-size: 26px; text-shadow: 0px 0px 8px ${zColor};">${zDisplay}</strong>
+                    <strong style="${zShadowStyle}">${zDisplay}</strong>
                 </div>
                 <div style="width: 1px; height: 40px; background: #333;"></div>
                 <div style="text-align: center;">
                     <span style="color: #888; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Piotroski F-Score (獲利品質)</span><br>
-                    <strong style="color: ${fColor}; font-size: 26px; text-shadow: 0px 0px 8px ${fColor};">${f} <span style="font-size: 14px; color: #555;">/ 9</span></strong>
+                    <strong style="${fShadowStyle}">${f} <span style="font-size: 14px; color: #555;">/ 9</span></strong>
                 </div>
             </div>
         </div>`;
@@ -9194,7 +9198,7 @@ function renderDeepDiveMarkdown(text, container, raw_data = null) {
 
     // 3. 把雷達徽章放在報告最上方
     container.innerHTML = healthBadgeHTML + html;
-}/**/
+}
 
 // ================= 圖表繪製函式集 (全部加上 suffix) =================
 
