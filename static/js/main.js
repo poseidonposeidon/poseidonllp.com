@@ -9068,7 +9068,7 @@ function closeDeepDiveModal() {
 }
 
 // ✅ 支援 suffix 參數 (例如 '-main')
-async function runDeepDive() {
+async function runDeepDive(event) {
     if (event) {
         event.preventDefault();
     }
@@ -9086,6 +9086,7 @@ async function runDeepDive() {
         return;
     }
 
+    // UI 切換：顯示主畫面，隱藏空狀態
     const emptyState = document.getElementById('dd-empty-state');
     const mainContent = document.getElementById('dd-main-content');
     if (emptyState) emptyState.style.display = 'none';
@@ -9096,7 +9097,9 @@ async function runDeepDive() {
     if(reportContainer) reportContainer.innerHTML = "";
 
     try {
-        const response = await fetch(`${baseUrl}/api/ai_deep_dive`, {
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/ai_deep_dive` : '/api/ai_deep_dive';
+
+        const response = await fetch(targetUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -9107,18 +9110,24 @@ async function runDeepDive() {
         if (!response.ok) throw new Error("Analysis Failed");
         const data = await response.json();
 
+        // 儲存至全域變數供後續 Chat 使用
         window.currentDeepDiveData = data.raw_data;
         window.currentReportContent = data.report;
 
-        if(loadingText) loadingText.innerText = "AI 正在排版分析報告...";
-        renderDeepDiveMarkdown(data.report, reportContainer);
+        if(loadingText) loadingText.innerText = "AI 正在排版分析報告與財務雷達...";
+
+        // 🌟 關鍵升級：將 raw_data 一併傳入，用來畫雷達徽章
+        renderDeepDiveMarkdown(data.report, reportContainer, data.raw_data);
 
         if(loadingText) loadingText.innerText = "正在繪製視覺化圖表...";
 
-        // 移除 suffix
+        // 確保全域圖表實例物件存在
+        window.deepDiveChartInstances = window.deepDiveChartInstances || {};
+
+        // 平行處理所有圖表繪製
         await Promise.all([
             drawValuationChart(symbol),
-            drawInsiderChart(data.raw_data.insider_transactions),
+            drawInsiderChart(data.raw_data.insider_transactions),/**/
             drawMarginsChart(symbol),
             drawGrowthChart(symbol),
             drawCashflowChart(symbol),
@@ -9130,22 +9139,62 @@ async function runDeepDive() {
 
     } catch (error) {
         console.error(error);
-        if(reportContainer) reportContainer.innerHTML = `<p style="color: red;">分析發生錯誤：${error.message}</p>`;
+        if(reportContainer) reportContainer.innerHTML = `<p style="color: #e74c3c; font-weight: bold; background: #331111; padding: 15px; border-radius: 8px;">分析發生錯誤：${error.message}</p>`;
     } finally {
         if(loadingScreen) loadingScreen.style.display = 'none';
     }
-}/**/
+}
 
-// 渲染 Markdown 報告 (升級版：支援表格與複雜排版)
-function renderDeepDiveMarkdown(text, container) {
+
+// ==========================================
+// 渲染 Markdown 報告 (升級版：支援表格排版 + 財報防禦雷達徽章)
+// ==========================================
+function renderDeepDiveMarkdown(text, container, raw_data = null) {
     if (!container) return;
 
-    // 使用 marked.js 直接將 Markdown 轉換為完美的 HTML 結構
-    // 同時移除把 \n 強制轉成 <br> 的舊邏輯，因為 marked 會自動處理段落 <p>
+    // 1. 使用 marked.js 將 AI 報告轉換為 HTML
     const html = marked.parse(text);
 
-    container.innerHTML = html;
-}
+    // 2. 🛡️ 繪製視覺化財報雷達徽章 (Anomaly Detection Radar)
+    let healthBadgeHTML = '';
+
+    if (raw_data && raw_data.health_scores) {
+        let z = raw_data.health_scores.altman_z_score;
+        let f = raw_data.health_scores.piotroski_f_score;
+
+        // 判斷紅綠燈顏色 (Z-Score < 1.8 危險，F-Score < 4 危險)
+        let zColor = (z !== "N/A" && z < 1.8) ? "#e74c3c" : ((z !== "N/A" && z > 3) ? "#27ae60" : "#f0b90b");
+        let fColor = (f !== "N/A" && f < 4) ? "#e74c3c" : ((f !== "N/A" && f > 6) ? "#27ae60" : "#f0b90b");
+
+        // 格式化數字 (保留兩位小數)
+        let zDisplay = (typeof z === 'number') ? z.toFixed(2) : z;
+
+        // 決定整體框線顏色（只要有一個紅燈，整體就亮紅燈警戒）
+        let borderColor = (zColor === "#e74c3c" || fColor === "#e74c3c") ? "#e74c3c" : "#27ae60";
+        let badgeTitle = (borderColor === "#e74c3c") ? "🚨 檢測到高風險財務紅旗" : "✅ 財務體質檢測健康";
+
+        healthBadgeHTML = `
+        <div style="margin-bottom: 25px; padding: 15px 20px; background: #1a1a1a; border-radius: 8px; border-left: 5px solid ${borderColor}; box-shadow: 0 4px 10px rgba(0,0,0,0.4);">
+            <div style="color: ${borderColor}; font-size: 14px; font-weight: bold; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                ${badgeTitle}
+            </div>
+            <div style="display: flex; align-items: center; justify-content: space-around;">
+                <div style="text-align: center;">
+                    <span style="color: #888; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Altman Z-Score (破產風險)</span><br>
+                    <strong style="color: ${zColor}; font-size: 26px; text-shadow: 0px 0px 8px ${zColor};">${zDisplay}</strong>
+                </div>
+                <div style="width: 1px; height: 40px; background: #333;"></div>
+                <div style="text-align: center;">
+                    <span style="color: #888; font-size: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">Piotroski F-Score (獲利品質)</span><br>
+                    <strong style="color: ${fColor}; font-size: 26px; text-shadow: 0px 0px 8px ${fColor};">${f} <span style="font-size: 14px; color: #555;">/ 9</span></strong>
+                </div>
+            </div>
+        </div>`;
+    }
+
+    // 3. 把雷達徽章放在報告最上方
+    container.innerHTML = healthBadgeHTML + html;
+}/**/
 
 // ================= 圖表繪製函式集 (全部加上 suffix) =================
 
@@ -9155,7 +9204,9 @@ async function drawValuationChart(symbol, suffix = '') {
     const ctx = canvas.getContext('2d');
 
     const instanceKey = 'valuation' + suffix;
-    if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
+    if (window.deepDiveChartInstances[instanceKey]) {
+        window.deepDiveChartInstances[instanceKey].destroy();
+    }
 
     const prices = await fetchStockPriceHistory(symbol, 365 * 3);
     const labels = prices.map(p => p.date);
@@ -9172,8 +9223,13 @@ async function drawValuationChart(symbol, suffix = '') {
             ]
         },
         options: {
-            responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false },
-            scales: { x: { display: true, grid: { display: false }, ticks: { color: '#888', maxRotation: 45, minRotation: 45, maxTicksLimit: 12 } }, y: { grid: { color: '#333' } } },
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: { display: true, grid: { display: false }, ticks: { color: '#888', maxRotation: 45, minRotation: 45, maxTicksLimit: 12 } },
+                y: { grid: { color: '#333' } }
+            },
             plugins: { legend: { labels: { color: '#ccc' } } }
         }
     });
