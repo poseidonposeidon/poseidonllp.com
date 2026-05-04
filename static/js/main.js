@@ -9117,8 +9117,24 @@ async function runDeepDive(event) {
 
         // 🌟 【新增：動態沙盤初始化】
         // 放在這裡，確保報告出來後立刻啟動滑桿邏輯
-        const currentEps = data.raw_data.financials?.[0]?.eps || 0;
-        const currentPrice = data.raw_data.price || 1;
+        let currentEps = 0;
+        if (data.raw_data.quote && data.raw_data.quote.length > 0 && data.raw_data.quote[0].eps) {
+            currentEps = data.raw_data.quote[0].eps;
+        } else if (data.raw_data.income_statement && data.raw_data.income_statement.length > 0) {
+            currentEps = data.raw_data.income_statement[0].eps;
+        } else {
+            currentEps = data.raw_data.eps || 1; // 避免為0導致算不出東西
+        }
+
+        // 🌟 尋找當前股價
+        let currentPrice = 1;
+        if (data.raw_data.quote && data.raw_data.quote.length > 0 && data.raw_data.quote[0].price) {
+            currentPrice = data.raw_data.quote[0].price;
+        } else {
+            currentPrice = data.raw_data.price || 1;
+        }
+
+        console.log(`[沙盤初始化] 抓到 EPS: ${currentEps}, 股價: ${currentPrice}`);
         initScenarioModeling(currentEps, currentPrice);
 
         if(loadingText) loadingText.innerText = "正在繪製視覺化圖表...";
