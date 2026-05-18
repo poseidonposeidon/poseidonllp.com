@@ -10278,3 +10278,60 @@ function getScenarioAiComment(cagr, pe) {
             commentBox.innerHTML = `<span style="color: #e74c3c;">⚠️ Error loading data: ${error.message}. Please check the console for more details.</span>`;
         });
 }
+
+function downloadDashboardPDF() {
+    // 1. 取得當前股票代碼與日期作為檔名
+    const symbol = document.getElementById('dd-stock-input').value.toUpperCase() || 'Stock';
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    const filename = `${symbol}_CIO_DeepDive_${dateStr}.pdf`;
+
+    const element = document.getElementById('dd-main-content');
+
+    // 🌟 修改提示文字：告知使用者正在儲存至 Google Drive
+    alert(`⏳ 正在生成 ${symbol} 投資報告，並直接儲存至 Google Drive「美股資訊」資料夾當中，請稍候...`);
+
+    // PDF 渲染參數設定 (維持 A3 橫向以完美容納雙欄圖表)
+    const opt = {
+        margin:       0.2,
+        filename:     filename,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  {
+            scale: 2,
+            useCORS: true,
+            backgroundColor: '#121212'
+        },
+        jsPDF:        {
+            unit: 'in',
+            format: 'a3',
+            orientation: 'landscape'
+        }
+    };
+
+    // 2. 呼叫 html2pdf，改為輸出二進位 Blob 檔案，不直接從瀏覽器下載
+    html2pdf().set(opt).from(element).output('blob').then(function(pdfBlob) {
+
+        // 3. 將 PDF 檔案打包進 FormData
+        const formData = new FormData();
+        formData.append('file', pdfBlob, filename);
+        formData.append('symbol', symbol);
+
+        // 4. 發送給 Flask 後端 API 進行儲存
+        return fetch('/api/save_pdf', {
+            method: 'POST',
+            body: formData
+        });
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                // 🌟 核心修改：儲存成功時，明確說明已存入 Google Drive
+                alert(`🎉 儲存成功！\n${symbol} 的 CIO 深度分析報告已自動存入 Google Drive「美股資訊」當中。\n(本地同步路徑：${data.file_path})`);
+            } else {
+                alert(`❌ 儲存失敗：${data.error}`);
+            }
+        })
+        .catch(err => {
+            console.error('PDF 儲存錯誤:', err);
+            alert('❌ 轉出 PDF 時發生系統錯誤，請檢查後端連線。');
+        });
+}
