@@ -2583,3 +2583,34 @@ body.light-mode {
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(231, 76, 60, 0.25);
 }
+
+/* =========================================
+   📄 PDF 匯出專用排版 (轉出瞬間會自動套用)
+   ========================================= */
+.pdf-export-mode .dd-top-layout {
+    flex-direction: column !important; /* 強制把左右雙欄變成上下單欄 */
+    gap: 20px;
+}
+.pdf-export-mode .dd-report-column,
+.pdf-export-mode .dd-report-area {
+    width: 100% !important;
+    max-height: none !important; /* 取消卷軸，讓文字報告完整向下展開 */
+    overflow: visible !important;
+}
+.pdf-export-mode .dd-charts-column {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important; /* 讓下方的 6 張圖表變成 2 排 3 列的整齊方格 */
+    gap: 20px;
+    margin-top: 30px;
+}
+.pdf-export-mode .dd-chart-card {
+    page-break-inside: avoid; /* 防止換頁時圖表被切成兩半 */
+    break-inside: avoid;
+}
+/* 👇 隱藏不應該出現在 PDF 的元素 👇 */
+.pdf-export-mode .dd-bottom-chat-layout,
+.pdf-export-mode #scenario-panel,
+.pdf-export-mode button {
+    display: none !important; /* 隱藏聊天室、沙盤滑桿與所有按鈕 */
+}

@@ -10282,7 +10282,6 @@ function getScenarioAiComment(cagr, pe) {
 function downloadDashboardPDF(event) {
     if (event) event.preventDefault();
 
-    // 1. 取得當前股票代碼與日期作為檔名
     const symbolInput = document.getElementById('dd-stock-input');
     const symbol = (symbolInput && symbolInput.value.trim().toUpperCase()) || 'UNKNOWN';
     const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
@@ -10291,7 +10290,6 @@ function downloadDashboardPDF(event) {
     const element = document.getElementById('dd-main-content');
     if (!element) return;
 
-    // 🌟 優化：改變按鈕外觀代替 alert，避免卡死瀏覽器
     const btn = event ? event.currentTarget : null;
     let originalText = "";
     if (btn) {
@@ -10301,45 +10299,43 @@ function downloadDashboardPDF(event) {
         btn.disabled = true;
     }
 
-    // PDF 渲染參數設定
+    // 🌟 魔法啟動：加上 PDF 專用 class，讓排版變成「A4 直式報告」，並隱藏聊天室
+    element.classList.add('pdf-export-mode');
+
+    // 🌟 PDF 渲染參數設定 (改為 A4 直排、加入分頁防護)
     const opt = {
-        margin:       0.2,
+        margin:       0.3, // 留一點白邊看起來更像正式報告
         filename:     filename,
         image:        { type: 'jpeg', quality: 0.98 },
         html2canvas:  {
             scale: 2,
             useCORS: true,
-            backgroundColor: '#121212'
+            backgroundColor: '#121212',
+            scrollY: 0 // 防止因網頁捲動導致截圖位移
         },
         jsPDF:        {
             unit: 'in',
-            format: 'a3',
-            orientation: 'landscape'
-        }
+            format: 'a4', // 變成 A4 尺寸
+            orientation: 'portrait' // 變成直式排版
+        },
+        pagebreak: { mode: ['css', 'legacy'] } // 啟動分頁防切斷機制
     };
 
-    // 2. 呼叫 html2pdf，產生 Blob 檔案
+    // 呼叫 html2pdf，產生 Blob 檔案
     html2pdf().set(opt).from(element).output('blob').then(function(pdfBlob) {
-
-        // 3. 將 PDF 檔案打包進 FormData
         const formData = new FormData();
         formData.append('file', pdfBlob, filename);
         formData.append('symbol', symbol);
 
-        // 🌟 優化：補上 baseUrl 防呆機制
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/save_pdf` : '/api/save_pdf';
 
-        // 4. 發送給 Flask 後端 API
         return fetch(targetUrl, {
             method: 'POST',
             body: formData
         });
     })
         .then(async (response) => {
-            // 🌟 優化：先檢查 HTTP 狀態碼，如果不是 200 OK 就拋出錯誤
-            if (!response.ok) {
-                throw new Error(`伺服器錯誤狀態碼: ${response.status}`);
-            }
+            if (!response.ok) throw new Error(`伺服器錯誤狀態碼: ${response.status}`);
             return response.json();
         })
         .then(data => {
@@ -10354,7 +10350,9 @@ function downloadDashboardPDF(event) {
             alert(`❌ 轉出 PDF 時發生系統錯誤：\n${err.message}`);
         })
         .finally(() => {
-            // 🌟 優化：無論成功失敗，最後都要把按鈕恢復原狀
+            // 🌟 魔法解除：把 PDF 專用 class 拔掉，瞬間恢復成左右並排的戰情儀表板
+            element.classList.remove('pdf-export-mode');
+
             if (btn) {
                 btn.innerHTML = originalText;
                 btn.style.background = "#e67e22";
