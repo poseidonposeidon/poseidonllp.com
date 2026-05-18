@@ -9865,7 +9865,7 @@ async function triggerExcelDownload(event) {
         const data = await response.json();
 
         if (response.ok) {
-            alert(`🎉 抓取成功！\n${symbol} 的 20 年財務數據與逐字稿已存入伺服器：\n📁 ${data.file_path}`);
+            alert(`🎉 抓取成功！\n${symbol} 的 20 年財務數據與逐字稿已存入Google dirve "美股資訊:資料夾中`);
         } else {
             alert(`❌ 抓取失敗：${data.error}`);
         }
