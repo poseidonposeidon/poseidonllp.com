@@ -2610,7 +2610,12 @@ body.light-mode {
 }
 /* 👇 隱藏不應該出現在 PDF 的元素 👇 */
 .pdf-export-mode .dd-bottom-chat-layout,
+.pdf-export-mode .dd-chat-header,
+.pdf-export-mode .dd-wide-chat-interface,
 .pdf-export-mode #scenario-panel,
 .pdf-export-mode button {
-    display: none !important; /* 隱藏聊天室、沙盤滑桿與所有按鈕 */
+    display: none !important;
+    height: 0 !important;
+    overflow: hidden !important;
+    opacity: 0 !important;
 }
