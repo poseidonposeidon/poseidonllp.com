@@ -8525,526 +8525,526 @@ function displayInsiderTrades(data, container) {
 
 
 ////////////////////////////錄音檔轉文字/////////////////////////////
-let originalFileNames = {};
-let currentOriginalFileName = '';
-let pollingInterval;
-
-document.addEventListener("DOMContentLoaded", () => {
-    fetchFileList();
-    fetchTextFileList();
-    updateQueueLength();
-    setInterval(updateQueueLength, 5000); // 每5秒更新一次排程長度
-});
-
-function fetchFileList(newFileName = null) {
-    console.log("Get file list from server...");
-    fetch(`${baseUrl}/list_files`, {
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'include'
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response is abnormal ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("File list successfully obtained:", data);
-            const select = document.getElementById('ftpFileSelect');
-            if (!select) {
-                console.error('Element with ID "ftpFileSelect" not found');
-                return;
-            }
-            select.innerHTML = '';  // 清空之前的選項
-
-            if (data.files && data.files.length > 0) {
-
-                // ======== 核心修改在此 ========
-                // 使用 localeCompare 進行智能、語言感知的字串排序
-                // 這會自動處理 數字 -> 字母 -> 中文 的順序
-                const sortedFiles = data.files.sort((a, b) => {
-                    return a.original.localeCompare(b.original, 'zh-Hant');
-                });
-                // ============================
-
-                sortedFiles.forEach(fileInfo => {
-                    const encodedFileName = fileInfo.encoded;
-                    const originalFileName = decodeURIComponent(fileInfo.original);
-                    originalFileNames[encodedFileName] = originalFileName;
-                    const option = document.createElement('option');
-                    option.value = encodedFileName;
-                    option.textContent = originalFileName;
-                    select.appendChild(option);
-                });
-
-                if (newFileName) {
-                    const newFileOption = Array.from(select.options).find(option => option.textContent === newFileName);
-                    if (newFileOption) {
-                        select.value = newFileOption.value;
-                    }
-                } else {
-                    select.selectedIndex = 0;
-                }
-            } else {
-                const option = document.createElement('option');
-                option.textContent = "No files available";
-                option.disabled = true;
-                select.appendChild(option);
-            }
-        })
-        .catch(error => {
-            console.error('Error getting file list:', error);
-            const uploadResult = document.getElementById('upload-result');
-            if (uploadResult) {
-                uploadResult.innerText = 'An error occurred, please check the network connection or server status！\n' + error;
-            }
-        });
-}
-
-function extractDate(fileName) {
-    const datePattern = /\d{8}/;
-    const match = fileName.match(datePattern);
-    if (match) {
-        const dateString = match[0];
-        return new Date(
-            parseInt(dateString.substring(0, 4), 10),
-            parseInt(dateString.substring(4, 6), 10) - 1,
-            parseInt(dateString.substring(6, 8), 10)
-        );
-    }
-    return new Date(0);
-}
-
-function fetchTextFileList(newTextFileName = null, isNewFile = false) {
-    console.log("Get a list of text files from the server...");
-    fetch(`${baseUrl}/list_text_files`, {
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'include'
-    })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Text file list successfully obtained:", data);
-            const select = document.getElementById('textFileSelect');
-            if (!select) return;
-            select.innerHTML = '';
-
-            // 【修改後】將所有檔案（包括新檔案和舊檔案）放在一個集合中，以防止重複
-            const allFiles = new Map();
-
-            // 如果有新檔案，先將它加入
-            if (newTextFileName && isNewFile) {
-                allFiles.set(newTextFileName, encodeURIComponent(newTextFileName));
-            }
-
-            // 將從伺服器獲取的檔案列表也加入
-            if (Array.isArray(data.files)) {
-                data.files.forEach(fileInfo => {
-                    // 直接使用解碼後的原始檔名，不再猜測
-                    const originalFileName = decodeURIComponent(fileInfo.original);
-                    allFiles.set(originalFileName, encodeURIComponent(originalFileName));
-                });
-            }
-
-            // 根據 Map 來生成下拉選單選項
-            if (allFiles.size > 0) {
-                allFiles.forEach((encodedName, originalName) => {
-                    const option = document.createElement('option');
-                    option.value = encodedName;
-                    option.textContent = originalName;
-                    select.appendChild(option);
-                });
-
-                // 如果有新檔案，預設選中它
-                if (newTextFileName && isNewFile) {
-                    select.value = encodeURIComponent(newTextFileName);
-                } else {
-                    select.selectedIndex = 0;
-                }
-            } else {
-                const option = document.createElement('option');
-                option.textContent = "No files available";
-                option.disabled = true;
-                select.appendChild(option);
-            }
-        })
-        .catch(error => {
-            console.error('獲取文字文件列表時出錯:', error);
-        });
-}
-
-function showAlert(message) {
-    const alertBox = document.createElement('div');
-    alertBox.className = 'alert';
-    alertBox.innerHTML = `${message}<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>`;
-    document.body.appendChild(alertBox);
-
-    setTimeout(() => {
-        alertBox.style.display = 'none';
-    }, 5000);
-}
-
-function uploadToFTP() {
-    const fileInput = document.getElementById('audioFile');
-    const file = fileInput.files[0];
-
-    if (!file) {
-        showAlert('Please select a file！');
-        return;
-    }
-
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('originalFileName', file.name);
-
-    const uploadProgressContainer = document.getElementById('upload-progress-container');
-    const uploadProgressBar = document.getElementById('upload-progress-bar');
-    const uploadProgressText = document.getElementById('upload-progress-text');
-
-    uploadProgressContainer.style.display = 'block';
-    uploadProgressText.style.display = 'block';
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', `${baseUrl}/upload_to_ftp`, true);
-
-    xhr.upload.onprogress = function (event) {
-        if (event.lengthComputable) {
-            const percentComplete = (event.loaded / event.total) * 100;
-            uploadProgressBar.style.width = `${percentComplete}%`;
-            uploadProgressText.textContent = `File uploading... ${Math.round(percentComplete)}%`;
-        }
-    };
-
-    xhr.onload = function () {
-        uploadProgressContainer.style.display = 'none';
-        uploadProgressText.style.display = 'none';
-        if (xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            showAlert(response.message || 'The file has been successfully uploaded to the server');
-            const newFileName = file.name;
-            fetchFileList(newFileName);
-            fileInput.value = '';
-        } else if (xhr.status === 503) {
-            showAlert('Another conversion process is in progress, please try again later');
-        } else {
-            const response = JSON.parse(xhr.responseText);
-            showAlert('Upload failed, please try again！' + (response.error ? '<br>' + response.error : ''));
-        }
-    };
-
-    xhr.onerror = function () {
-        uploadProgressContainer.style.display = 'none';
-        uploadProgressText.style.display = 'none';
-        showAlert('Upload failed, please try again！');
-    };
-
-    xhr.send(formData);
-}
-
-function transcribeFromFTP() {
-    const select = document.getElementById('ftpFileSelect');
-    const encodedFilename = select.value;
-
-    const buttonContainer = document.getElementById('buttonContainer');
-    buttonContainer.style.display = 'none';
-
-    currentOriginalFileName = originalFileNames[encodedFilename];
-
-    if (!encodedFilename) {
-        showAlert('Please select a file！');
-        return;
-    }
-
-    clearPreviousResult();
-    document.getElementById('transcription-progress-container').style.display = 'block';
-    document.getElementById('transcription-status').textContent = 'Submitting transcription request...';
-
-    fetch(`${baseUrl}/transcribe_from_ftp`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ filename: encodedFilename })
-    })
-        .then(response => {
-            if (response.status === 202) {
-                // showAlert('轉檔已加入排程，請稍後...');
-                document.getElementById('transcription-status').textContent = 'The conversion has been scheduled, please wait....';
-                startPolling(encodedFilename);
-                return { message: 'Already added to schedule queue' };
-            } else if (response.status === 503) {
-                showAlert('The server is busy, please try again later');
-            } else if (!response.ok) {
-                throw new Error('Server error, please try again later');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.message === 'Already added to schedule queue') {
-                showAlert(data.message);
-                document.getElementById('transcription-status').textContent = 'The conversion has been scheduled, please wait....';
-                startPolling(encodedFilename);
-            } else if (data.text) {
-                displayTranscription(data);
-                fetchTextFileList(currentOriginalFileName, true);
-            } else {
-                throw new Error('Expected response data not received');
-            }
-        })
-        .catch(error => {
-            document.getElementById('transcription-progress-container').style.display = 'none';
-            console.error('Transcription error:', error);
-            showAlert(error.message || 'An error occurred during transcription, please try again！');
-        });
-}
-
-function startPolling(encodedFilename) {
-    const statusElement = document.getElementById('transcription-status');
-    statusElement.textContent = 'Tasks are being queued, please wait....';
-
-    if (pollingInterval) {
-        clearInterval(pollingInterval);
-    }
-
-    pollingInterval = setInterval(() => {
-        fetch(`${baseUrl}/check_transcription_status`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ filename: encodedFilename })
-        })
-            .then(response => {
-                if (!response.ok) {
-                    // 如果伺服器回傳錯誤 (例如 404, 500)，也停止輪詢
-                    throw new Error(`Server responded with status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.status === 'completed') {
-                    clearInterval(pollingInterval);
-                    statusElement.textContent = 'Transcription completed';
-
-                    if (data.result) {
-                        displayTranscription({ text: data.result });
-                        // 【修改後】直接使用後端回傳的、正確的逐字稿檔名 (transcriptFilename)
-                        // 這樣就能確保文字檔列表更新為正確的檔名 (例如 ...memo.txt)
-                        fetchTextFileList(data.transcriptFilename, true);
-                        fetchPdfFileList(data.pdfFilename);
-                    } else {
-                        showAlert('Transcription completed, but no result was returned.');
-                    }
-
-                } else if (data.status === 'in_progress') {
-                    statusElement.textContent = 'Transcription in progress...';
-                } else if (data.status === 'queued') {
-                    statusElement.textContent = 'The task is still in the queue, please wait....';
-                } else if (data.status === 'error') {
-                    clearInterval(pollingInterval);
-                    const errorMessage = data.error || 'An unknown error occurred during transcription.';
-                    statusElement.textContent = `Error: ${errorMessage}`;
-                    showAlert(`Transcription failed: ${errorMessage}`);
-                }
-            })
-            .catch(error => {
-                clearInterval(pollingInterval);
-                console.error('An error occurred while checking status:', error);
-                showAlert('An error occurred while checking the transcription status, please check the results manually later.');
-                statusElement.textContent = 'Status check failed';
-            });
-    }, 5000); // 每5秒检查一次
-}
-
-function clearPreviousResult() {
-    const container = document.getElementById('transcriptionResult');
-    container.innerHTML = '';
-
-    document.getElementById('readMoreBtn').classList.add('hidden');
-    document.getElementById('readLessBtn').classList.add('hidden');
-    container.style.maxHeight = '200px';
-}
-
-function displayTranscription(data) {
-    const container = document.getElementById('transcriptionResult');
-    const buttonContainer = document.getElementById('buttonContainer');
-    const readMoreBtn = document.getElementById('readMoreBtn');
-    const readLessBtn = document.getElementById('readLessBtn');
-    const copyBtn = document.getElementById('copyBtn');
-
-    container.innerHTML = '';
-
-    if (data.text) {
-        const transcriptionText = data.text.replace(/\n/g, '<br>');
-        container.innerHTML = `<p>${transcriptionText}</p>`;
-
-        copyBtn.onclick = function() {
-            copyToClipboard(data.text);
-        };
-
-        buttonContainer.style.display = 'flex';
-
-        if (container.scrollHeight > 200) {
-            readMoreBtn.classList.remove('hidden');
-            readLessBtn.classList.add('hidden');
-        } else {
-            readMoreBtn.classList.add('hidden');
-            readLessBtn.classList.add('hidden');
-        }
-    } else {
-        container.innerHTML = '<p>No transcription content</p>';
-        buttonContainer.style.display = 'none';
-    }
-
-    document.getElementById('transcription-progress-container').style.display = 'none';
-    // 注意：這裡已經沒有那行 .style.display = 'block' 的程式碼了
-}
-
-function toggleReadMore() {
-    const container = document.getElementById('transcriptionResult');
-    const readMoreBtn = document.getElementById('readMoreBtn');
-    const readLessBtn = document.getElementById('readLessBtn');
-
-    if (readMoreBtn.classList.contains('hidden')) {
-        container.style.maxHeight = '200px';  // 设置最大高度以便显示 "Read More"
-        readMoreBtn.classList.remove('hidden');
-        readLessBtn.classList.add('hidden');
-    } else {
-        container.style.maxHeight = 'none';  // 移除最大高度限制以显示全部文本
-        readMoreBtn.classList.add('hidden');
-        readLessBtn.classList.remove('hidden');
-    }
-}
-
-function copyToClipboard(text) {
-    const textarea = document.createElement('textarea');
-    textarea.value = text;
-    document.body.appendChild(textarea);
-    textarea.select();
-    try {
-        document.execCommand('copy');
-        showAlert('Text copied to clipboard');
-    } catch (err) {
-        console.error('Failed to copy text', err);
-        showAlert('Failed to copy text');
-    }
-    document.body.removeChild(textarea);
-}
-
-function downloadTextFile() {
-    const select = document.getElementById('textFileSelect');
-    const encodedFileName = select.value; // 直接使用這個編碼過的檔名
-    if (!encodedFileName) {
-        alert('Please select a text file!');
-        return;
-    }
-
-    // 直接將編碼後的檔名用於 URL
-    const downloadUrl = `${baseUrl}/download_text_file/${encodedFileName}`;
-
-    console.log("Starting file download:", downloadUrl);
-
-    fetch(downloadUrl, {
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'include'
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok: ' + response.statusText);
-            }
-            return response.blob();
-        })
-        .then(blob => {
-            console.log("File downloaded successfully, processing Blob data...");
-            const downloadLink = document.createElement('a');
-            downloadLink.href = URL.createObjectURL(blob);
-            // download 屬性需要的是給使用者看的、未編碼的檔名
-            downloadLink.download = decodeURIComponent(encodedFileName);
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-        })
-        .catch(error => {
-            console.error('Error downloading file:', error);
-            alert('Download failed, please check network connection or server status!\n' + error);
-        });
-}
-
-function updateQueueLength() {
-    fetch(`${baseUrl}/queue_length`, {
-        method: 'GET',
-        mode: 'cors',
-        credentials: 'include'
-    })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok ' + response.statusText);
-            }
-            return response.json();
-        })
-        .then(data => {
-            const queueLengthElement = document.getElementById('queueLength');
-            queueLengthElement.innerText = data.queueLength;
-        })
-        .catch(error => {
-            // console.error('Error fetching queue length:', error);
-        });
-}
-
-function fetchPdfFileList(newPdfFileName = null) {
-    console.log("Get a list of PDF files from the server...");
-    fetch(`${baseUrl}/list_pdf_files`)
-        .then(response => response.json())
-        .then(data => {
-            const select = document.getElementById('pdfFileSelect');
-            if (!select) return;
-            select.innerHTML = '';
-
-            if (data.files && data.files.length > 0) {
-                data.files.forEach(fileInfo => {
-                    const option = document.createElement('option');
-                    option.value = fileInfo.encoded;
-                    option.textContent = fileInfo.original;
-                    select.appendChild(option);
-                });
-
-                if (newPdfFileName) {
-                    const encodedName = encodeURIComponent(newPdfFileName);
-                    select.value = encodedName;
-                } else {
-                    select.selectedIndex = 0;
-                }
-            } else {
-                const option = document.createElement('option');
-                option.textContent = "No PDF reports available";
-                option.disabled = true;
-                select.appendChild(option);
-            }
-        })/**/
-        .catch(error => console.error('Error getting PDF file list:', error));
-}
-
-function downloadPdfFile() {
-    const select = document.getElementById('pdfFileSelect');
-    const encodedFileName = select.value;
-    if (!encodedFileName) {
-        alert('Please select a PDF report!');
-        return;
-    }
-
-    const downloadUrl = `${baseUrl}/download_pdf_file/${encodedFileName}`;
-    console.log("Starting PDF download:", downloadUrl);
-
-    // 透過創建一個隱藏的連結來觸發下載
-    const downloadLink = document.createElement('a');
-    downloadLink.href = downloadUrl;
-    downloadLink.download = decodeURIComponent(encodedFileName); // 提示瀏覽器下載的檔名
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-}
+// let originalFileNames = {};
+// let currentOriginalFileName = '';
+// let pollingInterval;
+//
+// document.addEventListener("DOMContentLoaded", () => {
+//     fetchFileList();
+//     fetchTextFileList();
+//     updateQueueLength();
+//     setInterval(updateQueueLength, 5000); // 每5秒更新一次排程長度
+// });
+//
+// function fetchFileList(newFileName = null) {
+//     console.log("Get file list from server...");
+//     fetch(`${baseUrl}/list_files`, {
+//         method: 'GET',
+//         mode: 'cors',
+//         credentials: 'include'
+//     })
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error('Network response is abnormal ' + response.statusText);
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             console.log("File list successfully obtained:", data);
+//             const select = document.getElementById('ftpFileSelect');
+//             if (!select) {
+//                 console.error('Element with ID "ftpFileSelect" not found');
+//                 return;
+//             }
+//             select.innerHTML = '';  // 清空之前的選項
+//
+//             if (data.files && data.files.length > 0) {
+//
+//                 // ======== 核心修改在此 ========
+//                 // 使用 localeCompare 進行智能、語言感知的字串排序
+//                 // 這會自動處理 數字 -> 字母 -> 中文 的順序
+//                 const sortedFiles = data.files.sort((a, b) => {
+//                     return a.original.localeCompare(b.original, 'zh-Hant');
+//                 });
+//                 // ============================
+//
+//                 sortedFiles.forEach(fileInfo => {
+//                     const encodedFileName = fileInfo.encoded;
+//                     const originalFileName = decodeURIComponent(fileInfo.original);
+//                     originalFileNames[encodedFileName] = originalFileName;
+//                     const option = document.createElement('option');
+//                     option.value = encodedFileName;
+//                     option.textContent = originalFileName;
+//                     select.appendChild(option);
+//                 });
+//
+//                 if (newFileName) {
+//                     const newFileOption = Array.from(select.options).find(option => option.textContent === newFileName);
+//                     if (newFileOption) {
+//                         select.value = newFileOption.value;
+//                     }
+//                 } else {
+//                     select.selectedIndex = 0;
+//                 }
+//             } else {
+//                 const option = document.createElement('option');
+//                 option.textContent = "No files available";
+//                 option.disabled = true;
+//                 select.appendChild(option);
+//             }
+//         })
+//         .catch(error => {
+//             console.error('Error getting file list:', error);
+//             const uploadResult = document.getElementById('upload-result');
+//             if (uploadResult) {
+//                 uploadResult.innerText = 'An error occurred, please check the network connection or server status！\n' + error;
+//             }
+//         });
+// }
+//
+// function extractDate(fileName) {
+//     const datePattern = /\d{8}/;
+//     const match = fileName.match(datePattern);
+//     if (match) {
+//         const dateString = match[0];
+//         return new Date(
+//             parseInt(dateString.substring(0, 4), 10),
+//             parseInt(dateString.substring(4, 6), 10) - 1,
+//             parseInt(dateString.substring(6, 8), 10)
+//         );
+//     }
+//     return new Date(0);
+// }
+//
+// function fetchTextFileList(newTextFileName = null, isNewFile = false) {
+//     console.log("Get a list of text files from the server...");
+//     fetch(`${baseUrl}/list_text_files`, {
+//         method: 'GET',
+//         mode: 'cors',
+//         credentials: 'include'
+//     })
+//         .then(response => response.json())
+//         .then(data => {
+//             console.log("Text file list successfully obtained:", data);
+//             const select = document.getElementById('textFileSelect');
+//             if (!select) return;
+//             select.innerHTML = '';
+//
+//             // 【修改後】將所有檔案（包括新檔案和舊檔案）放在一個集合中，以防止重複
+//             const allFiles = new Map();
+//
+//             // 如果有新檔案，先將它加入
+//             if (newTextFileName && isNewFile) {
+//                 allFiles.set(newTextFileName, encodeURIComponent(newTextFileName));
+//             }
+//
+//             // 將從伺服器獲取的檔案列表也加入
+//             if (Array.isArray(data.files)) {
+//                 data.files.forEach(fileInfo => {
+//                     // 直接使用解碼後的原始檔名，不再猜測
+//                     const originalFileName = decodeURIComponent(fileInfo.original);
+//                     allFiles.set(originalFileName, encodeURIComponent(originalFileName));
+//                 });
+//             }
+//
+//             // 根據 Map 來生成下拉選單選項
+//             if (allFiles.size > 0) {
+//                 allFiles.forEach((encodedName, originalName) => {
+//                     const option = document.createElement('option');
+//                     option.value = encodedName;
+//                     option.textContent = originalName;
+//                     select.appendChild(option);
+//                 });
+//
+//                 // 如果有新檔案，預設選中它
+//                 if (newTextFileName && isNewFile) {
+//                     select.value = encodeURIComponent(newTextFileName);
+//                 } else {
+//                     select.selectedIndex = 0;
+//                 }
+//             } else {
+//                 const option = document.createElement('option');
+//                 option.textContent = "No files available";
+//                 option.disabled = true;
+//                 select.appendChild(option);
+//             }
+//         })
+//         .catch(error => {
+//             console.error('獲取文字文件列表時出錯:', error);
+//         });
+// }
+//
+// function showAlert(message) {
+//     const alertBox = document.createElement('div');
+//     alertBox.className = 'alert';
+//     alertBox.innerHTML = `${message}<span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span>`;
+//     document.body.appendChild(alertBox);
+//
+//     setTimeout(() => {
+//         alertBox.style.display = 'none';
+//     }, 5000);
+// }
+//
+// function uploadToFTP() {
+//     const fileInput = document.getElementById('audioFile');
+//     const file = fileInput.files[0];
+//
+//     if (!file) {
+//         showAlert('Please select a file！');
+//         return;
+//     }
+//
+//     const formData = new FormData();
+//     formData.append('file', file);
+//     formData.append('originalFileName', file.name);
+//
+//     const uploadProgressContainer = document.getElementById('upload-progress-container');
+//     const uploadProgressBar = document.getElementById('upload-progress-bar');
+//     const uploadProgressText = document.getElementById('upload-progress-text');
+//
+//     uploadProgressContainer.style.display = 'block';
+//     uploadProgressText.style.display = 'block';
+//
+//     const xhr = new XMLHttpRequest();
+//     xhr.open('POST', `${baseUrl}/upload_to_ftp`, true);
+//
+//     xhr.upload.onprogress = function (event) {
+//         if (event.lengthComputable) {
+//             const percentComplete = (event.loaded / event.total) * 100;
+//             uploadProgressBar.style.width = `${percentComplete}%`;
+//             uploadProgressText.textContent = `File uploading... ${Math.round(percentComplete)}%`;
+//         }
+//     };
+//
+//     xhr.onload = function () {
+//         uploadProgressContainer.style.display = 'none';
+//         uploadProgressText.style.display = 'none';
+//         if (xhr.status === 200) {
+//             const response = JSON.parse(xhr.responseText);
+//             showAlert(response.message || 'The file has been successfully uploaded to the server');
+//             const newFileName = file.name;
+//             fetchFileList(newFileName);
+//             fileInput.value = '';
+//         } else if (xhr.status === 503) {
+//             showAlert('Another conversion process is in progress, please try again later');
+//         } else {
+//             const response = JSON.parse(xhr.responseText);
+//             showAlert('Upload failed, please try again！' + (response.error ? '<br>' + response.error : ''));
+//         }
+//     };
+//
+//     xhr.onerror = function () {
+//         uploadProgressContainer.style.display = 'none';
+//         uploadProgressText.style.display = 'none';
+//         showAlert('Upload failed, please try again！');
+//     };
+//
+//     xhr.send(formData);
+// }
+//
+// function transcribeFromFTP() {
+//     const select = document.getElementById('ftpFileSelect');
+//     const encodedFilename = select.value;
+//
+//     const buttonContainer = document.getElementById('buttonContainer');
+//     buttonContainer.style.display = 'none';
+//
+//     currentOriginalFileName = originalFileNames[encodedFilename];
+//
+//     if (!encodedFilename) {
+//         showAlert('Please select a file！');
+//         return;
+//     }
+//
+//     clearPreviousResult();
+//     document.getElementById('transcription-progress-container').style.display = 'block';
+//     document.getElementById('transcription-status').textContent = 'Submitting transcription request...';
+//
+//     fetch(`${baseUrl}/transcribe_from_ftp`, {
+//         method: 'POST',
+//         headers: {
+//             'Content-Type': 'application/json'
+//         },
+//         body: JSON.stringify({ filename: encodedFilename })
+//     })
+//         .then(response => {
+//             if (response.status === 202) {
+//                 // showAlert('轉檔已加入排程，請稍後...');
+//                 document.getElementById('transcription-status').textContent = 'The conversion has been scheduled, please wait....';
+//                 startPolling(encodedFilename);
+//                 return { message: 'Already added to schedule queue' };
+//             } else if (response.status === 503) {
+//                 showAlert('The server is busy, please try again later');
+//             } else if (!response.ok) {
+//                 throw new Error('Server error, please try again later');
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             if (data.message === 'Already added to schedule queue') {
+//                 showAlert(data.message);
+//                 document.getElementById('transcription-status').textContent = 'The conversion has been scheduled, please wait....';
+//                 startPolling(encodedFilename);
+//             } else if (data.text) {
+//                 displayTranscription(data);
+//                 fetchTextFileList(currentOriginalFileName, true);
+//             } else {
+//                 throw new Error('Expected response data not received');
+//             }
+//         })
+//         .catch(error => {
+//             document.getElementById('transcription-progress-container').style.display = 'none';
+//             console.error('Transcription error:', error);
+//             showAlert(error.message || 'An error occurred during transcription, please try again！');
+//         });
+// }
+//
+// function startPolling(encodedFilename) {
+//     const statusElement = document.getElementById('transcription-status');
+//     statusElement.textContent = 'Tasks are being queued, please wait....';
+//
+//     if (pollingInterval) {
+//         clearInterval(pollingInterval);
+//     }
+//
+//     pollingInterval = setInterval(() => {
+//         fetch(`${baseUrl}/check_transcription_status`, {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json'
+//             },
+//             body: JSON.stringify({ filename: encodedFilename })
+//         })
+//             .then(response => {
+//                 if (!response.ok) {
+//                     // 如果伺服器回傳錯誤 (例如 404, 500)，也停止輪詢
+//                     throw new Error(`Server responded with status: ${response.status}`);
+//                 }
+//                 return response.json();
+//             })
+//             .then(data => {
+//                 if (data.status === 'completed') {
+//                     clearInterval(pollingInterval);
+//                     statusElement.textContent = 'Transcription completed';
+//
+//                     if (data.result) {
+//                         displayTranscription({ text: data.result });
+//                         // 【修改後】直接使用後端回傳的、正確的逐字稿檔名 (transcriptFilename)
+//                         // 這樣就能確保文字檔列表更新為正確的檔名 (例如 ...memo.txt)
+//                         fetchTextFileList(data.transcriptFilename, true);
+//                         fetchPdfFileList(data.pdfFilename);
+//                     } else {
+//                         showAlert('Transcription completed, but no result was returned.');
+//                     }
+//
+//                 } else if (data.status === 'in_progress') {
+//                     statusElement.textContent = 'Transcription in progress...';
+//                 } else if (data.status === 'queued') {
+//                     statusElement.textContent = 'The task is still in the queue, please wait....';
+//                 } else if (data.status === 'error') {
+//                     clearInterval(pollingInterval);
+//                     const errorMessage = data.error || 'An unknown error occurred during transcription.';
+//                     statusElement.textContent = `Error: ${errorMessage}`;
+//                     showAlert(`Transcription failed: ${errorMessage}`);
+//                 }
+//             })
+//             .catch(error => {
+//                 clearInterval(pollingInterval);
+//                 console.error('An error occurred while checking status:', error);
+//                 showAlert('An error occurred while checking the transcription status, please check the results manually later.');
+//                 statusElement.textContent = 'Status check failed';
+//             });
+//     }, 5000); // 每5秒检查一次
+// }
+//
+// function clearPreviousResult() {
+//     const container = document.getElementById('transcriptionResult');
+//     container.innerHTML = '';
+//
+//     document.getElementById('readMoreBtn').classList.add('hidden');
+//     document.getElementById('readLessBtn').classList.add('hidden');
+//     container.style.maxHeight = '200px';
+// }
+//
+// function displayTranscription(data) {
+//     const container = document.getElementById('transcriptionResult');
+//     const buttonContainer = document.getElementById('buttonContainer');
+//     const readMoreBtn = document.getElementById('readMoreBtn');
+//     const readLessBtn = document.getElementById('readLessBtn');
+//     const copyBtn = document.getElementById('copyBtn');
+//
+//     container.innerHTML = '';
+//
+//     if (data.text) {
+//         const transcriptionText = data.text.replace(/\n/g, '<br>');
+//         container.innerHTML = `<p>${transcriptionText}</p>`;
+//
+//         copyBtn.onclick = function() {
+//             copyToClipboard(data.text);
+//         };
+//
+//         buttonContainer.style.display = 'flex';
+//
+//         if (container.scrollHeight > 200) {
+//             readMoreBtn.classList.remove('hidden');
+//             readLessBtn.classList.add('hidden');
+//         } else {
+//             readMoreBtn.classList.add('hidden');
+//             readLessBtn.classList.add('hidden');
+//         }
+//     } else {
+//         container.innerHTML = '<p>No transcription content</p>';
+//         buttonContainer.style.display = 'none';
+//     }
+//
+//     document.getElementById('transcription-progress-container').style.display = 'none';
+//     // 注意：這裡已經沒有那行 .style.display = 'block' 的程式碼了
+// }
+//
+// function toggleReadMore() {
+//     const container = document.getElementById('transcriptionResult');
+//     const readMoreBtn = document.getElementById('readMoreBtn');
+//     const readLessBtn = document.getElementById('readLessBtn');
+//
+//     if (readMoreBtn.classList.contains('hidden')) {
+//         container.style.maxHeight = '200px';  // 设置最大高度以便显示 "Read More"
+//         readMoreBtn.classList.remove('hidden');
+//         readLessBtn.classList.add('hidden');
+//     } else {
+//         container.style.maxHeight = 'none';  // 移除最大高度限制以显示全部文本
+//         readMoreBtn.classList.add('hidden');
+//         readLessBtn.classList.remove('hidden');
+//     }
+// }
+//
+// function copyToClipboard(text) {
+//     const textarea = document.createElement('textarea');
+//     textarea.value = text;
+//     document.body.appendChild(textarea);
+//     textarea.select();
+//     try {
+//         document.execCommand('copy');
+//         showAlert('Text copied to clipboard');
+//     } catch (err) {
+//         console.error('Failed to copy text', err);
+//         showAlert('Failed to copy text');
+//     }
+//     document.body.removeChild(textarea);
+// }
+//
+// function downloadTextFile() {
+//     const select = document.getElementById('textFileSelect');
+//     const encodedFileName = select.value; // 直接使用這個編碼過的檔名
+//     if (!encodedFileName) {
+//         alert('Please select a text file!');
+//         return;
+//     }
+//
+//     // 直接將編碼後的檔名用於 URL
+//     const downloadUrl = `${baseUrl}/download_text_file/${encodedFileName}`;
+//
+//     console.log("Starting file download:", downloadUrl);
+//
+//     fetch(downloadUrl, {
+//         method: 'GET',
+//         mode: 'cors',
+//         credentials: 'include'
+//     })
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error('Network response was not ok: ' + response.statusText);
+//             }
+//             return response.blob();
+//         })
+//         .then(blob => {
+//             console.log("File downloaded successfully, processing Blob data...");
+//             const downloadLink = document.createElement('a');
+//             downloadLink.href = URL.createObjectURL(blob);
+//             // download 屬性需要的是給使用者看的、未編碼的檔名
+//             downloadLink.download = decodeURIComponent(encodedFileName);
+//             document.body.appendChild(downloadLink);
+//             downloadLink.click();
+//             document.body.removeChild(downloadLink);
+//         })
+//         .catch(error => {
+//             console.error('Error downloading file:', error);
+//             alert('Download failed, please check network connection or server status!\n' + error);
+//         });
+// }
+//
+// function updateQueueLength() {
+//     fetch(`${baseUrl}/queue_length`, {
+//         method: 'GET',
+//         mode: 'cors',
+//         credentials: 'include'
+//     })
+//         .then(response => {
+//             if (!response.ok) {
+//                 throw new Error('Network response was not ok ' + response.statusText);
+//             }
+//             return response.json();
+//         })
+//         .then(data => {
+//             const queueLengthElement = document.getElementById('queueLength');
+//             queueLengthElement.innerText = data.queueLength;
+//         })
+//         .catch(error => {
+//             // console.error('Error fetching queue length:', error);
+//         });
+// }
+//
+// function fetchPdfFileList(newPdfFileName = null) {
+//     console.log("Get a list of PDF files from the server...");
+//     fetch(`${baseUrl}/list_pdf_files`)
+//         .then(response => response.json())
+//         .then(data => {
+//             const select = document.getElementById('pdfFileSelect');
+//             if (!select) return;
+//             select.innerHTML = '';
+//
+//             if (data.files && data.files.length > 0) {
+//                 data.files.forEach(fileInfo => {
+//                     const option = document.createElement('option');
+//                     option.value = fileInfo.encoded;
+//                     option.textContent = fileInfo.original;
+//                     select.appendChild(option);
+//                 });
+//
+//                 if (newPdfFileName) {
+//                     const encodedName = encodeURIComponent(newPdfFileName);
+//                     select.value = encodedName;
+//                 } else {
+//                     select.selectedIndex = 0;
+//                 }
+//             } else {
+//                 const option = document.createElement('option');
+//                 option.textContent = "No PDF reports available";
+//                 option.disabled = true;
+//                 select.appendChild(option);
+//             }
+//         })/**/
+//         .catch(error => console.error('Error getting PDF file list:', error));
+// }
+//
+// function downloadPdfFile() {
+//     const select = document.getElementById('pdfFileSelect');
+//     const encodedFileName = select.value;
+//     if (!encodedFileName) {
+//         alert('Please select a PDF report!');
+//         return;
+//     }
+//
+//     const downloadUrl = `${baseUrl}/download_pdf_file/${encodedFileName}`;
+//     console.log("Starting PDF download:", downloadUrl);
+//
+//     // 透過創建一個隱藏的連結來觸發下載
+//     const downloadLink = document.createElement('a');
+//     downloadLink.href = downloadUrl;
+//     downloadLink.download = decodeURIComponent(encodedFileName); // 提示瀏覽器下載的檔名
+//     document.body.appendChild(downloadLink);
+//     downloadLink.click();
+//     document.body.removeChild(downloadLink);
+// }
 
 /* ==========================================================================
    AI Deep Dive (深度個股透視) 模組
