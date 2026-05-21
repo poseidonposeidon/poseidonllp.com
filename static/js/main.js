@@ -10285,21 +10285,17 @@ function initScenarioModeling(currentEps, currentPrice, currentPe) {
 }
 
 // 取得 AI 評論
+// 請直接覆蓋你 main.js 裡的 getScenarioAiComment 函式
 function getScenarioAiComment(cagr, pe) {
     const commentBox = document.getElementById('scenario-ai-comment');
     if (!commentBox) return;
 
-    // 1. 顯示 "Loading..." 提示 (符合你的風格)
     commentBox.innerHTML = '<span style="color: #888;">CIO 正在審核您的假設...</span>';
 
-    // 2. 獲取股票代碼
     const symbolInput = document.getElementById('dd-stock-input');
     const stockSymbol = symbolInput ? symbolInput.value.trim().toUpperCase() : "";
-
-    // 3. 設定 API URL
     const apiUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/scenario_comment` : '/api/scenario_comment';
 
-    // 4. 使用 fetch 進行 POST 請求，並套用你習慣的 Promise 鏈式寫法
     fetch(apiUrl, {
         method: 'POST',
         headers: {
@@ -10308,30 +10304,29 @@ function getScenarioAiComment(cagr, pe) {
         body: JSON.stringify({
             symbol: stockSymbol,
             cagr: cagr,
-            pe: pe,
-            context: window.currentReportContent // 給 AI 之前的背景
+            pe: pe
+            // 🗑️ 刪除 context: window.currentReportContent 避免傳送過大且無用的 Payload 導致斷線
         })
     })
         .then(response => {
-            // 嚴格的網路狀態檢查 (與你的 fetchData_2 相同)
             if (!response.ok) {
-                throw new Error(`Network response was not ok (Status: ${response.status})`);
+                // 嘗試解析後端傳來的錯誤訊息
+                return response.json().then(errData => {
+                    throw new Error(errData.comment || `伺服器狀態異常 (${response.status})`);
+                });
             }
             return response.json();
         })
         .then(data => {
-            console.log('AI Comment data received:', data); // 查看原始返回數據
-
-            // 確保 data 存在且包含 comment
             if (data && data.comment) {
                 commentBox.innerHTML = `🦅 <strong>CIO:</strong> <span style="color: #ccc;">${data.comment}</span>`;
-            } else {
-                commentBox.innerHTML = '<p>No comment data found for this scenario.</p>';
             }
         })
         .catch(error => {
             console.error('Error fetching AI comment: ', error);
-            commentBox.innerHTML = `<span style="color: #e74c3c;">⚠️ Error loading data: ${error.message}. Please check the console for more details.</span>`;
+            // 將生硬的 Failed to fetch 轉換為易讀的提示
+            let errorMsg = error.message === "Failed to fetch" ? "網路壅塞或伺服器無回應，請稍後再試。" : error.message;
+            commentBox.innerHTML = `<span style="color: #e74c3c;">⚠️ ${errorMsg}</span>`;
         });
 }
 
