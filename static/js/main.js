@@ -9281,21 +9281,52 @@ function drawInsiderChart(insiderData, suffix = '') {
     const canvas = document.getElementById('dd-insider-chart' + suffix);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    const wrapper = canvas.parentElement; // 抓取外層的 .chart-wrapper 容器
 
     const instanceKey = 'insider' + suffix;
-    if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
-
-    if (!insiderData || insiderData.length === 0) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.save(); ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "16px Arial"; ctx.fillStyle = "#888";
-        ctx.fillText("No Recent Insider Trading Data (近期無內部人交易)", canvas.width / 2, canvas.height / 2);
-        ctx.restore();
-        return;
+    if (window.deepDiveChartInstances[instanceKey]) {
+        window.deepDiveChartInstances[instanceKey].destroy();
     }
 
+    // ==========================================
+    // 🌟 核心修正：優雅處理「無資料」狀態
+    // 不要在 Canvas 裡面硬幹文字，直接用 HTML 顯示，避免被切斷
+    // ==========================================
+    if (!insiderData || insiderData.length === 0) {
+        // 1. 隱藏畫布
+        canvas.style.display = 'none';
+
+        // 2. 檢查是否已經有提示文字了，避免重複添加
+        if (!wrapper.querySelector('.no-data-msg')) {
+            const noDataDiv = document.createElement('div');
+            noDataDiv.className = 'no-data-msg';
+            // 使用 Flexbox 完美置中
+            noDataDiv.style.cssText = 'color: #888; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; min-height: 150px; font-size: 14px; text-align: center;';
+            noDataDiv.innerHTML = '<span>No Recent Insider Trading Data</span><span style="font-size: 12px; margin-top: 4px;">(近期無內部人交易)</span>';
+            wrapper.appendChild(noDataDiv);
+        }
+        return; // 提早結束，不執行畫圖
+    }
+
+    // ==========================================
+    // 恢復正常畫圖狀態
+    // ==========================================
+    // 1. 顯示畫布
+    canvas.style.display = 'block';
+    // 2. 移除之前可能留下的「無資料提示文字」
+    const noDataMsg = wrapper.querySelector('.no-data-msg');
+    if (noDataMsg) {
+        noDataMsg.remove();
+    }
+
+    // ==========================================
+    // 處理資料並繪製 Chart.js
+    // ==========================================
     const sortedData = [...insiderData].slice(0, 15).reverse();
-    const labels = sortedData.map(d => d.transactionDate ? d.transactionDate.split(' ') : 'N/A');
+    const labels = sortedData.map(d => d.transactionDate ? d.transactionDate.split(' ')[0] : 'N/A');
     const values = sortedData.map(d => d.securitiesTransacted);
+
+    // 根據買賣類型決定顏色 (Buy = 綠色, Sell = 紅色)
     const backgroundColors = sortedData.map(d => {
         const type = (d.transactionType || "").toLowerCase();
         return (type.includes('buy') || type.includes('purchase') || type.includes('award')) ? '#00e676' : '#ff5252';
@@ -9303,8 +9334,33 @@ function drawInsiderChart(insiderData, suffix = '') {
 
     window.deepDiveChartInstances[instanceKey] = new Chart(ctx, {
         type: 'bar',
-        data: { labels: labels, datasets: [{ label: 'Shares Transacted', data: values, backgroundColor: backgroundColors, borderWidth: 0, borderRadius: 4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { x: { ticks: { color: '#888', font: {size: 10}, maxRotation: 45, minRotation: 45 }, grid: { display: false } }, y: { grid: { color: '#333' }, ticks: { color: '#666' } } } }
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Shares Transacted',
+                data: values,
+                backgroundColor: backgroundColors,
+                borderWidth: 0,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                x: {
+                    ticks: { color: '#888', font: {size: 10}, maxRotation: 45, minRotation: 45 },
+                    grid: { display: false }
+                },
+                y: {
+                    grid: { color: '#333' },
+                    ticks: { color: '#666' }
+                }
+            }
+        }
     });
 }
 
