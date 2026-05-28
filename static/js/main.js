@@ -10330,60 +10330,68 @@ function getScenarioAiComment(cagr, pe) {
         });
 }
 
+// 輔助函式：將透明背景的圖表，填上深色底色後轉成圖片
+function getCanvasWithBackground(canvas, backgroundColor) {
+    const tempCanvas = document.createElement('canvas');
+    tempCanvas.width = canvas.width;
+    tempCanvas.height = canvas.height;
+    const ctx = tempCanvas.getContext('2d');
+    // 填上深色底，否則圖表的白字在 PDF 的白紙上會看不見
+    ctx.fillStyle = backgroundColor;
+    ctx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+    ctx.drawImage(canvas, 0, 0);
+    return tempCanvas.toDataURL('image/jpeg', 1.0);
+}
+
 function downloadDashboardPDF(event) {
     if (event) event.preventDefault();
 
     const symbolInput = document.getElementById('dd-stock-input');
     const symbol = (symbolInput && symbolInput.value.trim().toUpperCase()) || 'UNKNOWN';
-    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-    const filename = `${symbol}_CIO_DeepDive_${dateStr}.pdf`;
 
-    const element = document.getElementById('dd-main-content');
-    if (!element) return;
+    // 1. 抓取我們存在全域變數裡的 AI 純文字報告
+    const reportText = window.currentReportContent;
+    if (!reportText) {
+        alert("請先點擊 Analyze 產生報告後再匯出！");
+        return;
+    }
 
     const btn = event ? event.currentTarget : null;
     let originalText = "";
     if (btn) {
         originalText = btn.innerHTML;
-        btn.innerHTML = "⏳ 寫入雲端中...";
+        btn.innerHTML = "⏳ 產出原生報告中...";
         btn.style.background = "#555";
         btn.disabled = true;
     }
 
-    // 🌟 魔法啟動：加上 PDF 專用 class，讓排版變成「A4 直式報告」，並隱藏聊天室
-    element.classList.add('pdf-export-mode');
+    // 2. 自動擷取畫面上所有圖表，並保留深色背景
+    const charts = [];
+    const chartCards = document.querySelectorAll('.dd-chart-card');
+    chartCards.forEach(card => {
+        const titleElement = card.querySelector('.dd-chart-title');
+        const canvas = card.querySelector('canvas');
+        if (titleElement && canvas) {
+            // 擷取圖片並填入 #1e1e1e (儀表板底色)
+            const imageBase64 = getCanvasWithBackground(canvas, '#1e1e1e');
+            charts.push({
+                title: titleElement.innerText,
+                image: imageBase64
+            });
+        }
+    });
 
-    // 🌟 PDF 渲染參數設定 (改為 A4 直排、加入分頁防護)
-    const opt = {
-        margin:       0.3, // 留一點白邊看起來更像正式報告
-        filename:     filename,
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  {
-            scale: 2,
-            useCORS: true,
-            backgroundColor: '#121212',
-            scrollY: 0 // 防止因網頁捲動導致截圖位移
-        },
-        jsPDF:        {
-            unit: 'in',
-            format: 'a4', // 變成 A4 尺寸
-            orientation: 'portrait' // 變成直式排版
-        },
-        pagebreak: { mode: ['css', 'legacy'] } // 啟動分頁防切斷機制
-    };
+    // 3. 將純文字報告與圖表陣列，打包成 JSON 送給後端的全新 API
+    const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/generate_native_pdf` : '/api/generate_native_pdf';
 
-    // 呼叫 html2pdf，產生 Blob 檔案
-    html2pdf().set(opt).from(element).output('blob').then(function(pdfBlob) {
-        const formData = new FormData();
-        formData.append('file', pdfBlob, filename);
-        formData.append('symbol', symbol);
-
-        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/save_pdf` : '/api/save_pdf';
-
-        return fetch(targetUrl, {
-            method: 'POST',
-            body: formData
-        });
+    fetch(targetUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            symbol: symbol,
+            report_content: reportText,
+            charts: charts
+        })
     })
         .then(async (response) => {
             if (!response.ok) throw new Error(`伺服器錯誤狀態碼: ${response.status}`);
@@ -10391,19 +10399,16 @@ function downloadDashboardPDF(event) {
         })
         .then(data => {
             if (data.message) {
-                alert(`🎉 儲存成功！\n${symbol} 的 CIO 深度分析報告已自動存入 Google Drive「美股資訊」當中。\n(本地同步路徑：${data.file_path})`);
+                alert(`🎉 儲存成功！\n${symbol} 的「純文字＋圖表」原生 PDF 報告已存入 Google Drive。\n(本地路徑：${data.file_path})`);
             } else {
                 alert(`❌ 儲存失敗：${data.error}`);
             }
         })
         .catch(err => {
-            console.error('PDF 儲存錯誤:', err);
-            alert(`❌ 轉出 PDF 時發生系統錯誤：\n${err.message}`);
+            console.error('PDF 生成錯誤:', err);
+            alert(`❌ 產出原生 PDF 時發生系統錯誤：\n${err.message}`);
         })
         .finally(() => {
-            // 🌟 魔法解除：把 PDF 專用 class 拔掉，瞬間恢復成左右並排的戰情儀表板
-            element.classList.remove('pdf-export-mode');
-
             if (btn) {
                 btn.innerHTML = originalText;
                 btn.style.background = "#e67e22";
