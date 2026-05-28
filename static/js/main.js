@@ -10399,7 +10399,7 @@ function downloadDashboardPDF(event) {
         })
         .then(data => {
             if (data.message) {
-                alert(`🎉 儲存成功！\n${symbol} 的「純文字＋圖表」原生 PDF 報告已存入 Google Drive。\n(本地路徑：${data.file_path})`);
+                alert(`🎉 儲存成功！\n${symbol} 的「純文字＋圖表」原生 PDF 報告已存入 Google Drive/美股資訊`);
             } else {
                 alert(`❌ 儲存失敗：${data.error}`);
             }
