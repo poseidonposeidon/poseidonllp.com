@@ -10381,7 +10381,7 @@ function downloadDashboardPDF(event) {
         }
     });
 
-    // 3. 將純文字報告與圖表陣列，打包成 JSON 送給後端的全新 API
+    // 3. 將純文字報告與圖表陣列，打包成 JSON 送給後端
     const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/generate_native_pdf` : '/api/generate_native_pdf';
 
     fetch(targetUrl, {
@@ -10399,7 +10399,7 @@ function downloadDashboardPDF(event) {
         })
         .then(data => {
             if (data.message) {
-                alert(`🎉 儲存成功！\n${symbol} 的「純文字＋圖表」原生 PDF 報告已存入 Google Drive/美股資訊`);
+                alert(`🎉 儲存成功！\n${symbol} 的「純文字＋圖表」原生 PDF 報告已存入 Drive。\n(本地路徑：${data.file_path})`);
             } else {
                 alert(`❌ 儲存失敗：${data.error}`);
             }
