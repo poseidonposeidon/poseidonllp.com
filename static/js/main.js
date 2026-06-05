@@ -10294,11 +10294,8 @@ function getScenarioAiComment(cagr, pe) {
     const symbolInput = document.getElementById('dd-stock-input');
     const stockSymbol = symbolInput ? symbolInput.value.trim().toUpperCase() : "UNKNOWN";
 
-    // 🌟 核心修正：直接使用相對路徑，徹底避開 baseUrl 可能造成的 CORS 或網址無效地雷
-    const apiUrl = '/api/scenario_comment';
-
-    // 加上 Debug 訊息，讓你按 F12 時能看見到底送出了什麼
-    console.log(`[Debug] 準備發送沙盤數據至: ${apiUrl}`, { symbol: stockSymbol, cagr: cagr, pe: pe });
+    // 🌟 核心修正：恢復 baseUrl 邏輯！確保請求被送往 Flask 而不是靜態伺服器
+    const apiUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/scenario_comment` : '/api/scenario_comment';
 
     fetch(apiUrl, {
         method: 'POST',
@@ -10313,7 +10310,7 @@ function getScenarioAiComment(cagr, pe) {
     })
         .then(response => {
             if (!response.ok) {
-                // 🌟 增強防護：如果 Python 當機吐出 HTML 原生 500 頁面，這裡才不會解析 JSON 失敗
+                // 防護：如果 Python 當機，這裡不會因為解析 JSON 失敗而蓋掉真實錯誤
                 return response.text().then(text => {
                     let errMsg = `伺服器狀態異常 (${response.status})`;
                     try {
@@ -10334,8 +10331,7 @@ function getScenarioAiComment(cagr, pe) {
         })
         .catch(error => {
             console.error('Error fetching AI comment: ', error);
-            // 將生硬的 Failed to fetch 轉換為易讀的提示
-            let errorMsg = error.message === "Failed to fetch" ? "網路連線被阻擋或伺服器無回應，請確認 Flask 伺服器是否正常運行。" : error.message;
+            let errorMsg = error.message === "Failed to fetch" ? "網路連線被阻擋或伺服器無回應。" : error.message;
             commentBox.innerHTML = `<span style="color: #e74c3c;">⚠️ ${errorMsg}</span>`;
         });
 }
