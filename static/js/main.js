@@ -10285,7 +10285,6 @@ function initScenarioModeling(currentEps, currentPrice, currentPe) {
 }
 
 // 取得 AI 評論
-// 請直接覆蓋你 main.js 裡的 getScenarioAiComment 函式
 function getScenarioAiComment(cagr, pe) {
     const commentBox = document.getElementById('scenario-ai-comment');
     if (!commentBox) return;
@@ -10293,8 +10292,13 @@ function getScenarioAiComment(cagr, pe) {
     commentBox.innerHTML = '<span style="color: #888;">CIO 正在審核您的假設...</span>';
 
     const symbolInput = document.getElementById('dd-stock-input');
-    const stockSymbol = symbolInput ? symbolInput.value.trim().toUpperCase() : "";
-    const apiUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/scenario_comment` : '/api/scenario_comment';
+    const stockSymbol = symbolInput ? symbolInput.value.trim().toUpperCase() : "UNKNOWN";
+
+    // 🌟 核心修正：直接使用相對路徑，徹底避開 baseUrl 可能造成的 CORS 或網址無效地雷
+    const apiUrl = '/api/scenario_comment';
+
+    // 加上 Debug 訊息，讓你按 F12 時能看見到底送出了什麼
+    console.log(`[Debug] 準備發送沙盤數據至: ${apiUrl}`, { symbol: stockSymbol, cagr: cagr, pe: pe });
 
     fetch(apiUrl, {
         method: 'POST',
@@ -10305,14 +10309,20 @@ function getScenarioAiComment(cagr, pe) {
             symbol: stockSymbol,
             cagr: cagr,
             pe: pe
-            // 🗑️ 刪除 context: window.currentReportContent 避免傳送過大且無用的 Payload 導致斷線
         })
     })
         .then(response => {
             if (!response.ok) {
-                // 嘗試解析後端傳來的錯誤訊息
-                return response.json().then(errData => {
-                    throw new Error(errData.comment || `伺服器狀態異常 (${response.status})`);
+                // 🌟 增強防護：如果 Python 當機吐出 HTML 原生 500 頁面，這裡才不會解析 JSON 失敗
+                return response.text().then(text => {
+                    let errMsg = `伺服器狀態異常 (${response.status})`;
+                    try {
+                        const errData = JSON.parse(text);
+                        errMsg = errData.comment || errMsg;
+                    } catch (e) {
+                        console.error("後端回傳了非 JSON 格式的錯誤:", text);
+                    }
+                    throw new Error(errMsg);
                 });
             }
             return response.json();
@@ -10325,7 +10335,7 @@ function getScenarioAiComment(cagr, pe) {
         .catch(error => {
             console.error('Error fetching AI comment: ', error);
             // 將生硬的 Failed to fetch 轉換為易讀的提示
-            let errorMsg = error.message === "Failed to fetch" ? "網路壅塞或伺服器無回應，請稍後再試。" : error.message;
+            let errorMsg = error.message === "Failed to fetch" ? "網路連線被阻擋或伺服器無回應，請確認 Flask 伺服器是否正常運行。" : error.message;
             commentBox.innerHTML = `<span style="color: #e74c3c;">⚠️ ${errorMsg}</span>`;
         });
 }
