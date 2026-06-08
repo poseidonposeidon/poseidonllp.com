@@ -604,73 +604,76 @@
             </div>
         </div> <div style="max-width: 1200px; width: 100%; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; margin-left: auto; margin-right: auto;">
 
-        <div style="text-align: center; margin-bottom: 20px;">
-            <h4 style="color: #888; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; margin: 0;">Institutional-Grade Data Coverage</h4>
-            <h3 style="color: #fff; font-size: 18px; margin: 6px 0 0 0;">系統底層整合數據清單</h3>
-        </div>
+        <details style="margin-bottom: 20px; cursor: pointer; text-align: center;">
+            <summary style="outline: none; color: #888; font-size: 13px; letter-spacing: 1px; transition: color 0.3s;" onmouseover="this.style.color='#f0b90b';" onmouseout="this.style.color='#888';">
+        <span style="border-bottom: 1px dashed #888; padding-bottom: 2px;">
+            ▶ 展開查看：系統底層整合數據清單 (Institutional-Grade Data Coverage)
+        </span>
+            </summary>
 
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; text-align: left;">
+            <div style="margin-top: 25px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; text-align: left;">
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='rgba(240, 185, 11, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.08)';">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span style="font-size: 16px;">⚖️</span>
+                            <strong style="color: #f0b90b; font-size: 14px;">估值與市場定價</strong>
+                        </div>
+                        <ul style="color: #ccc; font-size: 12px; line-height: 1.6; padding-left: 18px; margin: 0;">
+                            <li><strong>本益比 (Current & Fwd)</strong></li>
+                            <li><strong>五年平均 P/E</strong></li>
+                            <li><strong>PEG Ratio</strong></li>
+                            <li><strong>DCF 絕對估值</strong></li>
+                            <li>P/S 與 P/B 比率</li>
+                            <li>股息殖利率 (Yield)</li>
+                        </ul>
+                    </div>
 
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='rgba(240, 185, 11, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.08)';">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <span style="font-size: 16px;">⚖️</span>
-                    <strong style="color: #f0b90b; font-size: 14px;">估值與市場定價</strong>
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='rgba(52, 152, 219, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.08)';">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span style="font-size: 16px;">📈</span>
+                            <strong style="color: #3498db; font-size: 14px;">獲利與成長動能</strong>
+                        </div>
+                        <ul style="color: #ccc; font-size: 12px; line-height: 1.6; padding-left: 18px; margin: 0;">
+                            <li><strong>近五年完整三大表</strong></li>
+                            <li><strong>EPS 過去四季軌跡</strong></li>
+                            <li><strong>毛利率 年對年趨勢</strong></li>
+                            <li>營業利益率 (OPM)</li>
+                            <li>股東權益報酬率 (ROE)</li>
+                            <li>營收 3Y CAGR</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='rgba(46, 204, 113, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.08)';">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span style="font-size: 16px;">🛡️</span>
+                            <strong style="color: #2ecc71; font-size: 14px;">前瞻預期與雷達</strong>
+                        </div>
+                        <ul style="color: #ccc; font-size: 12px; line-height: 1.6; padding-left: 18px; margin: 0;">
+                            <li><strong>財報驚喜度 (Surprise)</strong></li>
+                            <li><strong>未來 3 年 EPS 預估</strong></li>
+                            <li><strong>Altman Z-Score</strong></li>
+                            <li><strong>Piotroski F-Score</strong></li>
+                            <li>負債權益比 (D/E)</li>
+                            <li>自由現金流 (FCF)</li>
+                        </ul>
+                    </div>
+
+                    <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='rgba(155, 89, 182, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.08)';">
+                        <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+                            <span style="font-size: 16px;">🧠</span>
+                            <strong style="color: #9b59b6; font-size: 14px;">聰明錢與 RAG 情報</strong>
+                        </div>
+                        <ul style="color: #ccc; font-size: 12px; line-height: 1.6; padding-left: 18px; margin: 0;">
+                            <li><strong>內部人交易最新動向</strong></li>
+                            <li><strong>法說會逐字稿分析</strong></li>
+                            <li><strong>即時財經新聞萃取</strong></li>
+                            <li>高管層前瞻指引</li>
+                            <li>川普政策與總經關聯</li>
+                        </ul>
+                    </div>
                 </div>
-                <ul style="color: #ccc; font-size: 12px; line-height: 1.6; padding-left: 18px; margin: 0;">
-                    <li><strong>本益比 (Current & Fwd)</strong></li>
-                    <li><strong>五年平均 P/E</strong></li>
-                    <li><strong>PEG Ratio</strong></li>
-                    <li><strong>DCF 絕對估值</strong></li>
-                    <li>P/S 與 P/B 比率</li>
-                    <li>股息殖利率 (Yield)</li>
-                </ul>
             </div>
-
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='rgba(52, 152, 219, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.08)';">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <span style="font-size: 16px;">📈</span>
-                    <strong style="color: #3498db; font-size: 14px;">獲利與成長動能</strong>
-                </div>
-                <ul style="color: #ccc; font-size: 12px; line-height: 1.6; padding-left: 18px; margin: 0;">
-                    <li><strong>近五年完整三大表</strong></li>
-                    <li><strong>EPS 過去四季軌跡</strong></li>
-                    <li><strong>毛利率 年對年趨勢</strong></li>
-                    <li>營業利益率 (OPM)</li>
-                    <li>股東權益報酬率 (ROE)</li>
-                    <li>營收 3Y CAGR</li>
-                </ul>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='rgba(46, 204, 113, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.08)';">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <span style="font-size: 16px;">🛡️</span>
-                    <strong style="color: #2ecc71; font-size: 14px;">前瞻預期與雷達</strong>
-                </div>
-                <ul style="color: #ccc; font-size: 12px; line-height: 1.6; padding-left: 18px; margin: 0;">
-                    <li><strong>財報驚喜度 (Surprise)</strong></li>
-                    <li><strong>未來 3 年 EPS 預估</strong></li>
-                    <li><strong>Altman Z-Score</strong></li>
-                    <li><strong>Piotroski F-Score</strong></li>
-                    <li>負債權益比 (D/E)</li>
-                    <li>自由現金流 (FCF)</li>
-                </ul>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 8px; padding: 12px 15px; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-2px)'; this.style.borderColor='rgba(155, 89, 182, 0.5)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.08)';">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-                    <span style="font-size: 16px;">🧠</span>
-                    <strong style="color: #9b59b6; font-size: 14px;">聰明錢與 RAG 情報</strong>
-                </div>
-                <ul style="color: #ccc; font-size: 12px; line-height: 1.6; padding-left: 18px; margin: 0;">
-                    <li><strong>內部人交易最新動向</strong></li>
-                    <li><strong>法說會逐字稿分析</strong></li>
-                    <li><strong>即時財經新聞萃取</strong></li>
-                    <li>高管層前瞻指引</li>
-                    <li>川普政策與總經關聯</li>
-                </ul>
-            </div>
-
-        </div>
+        </details>
     </div>
 
     </div>
