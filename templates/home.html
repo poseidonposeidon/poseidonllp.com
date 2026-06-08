@@ -611,6 +611,15 @@
                 <h3 style="color: #fff; margin: 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
                     🗞️ 全球市場即時新聞 (Market News Feed)
                 </h3>
+
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="text" id="news-search-input" placeholder="搜尋代碼或關鍵字 (如: NVDA, 降息)" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #444; background: #111; color: #fff; font-size: 13px; outline: none; width: 220px; transition: border-color 0.3s;" onfocus="this.style.borderColor='#3498db'" onblur="this.style.borderColor='#444'">
+
+                    <button onclick="executeNewsSearch()" style="background: rgba(52, 152, 219, 0.2); border: 1px solid rgba(52, 152, 219, 0.5); color: #3498db; padding: 5px 12px; border-radius: 4px; font-size: 13px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(52, 152, 219, 0.4)'" onmouseout="this.style.background='rgba(52, 152, 219, 0.2)'">
+                        搜尋
+                    </button>
+                </div>
+
                 <span style="background: rgba(52, 152, 219, 0.15); border: 1px solid rgba(52, 152, 219, 0.5); color: #3498db; padding: 3px 8px; border-radius: 4px; font-size: 11px; letter-spacing: 1px;">
                     LIVE FEED
                 </span>

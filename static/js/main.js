@@ -10439,14 +10439,14 @@ function downloadDashboardPDF(event) {
 
 
 
-
 // ==========================================
-// 即時新聞清單與分頁邏輯
+// 即時新聞清單、搜尋與分頁邏輯
 // ==========================================
 let currentNewsPage = 1;
 let totalNewsPages = 1;
+let currentNewsQuery = ''; // 🌟 記住目前的搜尋字詞
 
-async function loadMarketNews(page) {
+async function loadMarketNews(page, query = '') {
     const container = document.getElementById('news-list-container');
     const prevBtn = document.getElementById('news-prev-btn');
     const nextBtn = document.getElementById('news-next-btn');
@@ -10454,13 +10454,16 @@ async function loadMarketNews(page) {
 
     if (!container) return;
 
-    // 顯示 Loading
-    container.innerHTML = '<p style="text-align: center; color: #666; margin: 40px 0;">正在獲取市場最新動態...</p>';
+    container.innerHTML = '<p style="text-align: center; color: #666; margin: 40px 0;"><i class="fas fa-spinner fa-spin"></i> 正在獲取市場最新動態...</p>';
     prevBtn.disabled = true;
     nextBtn.disabled = true;
 
     try {
-        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/market_news?page=${page}` : `/api/market_news?page=${page}`;
+        // 🌟 網址帶上 query 參數
+        const targetUrl = typeof baseUrl !== 'undefined'
+            ? `${baseUrl}/api/market_news?page=${page}&query=${encodeURIComponent(query)}`
+            : `/api/market_news?page=${page}&query=${encodeURIComponent(query)}`;
+
         const response = await fetch(targetUrl);
 
         if (!response.ok) throw new Error('API Error');
@@ -10472,11 +10475,15 @@ async function loadMarketNews(page) {
         if (data.news && data.news.length > 0) {
             let html = '';
             data.news.forEach(news => {
+                // 如果有震撼分數，可以給個小火焰圖示
+                let scoreBadge = news.score >= 80 ? '<span style="color:#e74c3c; font-size:12px; margin-left:5px;">🔥 熱門</span>' : '';
+
                 html += `
                 <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.08);">
                     <div style="margin-bottom: 5px; display: flex; align-items: center; gap: 8px;">
                         <span style="background: #f0b90b; color: #1e1e1e; font-weight: bold; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${news.symbol}</span>
                         <span style="color: #888; font-size: 12px;">${news.date} | 來源: ${news.source || 'FMP'}</span>
+                        ${scoreBadge}
                     </div>
                     <a href="${news.url}" target="_blank" style="color: #3498db; text-decoration: none; font-size: 16px; font-weight: bold; display: block; margin-bottom: 6px; transition: color 0.2s;" onmouseover="this.style.color='#2980b9'" onmouseout="this.style.color='#3498db'">${news.title}</a>
                     <p style="color: #aaa; margin: 0; font-size: 13px;">${news.summary}</p>
@@ -10484,15 +10491,12 @@ async function loadMarketNews(page) {
             });
             container.innerHTML = html;
         } else {
-            container.innerHTML = '<p style="text-align: center; color: #888; margin: 40px 0;">目前資料庫尚無新聞。系統將在清晨排程自動抓取。</p>';
+            container.innerHTML = `<p style="text-align: center; color: #888; margin: 40px 0;">找不到與「<span style="color:#f0b90b">${query}</span>」相關的新聞。</p>`;
         }
 
-        // 更新翻頁按鈕狀態與文字
         pageInfo.innerText = `第 ${currentNewsPage} 頁 / 共 ${totalNewsPages} 頁`;
         prevBtn.disabled = !data.has_prev;
         nextBtn.disabled = !data.has_next;
-
-        // 視覺化按鈕啟用/禁用狀態
         prevBtn.style.opacity = data.has_prev ? '1' : '0.4';
         nextBtn.style.opacity = data.has_next ? '1' : '0.4';
 
@@ -10502,16 +10506,36 @@ async function loadMarketNews(page) {
     }
 }
 
-// 供按鈕呼叫的翻頁函式
+// 🌟 供搜尋按鈕呼叫
+function executeNewsSearch() {
+    const input = document.getElementById('news-search-input');
+    if (!input) return;
+    currentNewsQuery = input.value.trim();
+    loadMarketNews(1, currentNewsQuery); // 搜尋時永遠從第 1 頁開始
+}
+
+// 🌟 翻頁時記得帶上目前的搜尋字詞
 function changeNewsPage(direction) {
     const newPage = currentNewsPage + direction;
     if (newPage >= 1 && newPage <= totalNewsPages) {
-        loadMarketNews(newPage);
+        loadMarketNews(newPage, currentNewsQuery);
     }
 }
 
+// 網頁一載入，立刻啟動
 document.addEventListener('DOMContentLoaded', () => {
+    // 綁定 Enter 鍵觸發搜尋
+    const newsInput = document.getElementById('news-search-input');
+    if (newsInput) {
+        newsInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                executeNewsSearch();
+            }
+        });
+    }
+
     if (typeof loadMarketNews === 'function') {
-        loadMarketNews(1);
+        loadMarketNews(1, ''); // 初始載入無過濾條件
     }
 });
