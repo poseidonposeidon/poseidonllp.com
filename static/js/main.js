@@ -10530,27 +10530,38 @@ function changeNewsPage(direction) {
 }
 
 // 網頁一載入，立刻去抓第一頁新聞
+// 網頁載入完成後，自動去抓取今天的晨報
 document.addEventListener('DOMContentLoaded', async () => {
+    // 先去畫面上尋找這兩個元素
     const briefingContent = document.getElementById('briefing-content');
     const briefingDate = document.getElementById('briefing-date');
+
+    // 🌟 終極防呆 1：如果當前頁面根本沒有晨報區塊 (例如登入頁)，就直接提早結束，什麼都不做！
+    if (!briefingContent) {
+        return;
+    }
 
     try {
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/daily_briefing` : '/api/daily_briefing';
         const response = await fetch(targetUrl);
         const data = await response.json();
 
-        if(briefingContent) { // 🌟 新增防呆檢查
-            if(data && data.content) {
-                if(briefingDate) briefingDate.innerText = `📅 ${data.date}`;
-                briefingContent.innerHTML = data.content;
-            } else {
-                briefingContent.innerHTML = "<p style='color: #888;'>目前尚無最新晨報資料。</p>";
-            }
+        // 🌟 終極防呆 2：確定 briefingDate 真的存在，才設定 innerText
+        if (briefingDate && data.date) {
+            briefingDate.innerText = `📅 ${data.date}`;
         }
+
+        // 確定 briefingContent 真的存在，才設定 innerHTML
+        if (data && data.content) {
+            briefingContent.innerHTML = data.content;
+        } else {
+            briefingContent.innerHTML = "<p style='color: #888;'>目前尚無最新晨報資料。</p>";
+        }
+
     } catch (error) {
         console.error("晨報載入失敗:", error);
-        // 🌟 新增防呆檢查
-        if(briefingContent) {
+        // 出錯時也要先檢查元素存不存在，再塞錯誤訊息
+        if (briefingContent) {
             briefingContent.innerHTML = "<p style='color: #e74c3c;'>晨報系統連線異常，請稍後再試。</p>";
         }
     }
