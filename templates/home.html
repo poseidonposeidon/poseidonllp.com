@@ -604,6 +604,31 @@
             </div>
         </div> <div style="max-width: 1200px; width: 100%; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; margin-left: auto; margin-right: auto;">
 
+
+        <div id="daily-briefing-section" class="daily-briefing-container" style="background: rgba(20, 20, 20, 0.8); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+            <!-- 標題列 -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
+                <h3 style="color: #fff; margin: 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
+                    🗞️ 全球市場即時新聞 (Market News Feed)
+                </h3>
+                <span style="background: rgba(52, 152, 219, 0.15); border: 1px solid rgba(52, 152, 219, 0.5); color: #3498db; padding: 3px 8px; border-radius: 4px; font-size: 11px; letter-spacing: 1px;">
+                    LIVE FEED
+                </span>
+            </div>
+
+            <!-- 🌟 新聞列表容器 -->
+            <div id="news-list-container" style="color: #ddd; font-size: 14px; line-height: 1.6; min-height: 400px;">
+                <p style="text-align: center; color: #666; margin: 20px 0;"><i class="fas fa-spinner fa-spin"></i> 載入新聞中...</p>
+            </div>
+
+            <!-- 🌟 分頁控制區 -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+                <button id="news-prev-btn" onclick="changeNewsPage(-1)" style="background: #333; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: 0.2s;" disabled>◀ 上一頁</button>
+                <span id="news-page-info" style="color: #888; font-size: 13px; font-weight: bold;">第 1 頁 / 共 -- 頁</span>
+                <button id="news-next-btn" onclick="changeNewsPage(1)" style="background: #333; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: 0.2s;">下一頁 ▶</button>
+            </div>
+        </div>
+
         <details style="margin-bottom: 20px; cursor: pointer; text-align: center;">
             <summary style="outline: none; color: #888; font-size: 13px; letter-spacing: 1px; transition: color 0.3s;" onmouseover="this.style.color='#f0b90b';" onmouseout="this.style.color='#888';">
         <span style="border-bottom: 1px dashed #888; padding-bottom: 2px;">

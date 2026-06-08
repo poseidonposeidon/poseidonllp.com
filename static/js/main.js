@@ -9074,6 +9074,9 @@ async function runDeepDive(event) {
         event.preventDefault();
     }
 
+    const briefingSection = document.getElementById('daily-briefing-section');
+    if (briefingSection) briefingSection.style.display = 'none';
+
     const symbolInput = document.getElementById('dd-stock-input');
     if (!symbolInput) return;
 
@@ -9941,6 +9944,9 @@ async function triggerExcelDownload(event) {
    ========================================================================== */
 
 function toggleScreener() {
+    const briefingSection = document.getElementById('daily-briefing-section');
+    if (briefingSection) briefingSection.style.display = 'none';
+
     const emptyState = document.getElementById('dd-empty-state');
     const mainContent = document.getElementById('dd-main-content');
     const screenerContent = document.getElementById('dd-screener-content');
@@ -10106,6 +10112,9 @@ function fillPrompt(promptText) {
 // ==========================================
 // 1. 啟動川普面板
 function toggleTrumpScreener() {
+
+    const briefingSection = document.getElementById('daily-briefing-section');
+    if (briefingSection) briefingSection.style.display = 'none';
     // 隱藏其他所有面板
     if(document.getElementById('dd-main-content')) document.getElementById('dd-main-content').style.display = 'none';
     if(document.getElementById('dd-screener-content')) document.getElementById('dd-screener-content').style.display = 'none';
@@ -10427,3 +10436,100 @@ function downloadDashboardPDF(event) {
             }
         });
 }
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const briefingContent = document.getElementById('briefing-content');
+    const briefingDate = document.getElementById('briefing-date');
+
+    try {
+        // 呼叫我們等一下要在後端寫的 API
+        const response = await fetch(baseUrl + '/api/daily_briefing');
+        const data = await response.json();
+
+        if(data && data.content) {
+            briefingDate.innerText = `📅 ${data.date}`;
+            briefingContent.innerHTML = data.content;
+        } else {
+            briefingContent.innerHTML = "<p style='color: #888;'>目前尚無最新晨報資料。</p>";
+        }
+    } catch (error) {
+        console.error("晨報載入失敗:", error);
+        briefingContent.innerHTML = "<p style='color: #e74c3c;'>晨報系統連線異常，請稍後再試。</p>";
+    }
+});
+
+
+// ==========================================
+// 即時新聞清單與分頁邏輯
+// ==========================================
+let currentNewsPage = 1;
+let totalNewsPages = 1;
+
+async function loadMarketNews(page) {
+    const container = document.getElementById('news-list-container');
+    const prevBtn = document.getElementById('news-prev-btn');
+    const nextBtn = document.getElementById('news-next-btn');
+    const pageInfo = document.getElementById('news-page-info');
+
+    if (!container) return;
+
+    // 顯示 Loading
+    container.innerHTML = '<p style="text-align: center; color: #666; margin: 40px 0;">正在獲取市場最新動態...</p>';
+    prevBtn.disabled = true;
+    nextBtn.disabled = true;
+
+    try {
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/market_news?page=${page}` : `/api/market_news?page=${page}`;
+        const response = await fetch(targetUrl);
+
+        if (!response.ok) throw new Error('API Error');
+        const data = await response.json();
+
+        currentNewsPage = data.current_page;
+        totalNewsPages = data.total_pages;
+
+        if (data.news && data.news.length > 0) {
+            let html = '';
+            data.news.forEach(news => {
+                html += `
+                <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.08);">
+                    <div style="margin-bottom: 5px; display: flex; align-items: center; gap: 8px;">
+                        <span style="background: #f0b90b; color: #1e1e1e; font-weight: bold; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${news.symbol}</span>
+                        <span style="color: #888; font-size: 12px;">${news.date} | 來源: ${news.source || 'FMP'}</span>
+                    </div>
+                    <a href="${news.url}" target="_blank" style="color: #3498db; text-decoration: none; font-size: 16px; font-weight: bold; display: block; margin-bottom: 6px; transition: color 0.2s;" onmouseover="this.style.color='#2980b9'" onmouseout="this.style.color='#3498db'">${news.title}</a>
+                    <p style="color: #aaa; margin: 0; font-size: 13px;">${news.summary}</p>
+                </div>`;
+            });
+            container.innerHTML = html;
+        } else {
+            container.innerHTML = '<p style="text-align: center; color: #888; margin: 40px 0;">目前資料庫尚無新聞。系統將在清晨排程自動抓取。</p>';
+        }
+
+        // 更新翻頁按鈕狀態與文字
+        pageInfo.innerText = `第 ${currentNewsPage} 頁 / 共 ${totalNewsPages} 頁`;
+        prevBtn.disabled = !data.has_prev;
+        nextBtn.disabled = !data.has_next;
+
+        // 視覺化按鈕啟用/禁用狀態
+        prevBtn.style.opacity = data.has_prev ? '1' : '0.4';
+        nextBtn.style.opacity = data.has_next ? '1' : '0.4';
+
+    } catch (error) {
+        console.error('新聞載入失敗:', error);
+        container.innerHTML = '<p style="color: #e74c3c; text-align: center; margin: 40px 0;">新聞載入失敗，請檢查伺服器連線。</p>';
+    }
+}
+
+// 供按鈕呼叫的翻頁函式
+function changeNewsPage(direction) {
+    const newPage = currentNewsPage + direction;
+    if (newPage >= 1 && newPage <= totalNewsPages) {
+        loadMarketNews(newPage);
+    }
+}
+
+// 網頁一載入，立刻去抓第一頁新聞
+document.addEventListener('DOMContentLoaded', () => {
+    loadMarketNews(1);
+});
