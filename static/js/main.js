@@ -10530,6 +10530,28 @@ function changeNewsPage(direction) {
 }
 
 // 網頁一載入，立刻去抓第一頁新聞
-document.addEventListener('DOMContentLoaded', () => {
-    loadMarketNews(1);
+document.addEventListener('DOMContentLoaded', async () => {
+    const briefingContent = document.getElementById('briefing-content');
+    const briefingDate = document.getElementById('briefing-date');
+
+    try {
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/daily_briefing` : '/api/daily_briefing';
+        const response = await fetch(targetUrl);
+        const data = await response.json();
+
+        if(briefingContent) { // 🌟 新增防呆檢查
+            if(data && data.content) {
+                if(briefingDate) briefingDate.innerText = `📅 ${data.date}`;
+                briefingContent.innerHTML = data.content;
+            } else {
+                briefingContent.innerHTML = "<p style='color: #888;'>目前尚無最新晨報資料。</p>";
+            }
+        }
+    } catch (error) {
+        console.error("晨報載入失敗:", error);
+        // 🌟 新增防呆檢查
+        if(briefingContent) {
+            briefingContent.innerHTML = "<p style='color: #e74c3c;'>晨報系統連線異常，請稍後再試。</p>";
+        }
+    }
 });
