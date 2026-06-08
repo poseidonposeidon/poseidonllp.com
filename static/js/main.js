@@ -6,7 +6,7 @@ const baseUrl = 'https://api.poseidonllp.com';
 document.addEventListener('DOMContentLoaded', () => {
     // 頁面載入後，所有需要「綁定」到頁面元素上的功能都在這裡統一執行
     setupThemeToggle();
-    initNewsSection();
+    // initNewsSection();
     // initSearchAndFilters();
 });
 function setupThemeToggle() {
