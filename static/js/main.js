@@ -47,368 +47,368 @@ function setupThemeToggle() {
 
 //////News////
 // 獲取股票新聞函數
-let isUsingAlternateSource = false; //
-const NEWS_PER_PAGE = 10; // 每頁新聞數量
-const MAX_VISIBLE_PAGES = 5;
-
-const toggleNewsSourceBtn = document.getElementById("toggle-news-source");
-if (toggleNewsSourceBtn) {
-    toggleNewsSourceBtn.addEventListener("click", async () => {
-        isUsingAlternateSource = !isUsingAlternateSource;
-
-        await loadNews();
-
-        const filterInputs = document.querySelector(".filter-inputs");
-        const toggleButton = document.getElementById("toggle-news-source");
-        const messageId = 'fmp-login-message';
-
-        if (isUsingAlternateSource) {
-            filterInputs.style.display = "none";
-            toggleButton.textContent = "切換至 原始 新聞來源";
-
-            if (!document.getElementById(messageId)) {
-                const message = document.createElement("div");
-                message.id = messageId;
-                message.textContent = "帳號 : poseidon@poseidonllp.com  密碼 : poseidon52369168";
-                message.style.marginTop = "10px";
-                toggleButton.insertAdjacentElement("afterend", message);
-            }
-        } else {
-            filterInputs.style.display = "flex";
-            toggleButton.textContent = "切換至 FMP 新聞來源";
-
-            const existingMessage = document.getElementById(messageId);
-            if (existingMessage) {
-                existingMessage.remove();
-            }
-        }
-    });
-}
-
-async function fetchStockNews(category = "all", symbol = "", date = "") {
-    let url;
-
-    if (isUsingAlternateSource) {
-        // 維持原始不變
-        url = `${ALTERNATE_URL}?apikey=${API_KEY}`;
-    } else {
-        if (symbol || date) {
-            // 有指定股票代碼或日期，使用特定API
-            url = `https://financialmodelingprep.com/stable/news/stock?apikey=${API_KEY}`;
-
-            if (symbol) {
-                url += `&symbols=${encodeURIComponent(symbol)}`;
-            }
-
-            if (date) {
-                url += `&to=${date}`;
-            }
-        } else {
-            // 無指定股票或日期，使用一般API
-            url = `https://financialmodelingprep.com/stable/news/general-latest?limit=1000&apikey=${API_KEY}`;
-        }
-    }
-
-    try {
-        const response = await fetch(url);
-        if (!response.ok) throw new Error(`Error fetching news: ${response.status}`);
-
-        let data = await response.json();
-
-        if (isUsingAlternateSource) {
-            // 轉換 fmp-articles API 格式，統一為原本 displayNews 所需要的格式
-            data = data.map(news => ({
-                title: news.title,
-                publishedDate: news.date,
-                text: news.content.replace(/<[^>]+>/g, ""),
-                url: news.link,
-                image: news.image || "placeholder.jpg",
-                site: news.site,
-                tickers: news.tickers ? news.tickers.toUpperCase() : "",
-            }));
-
-            if (symbol) {
-                data = data.filter(news => news.tickers && news.tickers.includes(symbol));
-            }
-
-            if (date) {
-                data = data.filter(news => news.publishedDate && news.publishedDate.startsWith(date));
-            }
-        } else {
-            // 排除 seekingalpha.com 的新聞
-            data = data.filter(news => news.site !== "seekingalpha.com");
-        }
-
-        return data;
-    } catch (error) {
-        console.error("Error fetching stock news:", error);
-        return [];
-    }
-}
-/**/
-async function loadNews() {
-    let newsList = await fetchStockNews("all");
-    displayNews(newsList, 1);
-    generatePagination(newsList, 1);
-
-    // **更新按鈕文字 (加入安全檢查)**
-    const toggleBtn = document.getElementById("toggle-news-source");
-    if (toggleBtn) {
-        toggleBtn.textContent = isUsingAlternateSource
-            ? "切換至 原始 新聞來源"
-            : "切換至 FMP 新聞來源";
-    }
-}
-
-async function handleStockSearch(event) {
-    if (event.key === "Enter") {
-        const stockInput = event.target.value.trim().toUpperCase(); // 轉大寫
-        const selectedDate = document.getElementById("news-date").value; // 取得日期（如果有選）
-
-        if (!stockInput) {
-            alert("Please enter a valid stock symbol");
-            return;
-        }
-
-        // **確保 selectedDate 為 undefined 時不傳遞**
-        const newsList = await fetchStockNews("all", stockInput, selectedDate ? selectedDate : undefined);
-        displayNews(newsList, 1);
-        generatePagination(newsList, 1);
-    }
-}
-
-// 頁面加載時初始化
-document.addEventListener("DOMContentLoaded", async () => {
-    await loadNews();
-});
-
-// 顯示新聞
-function displayNews(newsList, currentPage = 1) {
-    const newsContainer = document.getElementById('news-container');
-    // ✅ 修正點：原本寫 !container 會報錯，改為 !newsContainer
-    if (!newsContainer) return;
-
-    newsContainer.innerHTML = '';
-
-    const startIndex = (currentPage - 1) * NEWS_PER_PAGE;
-    const endIndex = startIndex + NEWS_PER_PAGE;
-    const paginatedNews = newsList.slice(startIndex, endIndex);
-
-    if (paginatedNews.length === 0) {
-        newsContainer.innerHTML = '<p>No news available for the selected category.</p>';
-        return;
-    }
-
-    paginatedNews.forEach(news => {
-        const newsItem = document.createElement('div');
-        newsItem.classList.add('news-item');
-        const imageUrl = news.image || 'placeholder.jpg';
-
-        newsItem.innerHTML = `
-            <img src="${imageUrl}" alt="${news.title}" class="news-image">
-            <div class="news-content">
-                <h3><a href="${news.url}" target="_blank">${news.title}</a></h3>
-                <p>${news.text}</p>
-                <a href="${news.url}" target="_blank">Read more</a>
-                <span>${new Date(news.publishedDate).toLocaleString()}</span>
-            </div>
-        `;
-        newsContainer.appendChild(newsItem);
-    });
-}
-
-// 生成分頁按鈕
-function generatePagination(newsList, currentPage) {
-    const paginationContainer = document.getElementById('pagination-container');
-
-    if (!paginationContainer) return;
-
-    paginationContainer.innerHTML = ''; // 清空舊按鈕
-
-    const totalPages = Math.ceil(newsList.length / NEWS_PER_PAGE);
-
-    // 如果只有一頁或根本沒東西，就什麼都不要顯示，保持乾淨
-    if (totalPages <= 1) {
-        return;
-    }
-
-    // --- 步驟一：建立「上一頁」按鈕 ---
-    const prevButton = document.createElement('button');
-    prevButton.textContent = '<< Prev'; // 你想寫中文「上一頁」也行，隨便你
-    prevButton.classList.add('pagination-button');
-    // 如果是第一頁，就讓它不能按
-    if (currentPage === 1) {
-        prevButton.disabled = true;
-        prevButton.style.cursor = 'not-allowed'; // 游標也改一下，比較專業
-    }
-    prevButton.addEventListener('click', () => {
-        displayNews(newsList, currentPage - 1);
-        generatePagination(newsList, currentPage - 1);
-    });
-    paginationContainer.appendChild(prevButton);
-
-
-    // --- 步驟二：中間的數字按鈕（沿用你大部分的舊邏輯）---
-    const createPageButton = (pageNumber) => { // 把你的舊函式搬進來，作用域比較清楚
-        const button = document.createElement('button');
-        button.textContent = pageNumber;
-        button.classList.add('pagination-button');
-        if (pageNumber === currentPage) {
-            button.classList.add('active');
-        }
-        button.addEventListener('click', () => {
-            displayNews(newsList, pageNumber);
-            generatePagination(newsList, pageNumber);
-        });
-        return button;
-    };
-
-    // 建立要顯示的頁碼陣列
-    let pagesToShow = [];
-    if (totalPages <= MAX_VISIBLE_PAGES + 2) {
-        for (let i = 1; i <= totalPages; i++) {
-            pagesToShow.push(i);
-        }
-    } else {
-        pagesToShow.push(1); // 永遠顯示第一頁
-        let start = Math.max(2, currentPage - 2);
-        let end = Math.min(totalPages - 1, currentPage + 2);
-
-        // 確保視窗寬度
-        if (currentPage < 4) {
-            end = 5;
-        }
-        if (currentPage > totalPages - 3) {
-            start = totalPages - 4;
-        }
-
-        if (start > 2) {
-            pagesToShow.push('...');
-        }
-        for (let i = start; i <= end; i++) {
-            pagesToShow.push(i);
-        }
-        if (end < totalPages - 1) {
-            pagesToShow.push('...');
-        }
-        pagesToShow.push(totalPages); // 永遠顯示最後一頁
-    }
-
-    // 根據頁碼陣列產生按鈕或省略號
-    pagesToShow.forEach(page => {
-        if (page === '...') {
-            const ellipsis = document.createElement('span');
-            ellipsis.textContent = '...';
-            ellipsis.style.margin = '0 10px'; // 給省略號一點空間
-            ellipsis.style.alignSelf = 'center';
-            paginationContainer.appendChild(ellipsis);
-        } else {
-            paginationContainer.appendChild(createPageButton(page));
-        }
-    });
-
-
-    // --- 步驟三：建立「下一頁」按鈕 ---
-    const nextButton = document.createElement('button');
-    nextButton.textContent = 'Next >>'; // 同上，你想寫中文也行
-    nextButton.classList.add('pagination-button');
-    // 如果是最後一頁，就讓它不能按
-    if (currentPage === totalPages) {
-        nextButton.disabled = true;
-        nextButton.style.cursor = 'not-allowed';
-    }
-    nextButton.addEventListener('click', () => {
-        displayNews(newsList, currentPage + 1);
-        generatePagination(newsList, currentPage + 1);
-    });
-    paginationContainer.appendChild(nextButton);
-}
-
-// 初始化函數
-async function initNewsSection() {
-    const filterButtons = document.querySelectorAll('.filter-section button[data-category]');
-    let newsList = await fetchStockNews('all');
-    displayNews(newsList, 1); // 預設顯示第 1 頁
-    generatePagination(newsList, 1);
-
-    filterButtons.forEach(button => {
-        button.addEventListener('click', async () => {
-            filterButtons.forEach(btn => btn.classList.remove('active'));
-            button.classList.add('active');
-
-            const category = button.getAttribute('data-category');
-            newsList = await fetchStockNews(category);
-            displayNews(newsList, 1); // 顯示新類別的第 1 頁
-            generatePagination(newsList, 1);
-        });
-    });
-}
-
-async function handleToggleNewsSource() {
-    isUsingAlternateSource = !isUsingAlternateSource;
-    await loadNews();
-
-    const filterInputs = document.querySelector(".filter-inputs");
-    const toggleButton = document.getElementById("toggle-news-source");
-    const messageId = 'fmp-login-message';
-
-    if (isUsingAlternateSource) {
-        // --- 切換到 FMP 來源 ---
-        filterInputs.style.display = "none";
-        toggleButton.textContent = "切換至 原始 新聞來源";
-
-        if (!document.getElementById(messageId)) {
-            const message = document.createElement("div");
-            message.id = messageId;
-            message.textContent = "帳號 : poseidon@poseidonllp.com  密碼 : poseidon52369168";
-            message.style.marginTop = "10px";
-            toggleButton.insertAdjacentElement("afterend", message);
-        }
-    } else {
-        // --- 切換回原始來源 ---
-        filterInputs.style.display = "flex";
-        toggleButton.textContent = "切換至 FMP 新聞來源";
-        const existingMessage = document.getElementById(messageId);
-        if (existingMessage) {
-            existingMessage.remove();
-        }
-    }
-}
-
-// 初始化輸入框監聽
-function initSearchInput() {
-    const stockInput = document.getElementById('stock-input');
-    stockInput.addEventListener('keyup', handleStockSearch);
-}
-
-// document.getElementById("filter-by-date").addEventListener("click", async () => {
-//     const selectedDate = document.getElementById("news-date").value;
-//     const stockInput = document.getElementById("stock-input").value.trim().toUpperCase(); // 取得輸入的股票代號（如果有）
+// let isUsingAlternateSource = false; //
+// const NEWS_PER_PAGE = 10; // 每頁新聞數量
+// const MAX_VISIBLE_PAGES = 5;
 //
-//     if (!selectedDate) {
-//         alert("請選擇日期");
+// const toggleNewsSourceBtn = document.getElementById("toggle-news-source");
+// if (toggleNewsSourceBtn) {
+//     toggleNewsSourceBtn.addEventListener("click", async () => {
+//         isUsingAlternateSource = !isUsingAlternateSource;
+//
+//         await loadNews();
+//
+//         const filterInputs = document.querySelector(".filter-inputs");
+//         const toggleButton = document.getElementById("toggle-news-source");
+//         const messageId = 'fmp-login-message';
+//
+//         if (isUsingAlternateSource) {
+//             filterInputs.style.display = "none";
+//             toggleButton.textContent = "切換至 原始 新聞來源";
+//
+//             if (!document.getElementById(messageId)) {
+//                 const message = document.createElement("div");
+//                 message.id = messageId;
+//                 message.textContent = "帳號 : poseidon@poseidonllp.com  密碼 : poseidon52369168";
+//                 message.style.marginTop = "10px";
+//                 toggleButton.insertAdjacentElement("afterend", message);
+//             }
+//         } else {
+//             filterInputs.style.display = "flex";
+//             toggleButton.textContent = "切換至 FMP 新聞來源";
+//
+//             const existingMessage = document.getElementById(messageId);
+//             if (existingMessage) {
+//                 existingMessage.remove();
+//             }
+//         }
+//     });
+// }
+//
+// async function fetchStockNews(category = "all", symbol = "", date = "") {
+//     let url;
+//
+//     if (isUsingAlternateSource) {
+//         // 維持原始不變
+//         url = `${ALTERNATE_URL}?apikey=${API_KEY}`;
+//     } else {
+//         if (symbol || date) {
+//             // 有指定股票代碼或日期，使用特定API
+//             url = `https://financialmodelingprep.com/stable/news/stock?apikey=${API_KEY}`;
+//
+//             if (symbol) {
+//                 url += `&symbols=${encodeURIComponent(symbol)}`;
+//             }
+//
+//             if (date) {
+//                 url += `&to=${date}`;
+//             }
+//         } else {
+//             // 無指定股票或日期，使用一般API
+//             url = `https://financialmodelingprep.com/stable/news/general-latest?limit=1000&apikey=${API_KEY}`;
+//         }
+//     }
+//
+//     try {
+//         const response = await fetch(url);
+//         if (!response.ok) throw new Error(`Error fetching news: ${response.status}`);
+//
+//         let data = await response.json();
+//
+//         if (isUsingAlternateSource) {
+//             // 轉換 fmp-articles API 格式，統一為原本 displayNews 所需要的格式
+//             data = data.map(news => ({
+//                 title: news.title,
+//                 publishedDate: news.date,
+//                 text: news.content.replace(/<[^>]+>/g, ""),
+//                 url: news.link,
+//                 image: news.image || "placeholder.jpg",
+//                 site: news.site,
+//                 tickers: news.tickers ? news.tickers.toUpperCase() : "",
+//             }));
+//
+//             if (symbol) {
+//                 data = data.filter(news => news.tickers && news.tickers.includes(symbol));
+//             }
+//
+//             if (date) {
+//                 data = data.filter(news => news.publishedDate && news.publishedDate.startsWith(date));
+//             }
+//         } else {
+//             // 排除 seekingalpha.com 的新聞
+//             data = data.filter(news => news.site !== "seekingalpha.com");
+//         }
+//
+//         return data;
+//     } catch (error) {
+//         console.error("Error fetching stock news:", error);
+//         return [];
+//     }
+// }
+// /**/
+// async function loadNews() {
+//     let newsList = await fetchStockNews("all");
+//     displayNews(newsList, 1);
+//     generatePagination(newsList, 1);
+//
+//     // **更新按鈕文字 (加入安全檢查)**
+//     const toggleBtn = document.getElementById("toggle-news-source");
+//     if (toggleBtn) {
+//         toggleBtn.textContent = isUsingAlternateSource
+//             ? "切換至 原始 新聞來源"
+//             : "切換至 FMP 新聞來源";
+//     }
+// }
+//
+// async function handleStockSearch(event) {
+//     if (event.key === "Enter") {
+//         const stockInput = event.target.value.trim().toUpperCase(); // 轉大寫
+//         const selectedDate = document.getElementById("news-date").value; // 取得日期（如果有選）
+//
+//         if (!stockInput) {
+//             alert("Please enter a valid stock symbol");
+//             return;
+//         }
+//
+//         // **確保 selectedDate 為 undefined 時不傳遞**
+//         const newsList = await fetchStockNews("all", stockInput, selectedDate ? selectedDate : undefined);
+//         displayNews(newsList, 1);
+//         generatePagination(newsList, 1);
+//     }
+// }
+//
+// // 頁面加載時初始化
+// document.addEventListener("DOMContentLoaded", async () => {
+//     await loadNews();
+// });
+//
+// // 顯示新聞
+// function displayNews(newsList, currentPage = 1) {
+//     const newsContainer = document.getElementById('news-container');
+//     // ✅ 修正點：原本寫 !container 會報錯，改為 !newsContainer
+//     if (!newsContainer) return;
+//
+//     newsContainer.innerHTML = '';
+//
+//     const startIndex = (currentPage - 1) * NEWS_PER_PAGE;
+//     const endIndex = startIndex + NEWS_PER_PAGE;
+//     const paginatedNews = newsList.slice(startIndex, endIndex);
+//
+//     if (paginatedNews.length === 0) {
+//         newsContainer.innerHTML = '<p>No news available for the selected category.</p>';
 //         return;
 //     }
 //
-//     // **確保 selectedDate 為 undefined 時不傳遞**
-//     const newsList = await fetchStockNews("all", stockInput || "", selectedDate ? selectedDate : undefined);
-//     displayNews(newsList, 1);
-//     generatePagination(newsList, 1);
-// });
+//     paginatedNews.forEach(news => {
+//         const newsItem = document.createElement('div');
+//         newsItem.classList.add('news-item');
+//         const imageUrl = news.image || 'placeholder.jpg';
 //
-// document.getElementById('stock-input').addEventListener('input', function (event) {
-//     event.target.value = event.target.value.toUpperCase(); // 轉換為大寫
-// });
+//         newsItem.innerHTML = `
+//             <img src="${imageUrl}" alt="${news.title}" class="news-image">
+//             <div class="news-content">
+//                 <h3><a href="${news.url}" target="_blank">${news.title}</a></h3>
+//                 <p>${news.text}</p>
+//                 <a href="${news.url}" target="_blank">Read more</a>
+//                 <span>${new Date(news.publishedDate).toLocaleString()}</span>
+//             </div>
+//         `;
+//         newsContainer.appendChild(newsItem);
+//     });
+// }
 //
-// document.getElementById('stock-input').addEventListener('keydown', function (event) {
-//     if (event.key === 'Enter') {
-//         // 獲取建議框容器
-//         const suggestionsContainer = document.getElementById('suggestions-container');
-//         // 執行清空建議框的操作
-//         clearSuggestions();
+// // 生成分頁按鈕
+// function generatePagination(newsList, currentPage) {
+//     const paginationContainer = document.getElementById('pagination-container');
+//
+//     if (!paginationContainer) return;
+//
+//     paginationContainer.innerHTML = ''; // 清空舊按鈕
+//
+//     const totalPages = Math.ceil(newsList.length / NEWS_PER_PAGE);
+//
+//     // 如果只有一頁或根本沒東西，就什麼都不要顯示，保持乾淨
+//     if (totalPages <= 1) {
+//         return;
 //     }
-// });
-
+//
+//     // --- 步驟一：建立「上一頁」按鈕 ---
+//     const prevButton = document.createElement('button');
+//     prevButton.textContent = '<< Prev'; // 你想寫中文「上一頁」也行，隨便你
+//     prevButton.classList.add('pagination-button');
+//     // 如果是第一頁，就讓它不能按
+//     if (currentPage === 1) {
+//         prevButton.disabled = true;
+//         prevButton.style.cursor = 'not-allowed'; // 游標也改一下，比較專業
+//     }
+//     prevButton.addEventListener('click', () => {
+//         displayNews(newsList, currentPage - 1);
+//         generatePagination(newsList, currentPage - 1);
+//     });
+//     paginationContainer.appendChild(prevButton);
+//
+//
+//     // --- 步驟二：中間的數字按鈕（沿用你大部分的舊邏輯）---
+//     const createPageButton = (pageNumber) => { // 把你的舊函式搬進來，作用域比較清楚
+//         const button = document.createElement('button');
+//         button.textContent = pageNumber;
+//         button.classList.add('pagination-button');
+//         if (pageNumber === currentPage) {
+//             button.classList.add('active');
+//         }
+//         button.addEventListener('click', () => {
+//             displayNews(newsList, pageNumber);
+//             generatePagination(newsList, pageNumber);
+//         });
+//         return button;
+//     };
+//
+//     // 建立要顯示的頁碼陣列
+//     let pagesToShow = [];
+//     if (totalPages <= MAX_VISIBLE_PAGES + 2) {
+//         for (let i = 1; i <= totalPages; i++) {
+//             pagesToShow.push(i);
+//         }
+//     } else {
+//         pagesToShow.push(1); // 永遠顯示第一頁
+//         let start = Math.max(2, currentPage - 2);
+//         let end = Math.min(totalPages - 1, currentPage + 2);
+//
+//         // 確保視窗寬度
+//         if (currentPage < 4) {
+//             end = 5;
+//         }
+//         if (currentPage > totalPages - 3) {
+//             start = totalPages - 4;
+//         }
+//
+//         if (start > 2) {
+//             pagesToShow.push('...');
+//         }
+//         for (let i = start; i <= end; i++) {
+//             pagesToShow.push(i);
+//         }
+//         if (end < totalPages - 1) {
+//             pagesToShow.push('...');
+//         }
+//         pagesToShow.push(totalPages); // 永遠顯示最後一頁
+//     }
+//
+//     // 根據頁碼陣列產生按鈕或省略號
+//     pagesToShow.forEach(page => {
+//         if (page === '...') {
+//             const ellipsis = document.createElement('span');
+//             ellipsis.textContent = '...';
+//             ellipsis.style.margin = '0 10px'; // 給省略號一點空間
+//             ellipsis.style.alignSelf = 'center';
+//             paginationContainer.appendChild(ellipsis);
+//         } else {
+//             paginationContainer.appendChild(createPageButton(page));
+//         }
+//     });
+//
+//
+//     // --- 步驟三：建立「下一頁」按鈕 ---
+//     const nextButton = document.createElement('button');
+//     nextButton.textContent = 'Next >>'; // 同上，你想寫中文也行
+//     nextButton.classList.add('pagination-button');
+//     // 如果是最後一頁，就讓它不能按
+//     if (currentPage === totalPages) {
+//         nextButton.disabled = true;
+//         nextButton.style.cursor = 'not-allowed';
+//     }
+//     nextButton.addEventListener('click', () => {
+//         displayNews(newsList, currentPage + 1);
+//         generatePagination(newsList, currentPage + 1);
+//     });
+//     paginationContainer.appendChild(nextButton);
+// }
+//
+// // 初始化函數
+// async function initNewsSection() {
+//     const filterButtons = document.querySelectorAll('.filter-section button[data-category]');
+//     let newsList = await fetchStockNews('all');
+//     displayNews(newsList, 1); // 預設顯示第 1 頁
+//     generatePagination(newsList, 1);
+//
+//     filterButtons.forEach(button => {
+//         button.addEventListener('click', async () => {
+//             filterButtons.forEach(btn => btn.classList.remove('active'));
+//             button.classList.add('active');
+//
+//             const category = button.getAttribute('data-category');
+//             newsList = await fetchStockNews(category);
+//             displayNews(newsList, 1); // 顯示新類別的第 1 頁
+//             generatePagination(newsList, 1);
+//         });
+//     });
+// }
+//
+// async function handleToggleNewsSource() {
+//     isUsingAlternateSource = !isUsingAlternateSource;
+//     await loadNews();
+//
+//     const filterInputs = document.querySelector(".filter-inputs");
+//     const toggleButton = document.getElementById("toggle-news-source");
+//     const messageId = 'fmp-login-message';
+//
+//     if (isUsingAlternateSource) {
+//         // --- 切換到 FMP 來源 ---
+//         filterInputs.style.display = "none";
+//         toggleButton.textContent = "切換至 原始 新聞來源";
+//
+//         if (!document.getElementById(messageId)) {
+//             const message = document.createElement("div");
+//             message.id = messageId;
+//             message.textContent = "帳號 : poseidon@poseidonllp.com  密碼 : poseidon52369168";
+//             message.style.marginTop = "10px";
+//             toggleButton.insertAdjacentElement("afterend", message);
+//         }
+//     } else {
+//         // --- 切換回原始來源 ---
+//         filterInputs.style.display = "flex";
+//         toggleButton.textContent = "切換至 FMP 新聞來源";
+//         const existingMessage = document.getElementById(messageId);
+//         if (existingMessage) {
+//             existingMessage.remove();
+//         }
+//     }
+// }
+//
+// // 初始化輸入框監聽
+// function initSearchInput() {
+//     const stockInput = document.getElementById('stock-input');
+//     stockInput.addEventListener('keyup', handleStockSearch);
+// }
+//
+// // document.getElementById("filter-by-date").addEventListener("click", async () => {
+// //     const selectedDate = document.getElementById("news-date").value;
+// //     const stockInput = document.getElementById("stock-input").value.trim().toUpperCase(); // 取得輸入的股票代號（如果有）
+// //
+// //     if (!selectedDate) {
+// //         alert("請選擇日期");
+// //         return;
+// //     }
+// //
+// //     // **確保 selectedDate 為 undefined 時不傳遞**
+// //     const newsList = await fetchStockNews("all", stockInput || "", selectedDate ? selectedDate : undefined);
+// //     displayNews(newsList, 1);
+// //     generatePagination(newsList, 1);
+// // });
+// //
+// // document.getElementById('stock-input').addEventListener('input', function (event) {
+// //     event.target.value = event.target.value.toUpperCase(); // 轉換為大寫
+// // });
+// //
+// // document.getElementById('stock-input').addEventListener('keydown', function (event) {
+// //     if (event.key === 'Enter') {
+// //         // 獲取建議框容器
+// //         const suggestionsContainer = document.getElementById('suggestions-container');
+// //         // 執行清空建議框的操作
+// //         clearSuggestions();
+// //     }
+// // });
+//
 
 //////////////////////////////////////////////////////////////////////////////
 let activeSection = null;
@@ -10529,8 +10529,6 @@ function changeNewsPage(direction) {
     }
 }
 
-// 網頁一載入，立刻去抓第一頁新聞
-// 網頁載入完成後，自動去抓取今天的晨報
 document.addEventListener('DOMContentLoaded', async () => {
     // 先去畫面上尋找這兩個元素
     const briefingContent = document.getElementById('briefing-content');
