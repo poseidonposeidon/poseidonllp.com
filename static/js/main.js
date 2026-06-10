@@ -9122,6 +9122,8 @@ async function runDeepDive(event) {
         window.currentDeepDiveData = data.raw_data;
         window.currentReportContent = data.report;
 
+        saveToLocalHistory(symbol, data.raw_data, data.report);
+
         if (loadingText) loadingText.innerText = "AI 正在排版分析報告與財務雷達...";
 
         // 5. 渲染報告與財報防禦雷達徽章
@@ -10594,5 +10596,137 @@ function switchView(targetView, event) {
             if(mainContent) mainContent.style.display = 'none';
             if(emptyState) emptyState.style.display = '';
         }
+    }
+}
+
+// ==========================================
+// 📜 全域共用歷史紀錄管理系統 (Database Backend)
+// ==========================================
+
+// 1. 打開歷史紀錄面板 (向伺服器要資料)
+async function openHistoryModal(event) {
+    if (event) event.preventDefault();
+    const modal = document.getElementById('history-modal');
+    const container = document.getElementById('history-list-container');
+    if (!modal || !container) return;
+
+    modal.style.display = 'flex';
+    container.innerHTML = '<p style="color: #888; text-align: center; margin: 30px 0;"><i class="fas fa-spinner fa-spin"></i> 正在從雲端智庫讀取紀錄...</p>';
+
+    try {
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/history/list` : '/api/history/list';
+        const response = await fetch(targetUrl);
+        const history = await response.json();
+
+        if (history.length === 0) {
+            container.innerHTML = '<p style="color: #888; text-align: center; margin: 30px 0;">智庫中目前尚無任何分析紀錄。</p>';
+        } else {
+            let html = '';
+            history.forEach(item => {
+                html += `
+                <div style="background: #2a2a2a; border: 1px solid #444; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; cursor: pointer;" onmouseover="this.style.borderColor='#f0b90b'" onmouseout="this.style.borderColor='#444'" onclick="restoreFromHistory(${item.id})">
+                    <div>
+                        <strong style="color: #f0b90b; font-size: 18px;">${item.symbol}</strong>
+                        <div style="color: #888; font-size: 12px; margin-top: 4px;">📅 全域分析時間：${item.date} (UTC)</div>
+                    </div>
+                    <button style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">
+                        載入還原 ⚡
+                    </button>
+                </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+    } catch (error) {
+        console.error("讀取歷史清單失敗:", error);
+        container.innerHTML = '<p style="color: #e74c3c; text-align: center; margin: 30px 0;">連線伺服器失敗，無法讀取紀錄。</p>';
+    }
+}
+
+// 2. 關閉面板
+function closeHistoryModal() {
+    const modal = document.getElementById('history-modal');
+    if (modal) modal.style.display = 'none';
+}
+
+// 3. 從雲端抓取詳細數據並一鍵還原 (Zero-API Cost Restoration)
+async function restoreFromHistory(historyId) {
+    // 關閉彈窗並切換視角
+    closeHistoryModal();
+    switchView('analysis');
+
+    const loadingScreen = document.getElementById('dd-loading-screen');
+    const loadingText = document.getElementById('dd-loading-text');
+    const reportContainer = document.getElementById('dd-report-container');
+
+    if (loadingScreen) loadingScreen.style.display = 'flex';
+    if (loadingText) loadingText.innerText = `⚡ 正在從雲端智庫下載並還原數據...`;
+    if (reportContainer) reportContainer.innerHTML = "";
+
+    try {
+        // 向後端請求完整的報告與 JSON 數據
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/history/${historyId}` : `/api/history/${historyId}`;
+        const response = await fetch(targetUrl);
+        const item = await response.json();
+
+        if (item.error) throw new Error(item.error);
+
+        // 填回搜尋框
+        const symbolInput = document.getElementById('dd-stock-input');
+        if (symbolInput) symbolInput.value = item.symbol;
+
+        // 設定全域變數
+        window.currentDeepDiveData = item.raw_data;
+        window.currentReportContent = item.report;
+
+        // 渲染 Markdown 與雷達徽章
+        renderDeepDiveMarkdown(item.report, reportContainer, item.raw_data);
+
+        // 重啟沙盤監聽
+        let currentEps = 0;
+        if (item.raw_data.quote && item.raw_data.quote.length > 0 && item.raw_data.quote[0].eps) {
+            currentEps = item.raw_data.quote[0].eps;
+        } else if (item.raw_data.income_statement && item.raw_data.income_statement.length > 0) {
+            currentEps = item.raw_data.income_statement[0].eps;
+        } else {
+            currentEps = item.raw_data.eps || 1;
+        }
+
+        let currentPrice = 1;
+        if (item.raw_data.quote && item.raw_data.quote.length > 0 && item.raw_data.quote[0].price) {
+            currentPrice = item.raw_data.quote[0].price;
+        } else {
+            currentPrice = item.raw_data.price || 1;
+        }
+
+        let currentPe = (currentEps > 0) ? (currentPrice / currentEps).toFixed(1) : "N/A";
+
+        if (typeof initScenarioModeling === 'function') {
+            initScenarioModeling(currentEps, currentPrice, currentPe);
+        }
+
+        // 重繪圖表
+        if (loadingText) loadingText.innerText = "正在重建視覺化圖表...";
+        window.deepDiveChartInstances = window.deepDiveChartInstances || {};
+
+        await Promise.all([
+            drawValuationChart(item.symbol),
+            drawInsiderChart(item.raw_data.insider_transactions),
+            drawMarginsChart(item.symbol),
+            drawGrowthChart(item.symbol),
+            drawCashflowChart(item.symbol),
+            drawTechChart(item.symbol)
+        ]);
+
+        if (typeof attachChartClickListeners === 'function') attachChartClickListeners();
+        initDeepDiveChat(item.symbol);
+
+    } catch (error) {
+        console.error("還原歷史失敗:", error);
+        alert(`還原失敗: ${error.message}`);
+    } finally {
+        if (loadingScreen) loadingScreen.style.display = 'none';
+        const returnAnalysisBtn = document.getElementById('nav-analysis-btn');
+        if (returnAnalysisBtn) returnAnalysisBtn.style.display = 'none';
     }
 }
