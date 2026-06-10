@@ -9077,6 +9077,9 @@ async function runDeepDive(event) {
     const briefingSection = document.getElementById('daily-briefing-section');
     if (briefingSection) briefingSection.style.display = 'none';
 
+    const returnAnalysisBtn = document.getElementById('nav-analysis-btn');
+    if (returnAnalysisBtn) returnAnalysisBtn.style.display = 'none';
+
     const symbolInput = document.getElementById('dd-stock-input');
     if (!symbolInput) return;
 
@@ -10539,3 +10542,48 @@ document.addEventListener('DOMContentLoaded', () => {
         loadMarketNews(1, ''); // 初始載入無過濾條件
     }
 });
+
+// ==========================================
+// 🌟 視角切換遙控器 (保留狀態，不重整網頁)
+// ==========================================
+function switchView(targetView) {
+    // 抓取畫面上所有的主區塊
+    const newsSection = document.getElementById('daily-briefing-section');
+    const mainContent = document.getElementById('dd-main-content');
+    const screenerContent = document.getElementById('dd-screener-content');
+    const trumpContent = document.getElementById('dd-trump-content');
+    const emptyState = document.getElementById('dd-empty-state');
+    const returnAnalysisBtn = document.getElementById('nav-analysis-btn');
+
+    // 第一步：無情地把所有區塊先隱藏起來
+    if(newsSection) newsSection.style.display = 'none';
+    if(mainContent) mainContent.style.display = 'none';
+    if(screenerContent) screenerContent.style.display = 'none';
+    if(trumpContent) trumpContent.style.display = 'none';
+    if(emptyState) emptyState.style.display = 'none';
+
+    // 第二步：根據使用者的指令，單獨顯示對應的區塊
+    if (targetView === 'news') {
+        // 顯示新聞
+        if(newsSection) newsSection.style.display = 'block';
+
+        // 💡 核心邏輯：判斷目前是否有「已完成的分析報告」？
+        // 如果有，就顯示「返回當前分析」的綠色按鈕，讓使用者可以隨時切回去
+        if (window.currentReportContent && returnAnalysisBtn) {
+            returnAnalysisBtn.style.display = 'inline-block';
+        }
+
+    } else if (targetView === 'analysis') {
+        // 因為已經回到分析畫面了，所以隱藏「返回」按鈕
+        if (returnAnalysisBtn) returnAnalysisBtn.style.display = 'none';
+
+        // 顯示分析畫面
+        if(window.currentReportContent) {
+            // 如果有資料，顯示報告與圖表區塊
+            if(mainContent) mainContent.style.display = 'block';
+        } else {
+            // 如果其實還沒分析過，顯示預設的歡迎畫面
+            if(emptyState) emptyState.style.display = 'block';
+        }
+    }
+}
