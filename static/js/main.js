@@ -10546,7 +10546,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // ==========================================
 // 🌟 視角切換遙控器 (保留狀態，不重整網頁)
 // ==========================================
-function switchView(targetView) {
+function switchView(targetView, event) {
+    // 🌟 終極防呆：阻止按鈕觸發任何表單重整
+    if (event) {
+        event.preventDefault();
+    }
+
     // 抓取畫面上所有的主區塊
     const newsSection = document.getElementById('daily-briefing-section');
     const mainContent = document.getElementById('dd-main-content');
@@ -10555,22 +10560,19 @@ function switchView(targetView) {
     const emptyState = document.getElementById('dd-empty-state');
     const returnAnalysisBtn = document.getElementById('nav-analysis-btn');
 
-    // 第一步：先把所有區塊先隱藏起來
-    if(newsSection) newsSection.style.display = 'none';
-    if(mainContent) mainContent.style.display = 'none';
-    if(screenerContent) screenerContent.style.display = 'none';
-    if(trumpContent) trumpContent.style.display = 'none';
-    if(emptyState) emptyState.style.display = 'none';
-
-    // 第二步：根據使用者的指令顯示對應區塊
+    // 根據使用者的指令切換視野
     if (targetView === 'news') {
-        // 🌟 顯示新聞區塊
-        if(newsSection) newsSection.style.display = 'block';
+        // 1. 隱藏不該出現的區塊 (分析、選股、川普)
+        if(mainContent) mainContent.style.display = 'none';
+        if(screenerContent) screenerContent.style.display = 'none';
+        if(trumpContent) trumpContent.style.display = 'none';
 
-        // 🌟 修正點：回到新聞首頁時，必須要把「探索美股板塊」也顯示出來！
-        if(emptyState) emptyState.style.display = 'block';
+        // 2. 顯示新聞與預設狀態
+        // 💡 關鍵技巧：使用空字串 '' 代替 'block'，這樣原本是 Flex 的元素就不會崩塌跑版！
+        if(newsSection) newsSection.style.display = '';
+        if(emptyState) emptyState.style.display = '';
 
-        // 判斷是否要顯示「返回當前分析」的綠色按鈕
+        // 3. 判斷是否要顯示「返回當前分析」的綠色按鈕
         if (window.currentReportContent && returnAnalysisBtn) {
             returnAnalysisBtn.style.display = 'inline-block';
         } else if (returnAnalysisBtn) {
@@ -10578,16 +10580,19 @@ function switchView(targetView) {
         }
 
     } else if (targetView === 'analysis') {
-        // 因為已經回到分析畫面了，所以隱藏「返回」按鈕
+        // 1. 回到分析畫面，隱藏「返回」按鈕與新聞
         if (returnAnalysisBtn) returnAnalysisBtn.style.display = 'none';
+        if (newsSection) newsSection.style.display = 'none';
 
-        // 顯示分析畫面
+        // 2. 判斷要顯示哪一個畫面
         if(window.currentReportContent) {
-            // 如果有資料，顯示報告與圖表區塊
-            if(mainContent) mainContent.style.display = 'block';
+            // 如果有跑過分析，就顯示圖表
+            if(emptyState) emptyState.style.display = 'none';
+            if(mainContent) mainContent.style.display = '';
         } else {
-            // 如果其實還沒分析過，顯示預設的歡迎畫面
-            if(emptyState) emptyState.style.display = 'block';
+            // 如果根本還沒分析過，就顯示預設畫面
+            if(mainContent) mainContent.style.display = 'none';
+            if(emptyState) emptyState.style.display = '';
         }
     }
 }
