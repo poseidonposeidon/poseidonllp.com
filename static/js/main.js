@@ -9122,8 +9122,6 @@ async function runDeepDive(event) {
         window.currentDeepDiveData = data.raw_data;
         window.currentReportContent = data.report;
 
-        saveToLocalHistory(symbol, data.raw_data, data.report);
-
         if (loadingText) loadingText.innerText = "AI 正在排版分析報告與財務雷達...";
 
         // 5. 渲染報告與財報防禦雷達徽章
