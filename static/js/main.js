@@ -10555,22 +10555,26 @@ function switchView(targetView) {
     const emptyState = document.getElementById('dd-empty-state');
     const returnAnalysisBtn = document.getElementById('nav-analysis-btn');
 
-    // 第一步：無情地把所有區塊先隱藏起來
+    // 第一步：先把所有區塊先隱藏起來
     if(newsSection) newsSection.style.display = 'none';
     if(mainContent) mainContent.style.display = 'none';
     if(screenerContent) screenerContent.style.display = 'none';
     if(trumpContent) trumpContent.style.display = 'none';
     if(emptyState) emptyState.style.display = 'none';
 
-    // 第二步：根據使用者的指令，單獨顯示對應的區塊
+    // 第二步：根據使用者的指令顯示對應區塊
     if (targetView === 'news') {
-        // 顯示新聞
+        // 🌟 顯示新聞區塊
         if(newsSection) newsSection.style.display = 'block';
 
-        // 💡 核心邏輯：判斷目前是否有「已完成的分析報告」？
-        // 如果有，就顯示「返回當前分析」的綠色按鈕，讓使用者可以隨時切回去
+        // 🌟 修正點：回到新聞首頁時，必須要把「探索美股板塊」也顯示出來！
+        if(emptyState) emptyState.style.display = 'block';
+
+        // 判斷是否要顯示「返回當前分析」的綠色按鈕
         if (window.currentReportContent && returnAnalysisBtn) {
             returnAnalysisBtn.style.display = 'inline-block';
+        } else if (returnAnalysisBtn) {
+            returnAnalysisBtn.style.display = 'none';
         }
 
     } else if (targetView === 'analysis') {
