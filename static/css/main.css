@@ -2619,3 +2619,80 @@ body.light-mode {
     overflow: hidden !important;
     opacity: 0 !important;
 }
+
+/* =========================================
+   操作列按鈕 (Action Bar Buttons) 統一視覺規範
+   ========================================= */
+.action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;             /* 圖示與文字的間距 */
+    height: 40px;         /* 🌟 核心：強制所有按鈕高度一致 */
+    padding: 0 16px;      /* 統一內邊距 */
+    font-size: 14px;      /* 統一字體大小 */
+    font-weight: 600;     /* 半粗體增加質感 */
+    border-radius: 8px;   /* 現代感圓角 */
+    border: 1px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;  /* 防止文字擠壓換行 */
+    transition: all 0.2s ease-in-out;
+}
+
+/* 讓裡面的 Emoji 圖示稍微大一點點，對齊文字 */
+.action-btn span {
+    font-size: 16px;
+}
+
+/* --- 按鈕顏色變體與 Hover 微動畫 --- */
+.btn-analyze {
+    background-color: #f0b90b;
+    color: #1e1e1e;
+}
+.btn-analyze:hover {
+    background-color: #f2c94c;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(240, 185, 11, 0.3);
+}
+
+.btn-excel {
+    background-color: #27ae60;
+    color: white;
+}
+.btn-excel:hover {
+    background-color: #2ecc71;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.3);
+}
+
+.btn-screener {
+    background-color: #3498db;
+    color: white;
+}
+.btn-screener:hover {
+    background-color: #2980b9;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+}
+
+.btn-trump {
+    background-color: #e74c3c;
+    color: white;
+}
+.btn-trump:hover {
+    background-color: #c0392b;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(231, 76, 60, 0.3);
+}
+
+/* 深色透明背景按鈕 (用於切換視圖) */
+.btn-nav {
+    background-color: rgba(255, 255, 255, 0.08);
+    color: #ffffff;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.btn-nav:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+    transform: translateY(-2px);
+}

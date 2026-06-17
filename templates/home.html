@@ -507,37 +507,39 @@
                 AI Deep Dive <span style="font-size: 12px; color: #aaa; border: 1px solid #555; padding: 2px 6px; border-radius: 4px;">PRO</span>
             </h2>
 
-            <div style="display: flex; flex-grow: 1; gap: 10px; max-width: 1000px;">
+            <div style="display: flex; flex-grow: 1; gap: 10px; max-width: 1000px; align-items: center;">
 
                 <div class="dd-search-box" style="position: relative; flex-grow: 1;">
-                    <input type="text" id="dd-stock-input" class="dd-search-input" placeholder="ENTER SYMBOL (E.G. AAPL)" autocomplete="off" style="width: 100%; box-sizing: border-box; padding: 10px 15px; border-radius: 6px; border: 1px solid #444; background: #222; color: white; outline: none; font-size: 15px;">
+                    <input type="text" id="dd-stock-input" class="dd-search-input" placeholder="ENTER SYMBOL (E.G. AAPL)" autocomplete="off" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 15px; border-radius: 8px; border: 1px solid #444; background: #222; color: white; outline: none; font-size: 14px;">
                     <div id="dd-suggestions" class="dd-suggestions-list" style="position: absolute; top: calc(100% + 5px); left: 0; width: 100%; z-index: 100;"></div>
                 </div>
 
-                <button onclick="runDeepDive()" style="background: #f0b90b; color: #1e1e1e; border: none; padding: 0 20px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap; font-size: 15px; transition: background 0.2s;">
+                <button onclick="runDeepDive()" class="action-btn btn-analyze">
                     Analyze
                 </button>
 
-                <button onclick="triggerExcelDownload(event)" title="將 20 年財務數據與逐字稿直接存入 Google Drive 的美股資訊資料夾" style="background: #27ae60; color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap; transition: background 0.2s; display: flex; align-items: center; gap: 6px; font-size: 15px;">
-                    <span style="font-size: 16px;">☁️</span> 匯出原始數據 (Drive)
+                <button onclick="triggerExcelDownload(event)" title="將 20 年財務數據與逐字稿存入 Google Drive" class="action-btn btn-excel">
+                    <span>☁️</span> 匯出數據
                 </button>
 
-                <button onclick="toggleScreener()" id="screener-toggle-btn" style="background: #3498db; color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap; transition: background 0.2s; display: flex; align-items: center; gap: 6px; font-size: 15px;">
-                    <span style="font-size: 16px;">✨</span> 語意選股
+                <button onclick="toggleScreener()" id="screener-toggle-btn" class="action-btn btn-screener">
+                    <span>✨</span> 語意選股
                 </button>
 
-                <button onclick="toggleTrumpScreener()" id="trump-toggle-btn" style="background: #e74c3c; color: white; border: none; padding: 0 15px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap; transition: background 0.2s; display: flex; align-items: center; gap: 6px; font-size: 15px; margin-left: 5px;">
-                    <span style="font-size: 16px;">🦅</span> 川普因子
-                </button>
-                <button type="button" id="nav-news-btn" onclick="switchView('news', event)" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #666; padding: 10px 15px; border-radius: 8px; cursor: pointer; margin-left: 10px; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                    🗞️ 新聞看板
-                </button>
-                <button type="button" id="nav-history-btn" onclick="openHistoryModal(event)" style="background: rgba(255,255,255,0.1); color: #fff; border: 1px solid #666; padding: 10px 15px; border-radius: 8px; cursor: pointer; margin-left: 5px; transition: 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
-                    📜 歷史CIO分析紀錄
+                <button onclick="toggleTrumpScreener()" id="trump-toggle-btn" class="action-btn btn-trump">
+                    <span>🦅</span> 川普因子
                 </button>
 
-                <button type="button" id="nav-analysis-btn" onclick="switchView('analysis', event)" style="display: none; background: #27ae60; color: #fff; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; margin-left: 10px; transition: 0.2s; box-shadow: 0 0 10px rgba(39, 174, 96, 0.4);" onmouseover="this.style.background='#2ecc71'" onmouseout="this.style.background='#27ae60'">
-                    📊 返回當前分析
+                <button type="button" id="nav-news-btn" onclick="switchView('news', event)" class="action-btn btn-nav">
+                    <span>🗞️</span> 新聞看板
+                </button>
+
+                <button type="button" id="nav-history-btn" onclick="openHistoryModal(event)" class="action-btn btn-nav">
+                    <span>📜</span> 歷史紀錄
+                </button>
+
+                <button type="button" id="nav-analysis-btn" onclick="switchView('analysis', event)" class="action-btn btn-excel" style="display: none;">
+                    <span>📊</span> 返回分析
                 </button>
 
             </div>
