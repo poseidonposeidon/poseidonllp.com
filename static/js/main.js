@@ -10474,7 +10474,7 @@ async function downloadDashboardPDF(event) {
         const result = await response.json();
 
         if (response.ok) {
-            alert(`🎉 PDF 產生成功！\n\n檔案已存入伺服器 (Drive)：\n${result.file_path}`);
+            alert(`🎉 PDF 產生成功！\n\n檔案已存入Google Drive/美股資訊`);
         } else {
             throw new Error(result.error || "未知錯誤");
         }
