@@ -10408,30 +10408,34 @@ async function downloadDashboardPDF(event) {
         // 🌟🌟 4. 新增：收集聊天室的 QA 紀錄 🌟🌟
         let chatHistoryText = "";
         const chatContainer = document.getElementById('dd-chat-messages');
-        if (chatContainer) {
-            // 抓取聊天室內所有的訊息氣泡
-            const messages = chatContainer.querySelectorAll('.chat-message');
-            if (messages.length > 0) {
-                chatHistoryText += "\n\n## 💬 附錄：CIO 深度問答紀錄\n\n";
-                messages.forEach(msg => {
-                    const isUser = msg.classList.contains('user-message');
-                    const text = msg.innerText || msg.textContent;
 
-                    // 略過歡迎詞或系統提示
-                    if (text.includes("您好，我是海川 AI 投資長")) return;
+        // 確保容器存在且裡面有對話
+        if (chatContainer && chatContainer.children.length > 0) {
+            chatHistoryText += "\n\n## 附錄：CIO 深度問答紀錄\n\n";
 
-                    if (isUser) {
-                        chatHistoryText += `**🙋‍♂️ 您的提問：** ${text}\n\n`;
-                    } else {
-                        // AI 回答
-                        chatHistoryText += `**🤖 CIO 分析：** ${text}\n\n---\n\n`;
-                    }
-                });
-            }
+            // 直接遍歷裡面的所有子元素 (無論你的 class 叫什麼)
+            Array.from(chatContainer.children).forEach(msg => {
+                const text = msg.innerText || msg.textContent;
+
+                // 略過空行與開頭的系統歡迎詞
+                if (!text.trim() || text.includes("您好，我是海川 AI 投資長")) return;
+
+                // 判斷是使用者還是 AI (透過 class 關鍵字、對齊方式，或是你加的 Emoji)
+                const isUser = msg.className.includes('user') || msg.style.textAlign === 'right' || text.startsWith('🙋');
+
+                // 為了防止後端 ReportLab 被彩色 Emoji 弄當機，我們在前端先把它們換成乾淨的文字
+                let cleanText = text.replace(/🙋‍♂️|🤖|💬|💡|您的提問：|CIO 分析：/g, '').trim();
+
+                if (isUser) {
+                    chatHistoryText += `**Q：${cleanText}**\n\n`;
+                } else {
+                    chatHistoryText += `**A：**\n${cleanText}\n\n---\n\n`;
+                }
+            });
         }
 
         // 🌟 5. 將原版報告與聊天紀錄合併
-        const combinedReportContent = window.currentReportContent + chatHistoryText;
+        const combinedReportContent = window.currentReportContent + "\n\n" + chatHistoryText;
 
         // 6. 呼叫我們自己寫的 Python API
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/generate_native_pdf` : '/api/generate_native_pdf';
