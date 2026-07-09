@@ -10670,10 +10670,10 @@ function closeHistoryModal() {
 }
 
 // 3. 從雲端抓取詳細數據並一鍵還原 (Zero-API Cost Restoration)
+// 3. 從雲端抓取詳細數據並一鍵還原 (Zero-API Cost Restoration)
 async function restoreFromHistory(historyId) {
-    // 關閉彈窗並切換視角
+    // 1. 先關閉彈窗，顯示 Loading 畫面 (此時先不切換 View)
     closeHistoryModal();
-    switchView('analysis');
 
     const loadingScreen = document.getElementById('dd-loading-screen');
     const loadingText = document.getElementById('dd-loading-text');
@@ -10684,25 +10684,29 @@ async function restoreFromHistory(historyId) {
     if (reportContainer) reportContainer.innerHTML = "";
 
     try {
-        // 向後端請求完整的報告與 JSON 數據
+        // 2. 向後端請求完整的報告與 JSON 數據
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/history/${historyId}` : `/api/history/${historyId}`;
         const response = await fetch(targetUrl);
         const item = await response.json();
 
         if (item.error) throw new Error(item.error);
 
-        // 填回搜尋框
+        // 3. 填回搜尋框
         const symbolInput = document.getElementById('dd-stock-input');
         if (symbolInput) symbolInput.value = item.symbol;
 
-        // 設定全域變數
+        // 4. 設定全域變數
         window.currentDeepDiveData = item.raw_data;
         window.currentReportContent = item.report;
 
-        // 渲染 Markdown 與雷達徽章
+        // 🌟🌟 核心修復：在確定有了 currentReportContent 之後，才呼叫 switchView！
+        // 這會確保 dd-main-content 被正確設定為 display: block，讓後面的圖表有空間可以畫 🌟🌟
+        switchView('analysis');
+
+        // 5. 渲染 Markdown 與雷達徽章
         renderDeepDiveMarkdown(item.report, reportContainer, item.raw_data);
 
-        // 重啟沙盤監聽
+        // 6. 重啟沙盤監聽
         let currentEps = 0;
         if (item.raw_data.quote && item.raw_data.quote.length > 0 && item.raw_data.quote[0].eps) {
             currentEps = item.raw_data.quote[0].eps;
@@ -10725,7 +10729,7 @@ async function restoreFromHistory(historyId) {
             initScenarioModeling(currentEps, currentPrice, currentPe);
         }
 
-        // 重繪圖表
+        // 7. 重繪圖表 (此時容器已經被 switchView 撐開，Chart.js 就不會縮成一點了)
         if (loadingText) loadingText.innerText = "正在重建視覺化圖表...";
         window.deepDiveChartInstances = window.deepDiveChartInstances || {};
 
