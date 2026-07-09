@@ -10366,81 +10366,103 @@ function getCanvasWithBackground(canvas, backgroundColor) {
     return tempCanvas.toDataURL('image/jpeg', 1.0);
 }
 
-function downloadDashboardPDF(event) {
+async function downloadDashboardPDF(event) {
     if (event) event.preventDefault();
 
     const symbolInput = document.getElementById('dd-stock-input');
-    const symbol = (symbolInput && symbolInput.value.trim().toUpperCase()) || 'UNKNOWN';
+    const symbol = symbolInput ? symbolInput.value.trim().toUpperCase() : 'UNKNOWN';
 
-    // 1. 抓取我們存在全域變數裡的 AI 純文字報告
-    const reportText = window.currentReportContent;
-    if (!reportText) {
-        alert("請先點擊 Analyze 產生報告後再匯出！");
+    // 1. 確認有報告內容
+    if (!window.currentReportContent) {
+        alert("目前沒有分析報告可供匯出，請先執行 Analyze。");
         return;
     }
 
-    const btn = event ? event.currentTarget : null;
-    let originalText = "";
-    if (btn) {
-        originalText = btn.innerHTML;
-        btn.innerHTML = "⏳ 產出原生報告中...";
-        btn.style.background = "#555";
-        btn.disabled = true;
-    }
+    // 2. 顯示 Loading 提示
+    const originalBtnText = event.target.innerHTML;
+    event.target.innerHTML = '⏳ 正在產生 PDF...';
+    event.target.disabled = true;
 
-    // 2. 自動擷取畫面上所有圖表，並保留深色背景
-    const charts = [];
-    const chartCards = document.querySelectorAll('.dd-chart-card');
-    chartCards.forEach(card => {
-        const titleElement = card.querySelector('.dd-chart-title');
-        const canvas = card.querySelector('canvas');
-        if (titleElement && canvas) {
-            // 擷取圖片並填入 #1e1e1e (儀表板底色)
-            const imageBase64 = getCanvasWithBackground(canvas, '#1e1e1e');
-            charts.push({
-                title: titleElement.innerText,
-                image: imageBase64
-            });
+    try {
+        // 3. 收集所有圖表 Base64
+        const chartData = [];
+        const canvasIds = [
+            { id: 'dd-valuation-chart', title: 'Valuation Band (本益比河流圖)' },
+            { id: 'dd-insider-chart', title: 'Smart Money (內部人交易)' },
+            { id: 'dd-financial-chart', title: 'Margins Trend (三率趨勢)' },
+            { id: 'dd-growth-chart', title: 'Revenue & EPS Trend (營收與獲利)' },
+            { id: 'dd-cashflow-chart', title: 'Cash Flow Structure (現金流)' },
+            { id: 'dd-tech-chart', title: 'Price & Volume (量價動能)' }
+        ];
+
+        for (const item of canvasIds) {
+            const canvas = document.getElementById(item.id);
+            if (canvas && canvas.toDataURL) {
+                chartData.push({
+                    title: item.title,
+                    image: canvas.toDataURL('image/png')
+                });
+            }
         }
-    });
 
-    // 3. 將純文字報告與圖表陣列，打包成 JSON 送給後端
-    const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/generate_native_pdf` : '/api/generate_native_pdf';
+        // 🌟🌟 4. 新增：收集聊天室的 QA 紀錄 🌟🌟
+        let chatHistoryText = "";
+        const chatContainer = document.getElementById('dd-chat-messages');
+        if (chatContainer) {
+            // 抓取聊天室內所有的訊息氣泡
+            const messages = chatContainer.querySelectorAll('.chat-message');
+            if (messages.length > 0) {
+                chatHistoryText += "\n\n## 💬 附錄：CIO 深度問答紀錄\n\n";
+                messages.forEach(msg => {
+                    const isUser = msg.classList.contains('user-message');
+                    const text = msg.innerText || msg.textContent;
 
-    fetch(targetUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            symbol: symbol,
-            report_content: reportText,
-            charts: charts
-        })
-    })
-        .then(async (response) => {
-            if (!response.ok) throw new Error(`伺服器錯誤狀態碼: ${response.status}`);
-            return response.json();
-        })
-        .then(data => {
-            if (data.message) {
-                alert(`🎉 儲存成功！\n${symbol} 的「純文字＋圖表」原生 PDF 報告已存入 Drive。\n(本地路徑：${data.file_path})`);
-            } else {
-                alert(`❌ 儲存失敗：${data.error}`);
+                    // 略過歡迎詞或系統提示
+                    if (text.includes("您好，我是海川 AI 投資長")) return;
+
+                    if (isUser) {
+                        chatHistoryText += `**🙋‍♂️ 您的提問：** ${text}\n\n`;
+                    } else {
+                        // AI 回答
+                        chatHistoryText += `**🤖 CIO 分析：** ${text}\n\n---\n\n`;
+                    }
+                });
             }
-        })
-        .catch(err => {
-            console.error('PDF 生成錯誤:', err);
-            alert(`❌ 產出原生 PDF 時發生系統錯誤：\n${err.message}`);
-        })
-        .finally(() => {
-            if (btn) {
-                btn.innerHTML = originalText;
-                btn.style.background = "#e67e22";
-                btn.disabled = false;
-            }
+        }
+
+        // 🌟 5. 將原版報告與聊天紀錄合併
+        const combinedReportContent = window.currentReportContent + chatHistoryText;
+
+        // 6. 呼叫我們自己寫的 Python API
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/generate_native_pdf` : '/api/generate_native_pdf';
+
+        const response = await fetch(targetUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                symbol: symbol,
+                report_content: combinedReportContent, // 👈 傳送合併後的心血
+                charts: chartData
+            })
         });
+
+        const result = await response.json();
+
+        if (response.ok) {
+            alert(`🎉 PDF 產生成功！\n\n檔案已存入伺服器 (Drive)：\n${result.file_path}`);
+        } else {
+            throw new Error(result.error || "未知錯誤");
+        }
+
+    } catch (error) {
+        console.error("PDF 匯出失敗:", error);
+        alert(`❌ 匯出失敗：${error.message}`);
+    } finally {
+        // 恢復按鈕狀態
+        event.target.innerHTML = originalBtnText;
+        event.target.disabled = false;
+    }
 }
-
-
 
 // ==========================================
 // 即時新聞清單、搜尋與分頁邏輯
