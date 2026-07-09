@@ -10409,25 +10409,46 @@ async function downloadDashboardPDF(event) {
         let chatHistoryText = "";
         const chatContainer = document.getElementById('dd-chat-messages');
 
-        // 確保容器存在且裡面有對話
         if (chatContainer && chatContainer.children.length > 0) {
-            chatHistoryText += "\n\n## 附錄：CIO 深度問答紀錄\n\n";
+            chatHistoryText += "\n\n## 💬 附錄：CIO 深度問答紀錄\n\n";
 
-            // 直接遍歷裡面的所有子元素 (無論你的 class 叫什麼)
             Array.from(chatContainer.children).forEach(msg => {
-                const text = msg.innerText || msg.textContent;
+                // 複製一個節點來操作，避免破壞網頁原本的畫面
+                let clone = msg.cloneNode(true);
 
-                // 略過空行與開頭的系統歡迎詞
+                // 【核心修復】將 HTML 表格還原成 Markdown 格式
+                clone.querySelectorAll('table').forEach(table => {
+                    let md = "\n\n";
+                    table.querySelectorAll('tr').forEach((row, index) => {
+                        let rowText = "|";
+                        let cells = row.querySelectorAll('th, td');
+                        cells.forEach(c => { rowText += ` ${c.innerText.trim()} |`; });
+                        md += rowText + "\n";
+                        // 加上表頭的分隔線
+                        if (index === 0) {
+                            md += "|" + Array.from(cells).map(() => "---|").join("") + "\n";
+                        }
+                    });
+                    md += "\n\n";
+                    let textNode = document.createTextNode(md);
+                    table.parentNode.replaceChild(textNode, table);
+                });
+
+                // 【核心修復】將 HTML 條列式還原，避免壓扁
+                clone.querySelectorAll('li').forEach(li => {
+                    let textNode = document.createTextNode("- " + li.innerText + "\n");
+                    li.parentNode.replaceChild(textNode, li);
+                });
+
+                const text = clone.innerText || clone.textContent;
                 if (!text.trim() || text.includes("您好，我是海川 AI 投資長")) return;
 
-                // 判斷是使用者還是 AI (透過 class 關鍵字、對齊方式，或是你加的 Emoji)
                 const isUser = msg.className.includes('user') || msg.style.textAlign === 'right' || text.startsWith('🙋');
-
-                // 為了防止後端 ReportLab 被彩色 Emoji 弄當機，我們在前端先把它們換成乾淨的文字
                 let cleanText = text.replace(/🙋‍♂️|🤖|💬|💡|您的提問：|CIO 分析：/g, '').trim();
 
+                // 標記 Q 與 A 讓後端可以辨識
                 if (isUser) {
-                    chatHistoryText += `**Q：${cleanText}**\n\n`;
+                    chatHistoryText += `**Q：** ${cleanText}\n\n`;
                 } else {
                     chatHistoryText += `**A：**\n${cleanText}\n\n---\n\n`;
                 }
