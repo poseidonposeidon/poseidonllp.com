@@ -500,54 +500,34 @@
         <p id="dd-loading-text" style="color: #aaa; font-size: 14px;">正在檢索 FMP 歷史數據...</p>
     </div>
 
-    <div class="dd-header" style="width: 100%; background: #1e1e1e; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; display: flex; flex-direction: column; align-items: center; gap: 15px; position: static !important; margin-top: 0 !important; transform: none !important;">
-        <div style="display: flex; align-items: center; gap: 15px; flex-wrap: wrap;">
+    <div class="dd-header" style="width: 100%; height: auto !important; min-height: fit-content; background: #1e1e1e; border-radius: 8px; padding: 20px; margin: 0 0 20px 0 !important; border: 1px solid #333; display: flex; flex-direction: column; align-items: center; gap: 20px; position: relative !important; z-index: 10; box-sizing: border-box; clear: both;">
 
-            <h2 style="color: #f0b90b; margin: 0; white-space: nowrap;">
-                AI Deep Dive <span style="font-size: 12px; color: #aaa; border: 1px solid #555; padding: 2px 6px; border-radius: 4px;">PRO</span>
-            </h2>
+        <!-- 第一層：置中標題 -->
+        <h2 style="color: #f0b90b; margin: 0; text-align: center; width: 100%;">
+            AI Deep Dive <span style="font-size: 12px; color: #aaa; border: 1px solid #555; padding: 2px 6px; border-radius: 4px;">PRO</span>
+        </h2>
 
-            <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%; align-items: center;">
+        <!-- 第二層：搜尋與操作按鈕 -->
+        <div style="display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; width: 100%; align-items: center;">
 
-                <div class="dd-search-box" style="position: relative; flex-grow: 1;">
-                    <input type="text" id="dd-stock-input" class="dd-search-input" placeholder="ENTER SYMBOL (E.G. AAPL)" autocomplete="off" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 15px; border-radius: 8px; border: 1px solid #444; background: #222; color: white; outline: none; font-size: 14px;">
-                    <div id="dd-suggestions" class="dd-suggestions-list" style="position: absolute; top: calc(100% + 5px); left: 0; width: 100%; z-index: 100;"></div>
-                </div>
-
-                <button onclick="runDeepDive()" class="action-btn btn-analyze">
-                    Analyze
-                </button>
-
-                <button onclick="triggerExcelDownload(event)" title="將 20 年財務數據與逐字稿存入 Google Drive" class="action-btn btn-excel">
-                    <span>☁️</span> 匯出數據
-                </button>
-
-                <button onclick="toggleScreener()" id="screener-toggle-btn" class="action-btn btn-screener">
-                    <span>✨</span> 語意選股
-                </button>
-
-                <button onclick="toggleTrumpScreener()" id="trump-toggle-btn" class="action-btn btn-trump">
-                    <span>🦅</span> 川普因子
-                </button>
-                <button onclick="toggleSentimentMatrix()" id="sentiment-toggle-btn" class="action-btn btn-sentiment"><span>🔮</span> 美股情緒矩陣</button>
-
-                <button type="button" id="nav-news-btn" onclick="switchView('news', event)" class="action-btn btn-nav">
-                    <span>🗞️</span> 新聞看板
-                </button>
-
-                <button type="button" id="nav-history-btn" onclick="openHistoryModal(event)" class="action-btn btn-nav">
-                    <span>📜</span> 歷史紀錄
-                </button>
-
-                <button type="button" id="nav-analysis-btn" onclick="switchView('analysis', event)" class="action-btn btn-excel" style="display: none;">
-                    <span>📊</span> 返回分析
-                </button>
-
+            <div class="dd-search-box" style="position: relative; width: 280px; flex-shrink: 0;">
+                <input type="text" id="dd-stock-input" class="dd-search-input" placeholder="ENTER SYMBOL (E.G. AAPL)" autocomplete="off" style="width: 100%; box-sizing: border-box; height: 40px; padding: 0 15px; border-radius: 8px; border: 1px solid #444; background: #222; color: white; outline: none; font-size: 14px;">
+                <div id="dd-suggestions" class="dd-suggestions-list" style="position: absolute; top: calc(100% + 5px); left: 0; width: 100%; z-index: 100;"></div>
             </div>
+
+            <button onclick="runDeepDive()" class="action-btn btn-analyze" style="height: 40px;">Analyze</button>
+            <button onclick="triggerExcelDownload(event)" title="將 20 年財務數據與逐字稿存入 Google Drive" class="action-btn btn-excel" style="height: 40px;"><span>☁️</span> 匯出數據</button>
+            <button onclick="toggleScreener()" id="screener-toggle-btn" class="action-btn btn-screener" style="height: 40px;"><span>✨</span> 語意選股</button>
+            <button onclick="toggleTrumpScreener()" id="trump-toggle-btn" class="action-btn btn-trump" style="height: 40px;"><span>🦅</span> 川普因子</button>
+            <button onclick="toggleSentimentMatrix()" id="sentiment-toggle-btn" class="action-btn btn-sentiment" style="height: 40px; background: rgba(155, 89, 182, 0.15); border: 1px solid rgba(155, 89, 182, 0.5); color: #9b59b6;"><span>🔮</span> 美股情緒矩陣</button>
+            <button type="button" id="nav-news-btn" onclick="switchView('news', event)" class="action-btn btn-nav" style="height: 40px;"><span>🗞️</span> 新聞看板</button>
+            <button type="button" id="nav-history-btn" onclick="openHistoryModal(event)" class="action-btn btn-nav" style="height: 40px;"><span>📜</span> 歷史紀錄</button>
+            <button type="button" id="nav-analysis-btn" onclick="switchView('analysis', event)" class="action-btn btn-excel" style="display: none; height: 40px;"><span>📊</span> 返回分析</button>
+
         </div>
     </div>
 
-    <div id="dd-empty-state" class="dd-empty-state" style="width: 100%; display: flex; flex-direction: column; align-items: center; padding-top: 10px; position: static !important; margin-top: 0 !important;">
+    <div id="dd-empty-state" class="dd-empty-state" style="width: 100%; height: auto !important; display: flex; flex-direction: column; align-items: center; padding-top: 10px; position: relative !important; margin-top: 0 !important; box-sizing: border-box; clear: both;">
 
         <div class="sector-explorer" style="margin-bottom: 35px; margin-top: 0;">
             <span class="explorer-label">探索美股板塊:</span>
