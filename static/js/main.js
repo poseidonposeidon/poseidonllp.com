@@ -10979,3 +10979,5 @@ function drawSentimentTrend(dataArray) {
         }
     });
 }
+
+//hk4g更新更新
