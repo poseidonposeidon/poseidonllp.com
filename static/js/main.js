@@ -10779,3 +10779,210 @@ async function restoreFromHistory(historyId) {
         if (returnAnalysisBtn) returnAnalysisBtn.style.display = 'none';
     }
 }
+
+/* ==========================================================================
+   🔮 美股情緒矩陣 (Sentiment Matrix) 核心邏輯
+   ========================================================================== */
+
+// 1. 面板切換與觸發載入
+function toggleSentimentMatrix() {
+    // 隱藏其他所有區塊
+    const briefingSection = document.getElementById('daily-briefing-section');
+    const mainContent = document.getElementById('dd-main-content');
+    const screenerContent = document.getElementById('dd-screener-content');
+    const trumpContent = document.getElementById('dd-trump-content');
+    const emptyState = document.getElementById('dd-empty-state');
+
+    if(briefingSection) briefingSection.style.display = 'none';
+    if(mainContent) mainContent.style.display = 'none';
+    if(screenerContent) screenerContent.style.display = 'none';
+    if(trumpContent) trumpContent.style.display = 'none';
+    if(emptyState) emptyState.style.display = 'none';
+
+    // 顯示情緒矩陣面板
+    const sentimentContent = document.getElementById('dd-sentiment-content');
+    if (sentimentContent) {
+        sentimentContent.style.display = 'block';
+        sentimentContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // 恢復所有按鈕預設狀態 (防呆)
+    document.getElementById('dd-stock-input').disabled = false;
+    document.getElementById('dd-stock-input').style.opacity = '1';
+
+    // 觸發載入資料
+    loadSentimentMatrixData();
+}
+
+// 2. 向後端請求 15 天歷史數據
+async function loadSentimentMatrixData() {
+    const tableBody = document.getElementById('sentiment-table-body');
+    if (!tableBody) return;
+
+    tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #6e685c;"><i class="fas fa-spinner fa-spin"></i> 正在從資料庫撈取並運算近 15 個交易日的情緒矩陣...</td></tr>';
+
+    try {
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/sentiment_history` : '/api/sentiment_history';
+        const response = await fetch(targetUrl);
+        if (!response.ok) throw new Error("無法取得情緒歷史資料");
+
+        const data = await response.json();
+
+        if (data && data.length > 0) {
+            // 渲染表格
+            renderSentimentTable(data);
+
+            // 渲染圖表 (取最新一天的分數畫指針，取 15 天的大盤畫走勢)
+            const latestScore = data[0].sentiment_score; // 假設後端回傳是由新到舊
+            drawBofAGauge(latestScore);
+            drawSentimentTrend(data);
+        } else {
+            tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #b0532f;">目前尚無情緒歷史資料，請確認後端排程已執行。</td></tr>';
+        }
+
+    } catch (error) {
+        console.error("Sentiment Matrix Error:", error);
+        tableBody.innerHTML = `<tr><td colspan="6" style="padding: 30px; text-align: center; color: #b0532f;">⚠️ 載入失敗: ${error.message}</td></tr>`;
+    }
+}
+
+// 3. 渲染 15 天歷史表格
+function renderSentimentTable(dataArray) {
+    const tbody = document.getElementById('sentiment-table-body');
+    tbody.innerHTML = '';
+
+    dataArray.forEach(item => {
+        // 顏色判定邏輯 (對應你的風格指南)
+        let labelColor = '#2b261c';
+        let bgOpacity = 'transparent';
+
+        if (item.sentiment_label.includes('恐慌')) {
+            labelColor = '#b0532f'; // 強調點紅色
+            bgOpacity = 'rgba(176, 83, 47, 0.05)';
+        } else if (item.sentiment_label.includes('樂觀')) {
+            labelColor = '#3e7d5c'; // 多方綠色
+            bgOpacity = 'rgba(62, 125, 92, 0.05)';
+        } else {
+            labelColor = '#8a6d3f'; // 中性/謹慎用恐慌線土黃色
+        }
+
+        // 解析後端傳來的 JSON 原始數據
+        let rawDataStr = "無底層數據";
+        try {
+            const rawObj = JSON.parse(item.raw_data_json);
+            rawDataStr = JSON.stringify(rawObj, null, 2);
+        } catch(e) {}
+
+        // 將推演邏輯與原始數據包裝成 Tooltip (使用 title 屬性實現最簡單的 Hover)
+        const tooltipText = `🤖【CIO 深度推演】\n${item.detailed_analysis}\n\n📊【底層觸發數據】\n${rawDataStr}`;
+
+        const tr = document.createElement('tr');
+        tr.style.borderBottom = '1px solid #f0ebe1';
+        tr.style.backgroundColor = bgOpacity;
+        tr.style.transition = 'background-color 0.2s';
+        tr.onmouseover = () => tr.style.backgroundColor = 'rgba(0,0,0,0.05)';
+        tr.onmouseout = () => tr.style.backgroundColor = bgOpacity;
+
+        tr.innerHTML = `
+            <td style="padding: 12px; font-weight: 500;">${item.date_str}</td>
+            <td style="padding: 12px; font-weight: bold; color: ${item.market_change_pct.includes('-') ? '#b0532f' : '#3e7d5c'};">${item.market_change_pct}</td>
+            <td style="padding: 12px; font-size: 13px; color: #6e685c;">等待 RAG 擴充</td>
+            <td style="padding: 12px; font-size: 13px; color: #6e685c;">等待 RAG 擴充</td>
+            <td style="padding: 12px; font-weight: bold; color: ${labelColor};">${item.sentiment_label}</td>
+            <td style="padding: 12px; text-align: left; cursor: help;" title="${tooltipText}">
+                <span style="border-bottom: 1px dashed #c2a26d;">${item.headline}</span>
+            </td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// 4. 渲染美銀風格恐慌貪婪指針 (ECharts)
+function drawBofAGauge(score100) {
+    const chartDom = document.getElementById('sentiment-gauge-chart');
+    if (!chartDom) return;
+    const myChart = echarts.init(chartDom);
+
+    // 將 0-100 的分數轉換為 0-10 的美銀標準 (0=極度恐慌/買進, 10=極度樂觀/賣出)
+    // 假設系統 0是恐慌, 100是樂觀。若需反轉請自行調整邏輯。
+    let bofaScore = (score100 / 10).toFixed(1);
+
+    const option = {
+        series: [{
+            type: 'gauge',
+            min: 0,
+            max: 10,
+            splitNumber: 5,
+            itemStyle: {
+                color: '#2b261c', // 指針顏色
+            },
+            progress: { show: true, width: 30 },
+            pointer: { itemStyle: { color: 'auto' } },
+            axisLine: {
+                lineStyle: {
+                    width: 30,
+                    color: [
+                        [0.2, '#3e7d5c'], // 0-2 綠色 (Buy / Extreme Bearish)
+                        [0.8, '#d3bd92'], // 2-8 香檳色/中性
+                        [1, '#b0532f']    // 8-10 紅色 (Sell / Extreme Bullish)
+                    ]
+                }
+            },
+            axisTick: { distance: -30, length: 8, lineStyle: { color: '#fff', width: 2 } },
+            splitLine: { distance: -30, length: 30, lineStyle: { color: '#fff', width: 4 } },
+            axisLabel: { color: '#6e685c', distance: 40, fontSize: 14 },
+            detail: { valueAnimation: true, formatter: '{value}', color: '#2b261c', fontSize: 30, offsetCenter: [0, '70%'] },
+            data: [{ value: bofaScore }]
+        }]
+    };
+    myChart.setOption(option);
+}
+
+// 5. 渲染 15 天迷你大盤走勢圖 (Chart.js)
+let sentimentTrendChartInstance = null;
+function drawSentimentTrend(dataArray) {
+    const canvas = document.getElementById('sentiment-trend-chart');
+    if (!canvas) return;
+
+    // 將資料反轉，讓圖表由左至右為「舊到新」
+    const reversedData = [...dataArray].reverse();
+    const labels = reversedData.map(item => item.date_str.substring(5)); // 只取 MM-DD
+
+    // 這裡我們簡單模擬指數點位，實務上你需要後端一起把 SPY 的實際 Close Price 傳過來
+    // 此處示範用一個基準值加上每日漲跌幅來畫線
+    let basePrice = 500;
+    const prices = reversedData.map(item => {
+        let pct = parseFloat(item.market_change_pct) || 0;
+        basePrice = basePrice * (1 + (pct/100));
+        return basePrice.toFixed(2);
+    });
+
+    if (sentimentTrendChartInstance) sentimentTrendChartInstance.destroy();
+
+    sentimentTrendChartInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'SPY Trajectory',
+                data: prices,
+                borderColor: '#3b3a35', // 收盤線顏色
+                backgroundColor: 'rgba(211, 189, 146, 0.2)', // 香檳色漸層
+                borderWidth: 2,
+                pointBackgroundColor: '#b0532f',
+                pointRadius: 3,
+                fill: true,
+                tension: 0.3
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { display: false } },
+            scales: {
+                x: { grid: { color: '#f0ebe1' }, ticks: { color: '#a29a8b' } },
+                y: { grid: { color: '#f0ebe1' }, ticks: { color: '#a29a8b' } }
+            }
+        }
+    });
+}
