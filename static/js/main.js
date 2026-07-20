@@ -10601,15 +10601,15 @@ function switchView(targetView, event) {
     const screenerContent = document.getElementById('dd-screener-content');
     const trumpContent = document.getElementById('dd-trump-content');
     const emptyState = document.getElementById('dd-empty-state');
+    const sentimentContent = document.getElementById('dd-sentiment-content'); // 情緒矩陣
     const returnAnalysisBtn = document.getElementById('nav-analysis-btn');
-
-    // 👇 1. 抓取新的情緒矩陣面板
-    const sentimentContent = document.getElementById('dd-sentiment-content');
+    
 
     if (targetView === 'news') {
         if(mainContent) mainContent.style.display = 'none';
         if(screenerContent) screenerContent.style.display = 'none';
         if(trumpContent) trumpContent.style.display = 'none';
+        if(sentimentContent) sentimentContent.style.display = 'none';
         // 👇 2. 切換到新聞時，必須隱藏情緒矩陣
         if(sentimentContent) sentimentContent.style.display = 'none';
 
