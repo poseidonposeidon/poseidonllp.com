@@ -10603,7 +10603,7 @@ function switchView(targetView, event) {
     const emptyState = document.getElementById('dd-empty-state');
     const sentimentContent = document.getElementById('dd-sentiment-content'); // 情緒矩陣
     const returnAnalysisBtn = document.getElementById('nav-analysis-btn');
-    
+
 
     if (targetView === 'news') {
         if(mainContent) mainContent.style.display = 'none';
