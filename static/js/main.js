@@ -11016,13 +11016,15 @@ function drawSentimentTrend(dataArray) {
     const reversedData = [...dataArray].reverse();
     const labels = reversedData.map(item => item.date_str.substring(5)); // 只取 MM-DD
 
-    // 這裡我們簡單模擬指數點位，實務上你需要後端一起把 SPY 的實際 Close Price 傳過來
-    // 此處示範用一個基準值加上每日漲跌幅來畫線
-    let basePrice = 500;
+    // 👇 核心修正：不再用 500 去模擬，直接從 raw_data_json 解析出真實收盤價
     const prices = reversedData.map(item => {
-        let pct = parseFloat(item.market_change_pct) || 0;
-        basePrice = basePrice * (1 + (pct/100));
-        return basePrice.toFixed(2);
+        try {
+            const rawObj = JSON.parse(item.raw_data_json);
+            // 如果有真實收盤價就用真實的，否則防呆給個 7400
+            return rawObj['真實收盤價'] ? parseFloat(rawObj['真實收盤價']).toFixed(2) : 7400;
+        } catch(e) {
+            return 7400;
+        }
     });
 
     if (sentimentTrendChartInstance) sentimentTrendChartInstance.destroy();
@@ -11032,7 +11034,7 @@ function drawSentimentTrend(dataArray) {
         data: {
             labels: labels,
             datasets: [{
-                label: 'SPY Trajectory',
+                label: 'S&P 500 Trajectory',
                 data: prices,
                 borderColor: '#3b3a35', // 收盤線顏色
                 backgroundColor: 'rgba(211, 189, 146, 0.2)', // 香檳色漸層
@@ -11049,10 +11051,13 @@ function drawSentimentTrend(dataArray) {
             plugins: { legend: { display: false } },
             scales: {
                 x: { grid: { color: '#f0ebe1' }, ticks: { color: '#a29a8b' } },
-                y: { grid: { color: '#f0ebe1' }, ticks: { color: '#a29a8b' } }
+                y: {
+                    grid: { color: '#f0ebe1' },
+                    ticks: { color: '#a29a8b' },
+                    // 自動縮放 Y 軸，讓圖表波動看起來更清晰
+                    grace: '5%'
+                }
             }
         }
     });
 }
-
-//hk4g更新更新
