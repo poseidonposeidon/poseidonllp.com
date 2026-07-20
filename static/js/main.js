@@ -10860,8 +10860,21 @@ function renderSentimentTable(dataArray) {
         let rawDataStr = "無底層數據";
         try {
             const rawObj = JSON.parse(item.raw_data_json);
-            rawDataStr = JSON.stringify(rawObj, null, 2);
-        } catch(e) {}
+
+            // 判斷是否為我們新版的豐富數據結構
+            if (rawObj['核心催化劑']) {
+                rawDataStr = `📈 大盤漲跌：${rawObj['大盤表現']} (量能: ${rawObj['市場量能']})\n`;
+                rawDataStr += `🔥 核心催化劑 (Catalysts)：\n`;
+                rawObj['核心催化劑'].forEach(news => {
+                    rawDataStr += `   • ${news}\n`;
+                });
+            } else {
+                // 相容舊資料的備用顯示
+                rawDataStr = `大盤漲跌：${rawObj.spy_change || 'N/A'} | 新聞數量：${rawObj.news_count || 0}`;
+            }
+        } catch(e) {
+            console.error("Parse JSON error", e);
+        }
 
         const tooltipText = `🤖【CIO 深度推演】\n${item.detailed_analysis}\n\n📊【底層觸發數據】\n${rawDataStr}`;
 
