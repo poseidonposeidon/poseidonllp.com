@@ -529,6 +529,9 @@
                 <button onclick="toggleTrumpScreener()" id="trump-toggle-btn" class="action-btn btn-trump">
                     <span>🦅</span> 川普因子
                 </button>
+                <button onclick="toggleSentimentMatrix()" id="sentiment-toggle-btn" class="action-btn btn-sentiment" style="background: rgba(155, 89, 182, 0.15); border: 1px solid rgba(155, 89, 182, 0.5); color: #9b59b6;">
+                    <span>🔮</span> 美股情緒矩陣123
+                </button>
 
                 <button type="button" id="nav-news-btn" onclick="switchView('news', event)" class="action-btn btn-nav">
                     <span>🗞️</span> 新聞看板
@@ -544,7 +547,6 @@
 
             </div>
         </div>
-    </div>
 
     <div id="dd-empty-state" class="dd-empty-state" style="display: flex; flex-direction: column; justify-content: flex-start; padding-top: 40px; min-height: auto; height: auto;">
 
@@ -907,6 +909,58 @@
                 <div id="trump-table-wrapper"></div>
             </div>
 
+        </div>
+
+        <div id="dd-sentiment-content" style="display: none; padding-top: 10px;">
+            <!-- 為了完美呈現包浩斯與機構感，我們套用你的設計規範背景與字體 -->
+            <div style="background: #f1ede4; border-radius: 8px; padding: 30px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
+
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="margin: 0; text-transform: uppercase; letter-spacing: 3px; color: #2b261c; font-weight: 700;">
+                        美股市場情緒監控：最近 15 個交易日總覽
+                    </h2>
+                    <p style="color: #6e685c; font-size: 14px; margin-top: 5px;">
+                        點擊日期開啟當日完整推演日報 | 底層涵蓋選擇權、融券、法人目標價與社群語意
+                    </p>
+                </div>
+
+                <!-- 上半部：左右分欄 (左邊美銀指針，右邊走勢圖) -->
+                <div style="display: flex; gap: 20px; margin-bottom: 30px; height: 280px;">
+                    <!-- 左側：BofA Style 恐慌貪婪指針 -->
+                    <div style="flex: 1; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; position: relative;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c; text-align: center;">BofA Style Bull & Bear Indicator</h4>
+                        <div id="sentiment-gauge-chart" style="width: 100%; height: 220px;"></div>
+                    </div>
+
+                    <!-- 右側：SPY 15天迷你走勢圖 -->
+                    <div style="flex: 2; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c;">S&P 500 Trajectory (15 Days)</h4>
+                        <div style="width: 100%; height: 220px;">
+                            <canvas id="sentiment-trend-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 下半部：歷史情緒數據表格 -->
+                <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                    <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
+                        <thead>
+                        <tr style="background: #2b261c; color: white;">
+                            <th style="padding: 12px;">日期</th>
+                            <th style="padding: 12px;">大盤漲跌</th>
+                            <th style="padding: 12px;">衍生槓桿 / 空頭水位</th>
+                            <th style="padding: 12px;">華爾街共識 / 法人</th>
+                            <th style="padding: 12px;">綜合情緒</th>
+                            <th style="padding: 12px; text-align: left;">AI 智能頭條 (Hover 展開推演)</th>
+                        </tr>
+                        </thead>
+                        <tbody id="sentiment-table-body">
+                        <!-- JS 將動態填入這 15 天的數據 -->
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
         </div>
     </div>
 
