@@ -10850,26 +10850,28 @@ function renderSentimentTable(dataArray) {
                 visibility: hidden;
                 opacity: 0;
                 position: absolute;
-                bottom: 100%;
-                right: 0; /* 卡片向左展開，避免超出螢幕邊界 */
+                top: 50%;                    /* 基準點設為儲存格垂直中心 */
+                transform: translateY(-50%); /* 完美垂直置中對齊 */
+                right: 100%;                 /* 強制向「左邊」展開，避開上下邊界 */
+                margin-right: 12px;          /* 與文字保持一點安全距離 */
                 width: 360px;
                 background: rgba(25, 25, 25, 0.95);
                 backdrop-filter: blur(10px);
                 border: 1px solid #c2a26d;
                 border-radius: 8px;
                 padding: 16px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-                z-index: 999;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* 稍微加深陰影增強立體感 */
+                z-index: 9999;               /* 確保層級在最上層 */
                 font-family: inherit;
                 font-size: 13.5px;
                 line-height: 1.6;
                 transition: all 0.2s ease-out;
-                pointer-events: none; /* 避免滑鼠干擾卡片 */
+                pointer-events: none;
             }
             .sentiment-hover-cell:hover .custom-tooltip-card {
                 visibility: visible;
                 opacity: 1;
-                bottom: calc(100% + 8px); /* 向上浮出 */
+                transform: translateY(-50%) translateX(-8px); /* 滑過時帶有一點向左浮現的動態感 */
             }
         `;
         document.head.appendChild(style);
