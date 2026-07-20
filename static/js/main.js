@@ -10840,7 +10840,7 @@ async function loadSentimentMatrixData() {
 
 // 3. 渲染 15 天歷史表格
 function renderSentimentTable(dataArray) {
-    // 💡 步驟 A：自動注入懸浮卡片的專屬 CSS 樣式 (只要執行一次)
+    // 💡 步驟 A：自動注入懸浮卡片的專屬 CSS 樣式 (智慧防裁切完美版)
     if (!document.getElementById('sentiment-tooltip-styles')) {
         const style = document.createElement('style');
         style.id = 'sentiment-tooltip-styles';
@@ -10850,7 +10850,8 @@ function renderSentimentTable(dataArray) {
                 visibility: hidden;
                 opacity: 0;
                 position: absolute;
-                top: -5px;                   /* 👈 對齊儲存格頂部稍微偏上，讓卡片主要「往下」展開 */
+                top: -5px;                   /* 預設：往下展開，對齊儲存格頂部 */
+                bottom: auto;                /* 確保預設不綁定底部 */
                 right: 100%;                 /* 保持向左展開 */
                 margin-right: 12px;          
                 width: 360px;
@@ -10860,17 +10861,24 @@ function renderSentimentTable(dataArray) {
                 border-radius: 8px;
                 padding: 16px;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-                z-index: 99999;              /* 👈 加到 99999，確保絕對蓋過深褐色的標題列 */
+                z-index: 99999;              /* 確保絕對蓋過所有標題與外框 */
                 font-family: inherit;
                 font-size: 13.5px;
                 line-height: 1.6;
                 transition: all 0.2s ease-out;
                 pointer-events: none;
             }
+            
+            /* 👇 關鍵修復：針對表格的「倒數 4 行」，卡片強制改為「往上展開」 👇 */
+            tr:nth-last-child(-n+4) .sentiment-hover-cell .custom-tooltip-card {
+                top: auto;                   /* 取消往下展開 */
+                bottom: -5px;                /* 改為往上展開，對齊儲存格底部 */
+            }
+
             .sentiment-hover-cell:hover .custom-tooltip-card {
                 visibility: visible;
                 opacity: 1;
-                transform: translateX(-8px); /* 👈 刪除了 translateY，只保留向左浮現的動態效果 */
+                transform: translateX(-8px); /* 保持向左浮現的動態效果 */
             }
         `;
         document.head.appendChild(style);
@@ -10907,7 +10915,7 @@ function renderSentimentTable(dataArray) {
                 });
                 dataHtml += `</ul>`;
             } else {
-                // 如果是圖中舊版的 raw_data_json (例如 {"spy_change": "0.16%", "news_count": 20})
+                // 如果是圖中舊版的 raw_data_json
                 const change = rawObj.spy_change || rawObj['大盤表現'] || 'N/A';
                 const count = rawObj.news_count || 0;
                 dataHtml = `<div style="color: #bbb;">📈 <b>觸發基準：</b>大盤變動 ${change} | 關鍵新聞掃描：${count} 則</div>`;
