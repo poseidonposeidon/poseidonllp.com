@@ -10594,12 +10594,8 @@ document.addEventListener('DOMContentLoaded', () => {
 // 🌟 視角切換遙控器 (保留狀態，不重整網頁)
 // ==========================================
 function switchView(targetView, event) {
-    // 🌟 終極防呆：阻止按鈕觸發任何表單重整
-    if (event) {
-        event.preventDefault();
-    }
+    if (event) event.preventDefault();
 
-    // 抓取畫面上所有的主區塊
     const newsSection = document.getElementById('daily-briefing-section');
     const mainContent = document.getElementById('dd-main-content');
     const screenerContent = document.getElementById('dd-screener-content');
@@ -10607,37 +10603,33 @@ function switchView(targetView, event) {
     const emptyState = document.getElementById('dd-empty-state');
     const returnAnalysisBtn = document.getElementById('nav-analysis-btn');
 
-    // 根據使用者的指令切換視野
+    // 👇 1. 抓取新的情緒矩陣面板
+    const sentimentContent = document.getElementById('dd-sentiment-content');
+
     if (targetView === 'news') {
-        // 1. 隱藏不該出現的區塊 (分析、選股、川普)
         if(mainContent) mainContent.style.display = 'none';
         if(screenerContent) screenerContent.style.display = 'none';
         if(trumpContent) trumpContent.style.display = 'none';
+        // 👇 2. 切換到新聞時，必須隱藏情緒矩陣
+        if(sentimentContent) sentimentContent.style.display = 'none';
 
-        // 2. 顯示新聞與預設狀態
-        // 💡 關鍵技巧：使用空字串 '' 代替 'block'，這樣原本是 Flex 的元素就不會崩塌跑版！
         if(newsSection) newsSection.style.display = '';
         if(emptyState) emptyState.style.display = '';
-
-        // 3. 判斷是否要顯示「返回當前分析」的綠色按鈕
         if (window.currentReportContent && returnAnalysisBtn) {
             returnAnalysisBtn.style.display = 'inline-block';
         } else if (returnAnalysisBtn) {
             returnAnalysisBtn.style.display = 'none';
         }
-
     } else if (targetView === 'analysis') {
-        // 1. 回到分析畫面，隱藏「返回」按鈕與新聞
         if (returnAnalysisBtn) returnAnalysisBtn.style.display = 'none';
         if (newsSection) newsSection.style.display = 'none';
+        // 👇 3. 回到單股分析時，也要隱藏情緒矩陣
+        if(sentimentContent) sentimentContent.style.display = 'none';
 
-        // 2. 判斷要顯示哪一個畫面
         if(window.currentReportContent) {
-            // 如果有跑過分析，就顯示圖表
             if(emptyState) emptyState.style.display = 'none';
             if(mainContent) mainContent.style.display = '';
         } else {
-            // 如果根本還沒分析過，就顯示預設畫面
             if(mainContent) mainContent.style.display = 'none';
             if(emptyState) emptyState.style.display = '';
         }
@@ -10852,29 +10844,29 @@ function renderSentimentTable(dataArray) {
     tbody.innerHTML = '';
 
     dataArray.forEach(item => {
-        // 顏色判定邏輯 (對應你的風格指南)
         let labelColor = '#2b261c';
         let bgOpacity = 'transparent';
 
         if (item.sentiment_label.includes('恐慌')) {
-            labelColor = '#b0532f'; // 強調點紅色
+            labelColor = '#b0532f';
             bgOpacity = 'rgba(176, 83, 47, 0.05)';
         } else if (item.sentiment_label.includes('樂觀')) {
-            labelColor = '#3e7d5c'; // 多方綠色
+            labelColor = '#3e7d5c';
             bgOpacity = 'rgba(62, 125, 92, 0.05)';
         } else {
-            labelColor = '#8a6d3f'; // 中性/謹慎用恐慌線土黃色
+            labelColor = '#8a6d3f';
         }
 
-        // 解析後端傳來的 JSON 原始數據
         let rawDataStr = "無底層數據";
         try {
             const rawObj = JSON.parse(item.raw_data_json);
             rawDataStr = JSON.stringify(rawObj, null, 2);
         } catch(e) {}
 
-        // 將推演邏輯與原始數據包裝成 Tooltip (使用 title 屬性實現最簡單的 Hover)
         const tooltipText = `🤖【CIO 深度推演】\n${item.detailed_analysis}\n\n📊【底層觸發數據】\n${rawDataStr}`;
+
+        // 👇 核心修正：將雙引號替換為 HTML 實體，避免破壞 HTML 標籤！
+        const safeTooltipText = tooltipText.replace(/"/g, '&quot;');
 
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #f0ebe1';
@@ -10886,10 +10878,11 @@ function renderSentimentTable(dataArray) {
         tr.innerHTML = `
             <td style="padding: 12px; font-weight: 500;">${item.date_str}</td>
             <td style="padding: 12px; font-weight: bold; color: ${item.market_change_pct.includes('-') ? '#b0532f' : '#3e7d5c'};">${item.market_change_pct}</td>
-            <td style="padding: 12px; font-size: 13px; color: #6e685c;">等待 RAG 擴充</td>
-            <td style="padding: 12px; font-size: 13px; color: #6e685c;">等待 RAG 擴充</td>
+            <td style="padding: 12px; font-size: 13px; color: #6e685c;">(即將導入)</td>
+            <td style="padding: 12px; font-size: 13px; color: #6e685c;">(即將導入)</td>
             <td style="padding: 12px; font-weight: bold; color: ${labelColor};">${item.sentiment_label}</td>
-            <td style="padding: 12px; text-align: left; cursor: help;" title="${tooltipText}">
+            <!-- 👇 注意這裡使用了安全轉義後的 safeTooltipText -->
+            <td style="padding: 12px; text-align: left; cursor: help;" title="${safeTooltipText}">
                 <span style="border-bottom: 1px dashed #c2a26d;">${item.headline}</span>
             </td>
         `;
