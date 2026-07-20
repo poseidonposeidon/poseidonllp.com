@@ -10840,6 +10840,41 @@ async function loadSentimentMatrixData() {
 
 // 3. 渲染 15 天歷史表格
 function renderSentimentTable(dataArray) {
+    // 💡 步驟 A：自動注入懸浮卡片的專屬 CSS 樣式 (只要執行一次)
+    if (!document.getElementById('sentiment-tooltip-styles')) {
+        const style = document.createElement('style');
+        style.id = 'sentiment-tooltip-styles';
+        style.innerHTML = `
+            .sentiment-hover-cell { position: relative; }
+            .sentiment-hover-cell .custom-tooltip-card {
+                visibility: hidden;
+                opacity: 0;
+                position: absolute;
+                bottom: 100%;
+                right: 0; /* 卡片向左展開，避免超出螢幕邊界 */
+                width: 360px;
+                background: rgba(25, 25, 25, 0.95);
+                backdrop-filter: blur(10px);
+                border: 1px solid #c2a26d;
+                border-radius: 8px;
+                padding: 16px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+                z-index: 999;
+                font-family: inherit;
+                font-size: 13.5px;
+                line-height: 1.6;
+                transition: all 0.2s ease-out;
+                pointer-events: none; /* 避免滑鼠干擾卡片 */
+            }
+            .sentiment-hover-cell:hover .custom-tooltip-card {
+                visibility: visible;
+                opacity: 1;
+                bottom: calc(100% + 8px); /* 向上浮出 */
+            }
+        `;
+        document.head.appendChild(style);
+    }
+
     const tbody = document.getElementById('sentiment-table-body');
     tbody.innerHTML = '';
 
@@ -10847,7 +10882,7 @@ function renderSentimentTable(dataArray) {
         let labelColor = '#2b261c';
         let bgOpacity = 'transparent';
 
-        if (item.sentiment_label.includes('恐慌')) {
+        if (item.sentiment_label.includes('恐慌') || item.sentiment_label.includes('恐懼')) {
             labelColor = '#b0532f';
             bgOpacity = 'rgba(176, 83, 47, 0.05)';
         } else if (item.sentiment_label.includes('樂觀')) {
@@ -10857,29 +10892,28 @@ function renderSentimentTable(dataArray) {
             labelColor = '#8a6d3f';
         }
 
-        let rawDataStr = "無底層數據";
+        // 💡 步驟 B：優雅解析底層數據 (相容舊的 JSON 與新的豐富結構)
+        let dataHtml = "";
         try {
             const rawObj = JSON.parse(item.raw_data_json);
-
-            // 判斷是否為我們新版的豐富數據結構
             if (rawObj['核心催化劑']) {
-                rawDataStr = `📈 大盤漲跌：${rawObj['大盤表現']} (量能: ${rawObj['市場量能']})\n`;
-                rawDataStr += `🔥 核心催化劑 (Catalysts)：\n`;
+                // 如果是新版有新聞清單的數據
+                dataHtml = `<div style="margin-bottom: 6px; color: #ddd;">📈 <b>大盤與量能：</b>${rawObj['大盤表現']} (${rawObj['市場量能']})</div>`;
+                dataHtml += `<div style="color: #e67e22; margin-top: 8px;">🔥 <b>核心新聞催化劑：</b></div>`;
+                dataHtml += `<ul style="margin: 4px 0 0 0; padding-left: 20px; color: #bbb;">`;
                 rawObj['核心催化劑'].forEach(news => {
-                    rawDataStr += `   • ${news}\n`;
+                    dataHtml += `<li style="margin-bottom: 4px;">${news}</li>`;
                 });
+                dataHtml += `</ul>`;
             } else {
-                // 相容舊資料的備用顯示
-                rawDataStr = `大盤漲跌：${rawObj.spy_change || 'N/A'} | 新聞數量：${rawObj.news_count || 0}`;
+                // 如果是圖中舊版的 raw_data_json (例如 {"spy_change": "0.16%", "news_count": 20})
+                const change = rawObj.spy_change || rawObj['大盤表現'] || 'N/A';
+                const count = rawObj.news_count || 0;
+                dataHtml = `<div style="color: #bbb;">📈 <b>觸發基準：</b>大盤變動 ${change} | 關鍵新聞掃描：${count} 則</div>`;
             }
         } catch(e) {
-            console.error("Parse JSON error", e);
+            dataHtml = `<div style="color: #888;">無詳細底層數據</div>`;
         }
-
-        const tooltipText = `🤖【CIO 深度推演】\n${item.detailed_analysis}\n\n📊【底層觸發數據】\n${rawDataStr}`;
-
-        // 👇 核心修正：將雙引號替換為 HTML 實體，避免破壞 HTML 標籤！
-        const safeTooltipText = tooltipText.replace(/"/g, '&quot;');
 
         const tr = document.createElement('tr');
         tr.style.borderBottom = '1px solid #f0ebe1';
@@ -10888,17 +10922,34 @@ function renderSentimentTable(dataArray) {
         tr.onmouseover = () => tr.style.backgroundColor = 'rgba(0,0,0,0.05)';
         tr.onmouseout = () => tr.style.backgroundColor = bgOpacity;
 
+        // 💡 步驟 C：建立 HTML 結構，移除 title，改用 .custom-tooltip-card
         tr.innerHTML = `
             <td style="padding: 12px; font-weight: 500;">${item.date_str}</td>
             <td style="padding: 12px; font-weight: bold; color: ${item.market_change_pct.includes('-') ? '#b0532f' : '#3e7d5c'};">${item.market_change_pct}</td>
-            
-            <!-- 👇 替換成真實的後端數據，並加上防呆處理 👇 -->
             <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.derivative_status || '數據不足'}</td>
             <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.institutional_status || '數據不足'}</td>
-            
             <td style="padding: 12px; font-weight: bold; color: ${labelColor};">${item.sentiment_label}</td>
-            <td style="padding: 12px; text-align: left; cursor: help;" title="${safeTooltipText}">
-                <span style="border-bottom: 1px dashed #c2a26d;">${item.headline}</span>
+            
+            <!-- 專屬的 Hover 儲存格 -->
+            <td class="sentiment-hover-cell" style="padding: 12px; text-align: left;">
+                <span style="border-bottom: 1px dashed #c2a26d; cursor: help; color: #2b261c;">${item.headline}</span>
+                
+                <!-- 浮動卡片 (自訂 Tooltip) -->
+                <div class="custom-tooltip-card">
+                    <div style="color: #f0b90b; font-weight: bold; margin-bottom: 8px; font-size: 14.5px;">
+                        🤖 CIO 深度推演
+                    </div>
+                    <div style="color: #eee; margin-bottom: 15px; text-align: justify;">
+                        ${item.detailed_analysis}
+                    </div>
+                    
+                    <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">
+                        📊 底層觸發數據
+                    </div>
+                    <div style="text-align: left;">
+                        ${dataHtml}
+                    </div>
+                </div>
             </td>
         `;
         tbody.appendChild(tr);
