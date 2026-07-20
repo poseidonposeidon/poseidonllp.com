@@ -10878,10 +10878,12 @@ function renderSentimentTable(dataArray) {
         tr.innerHTML = `
             <td style="padding: 12px; font-weight: 500;">${item.date_str}</td>
             <td style="padding: 12px; font-weight: bold; color: ${item.market_change_pct.includes('-') ? '#b0532f' : '#3e7d5c'};">${item.market_change_pct}</td>
-            <td style="padding: 12px; font-size: 13px; color: #6e685c;">(即將導入)</td>
-            <td style="padding: 12px; font-size: 13px; color: #6e685c;">(即將導入)</td>
+            
+            <!-- 👇 替換成真實的後端數據，並加上防呆處理 👇 -->
+            <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.derivative_status || '數據不足'}</td>
+            <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.institutional_status || '數據不足'}</td>
+            
             <td style="padding: 12px; font-weight: bold; color: ${labelColor};">${item.sentiment_label}</td>
-            <!-- 👇 注意這裡使用了安全轉義後的 safeTooltipText -->
             <td style="padding: 12px; text-align: left; cursor: help;" title="${safeTooltipText}">
                 <span style="border-bottom: 1px dashed #c2a26d;">${item.headline}</span>
             </td>
