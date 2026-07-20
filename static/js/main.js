@@ -10850,18 +10850,17 @@ function renderSentimentTable(dataArray) {
                 visibility: hidden;
                 opacity: 0;
                 position: absolute;
-                top: 50%;                    /* 基準點設為儲存格垂直中心 */
-                transform: translateY(-50%); /* 完美垂直置中對齊 */
-                right: 100%;                 /* 強制向「左邊」展開，避開上下邊界 */
-                margin-right: 12px;          /* 與文字保持一點安全距離 */
+                top: -5px;                   /* 👈 對齊儲存格頂部稍微偏上，讓卡片主要「往下」展開 */
+                right: 100%;                 /* 保持向左展開 */
+                margin-right: 12px;          
                 width: 360px;
                 background: rgba(25, 25, 25, 0.95);
                 backdrop-filter: blur(10px);
                 border: 1px solid #c2a26d;
                 border-radius: 8px;
                 padding: 16px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.5); /* 稍微加深陰影增強立體感 */
-                z-index: 9999;               /* 確保層級在最上層 */
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+                z-index: 99999;              /* 👈 加到 99999，確保絕對蓋過深褐色的標題列 */
                 font-family: inherit;
                 font-size: 13.5px;
                 line-height: 1.6;
@@ -10871,7 +10870,7 @@ function renderSentimentTable(dataArray) {
             .sentiment-hover-cell:hover .custom-tooltip-card {
                 visibility: visible;
                 opacity: 1;
-                transform: translateY(-50%) translateX(-8px); /* 滑過時帶有一點向左浮現的動態感 */
+                transform: translateX(-8px); /* 👈 刪除了 translateY，只保留向左浮現的動態效果 */
             }
         `;
         document.head.appendChild(style);
