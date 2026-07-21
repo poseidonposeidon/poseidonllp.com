@@ -904,20 +904,42 @@
                 </div>
 
                 <!-- 上半部：左右分欄 (左邊美銀指針，右邊走勢圖) -->
-                <div style="display: flex; gap: 20px; margin-bottom: 30px; height: 280px;">
-                    <!-- 左側：BofA Style 恐慌貪婪指針 -->
-                    <div style="flex: 1; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; position: relative;">
-                        <h4 style="margin: 0 0 10px 0; color: #2b261c; text-align: center;">BofA Style Bull & Bear Indicator</h4>
-                        <div id="sentiment-gauge-chart" style="width: 100%; height: 220px;"></div>
+                <div style="display: flex; gap: 20px; margin-bottom: 30px; min-height: 290px;">
+
+                    <!-- 左側：BofA 指針 與 量化持股水位 -->
+                    <div style="flex: 1; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; display: flex; flex-direction: column; justify-content: space-between;">
+                        <div>
+                            <h4 style="margin: 0 0 0 0; color: #2b261c; text-align: center; font-size: 15px;">BofA Style Bull & Bear</h4>
+                            <!-- 高度稍微縮減，讓出空間給下方的進度條 -->
+                            <div id="sentiment-gauge-chart" style="width: 100%; height: 180px;"></div>
+                        </div>
+
+                        <!-- 🌟 新增：量化風控建議持股水位 UI -->
+                        <div style="background: #fcfbf9; border: 1px solid #e8e3d8; border-radius: 6px; padding: 12px; margin-top: -10px;">
+                            <div style="font-size: 12.5px; color: #8a6d3f; margin-bottom: 8px; font-weight: bold; display: flex; justify-content: space-between;">
+                                <span>🛡️ 建議持股水位</span>
+                                <span style="font-size: 11px; color: #aaa; font-weight: normal;">(量化逆勢防禦)</span>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 12px;">
+                                <!-- 跑馬燈軌道 -->
+                                <div style="flex-grow: 1; background: #e8e3d8; height: 12px; border-radius: 6px; overflow: hidden; position: relative;">
+                                    <div id="exposure-progress-bar" style="width: 0%; height: 100%; background: #a29a8b; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s;"></div>
+                                </div>
+                                <!-- 數字顯示器 -->
+                                <div id="exposure-text" style="font-weight: bold; color: #2b261c; font-size: 18px; width: 50px; text-align: right; font-family: monospace;">--%</div>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- 右側：SPY 15天迷你走勢圖 -->
-                    <div style="flex: 2; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
-                        <h4 style="margin: 0 0 10px 0; color: #2b261c;">S&P 500 Trajectory (15 Days)</h4>
-                        <div style="width: 100%; height: 220px;">
+                    <!-- 右側：三大指數歸一化走勢圖 -->
+                    <div style="flex: 2; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; display: flex; flex-direction: column;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c;">US Markets Trajectory (S&P 500 / Nasdaq / SOX)</h4>
+                        <!-- 讓 canvas 容器自動填滿剩餘高度 -->
+                        <div style="width: 100%; flex-grow: 1; position: relative;">
                             <canvas id="sentiment-trend-chart"></canvas>
                         </div>
                     </div>
+
                 </div>
 
                 <!-- 下半部：歷史情緒數據表格 -->

@@ -10806,7 +10806,7 @@ function toggleSentimentMatrix() {
     loadSentimentMatrixData();
 }
 
-// 2. 向後端請求 15 天歷史數據
+// 2. 向後端請求 15 天歷史數據並渲染所有模組
 async function loadSentimentMatrixData() {
     const tableBody = document.getElementById('sentiment-table-body');
     if (!tableBody) return;
@@ -10821,12 +10821,41 @@ async function loadSentimentMatrixData() {
         const data = await response.json();
 
         if (data && data.length > 0) {
-            // 渲染表格
+            // 1. 渲染底部表格與 Hover 資訊卡
             renderSentimentTable(data);
 
-            // 渲染圖表 (取最新一天的分數畫指針，取 15 天的大盤畫走勢)
-            const latestScore = data[0].sentiment_score; // 假設後端回傳是由新到舊
+            // 2. 取最新一天 (陣列第一筆) 的資料來畫左側儀表板
+            const latestRecord = data[0];
+            const latestScore = latestRecord.sentiment_score;
             drawBofAGauge(latestScore);
+
+            // 3. 🌟 新增：解析 JSON，渲染「建議持股水位」跑馬燈動畫
+            try {
+                const rawObj = JSON.parse(latestRecord.raw_data_json);
+                const holdLevel = parseFloat(rawObj['建議持股水位']) || 75; // 若無資料預設 75%
+
+                const progressBar = document.getElementById('exposure-progress-bar');
+                const progressText = document.getElementById('exposure-text');
+
+                if (progressBar && progressText) {
+                    // 動態決定顏色：水位高代表安全(綠色)，水位低代表需防禦(橘/紅色)
+                    let barColor = '#3e7d5c'; // 綠色
+                    if (holdLevel < 60) barColor = '#b0532f'; // 紅色
+                    else if (holdLevel < 80) barColor = '#d3bd92'; // 香檳色/中性
+
+                    // 延遲一點點執行，讓動畫更順暢
+                    setTimeout(() => {
+                        progressBar.style.width = `${holdLevel}%`;
+                        progressBar.style.backgroundColor = barColor;
+                        // 數字跑動特效
+                        animateValue(progressText, 0, holdLevel, 1000);
+                    }, 200);
+                }
+            } catch(e) {
+                console.error("解析持股水位失敗", e);
+            }
+
+            // 4. 渲染右側三維大盤走勢圖
             drawSentimentTrend(data);
         } else {
             tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #b0532f;">目前尚無情緒歷史資料，請確認後端排程已執行。</td></tr>';
@@ -10836,6 +10865,20 @@ async function loadSentimentMatrixData() {
         console.error("Sentiment Matrix Error:", error);
         tableBody.innerHTML = `<tr><td colspan="6" style="padding: 30px; text-align: center; color: #b0532f;">⚠️ 載入失敗: ${error.message}</td></tr>`;
     }
+}
+
+// 輔助函式：讓數字平滑增加的動畫特效
+function animateValue(obj, start, end, duration) {
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = (progress * (end - start) + start).toFixed(1) + '%';
+        if (progress < 1) {
+            window.requestAnimationFrame(step);
+        }
+    };
+    window.requestAnimationFrame(step);
 }
 
 // 3. 渲染 15 天歷史表格
@@ -10905,20 +10948,29 @@ function renderSentimentTable(dataArray) {
         let dataHtml = "";
         try {
             const rawObj = JSON.parse(item.raw_data_json);
+
+            // 🌟 判斷是否為新的「三維指數」格式
+            if (rawObj['三大指數']) {
+                const indices = rawObj['三大指數'];
+                dataHtml = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid #444;">
+                        <div><span style="color:#aaa; font-size:12px;">S&P 500:</span><br><b style="color:#ddd;">${parseFloat(indices.SP500).toFixed(2)}</b> <span style="color:${rawObj['大盤表現'].includes('-') ? '#e74c3c' : '#2ecc71'}; font-size:11px;">(${rawObj['大盤表現']})</span></div>
+                        <div><span style="color:#aaa; font-size:12px;">Nasdaq:</span><br><b style="color:#ddd;">${parseFloat(indices.NASDAQ).toFixed(2)}</b></div>
+                        <div><span style="color:#aaa; font-size:12px;">費城半導體:</span><br><b style="color:#ddd;">${parseFloat(indices.SOX).toFixed(2)}</b></div>
+                        <div><span style="color:#aaa; font-size:12px;">VIX 恐慌指數:</span><br><b style="color:#f0b90b;">${parseFloat(indices.VIX).toFixed(2)}</b></div>
+                    </div>
+                `;
+            } else if (rawObj['大盤表現']) {
+                dataHtml = `<div style="margin-bottom: 6px; color: #ddd;">📈 <b>大盤與量能：</b>${rawObj['大盤表現']} (${rawObj['市場量能'] || 'N/A'})</div>`;
+            }
+
             if (rawObj['核心催化劑']) {
-                // 如果是新版有新聞清單的數據
-                dataHtml = `<div style="margin-bottom: 6px; color: #ddd;">📈 <b>大盤與量能：</b>${rawObj['大盤表現']} (${rawObj['市場量能']})</div>`;
                 dataHtml += `<div style="color: #e67e22; margin-top: 8px;">🔥 <b>核心新聞催化劑：</b></div>`;
                 dataHtml += `<ul style="margin: 4px 0 0 0; padding-left: 20px; color: #bbb;">`;
                 rawObj['核心催化劑'].forEach(news => {
                     dataHtml += `<li style="margin-bottom: 4px;">${news}</li>`;
                 });
                 dataHtml += `</ul>`;
-            } else {
-                // 如果是圖中舊版的 raw_data_json
-                const change = rawObj.spy_change || rawObj['大盤表現'] || 'N/A';
-                const count = rawObj.news_count || 0;
-                dataHtml = `<div style="color: #bbb;">📈 <b>觸發基準：</b>大盤變動 ${change} | 關鍵新聞掃描：${count} 則</div>`;
             }
         } catch(e) {
             dataHtml = `<div style="color: #888;">無詳細底層數據</div>`;
@@ -10938,26 +10990,13 @@ function renderSentimentTable(dataArray) {
             <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.derivative_status || '數據不足'}</td>
             <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.institutional_status || '數據不足'}</td>
             <td style="padding: 12px; font-weight: bold; color: ${labelColor};">${item.sentiment_label}</td>
-            
-            <!-- 專屬的 Hover 儲存格 -->
             <td class="sentiment-hover-cell" style="padding: 12px; text-align: left;">
                 <span style="border-bottom: 1px dashed #c2a26d; cursor: help; color: #2b261c;">${item.headline}</span>
-                
-                <!-- 浮動卡片 (自訂 Tooltip) -->
                 <div class="custom-tooltip-card">
-                    <div style="color: #f0b90b; font-weight: bold; margin-bottom: 8px; font-size: 14.5px;">
-                        🤖 CIO 深度推演
-                    </div>
-                    <div style="color: #eee; margin-bottom: 15px; text-align: justify;">
-                        ${item.detailed_analysis}
-                    </div>
-                    
-                    <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">
-                        📊 底層觸發數據
-                    </div>
-                    <div style="text-align: left;">
-                        ${dataHtml}
-                    </div>
+                    <div style="color: #f0b90b; font-weight: bold; margin-bottom: 8px; font-size: 14.5px;">🤖 CIO 深度推演</div>
+                    <div style="color: #eee; margin-bottom: 15px; text-align: justify;">${item.detailed_analysis}</div>
+                    <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📊 底層觸發數據</div>
+                    <div style="text-align: left;">${dataHtml}</div>
                 </div>
             </td>
         `;
