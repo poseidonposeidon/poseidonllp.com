@@ -10882,6 +10882,39 @@ async function loadSentimentMatrixData() {
                 renderEarningsCalendar(rawObj['未來財報'] || []);
                 renderMag7Performance(rawObj['科技七雄'] || []);
 
+                // 👇 🌟 新增：渲染「三、財經新聞焦點」
+                const newsFocusContainer = document.getElementById('daily-news-focus-content');
+                if (newsFocusContainer) {
+                    let newsHtml = '<ul style="padding-left: 20px; margin: 0; color: #4a4436;">';
+                    // 1. 先列出條列式的新聞標題
+                    if (rawObj['核心催化劑'] && rawObj['核心催化劑'].length > 0) {
+                        rawObj['核心催化劑'].forEach(news => {
+                            newsHtml += `<li style="margin-bottom: 10px;">${news}</li>`;
+                        });
+                    } else {
+                        newsHtml += '<li>今日盤面無重大財經新聞催化劑。</li>';
+                    }
+                    newsHtml += '</ul>';
+
+                    // 2. 補上 AI 的專業總結 (機構感點評)
+                    if (rawObj['AI新聞點評']) {
+                        newsHtml += `<div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #d3bd92; color: #8a6d3f;">
+                                        <strong>💡 CIO 總結：</strong>${rawObj['AI新聞點評']}
+                                     </div>`;
+                    }
+                    newsFocusContainer.innerHTML = newsHtml;
+                }
+
+                // 👇 🌟 新增：渲染「四、散戶討論區溫度」
+                const retailVibeContainer = document.getElementById('daily-retail-vibe-content');
+                if (retailVibeContainer) {
+                    if (rawObj['AI散戶溫度']) {
+                        retailVibeContainer.innerHTML = `<p style="margin: 0;">${rawObj['AI散戶溫度']}</p>`;
+                    } else {
+                        retailVibeContainer.innerHTML = '<p style="margin: 0; color: #888;">社群情緒數據結算中，暫無散戶動向。</p>';
+                    }
+                }
+
             } catch(e) {
                 console.error("解析頂部戰情室資料失敗", e);
             }
