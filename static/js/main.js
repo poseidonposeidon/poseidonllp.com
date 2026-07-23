@@ -10877,8 +10877,10 @@ async function loadSentimentMatrixData() {
                 }
 
                 // 🌟 新增：渲染財報行事曆與科技七雄表格
-                if (rawObj['未來財報']) renderEarningsCalendar(rawObj['未來財報']);
-                if (rawObj['科技七雄']) renderMag7Performance(rawObj['科技七雄']);
+                // if (rawObj['未來財報']) renderEarningsCalendar(rawObj['未來財報']);
+                // if (rawObj['科技七雄']) renderMag7Performance(rawObj['科技七雄']);
+                renderEarningsCalendar(rawObj['未來財報'] || []);
+                renderMag7Performance(rawObj['科技七雄'] || []);
 
             } catch(e) {
                 console.error("解析頂部戰情室資料失敗", e);
@@ -11503,7 +11505,7 @@ function renderEarningsCalendar(earningsList) {
     if (!tbody) return;
 
     if (!earningsList || earningsList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">未來一週無重大財報發布</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#b0532f;">⚠️ 歷史快取未含此數據，請重啟 app.py 讓系統重新回填資料。</td></tr>';
         return;
     }
 
@@ -11538,7 +11540,7 @@ function renderMag7Performance(mag7Data) {
     if (!tbody) return;
 
     if (!mag7Data || mag7Data.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">無法取得科技七雄報價</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#b0532f;">⚠️ 歷史快取未含此數據，請重啟 app.py 讓系統重新回填資料。</td></tr>';
         return;
     }
 
