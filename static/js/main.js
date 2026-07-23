@@ -11499,35 +11499,48 @@ function drawMacroEconomicChart(gdpData, cpiData) {
     });
 }
 
-// 2. 渲染：前 20 大巨頭財報行事曆
+// 2. 渲染：前 20 大巨頭財報行事曆 (結構化解析升級版)
 function renderEarningsCalendar(earningsList) {
     const tbody = document.getElementById('earnings-calendar-body');
     if (!tbody) return;
 
     if (!earningsList || earningsList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#b0532f;">⚠️ 歷史快取未含此數據，請重啟 app.py 讓系統重新回填資料。</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:15px; color:#aaa;">未來 14 天內無美股頂級巨頭發布財報</td></tr>';
         return;
     }
 
     let html = '';
     earningsList.forEach(item => {
-        // Python 傳來的是字串格式："2026-07-25: AAPL (預估EPS: 1.2)"
-        // 這裡我們進行優雅的字串拆解
-        const parts = item.split(': ');
-        const date = parts[0];
-        const rest = parts[1] || "";
-        const symMatch = rest.match(/^([A-Z]+)/);
-        const epsMatch = rest.match(/預估EPS:\s*([^)]+)/);
+        let symbol = '--', date = '--', eps = '--', revenue = '--';
 
-        const symbol = symMatch ? symMatch[1] : '--';
-        const eps = epsMatch ? epsMatch[1] : '--';
+        // 🌟 防呆：如果後端傳來的是新的 JSON 物件結構
+        if (typeof item === 'object' && item !== null) {
+            symbol = item.symbol || '--';
+            date = item.date || '--';
+            eps = item.eps || '--';
+            revenue = item.revenue || '--';
+        }
+        // 🌟 防呆：萬一是舊版快取的字串結構，優雅降級解析
+        else if (typeof item === 'string') {
+            try {
+                const parts = item.split(': ');
+                date = parts[0] || '--';
+                const rest = parts[1] || "";
+                const symMatch = rest.match(/^([A-Z]+)/);
+                const epsMatch = rest.match(/預估EPS:\s*([^)]+)/);
+                symbol = symMatch ? symMatch[1] : '--';
+                eps = epsMatch ? epsMatch[1] : '--';
+            } catch(e) {
+                console.error("財報字串解析失敗", e);
+            }
+        }
 
         html += `
             <tr style="border-bottom: 1px solid #f0ebe1; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
                 <td style="padding: 8px; font-weight: bold; color: #3498db;">${symbol}</td>
                 <td style="padding: 8px; color: #6e685c;">${date}</td>
                 <td style="padding: 8px; text-align: right; color: #b0532f; font-weight: bold;">${eps}</td>
-                <td style="padding: 8px; text-align: right; color: #888;">-- (待揭曉)</td>
+                <td style="padding: 8px; text-align: right; color: #3e7d5c; font-weight: bold;">${revenue}</td>
             </tr>
         `;
     });
