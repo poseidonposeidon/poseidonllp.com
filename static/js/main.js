@@ -10775,10 +10775,8 @@ async function restoreFromHistory(historyId) {
 /* ==========================================================================
    🔮 美股情緒矩陣 (Sentiment Matrix) 核心邏輯
    ========================================================================== */
-
-// 1. 面板切換與觸發載入
+// 1. 面板切換與觸發載入 (維持不變，放在這裡方便你對齊)
 function toggleSentimentMatrix() {
-    // 隱藏其他所有區塊
     const briefingSection = document.getElementById('daily-briefing-section');
     const mainContent = document.getElementById('dd-main-content');
     const screenerContent = document.getElementById('dd-screener-content');
@@ -10791,22 +10789,19 @@ function toggleSentimentMatrix() {
     if(trumpContent) trumpContent.style.display = 'none';
     if(emptyState) emptyState.style.display = 'none';
 
-    // 顯示情緒矩陣面板
     const sentimentContent = document.getElementById('dd-sentiment-content');
     if (sentimentContent) {
         sentimentContent.style.display = 'block';
         sentimentContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
-    // 恢復所有按鈕預設狀態 (防呆)
     document.getElementById('dd-stock-input').disabled = false;
     document.getElementById('dd-stock-input').style.opacity = '1';
 
-    // 觸發載入資料
     loadSentimentMatrixData();
 }
 
-// 2. 向後端請求 15 天歷史數據並渲染所有模組
+// 2. 🚀 核心升級：解析最新資料，動態填入頂部戰情室與水位條
 async function loadSentimentMatrixData() {
     const tableBody = document.getElementById('sentiment-table-body');
     if (!tableBody) return;
@@ -10821,42 +10816,60 @@ async function loadSentimentMatrixData() {
         const data = await response.json();
 
         if (data && data.length > 0) {
-            // 1. 渲染底部表格與 Hover 資訊卡
+            // A. 渲染底部表格與 Hover 資訊卡
             renderSentimentTable(data);
 
-            // 2. 取最新一天 (陣列第一筆) 的資料來畫左側儀表板
+            // B. 取出最新一天 (陣列第一筆) 來渲染頂部戰情報價區
             const latestRecord = data[0];
             const latestScore = latestRecord.sentiment_score;
-            drawBofAGauge(latestScore);
 
-            // 3. 🌟 新增：解析 JSON，渲染「建議持股水位」跑馬燈動畫
             try {
                 const rawObj = JSON.parse(latestRecord.raw_data_json);
-                const holdLevel = parseFloat(rawObj['建議持股水位']) || 75; // 若無資料預設 75%
 
+                // --- 填入頂部報價看板 ---
+                document.getElementById('daily-report-date').innerText = latestRecord.date_str;
+                document.getElementById('daily-spy-close').innerText = parseFloat(rawObj['真實收盤價']).toFixed(2);
+
+                const changeSpan = document.getElementById('daily-spy-change');
+                const changeVal = parseFloat(latestRecord.market_change_pct);
+                changeSpan.innerText = (changeVal > 0 ? '+' : '') + latestRecord.market_change_pct;
+                changeSpan.style.color = changeVal > 0 ? '#3e7d5c' : '#b0532f'; // 漲綠跌紅
+
+                if (rawObj['市場量能']) {
+                    document.getElementById('daily-spy-volume').innerText = `成交量: ${rawObj['市場量能']}`;
+                }
+                if (rawObj['三大指數']) {
+                    document.getElementById('daily-ndx-close').innerText = `Nasdaq: ${parseFloat(rawObj['三大指數']['NASDAQ']).toFixed(2)}`;
+                    document.getElementById('daily-vix-close').innerText = `VIX: ${parseFloat(rawObj['三大指數']['VIX']).toFixed(2)}`;
+                }
+
+                // --- 渲染右上角建議持股水位與指針 ---
+                const holdLevel = parseFloat(rawObj['建議持股水位']) || 75;
                 const progressBar = document.getElementById('exposure-progress-bar');
                 const progressText = document.getElementById('exposure-text');
 
                 if (progressBar && progressText) {
-                    // 動態決定顏色：水位高代表安全(綠色)，水位低代表需防禦(橘/紅色)
                     let barColor = '#3e7d5c'; // 綠色
                     if (holdLevel < 60) barColor = '#b0532f'; // 紅色
-                    else if (holdLevel < 80) barColor = '#d3bd92'; // 香檳色/中性
+                    else if (holdLevel < 80) barColor = '#d3bd92'; // 香檳色
 
-                    // 延遲一點點執行，讓動畫更順暢
                     setTimeout(() => {
                         progressBar.style.width = `${holdLevel}%`;
                         progressBar.style.backgroundColor = barColor;
-                        // 數字跑動特效
+                        progressText.style.color = barColor; // 文字顏色同步
                         animateValue(progressText, 0, holdLevel, 1000);
                     }, 200);
                 }
             } catch(e) {
-                console.error("解析持股水位失敗", e);
+                console.error("解析頂部戰情室資料失敗", e);
             }
 
-            // 4. 渲染右側三維大盤走勢圖
-            drawSentimentTrend(data);
+            // C. 畫圖表：美銀指針與全新雙軸圖表
+            drawBofAGauge(latestScore);
+            drawSentimentMixedChart(data);
+            // 🌟 觸發下半部進階流動性與籌碼戰情室的資料載入
+            loadAdvancedLiquidityData();
+
         } else {
             tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #b0532f;">目前尚無情緒歷史資料，請確認後端排程已執行。</td></tr>';
         }
@@ -10883,7 +10896,6 @@ function animateValue(obj, start, end, duration) {
 
 // 3. 渲染 15 天歷史表格
 function renderSentimentTable(dataArray) {
-    // 💡 步驟 A：自動注入懸浮卡片的專屬 CSS 樣式 (智慧防裁切完美版)
     if (!document.getElementById('sentiment-tooltip-styles')) {
         const style = document.createElement('style');
         style.id = 'sentiment-tooltip-styles';
@@ -10893,9 +10905,9 @@ function renderSentimentTable(dataArray) {
                 visibility: hidden;
                 opacity: 0;
                 position: absolute;
-                top: -5px;                   /* 預設：往下展開，對齊儲存格頂部 */
-                bottom: auto;                /* 確保預設不綁定底部 */
-                right: 100%;                 /* 保持向左展開 */
+                top: -5px;
+                bottom: auto;
+                right: 100%;
                 margin-right: 12px;          
                 width: 360px;
                 background: rgba(25, 25, 25, 0.95);
@@ -10904,24 +10916,21 @@ function renderSentimentTable(dataArray) {
                 border-radius: 8px;
                 padding: 16px;
                 box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-                z-index: 99999;              /* 確保絕對蓋過所有標題與外框 */
+                z-index: 99999;
                 font-family: inherit;
                 font-size: 13.5px;
                 line-height: 1.6;
                 transition: all 0.2s ease-out;
                 pointer-events: none;
             }
-            
-            /* 👇 關鍵修復：針對表格的「倒數 4 行」，卡片強制改為「往上展開」 👇 */
             tr:nth-last-child(-n+4) .sentiment-hover-cell .custom-tooltip-card {
-                top: auto;                   /* 取消往下展開 */
-                bottom: -5px;                /* 改為往上展開，對齊儲存格底部 */
+                top: auto;
+                bottom: -5px;
             }
-
             .sentiment-hover-cell:hover .custom-tooltip-card {
                 visibility: visible;
                 opacity: 1;
-                transform: translateX(-8px); /* 保持向左浮現的動態效果 */
+                transform: translateX(-8px);
             }
         `;
         document.head.appendChild(style);
@@ -10944,12 +10953,10 @@ function renderSentimentTable(dataArray) {
             labelColor = '#8a6d3f';
         }
 
-        // 💡 步驟 B：優雅解析底層數據 (相容舊的 JSON 與新的豐富結構)
         let dataHtml = "";
         try {
             const rawObj = JSON.parse(item.raw_data_json);
 
-            // 🌟 判斷是否為新的「三維指數」格式
             if (rawObj['三大指數']) {
                 const indices = rawObj['三大指數'];
                 dataHtml = `
@@ -10983,7 +10990,6 @@ function renderSentimentTable(dataArray) {
         tr.onmouseover = () => tr.style.backgroundColor = 'rgba(0,0,0,0.05)';
         tr.onmouseout = () => tr.style.backgroundColor = bgOpacity;
 
-        // 💡 步驟 C：建立 HTML 結構，移除 title，改用 .custom-tooltip-card
         tr.innerHTML = `
             <td style="padding: 12px; font-weight: 500;">${item.date_str}</td>
             <td style="padding: 12px; font-weight: bold; color: ${item.market_change_pct.includes('-') ? '#b0532f' : '#3e7d5c'};">${item.market_change_pct}</td>
@@ -11010,8 +11016,6 @@ function drawBofAGauge(score100) {
     if (!chartDom) return;
     const myChart = echarts.init(chartDom);
 
-    // 將 0-100 的分數轉換為 0-10 的美銀標準 (0=極度恐慌/買進, 10=極度樂觀/賣出)
-    // 假設系統 0是恐慌, 100是樂觀。若需反轉請自行調整邏輯。
     let bofaScore = (score100 / 10).toFixed(1);
 
     const option = {
@@ -11020,82 +11024,368 @@ function drawBofAGauge(score100) {
             min: 0,
             max: 10,
             splitNumber: 5,
-            itemStyle: {
-                color: '#2b261c', // 指針顏色
-            },
-            progress: { show: true, width: 30 },
+            itemStyle: { color: '#2b261c' },
+            progress: { show: true, width: 20 },
             pointer: { itemStyle: { color: 'auto' } },
             axisLine: {
                 lineStyle: {
-                    width: 30,
+                    width: 20,
                     color: [
-                        [0.2, '#3e7d5c'], // 0-2 綠色 (Buy / Extreme Bearish)
+                        [0.2, '#b0532f'], // 0-2 紅色 (恐慌)
                         [0.8, '#d3bd92'], // 2-8 香檳色/中性
-                        [1, '#b0532f']    // 8-10 紅色 (Sell / Extreme Bullish)
+                        [1, '#3e7d5c']    // 8-10 綠色 (樂觀)
                     ]
                 }
             },
-            axisTick: { distance: -30, length: 8, lineStyle: { color: '#fff', width: 2 } },
-            splitLine: { distance: -30, length: 30, lineStyle: { color: '#fff', width: 4 } },
-            axisLabel: { color: '#6e685c', distance: 40, fontSize: 14 },
-            detail: { valueAnimation: true, formatter: '{value}', color: '#2b261c', fontSize: 30, offsetCenter: [0, '70%'] },
+            axisTick: { distance: -20, length: 5, lineStyle: { color: '#fff', width: 2 } },
+            splitLine: { distance: -20, length: 20, lineStyle: { color: '#fff', width: 3 } },
+            axisLabel: { color: '#6e685c', distance: 30, fontSize: 12 },
+            detail: { valueAnimation: true, formatter: '{value}', color: '#2b261c', fontSize: 24, offsetCenter: [0, '70%'] },
             data: [{ value: bofaScore }]
         }]
     };
     myChart.setOption(option);
 }
 
-// 5. 渲染 15 天迷你大盤走勢圖 (Chart.js)
-let sentimentTrendChartInstance = null;
-function drawSentimentTrend(dataArray) {
-    const canvas = document.getElementById('sentiment-trend-chart');
+// 5. 🚀 核心升級：對標 PDF 範例的「雙軸混合圖表 (Mixed Chart)」
+let sentimentMixedChartInstance = null;
+
+function drawSentimentMixedChart(dataArray) {
+    const canvas = document.getElementById('sentiment-mixed-chart');
     if (!canvas) return;
 
-    // 將資料反轉，讓圖表由左至右為「舊到新」
+    // 將資料反轉，由舊到新
     const reversedData = [...dataArray].reverse();
-    const labels = reversedData.map(item => item.date_str.substring(5)); // 只取 MM-DD
+    const labels = reversedData.map(item => item.date_str.substring(5)); // 取 MM-DD
 
-    // 👇 核心修正：不再用 500 去模擬，直接從 raw_data_json 解析出真實收盤價
-    const prices = reversedData.map(item => {
-        try {
-            const rawObj = JSON.parse(item.raw_data_json);
-            // 如果有真實收盤價就用真實的，否則防呆給個 7400
-            return rawObj['真實收盤價'] ? parseFloat(rawObj['真實收盤價']).toFixed(2) : 7400;
-        } catch(e) {
-            return 7400;
-        }
-    });
+    // 萃取 AI 情緒分數 (用於折線圖)
+    const scores = reversedData.map(item => item.sentiment_score);
 
-    if (sentimentTrendChartInstance) sentimentTrendChartInstance.destroy();
+    // 萃取大盤漲跌幅 (用於柱狀圖)
+    const spyChanges = reversedData.map(item => parseFloat(item.market_change_pct));
 
-    sentimentTrendChartInstance = new Chart(canvas, {
-        type: 'line',
+    // 決定柱子顏色：漲為綠色，跌為紅色，並加入透明度與機構感
+    const barColors = spyChanges.map(val => val > 0 ? 'rgba(62, 125, 92, 0.6)' : 'rgba(176, 83, 47, 0.6)');
+    const borderColors = spyChanges.map(val => val > 0 ? 'rgba(62, 125, 92, 1)' : 'rgba(176, 83, 47, 1)');
+
+    if (sentimentMixedChartInstance) sentimentMixedChartInstance.destroy();
+
+    sentimentMixedChartInstance = new Chart(canvas, {
         data: {
             labels: labels,
-            datasets: [{
-                label: 'S&P 500 Trajectory',
-                data: prices,
-                borderColor: '#3b3a35', // 收盤線顏色
-                backgroundColor: 'rgba(211, 189, 146, 0.2)', // 香檳色漸層
-                borderWidth: 2,
-                pointBackgroundColor: '#b0532f',
-                pointRadius: 3,
-                fill: true,
-                tension: 0.3
-            }]
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'AI 情緒分數 (左軸)',
+                    data: scores,
+                    borderColor: '#8a6d3f', // 香檳金折線
+                    backgroundColor: '#8a6d3f',
+                    borderWidth: 3,
+                    pointBackgroundColor: '#2b261c',
+                    pointRadius: 4,
+                    yAxisID: 'y', // 對應左側 Y 軸
+                    tension: 0.3, // 讓線條平滑
+                    order: 1 // 讓折線圖浮在柱狀圖上方
+                },
+                {
+                    type: 'bar',
+                    label: 'S&P 500 單日漲跌幅 (右軸)',
+                    data: spyChanges,
+                    backgroundColor: barColors,
+                    borderColor: borderColors,
+                    borderWidth: 1,
+                    yAxisID: 'y1', // 對應右側 Y 軸
+                    borderRadius: 4, // 柱子邊角圓滑
+                    order: 2
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } },
-            scales: {
-                x: { grid: { color: '#f0ebe1' }, ticks: { color: '#a29a8b' } },
-                y: {
-                    grid: { color: '#f0ebe1' },
-                    ticks: { color: '#a29a8b' },
-                    // 自動縮放 Y 軸，讓圖表波動看起來更清晰
-                    grace: '5%'
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: { color: '#2b261c', usePointStyle: true, font: { family: 'Jost' } }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.dataset.type === 'bar') {
+                                return label + context.parsed.y + '%';
+                            }
+                            return label + context.parsed.y + ' 分';
+                        }
+                    }
                 }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#6e685c', font: { family: 'Jost' } }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    title: { display: true, text: '情緒分數 (0-100)', color: '#8a6d3f', font: { weight: 'bold' } },
+                    grid: { color: '#e8e3d8' },
+                    min: 0,
+                    max: 100
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    title: { display: true, text: '漲跌幅 (%)', color: '#2b261c', font: { weight: 'bold' } },
+                    grid: { display: false }, // 隱藏右軸格線，避免畫面凌亂
+                    ticks: {
+                        callback: function(value) { return value + '%'; },
+                        color: '#6e685c'
+                    }
+                }
+            }
+        }
+    });
+}
+
+/* ==========================================================================
+   🦅 下半部：華爾街流動性與聰明錢籌碼追蹤 (Advanced Liquidity & Smart Money)
+   ========================================================================== */
+
+let liquidityVolChartInstance = null;
+let drawdownStressChartInstance = null;
+let retailSpecChartInstance = null;
+
+async function loadAdvancedLiquidityData() {
+    try {
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/us_advanced_liquidity` : '/api/us_advanced_liquidity';
+        const response = await fetch(targetUrl);
+        if (!response.ok) throw new Error("無法取得進階流動性數據");
+
+        const data = await response.json();
+
+        // FMP 的歷史資料預設是由新到舊，畫圖表前需要反轉成由舊到新
+        const spyHistory = (data.spy_history || []).reverse();
+        const tnxHistory = (data.tnx_history || []).reverse();
+        const vixHistory = (data.vix_history || []).reverse();
+        const socialHistory = (data.social_history || []).reverse();
+
+        // 渲染四個戰情區塊
+        renderInsiderTradingTable(data.smart_money || []);
+        drawLiquidityVolumeChart(spyHistory, tnxHistory);
+        drawDrawdownStressChart(spyHistory, vixHistory);
+        drawRetailSpeculationChart(spyHistory, socialHistory);
+
+    } catch (error) {
+        console.error("Advanced Liquidity Error:", error);
+    }
+}
+
+// 1. 渲染內部人交易表格 (取代三大法人)
+function renderInsiderTradingTable(smartMoneyList) {
+    const tbody = document.getElementById('insider-trading-body');
+    if (!tbody) return;
+
+    if (smartMoneyList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">近期無鉅額內部人交易</td></tr>';
+        return;
+    }
+
+    let html = '';
+    smartMoneyList.forEach(trade => {
+        const isBuy = trade.type === 'BUY';
+        const typeColor = isBuy ? '#3e7d5c' : '#b0532f'; // 買綠賣紅
+        const typeText = isBuy ? '買進 (Buy)' : '賣出 (Sell)';
+
+        // 格式化金額為美金 (如 $1,234,567)
+        const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
+        html += `
+            <tr style="border-bottom: 1px solid #f0ebe1;">
+                <td style="padding: 8px; font-weight: bold; color: #2b261c;">${trade.symbol}</td>
+                <td style="padding: 8px; color: #6e685c; font-size: 11px;">${trade.title || 'Director'}</td>
+                <td style="padding: 8px; color: ${typeColor}; font-weight: bold;">${typeText}</td>
+                <td style="padding: 8px; text-align: right; color: #2b261c;">${formatter.format(trade.amount)}</td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
+}
+
+// 2. 畫圖：量能 vs 10年期美債殖利率 (對標：量能與融資)
+function drawLiquidityVolumeChart(spy, tnx) {
+    const canvas = document.getElementById('liquidity-volume-chart');
+    if (!canvas || spy.length === 0) return;
+
+    const labels = spy.map(d => d.date.substring(5)); // MM-DD
+    const volumes = spy.map(d => d.volume / 1000000); // 轉換為百萬股 (M)
+
+    // 將 TNX 日期與 SPY 對齊 (因為休市可能不同步)
+    const yields = spy.map(s => {
+        const match = tnx.find(t => t.date === s.date);
+        return match ? match.close : null;
+    });
+
+    if (liquidityVolChartInstance) liquidityVolChartInstance.destroy();
+
+    liquidityVolChartInstance = new Chart(canvas, {
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'line',
+                    label: '10年美債殖利率 (%)',
+                    data: yields,
+                    borderColor: '#b0532f',
+                    backgroundColor: '#b0532f',
+                    borderWidth: 2,
+                    yAxisID: 'y1',
+                    tension: 0.2,
+                    pointRadius: 0
+                },
+                {
+                    type: 'bar',
+                    label: 'S&P 500 成交量 (百萬)',
+                    data: volumes,
+                    backgroundColor: 'rgba(211, 189, 146, 0.5)',
+                    yAxisID: 'y',
+                    borderRadius: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: {size: 10} } } },
+            scales: {
+                x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
+                y: { type: 'linear', position: 'left', grid: { color: '#f0ebe1' } },
+                y1: { type: 'linear', position: 'right', grid: { display: false }, ticks: { callback: v => v + '%' } }
+            }
+        }
+    });
+}
+
+// 3. 畫圖：大盤高點回撤率 vs VIX (對標：融資維持率)
+function drawDrawdownStressChart(spy, vix) {
+    const canvas = document.getElementById('drawdown-stress-chart');
+    if (!canvas || spy.length === 0) return;
+
+    const labels = spy.map(d => d.date.substring(5));
+
+    // 計算滾動高點回撤 (Drawdown)
+    let maxPrice = 0;
+    const drawdowns = spy.map(d => {
+        if (d.close > maxPrice) maxPrice = d.close;
+        return ((d.close - maxPrice) / maxPrice * 100).toFixed(2);
+    });
+
+    const vixData = spy.map(s => {
+        const match = vix.find(v => v.date === s.date);
+        return match ? match.close : null;
+    });
+
+    if (drawdownStressChartInstance) drawdownStressChartInstance.destroy();
+
+    drawdownStressChartInstance = new Chart(canvas, {
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'S&P 500 回撤率 (%)',
+                    data: drawdowns,
+                    borderColor: '#3e7d5c',
+                    backgroundColor: 'rgba(62, 125, 92, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    yAxisID: 'y',
+                    pointRadius: 0
+                },
+                {
+                    type: 'line',
+                    label: 'VIX 恐慌指數',
+                    data: vixData,
+                    borderColor: '#2b261c',
+                    borderWidth: 2,
+                    borderDash: [5, 5], // 虛線
+                    yAxisID: 'y1',
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: {size: 10} } } },
+            scales: {
+                x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
+                y: { type: 'linear', position: 'left', grid: { color: '#f0ebe1' }, max: 1 },
+                y1: { type: 'linear', position: 'right', grid: { display: false } }
+            }
+        }
+    });
+}
+
+// 4. 畫圖：散戶投機熱度 vs 價格震幅 (對標：當沖動向)
+function drawRetailSpeculationChart(spy, social) {
+    const canvas = document.getElementById('retail-speculation-chart');
+    if (!canvas || spy.length === 0) return;
+
+    const labels = spy.map(d => d.date.substring(5));
+
+    // 計算日震幅 (High - Low) / Close * 100 做為當沖/波動熱度指標
+    const volatility = spy.map(d => ((d.high - d.low) / d.close * 100).toFixed(2));
+
+    // 匹配社群情緒分數
+    const socialScores = spy.map(s => {
+        // FMP Social API 日期格式可能包含時間，需做前綴匹配
+        const match = social.find(soc => soc.date.startsWith(s.date));
+        // 若找不到資料，預設給 50 (中性)
+        return match ? match.stocktwitsSentiment : 50;
+    });
+
+    if (retailSpecChartInstance) retailSpecChartInstance.destroy();
+
+    retailSpecChartInstance = new Chart(canvas, {
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: '社群情緒分數 (StockTwits)',
+                    data: socialScores,
+                    backgroundColor: 'rgba(52, 152, 219, 0.4)',
+                    borderColor: 'rgba(52, 152, 219, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y1',
+                    borderRadius: 2
+                },
+                {
+                    type: 'line',
+                    label: 'S&P 500 日震幅 (%)',
+                    data: volatility,
+                    borderColor: '#8a6d3f',
+                    borderWidth: 2,
+                    yAxisID: 'y',
+                    tension: 0.3,
+                    pointRadius: 0
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: {size: 10} } } },
+            scales: {
+                x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
+                y: { type: 'linear', position: 'left', grid: { color: '#f0ebe1' }, title: {display:true, text:'震幅 %'} },
+                y1: { type: 'linear', position: 'right', grid: { display: false }, min: 0, max: 100, title: {display:true, text:'情緒分'} }
             }
         }
     });

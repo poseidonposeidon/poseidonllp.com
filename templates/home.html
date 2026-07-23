@@ -891,74 +891,119 @@
         </div>
 
         <div id="dd-sentiment-content" style="display: none; padding-top: 10px;">
-            <!-- 為了完美呈現包浩斯與機構感，我們套用你的設計規範背景與字體 -->
+            <!-- 機構級包浩斯風格背景 -->
             <div style="background: #f1ede4; border-radius: 8px; padding: 30px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
 
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <h2 style="margin: 0; text-transform: uppercase; letter-spacing: 3px; color: #2b261c; font-weight: 700;">
-                        美股市場情緒監控：最近 15 個交易日總覽
-                    </h2>
-                    <p style="color: #6e685c; font-size: 14px; margin-top: 5px;">
-                        點擊日期開啟當日完整推演日報 | 底層涵蓋選擇權、融券、法人目標價與社群語意
-                    </p>
-                </div>
-
-                <!-- 上半部：左右分欄 (左邊美銀指針，右邊走勢圖) -->
-                <div style="display: flex; gap: 20px; margin-bottom: 30px; min-height: 290px;">
-
-                    <!-- 左側：BofA 指針 與 量化持股水位 -->
-                    <div style="flex: 1; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; display: flex; flex-direction: column; justify-content: space-between;">
-                        <div>
-                            <h4 style="margin: 0 0 0 0; color: #2b261c; text-align: center; font-size: 15px;">BofA Style Bull & Bear</h4>
-                            <!-- 高度稍微縮減，讓出空間給下方的進度條 -->
-                            <div id="sentiment-gauge-chart" style="width: 100%; height: 180px;"></div>
+                <!-- 🌟 1. 頂部戰情報價區 (完全對標 PDF 的頭部) -->
+                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #d3bd92; padding-bottom: 15px; margin-bottom: 25px;">
+                    <div>
+                        <h2 style="margin: 0; font-size: 28px; font-weight: 900; color: #2b261c; display: flex; align-items: center; gap: 12px;">
+                            美股市場情緒日報
+                            <span id="daily-report-date" style="font-size: 16px; font-weight: normal; color: #6e685c; background: #e8e3d8; padding: 4px 10px; border-radius: 4px;">載入中...</span>
+                        </h2>
+                        <div style="margin-top: 12px; font-size: 16px; display: flex; gap: 20px; align-items: baseline;">
+                            <span style="color: #6e685c; font-weight: bold;">S&P 500 收盤</span>
+                            <span id="daily-spy-close" style="font-size: 26px; font-weight: 900; color: #2b261c;">--</span>
+                            <span id="daily-spy-change" style="font-size: 18px; font-weight: bold;">--</span>
                         </div>
-
-                        <!-- 🌟 新增：量化風控建議持股水位 UI -->
-                        <div style="background: #fcfbf9; border: 1px solid #e8e3d8; border-radius: 6px; padding: 12px; margin-top: -10px;">
-                            <div style="font-size: 12.5px; color: #8a6d3f; margin-bottom: 8px; font-weight: bold; display: flex; justify-content: space-between;">
-                                <span>🛡️ 建議持股水位</span>
-                                <span style="font-size: 11px; color: #aaa; font-weight: normal;">(量化逆勢防禦)</span>
-                            </div>
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <!-- 跑馬燈軌道 -->
-                                <div style="flex-grow: 1; background: #e8e3d8; height: 12px; border-radius: 6px; overflow: hidden; position: relative;">
-                                    <div id="exposure-progress-bar" style="width: 0%; height: 100%; background: #a29a8b; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.5s;"></div>
-                                </div>
-                                <!-- 數字顯示器 -->
-                                <div id="exposure-text" style="font-weight: bold; color: #2b261c; font-size: 18px; width: 50px; text-align: right; font-family: monospace;">--%</div>
-                            </div>
+                        <div style="margin-top: 8px; font-size: 13px; color: #8a6d3f; display: flex; gap: 15px;">
+                            <span id="daily-spy-volume">成交量: -- 億</span>
+                            <span id="daily-vix-close">VIX 恐慌指數: --</span>
+                            <span id="daily-ndx-close">Nasdaq: --</span>
                         </div>
                     </div>
 
-                    <!-- 右側：三大指數歸一化走勢圖 -->
-                    <div style="flex: 2; background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; display: flex; flex-direction: column;">
-                        <h4 style="margin: 0 0 10px 0; color: #2b261c;">US Markets Trajectory (S&P 500 / Nasdaq / SOX)</h4>
-                        <!-- 讓 canvas 容器自動填滿剩餘高度 -->
-                        <div style="width: 100%; flex-grow: 1; position: relative;">
-                            <canvas id="sentiment-trend-chart"></canvas>
+                    <!-- 🌟 2. 右上角：美銀指針與持股水位 (融合 PDF 的右側佈局) -->
+                    <div style="display: flex; gap: 25px; align-items: center; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                        <div style="text-align: center;">
+                            <div style="font-size: 12px; color: #8a6d3f; font-weight: bold; margin-bottom: 5px;">建議持股水位</div>
+                            <div id="exposure-text" style="font-size: 32px; font-weight: 900; color: #b0532f;">--%</div>
+                            <div style="width: 100px; height: 8px; background: #e8e3d8; border-radius: 4px; margin-top: 5px; overflow: hidden;">
+                                <div id="exposure-progress-bar" style="height: 100%; width: 0%; background: #b0532f; transition: 1s;"></div>
+                            </div>
+                        </div>
+                        <div style="width: 160px; height: 120px; position: relative;">
+                            <div id="sentiment-gauge-chart" style="width: 100%; height: 100%; position: absolute; top: -15px;"></div>
                         </div>
                     </div>
-
                 </div>
 
-                <!-- 下半部：歷史情緒數據表格 -->
+                <!-- 🌟 3. 核心視覺：情緒分數 vs 漲跌幅 雙軸混合圖表 (對標 PDF 走勢圖) -->
+                <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 25px;">
+                    <h4 style="margin: 0 0 15px 0; color: #2b261c; border-left: 4px solid #b0532f; padding-left: 10px;">▌ 情緒走勢 (AI 情緒分數 × 每日漲跌幅)</h4>
+                    <div style="width: 100%; height: 300px;">
+                        <canvas id="sentiment-mixed-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- 🌟 4. 下半部：歷史情緒數據表格 -->
                 <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                    <div style="padding: 15px 20px; background: #fcfbf9; border-bottom: 1px solid #f0ebe1;">
+                        <h4 style="margin: 0; color: #2b261c; font-size: 15px;">近 15 個交易日底層數據總覽</h4>
+                    </div>
                     <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
                         <thead>
                         <tr style="background: #2b261c; color: white;">
                             <th style="padding: 12px;">日期</th>
                             <th style="padding: 12px;">大盤漲跌</th>
-                            <th style="padding: 12px;">衍生槓桿 / 空頭水位</th>
-                            <th style="padding: 12px;">華爾街共識 / 法人</th>
+                            <th style="padding: 12px;">衍生槓桿 / VIX 水位</th>
+                            <th style="padding: 12px;">法人輪動狀態</th>
                             <th style="padding: 12px;">綜合情緒</th>
-                            <th style="padding: 12px; text-align: left;">AI 智能頭條 (Hover 展開推演)</th>
+                            <th style="padding: 12px; text-align: left;">AI 智能頭條 (Hover 展開深度推演)</th>
                         </tr>
                         </thead>
                         <tbody id="sentiment-table-body">
                         <!-- JS 將動態填入這 15 天的數據 -->
                         </tbody>
                     </table>
+                </div>
+                <!-- 🌟 5. 新增：美股機構級流動性與籌碼戰情室 (對標 PDF 下半部) -->
+                <div style="margin-top: 30px; border-top: 2px dashed #d3bd92; padding-top: 30px;">
+                    <h3 style="margin: 0 0 20px 0; color: #2b261c; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                        🦅 華爾街流動性與聰明錢籌碼追蹤
+                    </h3>
+
+                    <!-- 第一排：量能殖利率 vs 回撤恐慌 -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <!-- 1. 量能與資金成本 (對標：量能與融資) -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">S&P 500 量能 vs 10年美債殖利率 (資金成本)</h4>
+                            <div style="width: 100%; height: 220px;"><canvas id="liquidity-volume-chart"></canvas></div>
+                        </div>
+
+                        <!-- 2. 大盤回撤與恐慌極值 (對標：融資維持率) -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">S&P 500 高點回撤率 vs VIX (市場壓力測試)</h4>
+                            <div style="width: 100%; height: 220px;"><canvas id="drawdown-stress-chart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <!-- 第二排：散戶投機熱度 vs 聰明錢內部人交易 -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                        <!-- 3. 散戶情緒與波動率 (對標：當沖動向) -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">散戶社群投機熱度 vs 真實波動率</h4>
+                            <div style="width: 100%; height: 220px;"><canvas id="retail-speculation-chart"></canvas></div>
+                        </div>
+
+                        <!-- 5. 內部人交易淨額表 (對標：三大法人買賣超) -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; overflow-y: auto; max-height: 250px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">聰明錢動向：近 3 日內部人鉅額交易 (Smart Money)</h4>
+                            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
+                                <thead>
+                                <tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;">
+                                    <th style="padding: 6px;">股票</th>
+                                    <th style="padding: 6px;">交易人職稱</th>
+                                    <th style="padding: 6px;">買/賣</th>
+                                    <th style="padding: 6px; text-align: right;">總金額 (USD)</th>
+                                </tr>
+                                </thead>
+                                <tbody id="insider-trading-body">
+                                <tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">載入數據中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
 
             </div>
