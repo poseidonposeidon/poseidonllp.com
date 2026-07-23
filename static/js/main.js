@@ -10882,7 +10882,7 @@ async function loadSentimentMatrixData() {
                 renderEarningsCalendar(rawObj['未來財報'] || []);
                 renderMag7Performance(rawObj['科技七雄'] || []);
 
-                
+
 
                 const fallbackSectors = [
                     { sector: "Information Technology (科技)", changesPercentage: "1.25%" },

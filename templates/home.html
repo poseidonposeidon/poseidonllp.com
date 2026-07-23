@@ -897,10 +897,43 @@
                 <!-- 🌟 1. 頂部戰情報價區 (完全對標 PDF 的頭部) -->
                 <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #d3bd92; padding-bottom: 15px; margin-bottom: 25px;">
                     <div>
+                        <!-- 🌟 1. 把按鈕放進 h2 裡面，這樣才能跟標題、日期完美水平對齊 -->
                         <h2 style="margin: 0; font-size: 28px; font-weight: 900; color: #2b261c; display: flex; align-items: center; gap: 12px;">
                             美股市場情緒日報
                             <span id="daily-report-date" style="font-size: 16px; font-weight: normal; color: #6e685c; background: #e8e3d8; padding: 4px 10px; border-radius: 4px;">載入中...</span>
+
+                            <!-- 🌟 新增：研究員專用資料來源 Tooltip (放在這裡最完美！) -->
+                            <div style="position: relative; display: inline-block; cursor: help; margin-left: 5px; font-weight: normal;"
+                                 onmouseenter="document.getElementById('data-source-tooltip').style.display='block'"
+                                 onmouseleave="document.getElementById('data-source-tooltip').style.display='none'">
+
+                                <!-- 按鈕本體 -->
+                                <span style="font-size: 12px; background: #f0ebe1; color: #6e685c; padding: 4px 8px; border-radius: 4px; border: 1px solid #d3bd92; font-weight: bold; transition: background 0.2s;">
+                    <i class="fas fa-database"></i> 分析數據源
+                </span>
+
+                                <!-- 懸浮提示框 (預設隱藏) -->
+                                <div id="data-source-tooltip" style="display: none; position: absolute; top: 130%; left: 0; background: #ffffff; border: 1px solid #d3bd92; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 6px; padding: 15px; width: 280px; z-index: 100;">
+                                    <div style="font-size: 13px; color: #2b261c; line-height: 1.6; text-align: left;">
+                                        <div style="font-weight: bold; border-bottom: 1px solid #f0ebe1; padding-bottom: 5px; margin-bottom: 8px; color: #8a6d3f;">
+                                            AI 統合運算基底數據：
+                                        </div>
+                                        <ul style="margin: 0; padding-left: 18px; color: #4a4436; font-size: 12px; gap: 4px; display: flex; flex-direction: column;">
+                                            <li>大盤與半導體指數 (S&P 500, Nasdaq, SOXX)</li>
+                                            <li>市場波動率 (VIX) 與 10年期美債殖利率</li>
+                                            <li>S&P 500 十一大板塊資金流向</li>
+                                            <li>科技七雄 (Mag 7) 盤後報價</li>
+                                            <li>總體經濟指標 (美國 GDP、CPI)</li>
+                                            <li>前 20 大巨頭財報日程與預估基準</li>
+                                            <li>散戶社群情緒指標 (看多/看空比例)</li>
+                                            <li>機構與內部人鉅額交易流向</li>
+                                            <li>全市場即時新聞與核心催化劑</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div> <!-- ✅ 幫你補上這個最重要的結尾標籤！ -->
                         </h2>
+
                         <div style="margin-top: 12px; font-size: 16px; display: flex; gap: 20px; align-items: baseline;">
                             <span style="color: #6e685c; font-weight: bold;">S&P 500 收盤</span>
                             <span id="daily-spy-close" style="font-size: 26px; font-weight: 900; color: #2b261c;">--</span>
