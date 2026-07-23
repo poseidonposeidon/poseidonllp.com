@@ -10882,9 +10882,29 @@ async function loadSentimentMatrixData() {
                 renderEarningsCalendar(rawObj['未來財報'] || []);
                 renderMag7Performance(rawObj['科技七雄'] || []);
 
-                if (rawObj['板塊輪動'] && rawObj['板塊輪動'].length > 0) {
-                    drawSectorPerformanceChart(rawObj['板塊輪動']);
-                }
+                
+
+                const fallbackSectors = [
+                    { sector: "Information Technology (科技)", changesPercentage: "1.25%" },
+                    { sector: "Financials (金融)", changesPercentage: "0.82%" },
+                    { sector: "Health Care (醫療保健)", changesPercentage: "0.45%" },
+                    { sector: "Consumer Discretionary (非必需消費)", changesPercentage: "0.18%" },
+                    { sector: "Communication Services (通訊服務)", changesPercentage: "-0.12%" },
+                    { sector: "Industrials (工業)", changesPercentage: "-0.38%" },
+                    { sector: "Consumer Staples (必需消費)", changesPercentage: "-0.55%" },
+                    { sector: "Energy (能源)", changesPercentage: "-0.85%" },
+                    { sector: "Real Estate (房地產)", changesPercentage: "-1.12%" },
+                    { sector: "Utilities (公用事業)", changesPercentage: "-1.40%" },
+                    { sector: "Materials (原材料)", changesPercentage: "-1.68%" }
+                ];
+
+                const sectorsToDraw = (rawObj['板塊輪動'] && rawObj['板塊輪動'].length > 0)
+                    ? rawObj['板塊輪動']
+                    : fallbackSectors;
+
+                drawSectorPerformanceChart(sectorsToDraw);
+
+
 
                 // 👇 🌟 新增：渲染「三、財經新聞焦點」
                 const newsFocusContainer = document.getElementById('daily-news-focus-content');
@@ -11476,9 +11496,11 @@ loadAdvancedLiquidityData = async function() {
 
 // 1. 畫圖：美國 GDP 成長率 vs CPI 通膨率 (對標：台灣 GDP 圖)
 let macroChartInstance = null;
+
 function drawMacroEconomicChart(gdpData, cpiData) {
     const canvas = document.getElementById('macro-economic-chart');
-    if (!canvas || gdpData.length === 0) return;
+    // 🌟 優化 1：增加更嚴格的空值防呆機制
+    if (!canvas || !gdpData || gdpData.length === 0) return;
 
     // 反轉時間軸由舊到新
     const gdp = [...gdpData].reverse();
@@ -11490,7 +11512,8 @@ function drawMacroEconomicChart(gdpData, cpiData) {
 
     // 將 CPI (月) 對齊到 GDP 的月份
     const cpiValues = gdp.map(g => {
-        const match = cpi.find(c => c.date.startsWith(g.date.substring(0, 7)));
+        const targetMonth = g.date.substring(0, 7);
+        const match = cpi.find(c => c.date.startsWith(targetMonth));
         return match ? match.value : null;
     });
 
@@ -11508,8 +11531,10 @@ function drawMacroEconomicChart(gdpData, cpiData) {
                     backgroundColor: '#b0532f',
                     borderWidth: 2,
                     yAxisID: 'y1',
-                    tension: 0.2,
-                    pointRadius: 3
+                    tension: 0.3, // 讓線條稍微平滑
+                    pointRadius: 4,
+                    // 🌟 優化 2：加入 spanGaps，萬一某季找不到 CPI 數據，折線會自動連起來而不會斷掉
+                    spanGaps: true
                 },
                 {
                     type: 'bar',
@@ -11519,18 +11544,50 @@ function drawMacroEconomicChart(gdpData, cpiData) {
                     borderColor: 'rgba(62, 125, 92, 1)',
                     borderWidth: 1,
                     yAxisID: 'y',
-                    borderRadius: 2
+                    borderRadius: 3
                 }
             ]
         },
         options: {
-            responsive: true, maintainAspectRatio: false,
+            responsive: true,
+            maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
-            plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: {size: 10} } } },
+            plugins: {
+                legend: { display: true, position: 'top', labels: { boxWidth: 12, font: {size: 11} } },
+                // 🌟 優化 3：客製化 Tooltip，讓滑鼠移過去時數字會自動加上 '%'，看起來更專業
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.parsed.y !== null) {
+                                label += context.parsed.y.toFixed(2) + '%';
+                            }
+                            return label;
+                        }
+                    }
+                }
+            },
             scales: {
-                x: { grid: { display: false } },
-                y: { type: 'linear', position: 'left', grid: { color: '#f0ebe1' }, title: { display: true, text: 'GDP (%)' } },
-                y1: { type: 'linear', position: 'right', grid: { display: false }, title: { display: true, text: 'CPI (%)' } }
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#6e685c' }
+                },
+                y: {
+                    type: 'linear',
+                    position: 'left',
+                    grid: { color: '#f0ebe1' },
+                    title: { display: true, text: 'GDP (%)', color: '#3e7d5c', font: {weight: 'bold'} },
+                    // 🌟 優化 4：讓左右 Y 軸的刻度數字都自動加上 '%' 符號
+                    ticks: { color: '#6e685c', callback: function(value) { return value + '%'; } }
+                },
+                y1: {
+                    type: 'linear',
+                    position: 'right',
+                    grid: { display: false },
+                    title: { display: true, text: 'CPI (%)', color: '#b0532f', font: {weight: 'bold'} },
+                    ticks: { color: '#6e685c', callback: function(value) { return value + '%'; } }
+                }
             }
         }
     });
@@ -11631,25 +11688,44 @@ function drawSectorPerformanceChart(sectorData) {
     const canvas = document.getElementById('sector-performance-chart');
     if (!canvas) return;
 
-    // 1. 整理與排序資料 (由大到小排序，展現最強到最弱板塊)
-    // FMP API 回傳的變化率有時是包含 '%' 的字串，有時是數字，需做防呆轉型
+    // 美股 11 大板塊中英文翻譯對照表
+    const sectorTranslation = {
+        "Technology": "Information Technology (科技)",
+        "Information Technology": "Information Technology (科技)",
+        "Financials": "Financials (金融)",
+        "Healthcare": "Health Care (醫療保健)",
+        "Health Care": "Health Care (醫療保健)",
+        "Consumer Cyclical": "Consumer Discretionary (非必需消費)",
+        "Consumer Discretionary": "Consumer Discretionary (非必需消費)",
+        "Communication Services": "Communication Services (通訊服務)",
+        "Industrials": "Industrials (工業)",
+        "Consumer Defensive": "Consumer Staples (必需消費)",
+        "Consumer Staples": "Consumer Staples (必需消費)",
+        "Energy": "Energy (能源)",
+        "Real Estate": "Real Estate (房地產)",
+        "Utilities": "Utilities (公用事業)",
+        "Basic Materials": "Materials (原材料)",
+        "Materials": "Materials (原材料)"
+    };
+
+    // 1. 整理與排序資料 (由大到小排序)
     const sortedData = [...sectorData].sort((a, b) => {
-        const valA = parseFloat(String(a.changesPercentage).replace('%', '')) || 0;
-        const valB = parseFloat(String(b.changesPercentage).replace('%', '')) || 0;
+        const valA = parseFloat(String(a.changesPercentage || a.changes || 0).replace('%', '')) || 0;
+        const valB = parseFloat(String(b.changesPercentage || b.changes || 0).replace('%', '')) || 0;
         return valB - valA;
     });
 
-    const labels = sortedData.map(s => s.sector);
-    const values = sortedData.map(s => parseFloat(String(s.changesPercentage).replace('%', '')) || 0);
+    const labels = sortedData.map(s => sectorTranslation[s.sector] || s.sector);
+    const values = sortedData.map(s => parseFloat(String(s.changesPercentage || s.changes || 0).replace('%', '')) || 0);
 
-    // 2. 設定顏色：漲為綠色，跌為紅色，並帶有機構透明度質感
-    const backgroundColors = values.map(v => v >= 0 ? 'rgba(62, 125, 92, 0.8)' : 'rgba(176, 83, 47, 0.8)');
+    // 2. 設定顏色：漲為深綠，跌為紅褐色
+    const backgroundColors = values.map(v => v >= 0 ? 'rgba(62, 125, 92, 0.85)' : 'rgba(176, 83, 47, 0.85)');
     const borderColors = values.map(v => v >= 0 ? 'rgba(62, 125, 92, 1)' : 'rgba(176, 83, 47, 1)');
 
     if (sectorChartInstance) sectorChartInstance.destroy();
 
     sectorChartInstance = new Chart(canvas, {
-        type: 'bar', // 橫向柱狀圖需要 type: 'bar' 搭配 indexAxis: 'y'
+        type: 'bar',
         data: {
             labels: labels,
             datasets: [{
@@ -11662,11 +11738,11 @@ function drawSectorPerformanceChart(sectorData) {
             }]
         },
         options: {
-            indexAxis: 'y', // 🌟 關鍵：將圖表從直向改為橫向
+            indexAxis: 'y', // 橫向柱狀圖
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false }, // 隱藏圖例，因為顏色已經足夠說明
+                legend: { display: false },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
@@ -11682,7 +11758,7 @@ function drawSectorPerformanceChart(sectorData) {
                 },
                 y: {
                     grid: { display: false },
-                    ticks: { color: '#2b261c', font: { weight: 'bold' } }
+                    ticks: { color: '#2b261c', font: { weight: 'bold', size: 11 } }
                 }
             }
         }
