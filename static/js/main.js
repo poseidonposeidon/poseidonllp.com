@@ -10819,7 +10819,7 @@ async function loadSentimentMatrixData() {
             // A. 渲染底部表格與 Hover 資訊卡
             renderSentimentTable(data);
 
-            // B. 取出最新一天 (陣列第一筆) 來渲染頂部戰情報價區
+            // B. 取出最新一天 (陣列第一筆) 來渲染頂部戰情報價區與表格
             const latestRecord = data[0];
             const latestScore = latestRecord.sentiment_score;
 
@@ -10834,6 +10834,21 @@ async function loadSentimentMatrixData() {
                 const changeVal = parseFloat(latestRecord.market_change_pct);
                 changeSpan.innerText = (changeVal > 0 ? '+' : '') + latestRecord.market_change_pct;
                 changeSpan.style.color = changeVal > 0 ? '#3e7d5c' : '#b0532f'; // 漲綠跌紅
+
+                // 🌟 新增：YTD 渲染
+                const ytdSpan = document.getElementById('daily-spy-ytd');
+                if (ytdSpan && rawObj['YTD']) {
+                    ytdSpan.innerText = `YTD: ${rawObj['YTD']}`;
+                }
+
+                // 🌟 新增：極端行情標籤渲染
+                const extremeSpan = document.getElementById('daily-extreme-label');
+                if (extremeSpan && rawObj['極端標籤']) {
+                    extremeSpan.innerText = `(${rawObj['極端標籤']})`;
+                    extremeSpan.style.display = 'inline-block';
+                } else if (extremeSpan) {
+                    extremeSpan.style.display = 'none';
+                }
 
                 if (rawObj['市場量能']) {
                     document.getElementById('daily-spy-volume').innerText = `成交量: ${rawObj['市場量能']}`;
@@ -10856,10 +10871,15 @@ async function loadSentimentMatrixData() {
                     setTimeout(() => {
                         progressBar.style.width = `${holdLevel}%`;
                         progressBar.style.backgroundColor = barColor;
-                        progressText.style.color = barColor; // 文字顏色同步
+                        progressText.style.color = barColor;
                         animateValue(progressText, 0, holdLevel, 1000);
                     }, 200);
                 }
+
+                // 🌟 新增：渲染財報行事曆與科技七雄表格
+                if (rawObj['未來財報']) renderEarningsCalendar(rawObj['未來財報']);
+                if (rawObj['科技七雄']) renderMag7Performance(rawObj['科技七雄']);
+
             } catch(e) {
                 console.error("解析頂部戰情室資料失敗", e);
             }
@@ -10867,11 +10887,12 @@ async function loadSentimentMatrixData() {
             // C. 畫圖表：美銀指針與全新雙軸圖表
             drawBofAGauge(latestScore);
             drawSentimentMixedChart(data);
-            // 🌟 觸發下半部進階流動性與籌碼戰情室的資料載入
+
+            // 觸發下半部進階流動性與籌碼戰情室的資料載入
             loadAdvancedLiquidityData();
 
         } else {
-            tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #b0532f;">目前尚無情緒歷史資料，請確認後端排程已執行。</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #b0532f;">目前尚無情緒歷史資料...</td></tr>';
         }
 
     } catch (error) {
@@ -11389,4 +11410,162 @@ function drawRetailSpeculationChart(spy, social) {
             }
         }
     });
+}
+
+/* ==========================================================================
+   🇺🇸 總經基本面與科技巨頭追蹤 (Macro & Mag 7 Tracker)
+   ========================================================================== */
+
+// 升級：在載入進階流動性資料時，同步畫出總經圖表
+const originalLoadAdvancedLiquidityData = loadAdvancedLiquidityData;
+loadAdvancedLiquidityData = async function() {
+    await originalLoadAdvancedLiquidityData(); // 執行原本的流動性打撈
+
+    try {
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/us_advanced_liquidity` : '/api/us_advanced_liquidity';
+        const response = await fetch(targetUrl);
+        const data = await response.json();
+
+        // 畫出美國 GDP vs CPI 總經圖表
+        if (data.macro_gdp && data.macro_cpi) {
+            drawMacroEconomicChart(data.macro_gdp, data.macro_cpi);
+        }
+    } catch (error) {
+        console.error("Macro Data Error:", error);
+    }
+};
+
+// 1. 畫圖：美國 GDP 成長率 vs CPI 通膨率 (對標：台灣 GDP 圖)
+let macroChartInstance = null;
+function drawMacroEconomicChart(gdpData, cpiData) {
+    const canvas = document.getElementById('macro-economic-chart');
+    if (!canvas || gdpData.length === 0) return;
+
+    // 反轉時間軸由舊到新
+    const gdp = [...gdpData].reverse();
+    const cpi = [...cpiData].reverse();
+
+    // 以 GDP (季) 為橫軸基準
+    const labels = gdp.map(d => d.date.substring(0, 7)); // YYYY-MM
+    const gdpValues = gdp.map(d => d.value);
+
+    // 將 CPI (月) 對齊到 GDP 的月份
+    const cpiValues = gdp.map(g => {
+        const match = cpi.find(c => c.date.startsWith(g.date.substring(0, 7)));
+        return match ? match.value : null;
+    });
+
+    if (macroChartInstance) macroChartInstance.destroy();
+
+    macroChartInstance = new Chart(canvas, {
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'CPI 通膨率 (%)',
+                    data: cpiValues,
+                    borderColor: '#b0532f',
+                    backgroundColor: '#b0532f',
+                    borderWidth: 2,
+                    yAxisID: 'y1',
+                    tension: 0.2,
+                    pointRadius: 3
+                },
+                {
+                    type: 'bar',
+                    label: 'GDP 成長率 (%)',
+                    data: gdpValues,
+                    backgroundColor: 'rgba(62, 125, 92, 0.6)',
+                    borderColor: 'rgba(62, 125, 92, 1)',
+                    borderWidth: 1,
+                    yAxisID: 'y',
+                    borderRadius: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: {size: 10} } } },
+            scales: {
+                x: { grid: { display: false } },
+                y: { type: 'linear', position: 'left', grid: { color: '#f0ebe1' }, title: { display: true, text: 'GDP (%)' } },
+                y1: { type: 'linear', position: 'right', grid: { display: false }, title: { display: true, text: 'CPI (%)' } }
+            }
+        }
+    });
+}
+
+// 2. 渲染：前 20 大巨頭財報行事曆
+function renderEarningsCalendar(earningsList) {
+    const tbody = document.getElementById('earnings-calendar-body');
+    if (!tbody) return;
+
+    if (!earningsList || earningsList.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">未來一週無重大財報發布</td></tr>';
+        return;
+    }
+
+    let html = '';
+    earningsList.forEach(item => {
+        // Python 傳來的是字串格式："2026-07-25: AAPL (預估EPS: 1.2)"
+        // 這裡我們進行優雅的字串拆解
+        const parts = item.split(': ');
+        const date = parts[0];
+        const rest = parts[1] || "";
+        const symMatch = rest.match(/^([A-Z]+)/);
+        const epsMatch = rest.match(/預估EPS:\s*([^)]+)/);
+
+        const symbol = symMatch ? symMatch[1] : '--';
+        const eps = epsMatch ? epsMatch[1] : '--';
+
+        html += `
+            <tr style="border-bottom: 1px solid #f0ebe1; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 8px; font-weight: bold; color: #3498db;">${symbol}</td>
+                <td style="padding: 8px; color: #6e685c;">${date}</td>
+                <td style="padding: 8px; text-align: right; color: #b0532f; font-weight: bold;">${eps}</td>
+                <td style="padding: 8px; text-align: right; color: #888;">-- (待揭曉)</td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
+}
+
+// 3. 渲染：科技七雄 (Mag 7) 盤後追蹤表
+function renderMag7Performance(mag7Data) {
+    const tbody = document.getElementById('mag7-performance-body');
+    if (!tbody) return;
+
+    if (!mag7Data || mag7Data.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">無法取得科技七雄報價</td></tr>';
+        return;
+    }
+
+    // 依據漲跌幅大小進行排序 (強者在最上面)
+    const sortedData = [...mag7Data].sort((a, b) => (b.changesPercentage || 0) - (a.changesPercentage || 0));
+
+    let html = '';
+    sortedData.forEach(q => {
+        const changePct = q.changesPercentage || 0;
+        const color = changePct > 0 ? '#3e7d5c' : (changePct < 0 ? '#b0532f' : '#6e685c');
+        const sign = changePct > 0 ? '+' : '';
+
+        // 🚀 AI 級自動短評邏輯：根據漲跌幅給出機構感點評
+        let comment = "表現平穩，跟隨大盤震盪，無明顯獨立行情。";
+        if (changePct > 3) comment = "🔥 強勢吸金！資金湧入充當今日大盤領漲引擎。";
+        else if (changePct > 1) comment = "🟢 穩健上攻，維持多頭排列格局。";
+        else if (changePct < -3) comment = "🚨 賣壓沉重，成為拖累科技板塊的重災區。";
+        else if (changePct < -1) comment = "🔴 遭遇獲利了結壓力，表現弱於大盤。";
+
+        html += `
+            <tr style="border-bottom: 1px solid #f0ebe1; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 10px; font-weight: bold; color: #2b261c;">${q.symbol}</td>
+                <td style="padding: 10px; color: #2b261c;">$${parseFloat(q.price).toFixed(2)}</td>
+                <td style="padding: 10px; color: ${color}; font-weight: bold;">${sign}${parseFloat(changePct).toFixed(2)}%</td>
+                <td style="padding: 10px; color: #6e685c; font-size: 12px; line-height: 1.5;">${comment}</td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
 }

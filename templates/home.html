@@ -905,6 +905,8 @@
                             <span style="color: #6e685c; font-weight: bold;">S&P 500 收盤</span>
                             <span id="daily-spy-close" style="font-size: 26px; font-weight: 900; color: #2b261c;">--</span>
                             <span id="daily-spy-change" style="font-size: 18px; font-weight: bold;">--</span>
+                            <span id="daily-spy-ytd" style="font-size: 15px; color: #8a6d3f; margin-left: 10px; font-weight: bold;">YTD: --%</span>
+                            <span id="daily-extreme-label" style="font-size: 13px; background: #b0532f; color: white; padding: 2px 8px; border-radius: 4px; display: none; font-weight: bold;">(極端行情)</span>
                         </div>
                         <div style="margin-top: 8px; font-size: 13px; color: #8a6d3f; display: flex; gap: 15px;">
                             <span id="daily-spy-volume">成交量: -- 億</span>
@@ -1003,6 +1005,56 @@
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                </div>
+                <!-- 🌟 6. 新增：美國總體經濟與巨頭動向追蹤 (對標 PDF 的 GDP、財報與熱門股) -->
+                <div style="margin-top: 30px; border-top: 2px dashed #d3bd92; padding-top: 30px;">
+                    <h3 style="margin: 0 0 20px 0; color: #2b261c; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                        🇺🇸 美國總經基本面 & 科技巨頭追蹤
+                    </h3>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <!-- 1. 總經圖表 (對標：台灣 GDP 圖表) -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">美國總體經濟：GDP 規模 vs CPI 通膨趨勢</h4>
+                            <div style="width: 100%; height: 220px;"><canvas id="macro-economic-chart"></canvas></div>
+                        </div>
+
+                        <!-- 2. 巨頭財報行事曆 (對標：市值前 20 大財報表) -->
+                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; overflow-y: auto; max-height: 270px;">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">即將發布：前 20 大巨頭財報行事曆</h4>
+                            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
+                                <thead>
+                                <tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;">
+                                    <th style="padding: 6px;">股票</th>
+                                    <th style="padding: 6px;">財報日期</th>
+                                    <th style="padding: 6px; text-align: right;">預估 EPS</th>
+                                    <th style="padding: 6px; text-align: right;">預估營收</th>
+                                </tr>
+                                </thead>
+                                <tbody id="earnings-calendar-body">
+                                <tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">載入數據中...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- 3. 熱門個股追蹤 (對標：五、熱門個股) -->
+                    <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">熱門板塊核心：科技七雄 (Magnificent 7) 盤後追蹤</h4>
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                            <thead>
+                            <tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;">
+                                <th style="padding: 8px;">標的</th>
+                                <th style="padding: 8px;">收盤價</th>
+                                <th style="padding: 8px;">單日漲跌</th>
+                                <th style="padding: 8px; width: 55%;">CIO 盤後點評 (自動生成)</th>
+                            </tr>
+                            </thead>
+                            <tbody id="mag7-performance-body">
+                            <tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">載入數據中...</td></tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
 
