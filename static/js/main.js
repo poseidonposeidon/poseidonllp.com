@@ -10882,6 +10882,10 @@ async function loadSentimentMatrixData() {
                 renderEarningsCalendar(rawObj['未來財報'] || []);
                 renderMag7Performance(rawObj['科技七雄'] || []);
 
+                if (rawObj['板塊輪動'] && rawObj['板塊輪動'].length > 0) {
+                    drawSectorPerformanceChart(rawObj['板塊輪動']);
+                }
+
                 // 👇 🌟 新增：渲染「三、財經新聞焦點」
                 const newsFocusContainer = document.getElementById('daily-news-focus-content');
                 if (newsFocusContainer) {
@@ -11616,4 +11620,71 @@ function renderMag7Performance(mag7Data) {
         `;
     });
     tbody.innerHTML = html;
+}
+
+/* ==========================================================================
+   📊 S&P 500 十一大板塊資金輪動圖 (Sector Performance)
+   ========================================================================== */
+let sectorChartInstance = null;
+
+function drawSectorPerformanceChart(sectorData) {
+    const canvas = document.getElementById('sector-performance-chart');
+    if (!canvas) return;
+
+    // 1. 整理與排序資料 (由大到小排序，展現最強到最弱板塊)
+    // FMP API 回傳的變化率有時是包含 '%' 的字串，有時是數字，需做防呆轉型
+    const sortedData = [...sectorData].sort((a, b) => {
+        const valA = parseFloat(String(a.changesPercentage).replace('%', '')) || 0;
+        const valB = parseFloat(String(b.changesPercentage).replace('%', '')) || 0;
+        return valB - valA;
+    });
+
+    const labels = sortedData.map(s => s.sector);
+    const values = sortedData.map(s => parseFloat(String(s.changesPercentage).replace('%', '')) || 0);
+
+    // 2. 設定顏色：漲為綠色，跌為紅色，並帶有機構透明度質感
+    const backgroundColors = values.map(v => v >= 0 ? 'rgba(62, 125, 92, 0.8)' : 'rgba(176, 83, 47, 0.8)');
+    const borderColors = values.map(v => v >= 0 ? 'rgba(62, 125, 92, 1)' : 'rgba(176, 83, 47, 1)');
+
+    if (sectorChartInstance) sectorChartInstance.destroy();
+
+    sectorChartInstance = new Chart(canvas, {
+        type: 'bar', // 橫向柱狀圖需要 type: 'bar' 搭配 indexAxis: 'y'
+        data: {
+            labels: labels,
+            datasets: [{
+                label: '板塊單日漲跌幅 (%)',
+                data: values,
+                backgroundColor: backgroundColors,
+                borderColor: borderColors,
+                borderWidth: 1,
+                borderRadius: 4
+            }]
+        },
+        options: {
+            indexAxis: 'y', // 🌟 關鍵：將圖表從直向改為橫向
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false }, // 隱藏圖例，因為顏色已經足夠說明
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return (context.parsed.x > 0 ? '+' : '') + context.parsed.x.toFixed(2) + '%';
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: '#f0ebe1' },
+                    ticks: { color: '#6e685c', callback: function(value) { return value + '%'; } }
+                },
+                y: {
+                    grid: { display: false },
+                    ticks: { color: '#2b261c', font: { weight: 'bold' } }
+                }
+            }
+        }
+    });
 }
