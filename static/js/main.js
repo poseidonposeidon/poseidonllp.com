@@ -10885,24 +10885,26 @@ async function loadSentimentMatrixData() {
 
 
                 const fallbackSectors = [
-                    { sector: "Information Technology (科技)", changesPercentage: "1.25%" },
-                    { sector: "Financials (金融)", changesPercentage: "0.82%" },
-                    { sector: "Health Care (醫療保健)", changesPercentage: "0.45%" },
-                    { sector: "Consumer Discretionary (非必需消費)", changesPercentage: "0.18%" },
-                    { sector: "Communication Services (通訊服務)", changesPercentage: "-0.12%" },
-                    { sector: "Industrials (工業)", changesPercentage: "-0.38%" },
-                    { sector: "Consumer Staples (必需消費)", changesPercentage: "-0.55%" },
-                    { sector: "Energy (能源)", changesPercentage: "-0.85%" },
-                    { sector: "Real Estate (房地產)", changesPercentage: "-1.12%" },
-                    { sector: "Utilities (公用事業)", changesPercentage: "-1.40%" },
-                    { sector: "Materials (原材料)", changesPercentage: "-1.68%" }
+                    { sector: "Information Technology (科技)", "1D": "1.25%", "1W": "1.8%", "1M": "4.0%", "YTD": "15.0%" },
+                    { sector: "Financials (金融)", "1D": "0.82%", "1W": "1.0%", "1M": "2.5%", "YTD": "8.5%" },
+                    { sector: "Health Care (醫療保健)", "1D": "0.45%", "1W": "0.8%", "1M": "1.5%", "YTD": "4.0%" },
+                    { sector: "Consumer Discretionary (非必需消費)", "1D": "0.18%", "1W": "0.3%", "1M": "1.0%", "YTD": "5.2%" },
+                    { sector: "Communication Services (通訊服務)", "1D": "-0.12%", "1W": "0.5%", "1M": "2.0%", "YTD": "12.0%" },
+                    { sector: "Industrials (工業)", "1D": "-0.38%", "1W": "-0.1%", "1M": "0.5%", "YTD": "3.5%" },
+                    { sector: "Consumer Staples (必需消費)", "1D": "-0.55%", "1W": "-0.8%", "1M": "-1.0%", "YTD": "1.2%" },
+                    { sector: "Energy (能源)", "1D": "-0.85%", "1W": "-1.5%", "1M": "-2.5%", "YTD": "-4.0%" },
+                    { sector: "Real Estate (房地產)", "1D": "-1.12%", "1W": "-2.0%", "1M": "-3.5%", "YTD": "-5.5%" },
+                    { sector: "Utilities (公用事業)", "1D": "-1.40%", "1W": "-2.5%", "1M": "-4.0%", "YTD": "-2.0%" },
+                    { sector: "Materials (原材料)", "1D": "-1.68%", "1W": "-3.0%", "1M": "-4.5%", "YTD": "-6.0%" }
                 ];
 
                 const sectorsToDraw = (rawObj['板塊輪動'] && rawObj['板塊輪動'].length > 0)
                     ? rawObj['板塊輪動']
                     : fallbackSectors;
 
-                drawSectorPerformanceChart(sectorsToDraw);
+                // 存入全域變數供按鈕切換時使用，並執行首次繪製
+                globalSectorData = sectorsToDraw;
+                drawSectorPerformanceChart(globalSectorData);
 
 
 
@@ -11710,13 +11712,14 @@ function drawSectorPerformanceChart(sectorData) {
 
     // 1. 整理與排序資料 (由大到小排序)
     const sortedData = [...sectorData].sort((a, b) => {
-        const valA = parseFloat(String(a.changesPercentage || a.changes || 0).replace('%', '')) || 0;
-        const valB = parseFloat(String(b.changesPercentage || b.changes || 0).replace('%', '')) || 0;
+        // 優先讀取選擇的維度 (1D, 1W等)，若無則降級讀取舊版 changesPercentage
+        const valA = parseFloat(String(a[currentSectorTimeframe] || a.changesPercentage || a.changes || 0).replace('%', '')) || 0;
+        const valB = parseFloat(String(b[currentSectorTimeframe] || b.changesPercentage || b.changes || 0).replace('%', '')) || 0;
         return valB - valA;
     });
 
     const labels = sortedData.map(s => sectorTranslation[s.sector] || s.sector);
-    const values = sortedData.map(s => parseFloat(String(s.changesPercentage || s.changes || 0).replace('%', '')) || 0);
+    const values = sortedData.map(s => parseFloat(String(s[currentSectorTimeframe] || s.changesPercentage || s.changes || 0).replace('%', '')) || 0);
 
     // 2. 設定顏色：漲為深綠，跌為紅褐色
     const backgroundColors = values.map(v => v >= 0 ? 'rgba(62, 125, 92, 0.85)' : 'rgba(176, 83, 47, 0.85)');
@@ -11763,4 +11766,31 @@ function drawSectorPerformanceChart(sectorData) {
             }
         }
     });
+}
+
+/* ==========================================================================
+   🔘 資金輪動圖表：時間維度切換邏輯 (1D / 1W / 1M / YTD)
+   ========================================================================== */
+let globalSectorData = []; // 儲存當下最新的板塊資料
+let currentSectorTimeframe = '1D'; // 預設顯示單日
+
+function updateSectorTimeframe(timeframe) {
+    currentSectorTimeframe = timeframe;
+
+    // 1. 更新按鈕的視覺狀態 (深色代表選中，米色代表未選中)
+    const buttons = document.querySelectorAll('.sector-btn');
+    buttons.forEach(btn => {
+        if (btn.innerText === timeframe) {
+            btn.style.background = '#2c3e50';
+            btn.style.color = 'white';
+        } else {
+            btn.style.background = '#f0ebe1';
+            btn.style.color = '#6e685c';
+        }
+    });
+
+    // 2. 觸發圖表重新繪製
+    if (globalSectorData.length > 0) {
+        drawSectorPerformanceChart(globalSectorData);
+    }
 }

@@ -889,7 +889,7 @@
             </div>
 
         </div>
-
+m
         <div id="dd-sentiment-content" style="display: none; padding-top: 10px;">
             <!-- 機構級包浩斯風格背景 -->
             <div style="background: #f1ede4; border-radius: 8px; padding: 30px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
@@ -1093,9 +1093,17 @@
                 <!-- 🌟 6.5 新增：S&P 500 11 大板塊資金輪動圖 -->
                 <div style="margin-top: 30px; border-top: 2px dashed #d3bd92; padding-top: 30px;">
                     <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px;">
-                        <h3 style="margin: 0 0 15px 0; color: #2b261c; font-size: 16px; border-left: 4px solid #3498db; padding-left: 10px;">
-                            📊 華爾街資金輪動：S&P 500 十一大板塊當日表現 (Sector Performance)
-                        </h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                            <h3 style="margin: 0; color: #2b261c; font-size: 16px; border-left: 4px solid #3498db; padding-left: 10px;">
+                                📊 華爾街資金輪動 (Sector Performance)
+                            </h3>
+                            <div style="display: flex; gap: 8px;">
+                                <button onclick="updateSectorTimeframe('1D')" class="sector-btn" style="border: none; background: #2c3e50; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">1D</button>
+                                <button onclick="updateSectorTimeframe('1W')" class="sector-btn" style="border: none; background: #f0ebe1; color: #6e685c; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">1W</button>
+                                <button onclick="updateSectorTimeframe('1M')" class="sector-btn" style="border: none; background: #f0ebe1; color: #6e685c; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">1M</button>
+                                <button onclick="updateSectorTimeframe('YTD')" class="sector-btn" style="border: none; background: #f0ebe1; color: #6e685c; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">YTD</button>
+                            </div>
+                        </div>
                         <div style="width: 100%; height: 350px;">
                             <canvas id="sector-performance-chart"></canvas>
                         </div>
