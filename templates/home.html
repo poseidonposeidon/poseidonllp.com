@@ -951,7 +951,29 @@ m
                     <!-- 🌟 2. 右上角：美銀指針與持股水位 (融合 PDF 的右側佈局) -->
                     <div style="display: flex; gap: 25px; align-items: center; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
                         <div style="text-align: center;">
-                            <div style="font-size: 12px; color: #8a6d3f; font-weight: bold; margin-bottom: 5px;">建議持股水位</div>
+                            <!-- 🌟 建議持股水位 (含量化模型 Tooltip 說明) -->
+                            <div style="position: relative; display: inline-block;">
+                                <div style="font-size: 12px; color: #8a6d3f; font-weight: bold; margin-bottom: 5px; cursor: help; display: flex; align-items: center; justify-content: center; gap: 4px;"
+                                     onmouseenter="document.getElementById('hold-level-tooltip').style.display='block'"
+                                     onmouseleave="document.getElementById('hold-level-tooltip').style.display='none'">
+                                    建議持股水位 <i class="fas fa-info-circle" style="font-size: 10px; color: #d3bd92;"></i>
+                                </div>
+
+                                <!-- 懸浮提示框 (預設隱藏) -->
+                                <div id="hold-level-tooltip" style="display: none; position: absolute; top: 20px; right: -80px; background: #ffffff; border: 1px solid #d3bd92; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 6px; padding: 15px; width: 280px; z-index: 100; text-align: left; white-space: normal;">
+                                    <div style="font-weight: bold; border-bottom: 1px solid #f0ebe1; padding-bottom: 5px; margin-bottom: 8px; color: #b0532f; font-size: 13px;">
+                                        ⚙️ 量化逆勢風控模型 (Contrarian Model)
+                                    </div>
+                                    <div style="color: #4a4436; font-size: 12px; line-height: 1.6;">
+                                        <strong>1. 基礎情緒逆勢策略：</strong><br>
+                                        基於 AI 情緒評分，採「恐懼貪婪」逆勢佈局。市場越恐慌基礎水位越高；市場越貪婪則基礎水位越低 (基礎範圍 70%~100%)。<br>
+                                        <strong>2. 近五日波段動能調節：</strong><br>
+                                        追蹤大盤近 5 日累積漲跌幅並乘上 1.5 倍調節係數。短線連跌觸發左側抄底加碼；急漲則觸發獲利了結減碼。<br>
+                                        <strong>3. 絕對風控邊界：</strong><br>
+                                        總倉位嚴格鉗制於 50% ~ 100% 之間，確保低檔不開槓桿，高檔保有 50% 現金儲備。
+                                    </div>
+                                </div>
+                            </div>
                             <div id="exposure-text" style="font-size: 32px; font-weight: 900; color: #b0532f;">--%</div>
                             <div style="width: 100px; height: 8px; background: #e8e3d8; border-radius: 4px; margin-top: 5px; overflow: hidden;">
                                 <div id="exposure-progress-bar" style="height: 100%; width: 0%; background: #b0532f; transition: 1s;"></div>
