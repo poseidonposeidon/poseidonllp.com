@@ -893,103 +893,102 @@ m
         <div id="dd-sentiment-content" style="display: none; padding-top: 10px;">
             <!-- 機構級包浩斯風格背景 -->
             <div style="background: #f1ede4; border-radius: 8px; padding: 30px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
+                        <div style="margin-bottom: 25px;">
 
-                <!-- 🌟 1. 頂部戰情報價區 (完全對標 PDF 的頭部) -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #d3bd92; padding-bottom: 15px; margin-bottom: 25px;">
-                    <div>
-                        <!-- 🌟 1. 把按鈕放進 h2 裡面，這樣才能跟標題、日期完美水平對齊 -->
-                        <h2 style="margin: 0; font-size: 28px; font-weight: 900; color: #2b261c; display: flex; align-items: center; gap: 12px;">
-                            美股市場情緒日報
-                            <span id="daily-report-date" style="font-size: 16px; font-weight: normal; color: #6e685c; background: #e8e3d8; padding: 4px 10px; border-radius: 4px;">載入中...</span>
+                            <!-- 上半部：標題與儀表板 (左右排開) -->
+                            <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #d3bd92; padding-bottom: 15px; margin-bottom: 15px; flex-wrap: wrap; gap: 20px;">
 
-                            <!-- 🌟 新增：研究員專用資料來源 Tooltip (放在這裡最完美！) -->
-                            <div style="position: relative; display: inline-block; cursor: help; margin-left: 5px; font-weight: normal;"
-                                 onmouseenter="document.getElementById('data-source-tooltip').style.display='block'"
-                                 onmouseleave="document.getElementById('data-source-tooltip').style.display='none'">
+                                <!-- 左側：標題與報價看板 -->
+                                <div style="flex: 1; min-width: 380px;">
+                                    <h2 style="margin: 0; font-size: 28px; font-weight: 900; color: #2b261c; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                                        <span style="white-space: nowrap;">美股市場情緒日報</span>
+                                        <span id="daily-report-date" style="font-size: 16px; font-weight: normal; color: #6e685c; background: #e8e3d8; padding: 4px 10px; border-radius: 4px; white-space: nowrap;">載入中...</span>
 
-                                <!-- 按鈕本體 -->
-                                <span style="font-size: 12px; background: #53de42; color: #ffffff; padding: 5px 10px; border-radius: 4px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #87e776; transition: opacity 0.2s;">
-                                    <i class="fas fa-database" style="margin-right: 3px; color: #d3bd92;"></i> 資料來源
-                                </span>
-
-                                <!-- 懸浮提示框 (預設隱藏) -->
-                                <div id="data-source-tooltip" style="display: none; position: absolute; top: 130%; left: 0; background: #ffffff; border: 1px solid #d3bd92; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 6px; padding: 15px; width: 280px; z-index: 100;">
-                                    <div style="font-size: 13px; color: #2b261c; line-height: 1.6; text-align: left;">
-                                        <div style="font-weight: bold; border-bottom: 1px solid #f0ebe1; padding-bottom: 5px; margin-bottom: 8px; color: #8a6d3f;">
-                                            AI 統合運算基底數據：
+                                        <!-- 分析數據源 Tooltip -->
+                                        <div style="position: relative; display: inline-block; cursor: help; margin-left: 5px; font-weight: normal;"
+                                             onmouseenter="document.getElementById('data-source-tooltip').style.display='block'"
+                                             onmouseleave="document.getElementById('data-source-tooltip').style.display='none'">
+                                    <span style="font-size: 12px; background: #53de42; color: #ffffff; padding: 5px 10px; border-radius: 4px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #87e776; transition: opacity 0.2s; white-space: nowrap;">
+                                        <i class="fas fa-database" style="margin-right: 3px; color: #d3bd92;"></i> 資料來源
+                                    </span>
+                                            <div id="data-source-tooltip" style="display: none; position: absolute; top: 130%; left: 0; background: #ffffff; border: 1px solid #d3bd92; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 6px; padding: 15px; width: 280px; z-index: 100;">
+                                                <div style="font-size: 13px; color: #2b261c; line-height: 1.6; text-align: left;">
+                                                    <div style="font-weight: bold; border-bottom: 1px solid #f0ebe1; padding-bottom: 5px; margin-bottom: 8px; color: #8a6d3f;">
+                                                        AI 統合運算基底數據：
+                                                    </div>
+                                                    <ul style="margin: 0; padding-left: 18px; color: #4a4436; font-size: 12px; gap: 4px; display: flex; flex-direction: column;">
+                                                        <li>大盤與半導體指數 (S&P 500, Nasdaq, SOXX)</li>
+                                                        <li>市場波動率 (VIX) 與 10年期美債殖利率</li>
+                                                        <li>S&P 500 十一大板塊資金流向</li>
+                                                        <li>科技七雄 (Mag 7) 盤後報價</li>
+                                                        <li>總體經濟指標 (美國 GDP、CPI)</li>
+                                                        <li>前 20 大巨頭財報日程與預估基準</li>
+                                                        <li>散戶社群情緒指標 (看多/看空比例)</li>
+                                                        <li>機構與內部人鉅額交易流向</li>
+                                                        <li>全市場即時新聞與核心催化劑</li>
+                                                    </ul>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <ul style="margin: 0; padding-left: 18px; color: #4a4436; font-size: 12px; gap: 4px; display: flex; flex-direction: column;">
-                                            <li>大盤與半導體指數 (S&P 500, Nasdaq, SOXX)</li>
-                                            <li>市場波動率 (VIX) 與 10年期美債殖利率</li>
-                                            <li>S&P 500 十一大板塊資金流向</li>
-                                            <li>科技七雄 (Mag 7) 盤後報價</li>
-                                            <li>總體經濟指標 (美國 GDP、CPI)</li>
-                                            <li>前 20 大巨頭財報日程與預估基準</li>
-                                            <li>散戶社群情緒指標 (看多/看空比例)</li>
-                                            <li>機構與內部人鉅額交易流向</li>
-                                            <li>全市場即時新聞與核心催化劑</li>
-                                        </ul>
+                                    </h2>
+
+                                    <!-- 報價數據 (強制不換行) -->
+                                    <div style="margin-top: 12px; font-size: 16px; display: flex; gap: 15px; align-items: baseline; white-space: nowrap; flex-wrap: wrap;">
+                                        <span style="color: #6e685c; font-weight: bold;">S&P 500 收盤</span>
+                                        <span id="daily-spy-close" style="font-size: 26px; font-weight: 900; color: #2b261c;">--</span>
+                                        <span id="daily-spy-change" style="font-size: 18px; font-weight: bold;">--</span>
+                                        <span id="daily-spy-ytd" style="font-size: 15px; color: #8a6d3f; font-weight: bold;">YTD: --%</span>
+                                        <span id="daily-extreme-label" style="font-size: 13px; background: #b0532f; color: white; padding: 2px 8px; border-radius: 4px; display: none; font-weight: bold;">(極端行情)</span>
+                                    </div>
+                                    <div style="margin-top: 8px; font-size: 13px; color: #8a6d3f; display: flex; gap: 15px; white-space: nowrap;">
+                                        <span id="daily-spy-volume">成交量: -- 億</span>
+                                        <span id="daily-vix-close">VIX 恐慌指數: --</span>
+                                        <span id="daily-ndx-close">Nasdaq: --</span>
                                     </div>
                                 </div>
-                            </div> <!-- ✅ 幫你補上這個最重要的結尾標籤！ -->
-                        </h2>
 
-                        <div style="margin-top: 12px; font-size: 16px; display: flex; gap: 20px; align-items: baseline;">
-                            <span style="color: #6e685c; font-weight: bold;">S&P 500 收盤</span>
-                            <span id="daily-spy-close" style="font-size: 26px; font-weight: 900; color: #2b261c;">--</span>
-                            <span id="daily-spy-change" style="font-size: 18px; font-weight: bold;">--</span>
-                            <span id="daily-spy-ytd" style="font-size: 15px; color: #8a6d3f; margin-left: 10px; font-weight: bold;">YTD: --%</span>
-                            <span id="daily-extreme-label" style="font-size: 13px; background: #b0532f; color: white; padding: 2px 8px; border-radius: 4px; display: none; font-weight: bold;">(極端行情)</span>
-                        </div>
-                        <div style="margin-top: 8px; font-size: 13px; color: #8a6d3f; display: flex; gap: 15px;">
-                            <span id="daily-spy-volume">成交量: -- 億</span>
-                            <span id="daily-vix-close">VIX 恐慌指數: --</span>
-                            <span id="daily-ndx-close">Nasdaq: --</span>
-                        </div>
-                    </div>
-
-                    <!-- 🌟 2. 右上角：美銀指針與持股水位 (融合 PDF 的右側佈局) -->
-                    <div style="display: flex; flex-direction: column; gap: 15px;">
-                        <div style="display: flex; gap: 25px; align-items: center; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
-                            <div style="text-align: center;">
-                                <!-- 原本的持股水位 Tooltip 邏輯保留不動 -->
-                                <div style="position: relative; display: inline-block;">
-                                    <div style="font-size: 12px; color: #8a6d3f; font-weight: bold; margin-bottom: 5px; cursor: help; display: flex; align-items: center; justify-content: center; gap: 4px;"
-                                         onmouseenter="document.getElementById('hold-level-tooltip').style.display='block'"
-                                         onmouseleave="document.getElementById('hold-level-tooltip').style.display='none'">
-                                        建議持股水位 <i class="fas fa-info-circle" style="font-size: 10px; color: #d3bd92;"></i>
-                                    </div>
-                                    <div id="hold-level-tooltip" style="display: none; position: absolute; top: 20px; right: -80px; background: #ffffff; border: 1px solid #d3bd92; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 6px; padding: 15px; width: 280px; z-index: 100; text-align: left; white-space: normal;">
-                                        <!-- (保留你原本 Tooltip 裡的文字) -->
-                                        <div style="font-weight: bold; border-bottom: 1px solid #f0ebe1; padding-bottom: 5px; margin-bottom: 8px; color: #b0532f; font-size: 13px;">
-                                            ⚙️ 量化逆勢風控模型 (Contrarian Model)
+                                <!-- 🌟 2. 右側：美銀指針與持股水位 -->
+                                <div style="display: flex; gap: 25px; align-items: center; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); min-width: 310px;">
+                                    <div style="text-align: center;">
+                                        <div style="position: relative; display: inline-block;">
+                                            <div style="font-size: 12px; color: #8a6d3f; font-weight: bold; margin-bottom: 5px; cursor: help; display: flex; align-items: center; justify-content: center; gap: 4px;"
+                                                 onmouseenter="document.getElementById('hold-level-tooltip').style.display='block'"
+                                                 onmouseleave="document.getElementById('hold-level-tooltip').style.display='none'">
+                                                建議持股水位 <i class="fas fa-info-circle" style="font-size: 10px; color: #d3bd92;"></i>
+                                            </div>
+                                            <div id="hold-level-tooltip" style="display: none; position: absolute; top: 20px; right: -80px; background: #ffffff; border: 1px solid #d3bd92; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 6px; padding: 15px; width: 280px; z-index: 100; text-align: left; white-space: normal;">
+                                                <div style="font-weight: bold; border-bottom: 1px solid #f0ebe1; padding-bottom: 5px; margin-bottom: 8px; color: #b0532f; font-size: 13px;">
+                                                    ⚙️ 量化逆勢風控模型 (Contrarian Model)
+                                                </div>
+                                                <div style="color: #4a4436; font-size: 12px; line-height: 1.6;">
+                                                    <strong>1. 基礎情緒逆勢策略：</strong><br>
+                                                    基於 AI 情緒評分，採「恐懼貪婪」逆勢佈局。<br>
+                                                    <strong>2. 近五日波段動能調節：</strong><br>
+                                                    短線連跌觸發左側抄底加碼；急漲則觸發獲利了結減碼。<br>
+                                                    <strong>3. 絕對風控邊界：</strong><br>
+                                                    總倉位嚴格鉗制於 50% ~ 100% 之間。
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div style="color: #4a4436; font-size: 12px; line-height: 1.6;">
-                                            <strong>1. 基礎情緒逆勢策略：</strong><br>
-                                            基於 AI 情緒評分，採「恐懼貪婪」逆勢佈局。<br>
-                                            <strong>2. 近五日波段動能調節：</strong><br>
-                                            短線連跌觸發左側抄底加碼；急漲則觸發獲利了結減碼。<br>
-                                            <strong>3. 絕對風控邊界：</strong><br>
-                                            總倉位嚴格鉗制於 50% ~ 100% 之間。
+                                        <div id="exposure-text" style="font-size: 32px; font-weight: 900; color: #b0532f;">--%</div>
+                                        <div style="width: 100px; height: 8px; background: #e8e3d8; border-radius: 4px; margin-top: 5px; overflow: hidden;">
+                                            <div id="exposure-progress-bar" style="height: 100%; width: 0%; background: #b0532f; transition: 1s;"></div>
                                         </div>
                                     </div>
-                                </div>
-                                <div id="exposure-text" style="font-size: 32px; font-weight: 900; color: #b0532f;">--%</div>
-                                <div style="width: 100px; height: 8px; background: #e8e3d8; border-radius: 4px; margin-top: 5px; overflow: hidden;">
-                                    <div id="exposure-progress-bar" style="height: 100%; width: 0%; background: #b0532f; transition: 1s;"></div>
+                                    <div style="width: 160px; height: 120px; position: relative;">
+                                        <div id="sentiment-gauge-chart" style="width: 100%; height: 100%; position: absolute; top: -15px;"></div>
+                                    </div>
                                 </div>
                             </div>
-                            <div style="width: 160px; height: 120px; position: relative;">
-                                <div id="sentiment-gauge-chart" style="width: 100%; height: 100%; position: absolute; top: -15px;"></div>
-                            </div>
-                        </div>
 
-                        <!-- 🌟 新增：CIO 交易員實戰視角卡片 -->
-                        <div id="cio-trading-desk-card" style="display: none; background: #fffdf8; border: 1px solid #d3bd92; border-left: 4px solid #b0532f; border-radius: 6px; padding: 12px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-                            <div style="font-weight: bold; color: #b0532f; font-size: 13px; margin-bottom: 5px; display: flex; align-items: center; gap: 5px;">
-                                <i class="fas fa-bolt"></i> 交易員實戰點評
+                            <!-- 下半部：🌟 新增的 CIO 實戰點評卡片 (橫跨全寬) -->
+                            <div id="cio-trading-desk-card" style="display: none; background: #fffdf8; border: 1px solid #d3bd92; border-left: 4px solid #b0532f; border-radius: 6px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                                <div style="font-weight: bold; color: #b0532f; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fas fa-bolt"></i> 交易員實戰點評
+                                </div>
+                                <div id="cio-trading-desk-content" style="font-size: 13px; color: #4a4436; line-height: 1.8; font-weight: bold;">--</div>
                             </div>
-                            <div id="cio-trading-desk-content" style="font-size: 12px; color: #4a4436; line-height: 1.6; font-weight: bold;">--</div>
+
                         </div>
                     </div>
                 </div>
