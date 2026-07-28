@@ -84,7 +84,7 @@
             <div class="dropdown"> <!-- 將 AI Research dropdown 放在一個 div 內 -->
                 <a href="#">AI Research</a> <!-- 下拉按鈕 -->
                 <div class="dropdown-content">
-<!--                    <a href="#" onclick="openDeepDiveModal();">AI Deep Dive (Beta)</a>-->
+                    <!--                    <a href="#" onclick="openDeepDiveModal();">AI Deep Dive (Beta)</a>-->
 
                     <a href="#" onclick="loadAIBoxSection('chat-gpt'); toggleSection(event, '#ai_box');">Chat GPT</a>
                     <a href="#" onclick="loadAIBoxSection('audio-transcription'); toggleSection(event, '#ai_box');">Audio Transcription</a>
@@ -706,470 +706,470 @@
     </div>
 
 
-        <div id="dd-main-content" style="display: none;">
+    <div id="dd-main-content" style="display: none;">
 
-            <div class="dd-top-layout">
-                <div class="dd-report-column">
-                    <h3 style="color: #f0b90b; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px;">📄 投資分析報告</h3>
-                    <button onclick="downloadDashboardPDF(event)" title="將下方的分析報告與右側所有圖表匯出成 PDF" style="background: #e67e22; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap; transition: background 0.2s; display: flex; align-items: center; gap: 6px; font-size: 13px;">
-                        <span style="font-size: 15px;">📄</span> 匯出 PDF
-                    </button>
-                    <div id="scenario-panel" style="background: #1a1a1a; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #3498db; box-shadow: 0 0 15px rgba(52, 152, 219, 0.2);">
-                        <h3 style="color: #3498db; margin-top: 0; font-size: 16px; display: flex; align-items: center; gap: 8px;">
-                            🎛️ CIO 模擬沙盤：5 年後價值推演
-                        </h3>
+        <div class="dd-top-layout">
+            <div class="dd-report-column">
+                <h3 style="color: #f0b90b; margin-bottom: 15px; border-bottom: 1px solid #444; padding-bottom: 10px;">📄 投資分析報告</h3>
+                <button onclick="downloadDashboardPDF(event)" title="將下方的分析報告與右側所有圖表匯出成 PDF" style="background: #e67e22; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; white-space: nowrap; transition: background 0.2s; display: flex; align-items: center; gap: 6px; font-size: 13px;">
+                    <span style="font-size: 15px;">📄</span> 匯出 PDF
+                </button>
+                <div id="scenario-panel" style="background: #1a1a1a; border-radius: 8px; padding: 20px; margin-bottom: 20px; border: 1px solid #3498db; box-shadow: 0 0 15px rgba(52, 152, 219, 0.2);">
+                    <h3 style="color: #3498db; margin-top: 0; font-size: 16px; display: flex; align-items: center; gap: 8px;">
+                        🎛️ CIO 模擬沙盤：5 年後價值推演
+                    </h3>
 
-                        <div style="background: rgba(52, 152, 219, 0.1); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 6px; padding: 10px 15px; margin-top: 15px; display: flex; gap: 25px; font-size: 14px;">
-                            <div><span style="color: #888;">當前股價:</span> <strong id="baseline-price" style="color: #fff;">-</strong></div>
-                            <div><span style="color: #888;">近四季 EPS:</span> <strong id="baseline-eps" style="color: #fff;">-</strong></div>
-                            <div><span style="color: #888;">當前 P/E:</span> <strong id="baseline-pe" style="color: #fff;">-</strong></div>
-                        </div>
-
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
-                            <div>
-                                <div style="display: flex; justify-content: space-between; color: #ccc; font-size: 13px; margin-bottom: 8px;">
-                                    <span>預估營收年複合成長 (CAGR)</span>
-                                    <span id="cagr-val" style="color: #f0b90b; font-weight: bold;">15%</span>
-                                </div>
-                                <input type="range" id="slider-cagr" min="0" max="50" value="15" style="width: 100%; cursor: pointer;">
-                            </div>
-
-                            <div>
-                                <div style="display: flex; justify-content: space-between; color: #ccc; font-size: 13px; margin-bottom: 8px;">
-                                    <span>預估 5 年後合理 P/E</span>
-                                    <span id="pe-val" style="color: #f0b90b; font-weight: bold;">20x</span>
-                                </div>
-                                <input type="range" id="slider-pe" min="5" max="60" value="20" style="width: 100%; cursor: pointer;">
-                            </div>
-                        </div>
-
-                        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; display: flex; align-items: center; justify-content: space-between;">
-                            <div>
-                                <span style="color: #888; font-size: 12px;">5 年後推演目標價</span><br>
-                                <strong id="target-price-val" style="color: #27ae60; font-size: 24px;">$0.00</strong>
-                            </div>
-<!--                            <div id="scenario-ai-comment" style="flex: 1; margin-left: 20px; background: #222; padding: 10px; border-radius: 6px; font-size: 13px; color: #aaa; font-style: italic; border-left: 3px solid #f0b90b;">-->
-<!--                                💡 調整滑桿，聽聽 CIO 的毒舌評論...-->
-<!--                            </div>-->
-                        </div>
+                    <div style="background: rgba(52, 152, 219, 0.1); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 6px; padding: 10px 15px; margin-top: 15px; display: flex; gap: 25px; font-size: 14px;">
+                        <div><span style="color: #888;">當前股價:</span> <strong id="baseline-price" style="color: #fff;">-</strong></div>
+                        <div><span style="color: #888;">近四季 EPS:</span> <strong id="baseline-eps" style="color: #fff;">-</strong></div>
+                        <div><span style="color: #888;">當前 P/E:</span> <strong id="baseline-pe" style="color: #fff;">-</strong></div>
                     </div>
-                    <div id="dd-report-container" class="dd-report-area"></div>
-                </div>
 
-                <div class="dd-charts-column">
-                    <div class="dd-chart-card"><div class="dd-chart-title">Valuation: PE Band</div><div class="chart-wrapper"><canvas id="dd-valuation-chart"></canvas></div></div>
-                    <div class="dd-chart-card"><div class="dd-chart-title">Smart Money: Insider Trading</div><div class="chart-wrapper"><canvas id="dd-insider-chart"></canvas></div></div>
-                    <div class="dd-chart-card"><div class="dd-chart-title">Quality: Margins Trend</div><div class="chart-wrapper"><canvas id="dd-financial-chart"></canvas></div></div>
-                    <div class="dd-chart-card"><div class="dd-chart-title">Growth: Revenue & EPS Trend</div><div class="chart-wrapper"><canvas id="dd-growth-chart"></canvas></div></div>
-                    <div class="dd-chart-card"><div class="dd-chart-title">Safety: Cash Flow Structure</div><div class="chart-wrapper"><canvas id="dd-cashflow-chart"></canvas></div></div>
-                    <div class="dd-chart-card"><div class="dd-chart-title">Momentum: Price & Volume</div><div class="chart-wrapper"><canvas id="dd-tech-chart"></canvas></div></div>
-                </div>
-            </div>
-            <div class="dd-bottom-chat-layout">
-                <div class="dd-chat-header">
-                    <h3>💬 與 CIO 對話 (Context-Aware)</h3>
-                    <span style="font-size: 13px; color: #888;">已閱讀完畢？現在可以針對上方的數據進行提問。</span>
-                </div>
-                <div class="dd-wide-chat-interface">
-                    <div id="dd-chat-messages" class="dd-chat-messages-wide"></div>
-                    <div class="dd-chat-input-box-wide">
-                        <input type="text" id="dd-chat-input" placeholder="Ask about Valuation, Risks, or Future Growth..." onkeypress="handleChatKey(event)">
-                        <button onclick="sendChatQuestion()">Send</button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div id="dd-screener-content" style="display: none; padding-top: 10px;">
-            <div style="background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #333; margin-bottom: 20px;">
-                <h3 style="color: #3498db; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                    ✨ AI 語意與主題選股器 (Semantic Screener)
-                </h3>
-                <div style="color: #888; font-size: 15px; margin-bottom: 20px; line-height: 1.6;">
-                    結合「量化過濾」與「質化檢索」的雙核心引擎，跳脫傳統選股框架。
-                    <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; color: #a0aec0;">
-                        <li style="margin-bottom: 4px;"><strong>🎯 涵蓋標的：</strong>嚴選 S&P 500、NASDAQ 100、道瓊 (DJIA) 與費城半導體 (SOXX) 等頂尖美股。</li>
-                        <li><strong>💡 如何使用：</strong>請用自然語言輸入。您可以設定嚴格的財報邊界（如：<code>EPS > 5 且 PEG < 1.5</code>），並疊加近期新聞或法說會的熱門題材（如：<code>且頻繁提及「AI 伺服器」或「庫存去化」</code>）。</li>
-                    </ul>
-                </div>
-                <div style="display: flex; gap: 15px;">
-                    <input type="text" id="screener-input" placeholder="例如：找出 P/E < 20，且近期法說會頻繁提及『液冷散熱』或『AI 伺服器擴張』的標普 500 公司" style="flex-grow: 1; padding: 15px; border-radius: 6px; border: 1px solid #444; background: #222; color: white; outline: none; font-size: 15px; font-family: inherit;">
-
-                    <button onclick="runSemanticScreener()" style="background: #3498db; color: white; border: none; padding: 0 30px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; transition: background 0.2s;">
-                        開始篩選
-                    </button>
-                </div>
-
-                <div class="prompt-chips-container">
-                    <span class="chip-label">💡 探索靈感：</span>
-
-                    <button class="prompt-chip" onclick="fillPrompt('找出 PEG < 1.5 且毛利率 > 0.4，且新聞頻繁提及「AI 伺服器」或「資料中心」的科技黑馬')">
-                        找出 PEG < 1.5 且毛利率 > 0.4，且新聞頻繁提及「AI 伺服器」或「資料中心」的科技黑馬
-                    </button>
-
-                    <button class="prompt-chip" onclick="fillPrompt('尋找 P/E < 15 且股息殖利率 > 0.04，且近期法說會強烈暗示「獲利穩定」的防禦型價值股')">
-                        尋找 P/E < 15 且股息殖利率 > 0.04，且近期法說會強烈暗示「獲利穩定」的防禦型價值股
-                    </button>
-
-                    <button class="prompt-chip" onclick="fillPrompt('過去四季 EPS > 5 且財報驚喜度 > 10%，並在法說會中提到「庫存去化」或「毛利改善」的轉機股')">
-                        過去四季 EPS > 5 且財報驚喜度 > 10%，並在法說會中提到「庫存去化」或「毛利改善」的轉機股
-                    </button>
-
-                    <button class="prompt-chip" onclick="fillPrompt('市值大於 50000000000 且負債權益比 < 1 且 ROE > 0.2，管理層對「下半年展望」樂觀的巨頭')">
-                        市值大於 50000000000 且負債權益比 < 1 且 ROE > 0.2，管理層對「下半年展望」樂觀的巨頭
-                    </button>
-
-                    <button class="prompt-chip" onclick="fillPrompt('Beta < 1 且股價淨值比 < 2，適合在降息循環中佈局，且提及「現金流強勁」的低波動標的')">
-                        Beta < 1 且股價淨值比 < 2，適合在降息循環中佈局，且提及「現金流強勁」的低波動標的
-                    </button>
-                </div>
-            </div>
-
-            <div id="screener-results-container" style="display: none; background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #333;">
-                <h4 style="color: #f0b90b; margin-top: 0; margin-bottom: 20px; font-size: 18px;">📊 主題篩選結果與證據驗證</h4>
-
-                <div id="screener-loading" style="display: none; color: #aaa; text-align: center; padding: 40px 20px;">
-                    <div class="loader" style="margin: 0 auto 15px auto;"><div></div><div></div><div></div></div>
-                    AI 正在為您檢索向量資料庫並調用 FMP 估值 API...
-                </div>
-
-                <div style="overflow-x: auto;">
-                    <table id="screener-table" style="width: 100%; border-collapse: collapse; color: #ddd; text-align: left; font-size: 15px;">
-                        <thead>
-                        <tr style="border-bottom: 2px solid #444; background: #252525;">
-                            <th style="padding: 15px; color: #aaa; width: 12%;">股票標的</th>
-                            <th style="padding: 15px; color: #aaa; width: 20%;">量化條件 (FMP)</th>
-                            <th style="padding: 15px; color: #aaa; width: 15%;">匹配強度</th>
-                            <th style="padding: 15px; color: #aaa; width: 53%;">關鍵字摘錄與溯源連結 (Source of Truth)</th>
-                        </tr>
-                        </thead>
-                        <tbody id="screener-table-body">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <div id="dd-trump-content" style="display: none; padding-top: 10px;">
-
-            <div style="background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #c0392b; margin-bottom: 20px; position: relative; overflow: hidden;">
-                <div style="position: absolute; top: -20px; right: -20px; font-size: 150px; opacity: 0.03; pointer-events: none;">🦅</div>
-                <h3 style="color: #e74c3c; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
-                    🦅 總經雷達：川普交易 (The Trump Trade)
-                </h3>
-                <div style="color: #888; font-size: 14px; margin-bottom: 25px; line-height: 1.7;">
-                    此模組採用「雙大腦核心引擎」進行交叉檢索，戳破市場蹭熱度假象。系統底層已整合並持續更新以下數據：
-                    <ul style="margin-top: 10px; margin-bottom: 0; padding-left: 20px; color: #a0aec0;">
-                        <li style="margin-bottom: 6px;">🏛️ <strong>總經與政策大腦 (Macro)：</strong>重大政策新聞 (關稅/去監管)、聯準會動態、美債殖利率與板塊資金流向。</li>
-                        <li style="margin-bottom: 6px;">🏢 <strong>個股真實 DNA (Micro)：</strong>公司主營業務 (Profile)、官方新聞稿 (Press Releases) 與法說會逐字稿。</li>
-                        <li style="margin-bottom: 6px;">📊 <strong>量化基本面 (Fundamentals)：</strong>PE、PEG、ROE、D/E 等核心財務估值與防禦指標。</li>
-                        <li>🐳 <strong>聰明錢籌碼 (Smart Money)：</strong>國會議員交易 (Senate Trading)、13F 頂層機構持倉與內部人買賣動向。</li>
-                    </ul>
-                </div>
-
-                <div class="prompt-chips-container" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 25px; align-items: flex-start;">
-                    <span class="chip-label" style="color: #e74c3c !important; font-size: 0.95rem; font-weight: 600; margin-top: 8px; white-space: nowrap;">🔥 啟動策略：</span>
-
-                    <!-- 加上 trump-chip，並移除所有行內 style 與 onmouseover 事件 -->
-                    <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('金融去監管')">🏦 金融去監管</button>
-                    <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('傳統能源')">🛢️ 傳統能源重返榮耀</button>
-                    <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('本土製造')">🏭 關稅保護與本土製造</button>
-                    <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('國防軍工')">🛡️ 國防軍工擴張</button>
-                    <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('數位資產')">🪙 加密貨幣與數位資產</button>
-                    <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('科技併購')">💻 科技併購與 AI 鬆綁</button>
-                    <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('生技解銬')">💊 生技醫療與定價鬆綁</button>
-                    <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('邊境安全')">🚓 邊境安全與國土基建</button>
-                </div>
-            </div>
-
-            <div id="trump-results-container" style="display: none; background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #333;">
-                <div id="trump-loading" style="display: none; color: #e74c3c; text-align: center; padding: 40px 20px; font-weight: bold;"></div>
-
-                <!-- 將表格內容塞進這個 wrapper 裡面，就不會破壞上面的 loading 元素 -->
-                <div id="trump-table-wrapper"></div>
-            </div>
-
-        </div>
-m
-        <div id="dd-sentiment-content" style="display: none; padding-top: 10px;">
-            <!-- 機構級包浩斯風格背景 -->
-            <div style="background: #f1ede4; border-radius: 8px; padding: 30px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
-
-                <div style="margin-bottom: 25px;">
-
-                    <!-- 上半部：標題與儀表板 (左右排開) -->
-                    <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #d3bd92; padding-bottom: 15px; margin-bottom: 15px; flex-wrap: wrap; gap: 20px;">
-
-                        <!-- 左側：標題與報價看板 -->
-                        <div style="flex: 1; min-width: 380px;">
-                            <h2 style="margin: 0; font-size: 28px; font-weight: 900; color: #2b261c; display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                                <span style="white-space: nowrap;">美股市場情緒日報</span>
-                                <span id="daily-report-date" style="font-size: 16px; font-weight: normal; color: #6e685c; background: #e8e3d8; padding: 4px 10px; border-radius: 4px; white-space: nowrap;">載入中...</span>
-
-                                <!-- 分析數據源 Tooltip -->
-                                <div style="position: relative; display: inline-block; cursor: help; margin-left: 5px; font-weight: normal;"
-                                     onmouseenter="document.getElementById('data-source-tooltip').style.display='block'"
-                                     onmouseleave="document.getElementById('data-source-tooltip').style.display='none'">
-                            <span style="font-size: 12px; background: #53de42; color: #ffffff; padding: 5px 10px; border-radius: 4px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #87e776; transition: opacity 0.2s; white-space: nowrap;">
-                                <i class="fas fa-database" style="margin-right: 3px; color: #d3bd92;"></i> 資料來源
-                            </span>
-                                    <div id="data-source-tooltip" style="display: none; position: absolute; top: 130%; left: 0; background: #ffffff; border: 1px solid #d3bd92; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 6px; padding: 15px; width: 280px; z-index: 100;">
-                                        <div style="font-size: 13px; color: #2b261c; line-height: 1.6; text-align: left;">
-                                            <div style="font-weight: bold; border-bottom: 1px solid #f0ebe1; padding-bottom: 5px; margin-bottom: 8px; color: #8a6d3f;">
-                                                AI 統合運算基底數據：
-                                            </div>
-                                            <ul style="margin: 0; padding-left: 18px; color: #4a4436; font-size: 12px; gap: 4px; display: flex; flex-direction: column;">
-                                                <li>大盤與半導體指數 (S&P 500, Nasdaq, SOXX)</li>
-                                                <li>市場波動率 (VIX) 與 10年期美債殖利率</li>
-                                                <li>S&P 500 十一大板塊資金流向</li>
-                                                <li>科技七雄 (Mag 7) 盤後報價</li>
-                                                <li>總體經濟指標 (美國 GDP、CPI)</li>
-                                                <li>前 20 大巨頭財報日程與預估基準</li>
-                                                <li>散戶社群情緒指標 (看多/看空比例)</li>
-                                                <li>機構與內部人鉅額交易流向</li>
-                                                <li>全市場即時新聞與核心催化劑</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </h2>
-
-                            <!-- 報價數據 (強制不換行) -->
-                            <div style="margin-top: 12px; font-size: 16px; display: flex; gap: 15px; align-items: baseline; white-space: nowrap; flex-wrap: wrap;">
-                                <span style="color: #6e685c; font-weight: bold;">S&P 500 收盤</span>
-                                <span id="daily-spy-close" style="font-size: 26px; font-weight: 900; color: #2b261c;">--</span>
-                                <span id="daily-spy-change" style="font-size: 18px; font-weight: bold;">--</span>
-                                <span id="daily-spy-ytd" style="font-size: 15px; color: #8a6d3f; font-weight: bold;">YTD: --%</span>
-                                <span id="daily-extreme-label" style="font-size: 13px; background: #b0532f; color: white; padding: 2px 8px; border-radius: 4px; display: none; font-weight: bold;">(極端行情)</span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 15px;">
+                        <div>
+                            <div style="display: flex; justify-content: space-between; color: #ccc; font-size: 13px; margin-bottom: 8px;">
+                                <span>預估營收年複合成長 (CAGR)</span>
+                                <span id="cagr-val" style="color: #f0b90b; font-weight: bold;">15%</span>
                             </div>
-                            <div style="margin-top: 8px; font-size: 13px; color: #8a6d3f; display: flex; gap: 15px; white-space: nowrap;">
-                                <span id="daily-spy-volume">成交量: -- 億</span>
-                                <span id="daily-vix-close">VIX 恐慌指數: --</span>
-                                <span id="daily-ndx-close">Nasdaq: --</span>
-                            </div>
+                            <input type="range" id="slider-cagr" min="0" max="50" value="15" style="width: 100%; cursor: pointer;">
                         </div>
 
-                        <!-- 🌟 2. 右側：美銀指針與持股水位 -->
-                        <div style="display: flex; gap: 25px; align-items: center; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); min-width: 310px;">
-                            <div style="text-align: center;">
-                                <div style="position: relative; display: inline-block;">
-                                    <div style="font-size: 12px; color: #8a6d3f; font-weight: bold; margin-bottom: 5px; cursor: help; display: flex; align-items: center; justify-content: center; gap: 4px;"
-                                         onmouseenter="document.getElementById('hold-level-tooltip').style.display='block'"
-                                         onmouseleave="document.getElementById('hold-level-tooltip').style.display='none'">
-                                        建議持股水位 <i class="fas fa-info-circle" style="font-size: 10px; color: #d3bd92;"></i>
-                                    </div>
-                                    <div id="hold-level-tooltip" style="display: none; position: absolute; top: 20px; right: -80px; background: #ffffff; border: 1px solid #d3bd92; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 6px; padding: 15px; width: 280px; z-index: 100; text-align: left; white-space: normal;">
-                                        <div style="font-weight: bold; border-bottom: 1px solid #f0ebe1; padding-bottom: 5px; margin-bottom: 8px; color: #b0532f; font-size: 13px;">
-                                            ⚙️ 量化逆勢風控模型 (Contrarian Model)
-                                        </div>
-                                        <div style="color: #4a4436; font-size: 12px; line-height: 1.6;">
-                                            <strong>1. 基礎情緒逆勢策略：</strong><br>
-                                            基於 AI 情緒評分，採「恐懼貪婪」逆勢佈局。<br>
-                                            <strong>2. 近五日波段動能調節：</strong><br>
-                                            短線連跌觸發左側抄底加碼；急漲則觸發獲利了結減碼。<br>
-                                            <strong>3. 絕對風控邊界：</strong><br>
-                                            總倉位嚴格鉗制於 50% ~ 100% 之間。
-                                        </div>
-                                    </div>
-                                </div>
-                                <div id="exposure-text" style="font-size: 32px; font-weight: 900; color: #b0532f;">--%</div>
-                                <div style="width: 100px; height: 8px; background: #e8e3d8; border-radius: 4px; margin-top: 5px; overflow: hidden;">
-                                    <div id="exposure-progress-bar" style="height: 100%; width: 0%; background: #b0532f; transition: 1s;"></div>
-                                </div>
+                        <div>
+                            <div style="display: flex; justify-content: space-between; color: #ccc; font-size: 13px; margin-bottom: 8px;">
+                                <span>預估 5 年後合理 P/E</span>
+                                <span id="pe-val" style="color: #f0b90b; font-weight: bold;">20x</span>
                             </div>
-                            <div style="width: 160px; height: 120px; position: relative;">
-                                <div id="sentiment-gauge-chart" style="width: 100%; height: 100%; position: absolute; top: -15px;"></div>
-                            </div>
+                            <input type="range" id="slider-pe" min="5" max="60" value="20" style="width: 100%; cursor: pointer;">
                         </div>
                     </div>
 
-                    <!-- 下半部：🌟 新增的 CIO 實戰點評卡片 (橫跨全寬) -->
-                    <div id="cio-trading-desk-card" style="display: none; background: #fffdf8; border: 1px solid #d3bd92; border-left: 4px solid #b0532f; border-radius: 6px; padding: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
-                        <div style="font-weight: bold; color: #b0532f; font-size: 14px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+                    <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid #333; display: flex; align-items: center; justify-content: space-between;">
+                        <div>
+                            <span style="color: #888; font-size: 12px;">5 年後推演目標價</span><br>
+                            <strong id="target-price-val" style="color: #27ae60; font-size: 24px;">$0.00</strong>
+                        </div>
+                        <!--                            <div id="scenario-ai-comment" style="flex: 1; margin-left: 20px; background: #222; padding: 10px; border-radius: 6px; font-size: 13px; color: #aaa; font-style: italic; border-left: 3px solid #f0b90b;">-->
+                        <!--                                💡 調整滑桿，聽聽 CIO 的毒舌評論...-->
+                        <!--                            </div>-->
+                    </div>
+                </div>
+                <div id="dd-report-container" class="dd-report-area"></div>
+            </div>
+
+            <div class="dd-charts-column">
+                <div class="dd-chart-card"><div class="dd-chart-title">Valuation: PE Band</div><div class="chart-wrapper"><canvas id="dd-valuation-chart"></canvas></div></div>
+                <div class="dd-chart-card"><div class="dd-chart-title">Smart Money: Insider Trading</div><div class="chart-wrapper"><canvas id="dd-insider-chart"></canvas></div></div>
+                <div class="dd-chart-card"><div class="dd-chart-title">Quality: Margins Trend</div><div class="chart-wrapper"><canvas id="dd-financial-chart"></canvas></div></div>
+                <div class="dd-chart-card"><div class="dd-chart-title">Growth: Revenue & EPS Trend</div><div class="chart-wrapper"><canvas id="dd-growth-chart"></canvas></div></div>
+                <div class="dd-chart-card"><div class="dd-chart-title">Safety: Cash Flow Structure</div><div class="chart-wrapper"><canvas id="dd-cashflow-chart"></canvas></div></div>
+                <div class="dd-chart-card"><div class="dd-chart-title">Momentum: Price & Volume</div><div class="chart-wrapper"><canvas id="dd-tech-chart"></canvas></div></div>
+            </div>
+        </div>
+        <div class="dd-bottom-chat-layout">
+            <div class="dd-chat-header">
+                <h3>💬 與 CIO 對話 (Context-Aware)</h3>
+                <span style="font-size: 13px; color: #888;">已閱讀完畢？現在可以針對上方的數據進行提問。</span>
+            </div>
+            <div class="dd-wide-chat-interface">
+                <div id="dd-chat-messages" class="dd-chat-messages-wide"></div>
+                <div class="dd-chat-input-box-wide">
+                    <input type="text" id="dd-chat-input" placeholder="Ask about Valuation, Risks, or Future Growth..." onkeypress="handleChatKey(event)">
+                    <button onclick="sendChatQuestion()">Send</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="dd-screener-content" style="display: none; padding-top: 10px;">
+        <div style="background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #333; margin-bottom: 20px;">
+            <h3 style="color: #3498db; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                ✨ AI 語意與主題選股器 (Semantic Screener)
+            </h3>
+            <div style="color: #888; font-size: 15px; margin-bottom: 20px; line-height: 1.6;">
+                結合「量化過濾」與「質化檢索」的雙核心引擎，跳脫傳統選股框架。
+                <ul style="margin-top: 8px; margin-bottom: 0; padding-left: 20px; color: #a0aec0;">
+                    <li style="margin-bottom: 4px;"><strong>🎯 涵蓋標的：</strong>嚴選 S&P 500、NASDAQ 100、道瓊 (DJIA) 與費城半導體 (SOXX) 等頂尖美股。</li>
+                    <li><strong>💡 如何使用：</strong>請用自然語言輸入。您可以設定嚴格的財報邊界（如：<code>EPS > 5 且 PEG < 1.5</code>），並疊加近期新聞或法說會的熱門題材（如：<code>且頻繁提及「AI 伺服器」或「庫存去化」</code>）。</li>
+                </ul>
+            </div>
+            <div style="display: flex; gap: 15px;">
+                <input type="text" id="screener-input" placeholder="例如：找出 P/E < 20，且近期法說會頻繁提及『液冷散熱』或『AI 伺服器擴張』的標普 500 公司" style="flex-grow: 1; padding: 15px; border-radius: 6px; border: 1px solid #444; background: #222; color: white; outline: none; font-size: 15px; font-family: inherit;">
+
+                <button onclick="runSemanticScreener()" style="background: #3498db; color: white; border: none; padding: 0 30px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px; transition: background 0.2s;">
+                    開始篩選
+                </button>
+            </div>
+
+            <div class="prompt-chips-container">
+                <span class="chip-label">💡 探索靈感：</span>
+
+                <button class="prompt-chip" onclick="fillPrompt('找出 PEG < 1.5 且毛利率 > 0.4，且新聞頻繁提及「AI 伺服器」或「資料中心」的科技黑馬')">
+                    找出 PEG < 1.5 且毛利率 > 0.4，且新聞頻繁提及「AI 伺服器」或「資料中心」的科技黑馬
+                </button>
+
+                <button class="prompt-chip" onclick="fillPrompt('尋找 P/E < 15 且股息殖利率 > 0.04，且近期法說會強烈暗示「獲利穩定」的防禦型價值股')">
+                    尋找 P/E < 15 且股息殖利率 > 0.04，且近期法說會強烈暗示「獲利穩定」的防禦型價值股
+                </button>
+
+                <button class="prompt-chip" onclick="fillPrompt('過去四季 EPS > 5 且財報驚喜度 > 10%，並在法說會中提到「庫存去化」或「毛利改善」的轉機股')">
+                    過去四季 EPS > 5 且財報驚喜度 > 10%，並在法說會中提到「庫存去化」或「毛利改善」的轉機股
+                </button>
+
+                <button class="prompt-chip" onclick="fillPrompt('市值大於 50000000000 且負債權益比 < 1 且 ROE > 0.2，管理層對「下半年展望」樂觀的巨頭')">
+                    市值大於 50000000000 且負債權益比 < 1 且 ROE > 0.2，管理層對「下半年展望」樂觀的巨頭
+                </button>
+
+                <button class="prompt-chip" onclick="fillPrompt('Beta < 1 且股價淨值比 < 2，適合在降息循環中佈局，且提及「現金流強勁」的低波動標的')">
+                    Beta < 1 且股價淨值比 < 2，適合在降息循環中佈局，且提及「現金流強勁」的低波動標的
+                </button>
+            </div>
+        </div>
+
+        <div id="screener-results-container" style="display: none; background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #333;">
+            <h4 style="color: #f0b90b; margin-top: 0; margin-bottom: 20px; font-size: 18px;">📊 主題篩選結果與證據驗證</h4>
+
+            <div id="screener-loading" style="display: none; color: #aaa; text-align: center; padding: 40px 20px;">
+                <div class="loader" style="margin: 0 auto 15px auto;"><div></div><div></div><div></div></div>
+                AI 正在為您檢索向量資料庫並調用 FMP 估值 API...
+            </div>
+
+            <div style="overflow-x: auto;">
+                <table id="screener-table" style="width: 100%; border-collapse: collapse; color: #ddd; text-align: left; font-size: 15px;">
+                    <thead>
+                    <tr style="border-bottom: 2px solid #444; background: #252525;">
+                        <th style="padding: 15px; color: #aaa; width: 12%;">股票標的</th>
+                        <th style="padding: 15px; color: #aaa; width: 20%;">量化條件 (FMP)</th>
+                        <th style="padding: 15px; color: #aaa; width: 15%;">匹配強度</th>
+                        <th style="padding: 15px; color: #aaa; width: 53%;">關鍵字摘錄與溯源連結 (Source of Truth)</th>
+                    </tr>
+                    </thead>
+                    <tbody id="screener-table-body">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="dd-trump-content" style="display: none; padding-top: 10px;">
+
+        <div style="background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #c0392b; margin-bottom: 20px; position: relative; overflow: hidden;">
+            <div style="position: absolute; top: -20px; right: -20px; font-size: 150px; opacity: 0.03; pointer-events: none;">🦅</div>
+            <h3 style="color: #e74c3c; margin-top: 0; margin-bottom: 10px; display: flex; align-items: center; gap: 10px;">
+                🦅 總經雷達：川普交易 (The Trump Trade)
+            </h3>
+            <div style="color: #888; font-size: 14px; margin-bottom: 25px; line-height: 1.7;">
+                此模組採用「雙大腦核心引擎」進行交叉檢索，戳破市場蹭熱度假象。系統底層已整合並持續更新以下數據：
+                <ul style="margin-top: 10px; margin-bottom: 0; padding-left: 20px; color: #a0aec0;">
+                    <li style="margin-bottom: 6px;">🏛️ <strong>總經與政策大腦 (Macro)：</strong>重大政策新聞 (關稅/去監管)、聯準會動態、美債殖利率與板塊資金流向。</li>
+                    <li style="margin-bottom: 6px;">🏢 <strong>個股真實 DNA (Micro)：</strong>公司主營業務 (Profile)、官方新聞稿 (Press Releases) 與法說會逐字稿。</li>
+                    <li style="margin-bottom: 6px;">📊 <strong>量化基本面 (Fundamentals)：</strong>PE、PEG、ROE、D/E 等核心財務估值與防禦指標。</li>
+                    <li>🐳 <strong>聰明錢籌碼 (Smart Money)：</strong>國會議員交易 (Senate Trading)、13F 頂層機構持倉與內部人買賣動向。</li>
+                </ul>
+            </div>
+
+            <div class="prompt-chips-container" style="display: flex; flex-wrap: wrap; gap: 12px; margin-top: 25px; align-items: flex-start;">
+                <span class="chip-label" style="color: #e74c3c !important; font-size: 0.95rem; font-weight: 600; margin-top: 8px; white-space: nowrap;">🔥 啟動策略：</span>
+
+                <!-- 加上 trump-chip，並移除所有行內 style 與 onmouseover 事件 -->
+                <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('金融去監管')">🏦 金融去監管</button>
+                <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('傳統能源')">🛢️ 傳統能源重返榮耀</button>
+                <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('本土製造')">🏭 關稅保護與本土製造</button>
+                <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('國防軍工')">🛡️ 國防軍工擴張</button>
+                <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('數位資產')">🪙 加密貨幣與數位資產</button>
+                <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('科技併購')">💻 科技併購與 AI 鬆綁</button>
+                <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('生技解銬')">💊 生技醫療與定價鬆綁</button>
+                <button class="prompt-chip trump-chip" onclick="runTrumpStrategy('邊境安全')">🚓 邊境安全與國土基建</button>
+            </div>
+        </div>
+
+        <div id="trump-results-container" style="display: none; background: #1e1e1e; border-radius: 8px; padding: 25px; border: 1px solid #333;">
+            <div id="trump-loading" style="display: none; color: #e74c3c; text-align: center; padding: 40px 20px; font-weight: bold;"></div>
+
+            <!-- 將表格內容塞進這個 wrapper 裡面，就不會破壞上面的 loading 元素 -->
+            <div id="trump-table-wrapper"></div>
+        </div>
+
+    </div>
+    m
+    <div id="dd-sentiment-content" style="display: none; padding-top: 10px;">
+        <!-- 機構級包浩斯風格背景 -->
+        <div style="background: #f1ede4; border-radius: 8px; padding: 30px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
+
+            <!-- 🌟 1. 頂部戰情報價區 (完全對標 PDF 的頭部) -->
+            <div style="display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #d3bd92; padding-bottom: 15px; margin-bottom: 25px;">
+                <div>
+                    <!-- 🌟 1. 把按鈕放進 h2 裡面，這樣才能跟標題、日期完美水平對齊 -->
+                    <h2 style="margin: 0; font-size: 28px; font-weight: 900; color: #2b261c; display: flex; align-items: center; gap: 12px;">
+                        美股市場情緒日報
+                        <span id="daily-report-date" style="font-size: 16px; font-weight: normal; color: #6e685c; background: #e8e3d8; padding: 4px 10px; border-radius: 4px;">載入中...</span>
+
+                        <!-- 🌟 新增：研究員專用資料來源 Tooltip (放在這裡最完美！) -->
+                        <div style="position: relative; display: inline-block; cursor: help; margin-left: 5px; font-weight: normal;"
+                             onmouseenter="document.getElementById('data-source-tooltip').style.display='block'"
+                             onmouseleave="document.getElementById('data-source-tooltip').style.display='none'">
+
+                            <!-- 按鈕本體 -->
+                            <span style="font-size: 12px; background: #53de42; color: #ffffff; padding: 5px 10px; border-radius: 4px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.15); border: 1px solid #87e776; transition: opacity 0.2s;">
+                                    <i class="fas fa-database" style="margin-right: 3px; color: #d3bd92;"></i> 資料來源
+                                </span>
+
+                            <!-- 懸浮提示框 (預設隱藏) -->
+                            <div id="data-source-tooltip" style="display: none; position: absolute; top: 130%; left: 0; background: #ffffff; border: 1px solid #d3bd92; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 6px; padding: 15px; width: 280px; z-index: 100;">
+                                <div style="font-size: 13px; color: #2b261c; line-height: 1.6; text-align: left;">
+                                    <div style="font-weight: bold; border-bottom: 1px solid #f0ebe1; padding-bottom: 5px; margin-bottom: 8px; color: #8a6d3f;">
+                                        AI 統合運算基底數據：
+                                    </div>
+                                    <ul style="margin: 0; padding-left: 18px; color: #4a4436; font-size: 12px; gap: 4px; display: flex; flex-direction: column;">
+                                        <li>大盤與半導體指數 (S&P 500, Nasdaq, SOXX)</li>
+                                        <li>市場波動率 (VIX) 與 10年期美債殖利率</li>
+                                        <li>S&P 500 十一大板塊資金流向</li>
+                                        <li>科技七雄 (Mag 7) 盤後報價</li>
+                                        <li>總體經濟指標 (美國 GDP、CPI)</li>
+                                        <li>前 20 大巨頭財報日程與預估基準</li>
+                                        <li>散戶社群情緒指標 (看多/看空比例)</li>
+                                        <li>機構與內部人鉅額交易流向</li>
+                                        <li>全市場即時新聞與核心催化劑</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div> <!-- ✅ 幫你補上這個最重要的結尾標籤！ -->
+                    </h2>
+
+                    <div style="margin-top: 12px; font-size: 16px; display: flex; gap: 20px; align-items: baseline;">
+                        <span style="color: #6e685c; font-weight: bold;">S&P 500 收盤</span>
+                        <span id="daily-spy-close" style="font-size: 26px; font-weight: 900; color: #2b261c;">--</span>
+                        <span id="daily-spy-change" style="font-size: 18px; font-weight: bold;">--</span>
+                        <span id="daily-spy-ytd" style="font-size: 15px; color: #8a6d3f; margin-left: 10px; font-weight: bold;">YTD: --%</span>
+                        <span id="daily-extreme-label" style="font-size: 13px; background: #b0532f; color: white; padding: 2px 8px; border-radius: 4px; display: none; font-weight: bold;">(極端行情)</span>
+                    </div>
+                    <div style="margin-top: 8px; font-size: 13px; color: #8a6d3f; display: flex; gap: 15px;">
+                        <span id="daily-spy-volume">成交量: -- 億</span>
+                        <span id="daily-vix-close">VIX 恐慌指數: --</span>
+                        <span id="daily-ndx-close">Nasdaq: --</span>
+                    </div>
+                </div>
+
+                <!-- 🌟 2. 右上角：美銀指針與持股水位 (融合 PDF 的右側佈局) -->
+                <div style="display: flex; flex-direction: column; gap: 15px;">
+                    <div style="display: flex; gap: 25px; align-items: center; background: white; padding: 15px 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+                        <div style="text-align: center;">
+                            <!-- 原本的持股水位 Tooltip 邏輯保留不動 -->
+                            <div style="position: relative; display: inline-block;">
+                                <div style="font-size: 12px; color: #8a6d3f; font-weight: bold; margin-bottom: 5px; cursor: help; display: flex; align-items: center; justify-content: center; gap: 4px;"
+                                     onmouseenter="document.getElementById('hold-level-tooltip').style.display='block'"
+                                     onmouseleave="document.getElementById('hold-level-tooltip').style.display='none'">
+                                    建議持股水位 <i class="fas fa-info-circle" style="font-size: 10px; color: #d3bd92;"></i>
+                                </div>
+                                <div id="hold-level-tooltip" style="display: none; position: absolute; top: 20px; right: -80px; background: #ffffff; border: 1px solid #d3bd92; box-shadow: 0 8px 16px rgba(0,0,0,0.1); border-radius: 6px; padding: 15px; width: 280px; z-index: 100; text-align: left; white-space: normal;">
+                                    <!-- (保留你原本 Tooltip 裡的文字) -->
+                                    <div style="font-weight: bold; border-bottom: 1px solid #f0ebe1; padding-bottom: 5px; margin-bottom: 8px; color: #b0532f; font-size: 13px;">
+                                        ⚙️ 量化逆勢風控模型 (Contrarian Model)
+                                    </div>
+                                    <div style="color: #4a4436; font-size: 12px; line-height: 1.6;">
+                                        <strong>1. 基礎情緒逆勢策略：</strong><br>
+                                        基於 AI 情緒評分，採「恐懼貪婪」逆勢佈局。<br>
+                                        <strong>2. 近五日波段動能調節：</strong><br>
+                                        短線連跌觸發左側抄底加碼；急漲則觸發獲利了結減碼。<br>
+                                        <strong>3. 絕對風控邊界：</strong><br>
+                                        總倉位嚴格鉗制於 50% ~ 100% 之間。
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="exposure-text" style="font-size: 32px; font-weight: 900; color: #b0532f;">--%</div>
+                            <div style="width: 100px; height: 8px; background: #e8e3d8; border-radius: 4px; margin-top: 5px; overflow: hidden;">
+                                <div id="exposure-progress-bar" style="height: 100%; width: 0%; background: #b0532f; transition: 1s;"></div>
+                            </div>
+                        </div>
+                        <div style="width: 160px; height: 120px; position: relative;">
+                            <div id="sentiment-gauge-chart" style="width: 100%; height: 100%; position: absolute; top: -15px;"></div>
+                        </div>
+                    </div>
+
+                    <!-- 🌟 新增：CIO 交易員實戰視角卡片 -->
+                    <div id="cio-trading-desk-card" style="display: none; background: #fffdf8; border: 1px solid #d3bd92; border-left: 4px solid #b0532f; border-radius: 6px; padding: 12px 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.03);">
+                        <div style="font-weight: bold; color: #b0532f; font-size: 13px; margin-bottom: 5px; display: flex; align-items: center; gap: 5px;">
                             <i class="fas fa-bolt"></i> 交易員實戰點評
                         </div>
-                        <div id="cio-trading-desk-content" style="font-size: 13px; color: #4a4436; line-height: 1.8; font-weight: bold;">--</div>
-                    </div>
-
-                </div>  
+                        <div id="cio-trading-desk-content" style="font-size: 12px; color: #4a4436; line-height: 1.6; font-weight: bold;">--</div>
                     </div>
                 </div>
+            </div>
 
-                <!-- 🌟 3. 核心視覺：情緒分數 vs 漲跌幅 雙軸混合圖表 (對標 PDF 走勢圖) -->
-                <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 25px;">
-                    <h4 style="margin: 0 0 15px 0; color: #2b261c; border-left: 4px solid #b0532f; padding-left: 10px;">▌ 情緒走勢 (AI 情緒分數 × 每日漲跌幅)</h4>
-                    <div style="width: 100%; height: 300px;">
-                        <canvas id="sentiment-mixed-chart"></canvas>
-                    </div>
+            <!-- 🌟 3. 核心視覺：情緒分數 vs 漲跌幅 雙軸混合圖表 (對標 PDF 走勢圖) -->
+            <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px; margin-bottom: 25px;">
+                <h4 style="margin: 0 0 15px 0; color: #2b261c; border-left: 4px solid #b0532f; padding-left: 10px;">▌ 情緒走勢 (AI 情緒分數 × 每日漲跌幅)</h4>
+                <div style="width: 100%; height: 300px;">
+                    <canvas id="sentiment-mixed-chart"></canvas>
                 </div>
+            </div>
 
-                <!-- 🌟 4. 下半部：歷史情緒數據表格 -->
-                <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                    <div style="padding: 15px 20px; background: #fcfbf9; border-bottom: 1px solid #f0ebe1;">
-                        <h4 style="margin: 0; color: #2b261c; font-size: 15px;">近 15 個交易日底層數據總覽</h4>
-                    </div>
-                    <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
-                        <thead>
-                        <tr style="background: #2b261c; color: white;">
-                            <th style="padding: 12px;">日期</th>
-                            <th style="padding: 12px;">大盤漲跌</th>
-                            <th style="padding: 12px;">衍生槓桿 / VIX 水位</th>
-                            <th style="padding: 12px;">法人輪動狀態</th>
-                            <th style="padding: 12px;">綜合情緒</th>
-                            <th style="padding: 12px; text-align: left;">AI 智能頭條 (Hover 展開深度推演)</th>
-                        </tr>
-                        </thead>
-                        <tbody id="sentiment-table-body">
-                        <!-- JS 將動態填入這 15 天的數據 -->
-                        </tbody>
-                    </table>
+            <!-- 🌟 4. 下半部：歷史情緒數據表格 -->
+            <div style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                <div style="padding: 15px 20px; background: #fcfbf9; border-bottom: 1px solid #f0ebe1;">
+                    <h4 style="margin: 0; color: #2b261c; font-size: 15px;">近 15 個交易日底層數據總覽</h4>
                 </div>
-                <!-- 🌟 5. 新增：美股機構級流動性與籌碼戰情室 (對標 PDF 下半部) -->
-                <div style="margin-top: 30px; border-top: 2px dashed #d3bd92; padding-top: 30px;">
-                    <h3 style="margin: 0 0 20px 0; color: #2b261c; font-size: 20px; display: flex; align-items: center; gap: 10px;">
-                        🦅 華爾街流動性與聰明錢籌碼追蹤
-                    </h3>
+                <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 14px;">
+                    <thead>
+                    <tr style="background: #2b261c; color: white;">
+                        <th style="padding: 12px;">日期</th>
+                        <th style="padding: 12px;">大盤漲跌</th>
+                        <th style="padding: 12px;">衍生槓桿 / VIX 水位</th>
+                        <th style="padding: 12px;">法人輪動狀態</th>
+                        <th style="padding: 12px;">綜合情緒</th>
+                        <th style="padding: 12px; text-align: left;">AI 智能頭條 (Hover 展開深度推演)</th>
+                    </tr>
+                    </thead>
+                    <tbody id="sentiment-table-body">
+                    <!-- JS 將動態填入這 15 天的數據 -->
+                    </tbody>
+                </table>
+            </div>
+            <!-- 🌟 5. 新增：美股機構級流動性與籌碼戰情室 (對標 PDF 下半部) -->
+            <div style="margin-top: 30px; border-top: 2px dashed #d3bd92; padding-top: 30px;">
+                <h3 style="margin: 0 0 20px 0; color: #2b261c; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                    🦅 華爾街流動性與聰明錢籌碼追蹤
+                </h3>
 
-                    <!-- 第一排：量能殖利率 vs 回撤恐慌 -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                        <!-- 1. 量能與資金成本 (對標：量能與融資) -->
-                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
-                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">S&P 500 量能 vs 10年美債殖利率 (資金成本)</h4>
-                            <div style="width: 100%; height: 220px;"><canvas id="liquidity-volume-chart"></canvas></div>
-                        </div>
-
-                        <!-- 2. 大盤回撤與恐慌極值 (對標：融資維持率) -->
-                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
-                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">S&P 500 高點回撤率 vs VIX (市場壓力測試)</h4>
-                            <div style="width: 100%; height: 220px;"><canvas id="drawdown-stress-chart"></canvas></div>
-                        </div>
-                    </div>
-
-                    <!-- 第二排：散戶投機熱度 vs 聰明錢內部人交易 -->
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                        <!-- 3. 散戶情緒與波動率 (對標：當沖動向) -->
-                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
-                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">散戶社群投機熱度 vs 真實波動率</h4>
-                            <div style="width: 100%; height: 220px;"><canvas id="retail-speculation-chart"></canvas></div>
-                        </div>
-
-                        <!-- 5. 內部人交易淨額表 (對標：三大法人買賣超) -->
-                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; overflow-y: auto; max-height: 250px;">
-                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">聰明錢動向：近 3 日內部人鉅額交易 (Smart Money)</h4>
-                            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
-                                <thead>
-                                <tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;">
-                                    <th style="padding: 6px;">股票</th>
-                                    <th style="padding: 6px;">交易人職稱</th>
-                                    <th style="padding: 6px;">買/賣</th>
-                                    <th style="padding: 6px; text-align: right;">總金額 (USD)</th>
-                                </tr>
-                                </thead>
-                                <tbody id="insider-trading-body">
-                                <tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">載入數據中...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <!-- 🌟 6. 新增：美國總體經濟與巨頭動向追蹤 (對標 PDF 的 GDP、財報與熱門股) -->
-                <div style="margin-top: 30px; border-top: 2px dashed #d3bd92; padding-top: 30px;">
-                    <h3 style="margin: 0 0 20px 0; color: #2b261c; font-size: 20px; display: flex; align-items: center; gap: 10px;">
-                        🇺🇸 美國總經基本面 & 科技巨頭追蹤
-                    </h3>
-
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                        <!-- 1. 總經圖表 (對標：台灣 GDP 圖表) -->
-                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
-                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">美國總體經濟：GDP 規模 vs CPI 通膨趨勢</h4>
-                            <div style="width: 100%; height: 220px;"><canvas id="macro-economic-chart"></canvas></div>
-                        </div>
-
-                        <!-- 2. 巨頭財報行事曆 (對標：市值前 20 大財報表) -->
-                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; overflow-y: auto; max-height: 270px;">
-                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">即將發布：前 20 大巨頭財報行事曆</h4>
-                            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
-                                <thead>
-                                <tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;">
-                                    <th style="padding: 6px;">股票</th>
-                                    <th style="padding: 6px;">財報日期</th>
-                                    <th style="padding: 6px; text-align: right;">預估 EPS</th>
-                                    <th style="padding: 6px; text-align: right;">預估營收</th>
-                                </tr>
-                                </thead>
-                                <tbody id="earnings-calendar-body">
-                                <tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">載入數據中...</td></tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- 3. 熱門個股追蹤 (對標：五、熱門個股) -->
+                <!-- 第一排：量能殖利率 vs 回撤恐慌 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <!-- 1. 量能與資金成本 (對標：量能與融資) -->
                     <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
-                        <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">熱門板塊核心：科技七雄 (Magnificent 7) 盤後追蹤</h4>
-                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">S&P 500 量能 vs 10年美債殖利率 (資金成本)</h4>
+                        <div style="width: 100%; height: 220px;"><canvas id="liquidity-volume-chart"></canvas></div>
+                    </div>
+
+                    <!-- 2. 大盤回撤與恐慌極值 (對標：融資維持率) -->
+                    <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">S&P 500 高點回撤率 vs VIX (市場壓力測試)</h4>
+                        <div style="width: 100%; height: 220px;"><canvas id="drawdown-stress-chart"></canvas></div>
+                    </div>
+                </div>
+
+                <!-- 第二排：散戶投機熱度 vs 聰明錢內部人交易 -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <!-- 3. 散戶情緒與波動率 (對標：當沖動向) -->
+                    <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">散戶社群投機熱度 vs 真實波動率</h4>
+                        <div style="width: 100%; height: 220px;"><canvas id="retail-speculation-chart"></canvas></div>
+                    </div>
+
+                    <!-- 5. 內部人交易淨額表 (對標：三大法人買賣超) -->
+                    <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; overflow-y: auto; max-height: 250px;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">聰明錢動向：近 3 日內部人鉅額交易 (Smart Money)</h4>
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
                             <thead>
                             <tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;">
-                                <th style="padding: 8px;">標的</th>
-                                <th style="padding: 8px;">收盤價</th>
-                                <th style="padding: 8px;">單日漲跌</th>
-                                <th style="padding: 8px; width: 55%;">CIO 盤後點評 (自動生成)</th>
+                                <th style="padding: 6px;">股票</th>
+                                <th style="padding: 6px;">交易人職稱</th>
+                                <th style="padding: 6px;">買/賣</th>
+                                <th style="padding: 6px; text-align: right;">總金額 (USD)</th>
                             </tr>
                             </thead>
-                            <tbody id="mag7-performance-body">
+                            <tbody id="insider-trading-body">
                             <tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">載入數據中...</td></tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
-                <!-- 🌟 6.5 新增：S&P 500 11 大板塊資金輪動圖 -->
-                <div style="margin-top: 30px; border-top: 2px dashed #d3bd92; padding-top: 30px;">
-                    <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h3 style="margin: 0; color: #2b261c; font-size: 16px; border-left: 4px solid #3498db; padding-left: 10px;">
-                                📊 華爾街資金輪動 (Sector Performance)
-                            </h3>
-                            <div style="display: flex; gap: 8px;">
-                                <button onclick="updateSectorTimeframe('1D')" class="sector-btn" style="border: none; background: #2c3e50; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">1D</button>
-                                <button onclick="updateSectorTimeframe('1W')" class="sector-btn" style="border: none; background: #f0ebe1; color: #6e685c; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">1W</button>
-                                <button onclick="updateSectorTimeframe('1M')" class="sector-btn" style="border: none; background: #f0ebe1; color: #6e685c; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">1M</button>
-                                <button onclick="updateSectorTimeframe('YTD')" class="sector-btn" style="border: none; background: #f0ebe1; color: #6e685c; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">YTD</button>
-                            </div>
-                        </div>
-                        <div style="width: 100%; height: 350px;">
-                            <canvas id="sector-performance-chart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                <!-- 🌟 7. 新增：財經新聞焦點 與 散戶討論區溫度 (對標 PDF 質化版塊) -->
-                <div style="margin-top: 30px; border-top: 2px dashed #d3bd92; padding-top: 30px;">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-
-                        <!-- 三、財經新聞焦點 -->
-                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 25px;">
-                            <h3 style="margin: 0 0 20px 0; color: #2b261c; font-size: 18px; border-left: 5px solid #b0532f; padding-left: 12px; display: flex; align-items: center; gap: 8px;">
-                                📰 三、財經新聞焦點
-                            </h3>
-                            <div id="daily-news-focus-content" style="color: #2b261c; font-size: 15px; line-height: 1.8;">
-                                <p style="text-align:center; color:#aaa;">載入數據中...</p>
-                            </div>
-                        </div>
-
-                        <!-- 四、散戶討論區溫度 -->
-                        <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 25px;">
-                            <h3 style="margin: 0 0 20px 0; color: #2b261c; font-size: 18px; border-left: 5px solid #3e7d5c; padding-left: 12px; display: flex; align-items: center; gap: 8px;">
-                                🔥 四、散戶討論區溫度
-                            </h3>
-                            <div id="daily-retail-vibe-content" style="color: #2b261c; font-size: 15px; line-height: 1.8; text-align: justify;">
-                                <p style="text-align:center; color:#aaa;">載入數據中...</p>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-
             </div>
+            <!-- 🌟 6. 新增：美國總體經濟與巨頭動向追蹤 (對標 PDF 的 GDP、財報與熱門股) -->
+            <div style="margin-top: 30px; border-top: 2px dashed #d3bd92; padding-top: 30px;">
+                <h3 style="margin: 0 0 20px 0; color: #2b261c; font-size: 20px; display: flex; align-items: center; gap: 10px;">
+                    🇺🇸 美國總經基本面 & 科技巨頭追蹤
+                </h3>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <!-- 1. 總經圖表 (對標：台灣 GDP 圖表) -->
+                    <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">美國總體經濟：GDP 規模 vs CPI 通膨趨勢</h4>
+                        <div style="width: 100%; height: 220px;"><canvas id="macro-economic-chart"></canvas></div>
+                    </div>
+
+                    <!-- 2. 巨頭財報行事曆 (對標：市值前 20 大財報表) -->
+                    <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px; overflow-y: auto; max-height: 270px;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">即將發布：前 20 大巨頭財報行事曆</h4>
+                        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
+                            <thead>
+                            <tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;">
+                                <th style="padding: 6px;">股票</th>
+                                <th style="padding: 6px;">財報日期</th>
+                                <th style="padding: 6px; text-align: right;">預估 EPS</th>
+                                <th style="padding: 6px; text-align: right;">預估營收</th>
+                            </tr>
+                            </thead>
+                            <tbody id="earnings-calendar-body">
+                            <tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">載入數據中...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 3. 熱門個股追蹤 (對標：五、熱門個股) -->
+                <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 15px;">
+                    <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">熱門板塊核心：科技七雄 (Magnificent 7) 盤後追蹤</h4>
+                    <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+                        <thead>
+                        <tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;">
+                            <th style="padding: 8px;">標的</th>
+                            <th style="padding: 8px;">收盤價</th>
+                            <th style="padding: 8px;">單日漲跌</th>
+                            <th style="padding: 8px; width: 55%;">CIO 盤後點評 (自動生成)</th>
+                        </tr>
+                        </thead>
+                        <tbody id="mag7-performance-body">
+                        <tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">載入數據中...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <!-- 🌟 6.5 新增：S&P 500 11 大板塊資金輪動圖 -->
+            <div style="margin-top: 30px; border-top: 2px dashed #d3bd92; padding-top: 30px;">
+                <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                        <h3 style="margin: 0; color: #2b261c; font-size: 16px; border-left: 4px solid #3498db; padding-left: 10px;">
+                            📊 華爾街資金輪動 (Sector Performance)
+                        </h3>
+                        <div style="display: flex; gap: 8px;">
+                            <button onclick="updateSectorTimeframe('1D')" class="sector-btn" style="border: none; background: #2c3e50; color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">1D</button>
+                            <button onclick="updateSectorTimeframe('1W')" class="sector-btn" style="border: none; background: #f0ebe1; color: #6e685c; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">1W</button>
+                            <button onclick="updateSectorTimeframe('1M')" class="sector-btn" style="border: none; background: #f0ebe1; color: #6e685c; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">1M</button>
+                            <button onclick="updateSectorTimeframe('YTD')" class="sector-btn" style="border: none; background: #f0ebe1; color: #6e685c; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; cursor: pointer; transition: background 0.2s;">YTD</button>
+                        </div>
+                    </div>
+                    <div style="width: 100%; height: 350px;">
+                        <canvas id="sector-performance-chart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- 🌟 7. 新增：財經新聞焦點 與 散戶討論區溫度 (對標 PDF 質化版塊) -->
+            <div style="margin-top: 30px; border-top: 2px dashed #d3bd92; padding-top: 30px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+
+                    <!-- 三、財經新聞焦點 -->
+                    <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 25px;">
+                        <h3 style="margin: 0 0 20px 0; color: #2b261c; font-size: 18px; border-left: 5px solid #b0532f; padding-left: 12px; display: flex; align-items: center; gap: 8px;">
+                            📰 三、財經新聞焦點
+                        </h3>
+                        <div id="daily-news-focus-content" style="color: #2b261c; font-size: 15px; line-height: 1.8;">
+                            <p style="text-align:center; color:#aaa;">載入數據中...</p>
+                        </div>
+                    </div>
+
+                    <!-- 四、散戶討論區溫度 -->
+                    <div style="background: white; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); padding: 25px;">
+                        <h3 style="margin: 0 0 20px 0; color: #2b261c; font-size: 18px; border-left: 5px solid #3e7d5c; padding-left: 12px; display: flex; align-items: center; gap: 8px;">
+                            🔥 四、散戶討論區溫度
+                        </h3>
+                        <div id="daily-retail-vibe-content" style="color: #2b261c; font-size: 15px; line-height: 1.8; text-align: justify;">
+                            <p style="text-align:center; color:#aaa;">載入數據中...</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
     </div>
+</div>
 
 
 </div>
