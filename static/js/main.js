@@ -11106,12 +11106,17 @@ function drawBofAGauge(score100) {
             min: 0,
             max: 10,
             splitNumber: 5,
+            radius: '95%', // 🌟 將圖表稍微放大，填滿小容器
             itemStyle: { color: '#2b261c' },
-            progress: { show: true, width: 20 },
-            pointer: { itemStyle: { color: 'auto' } },
+            progress: { show: true, width: 16 }, // 🌟 軸線稍微調細，讓出內部空間
+            pointer: {
+                width: 4,      // 🌟 【關鍵】把指針變細，不再像原本那麼笨重
+                length: '65%', // 🌟 【關鍵】指針縮短，避免打架
+                itemStyle: { color: 'auto' }
+            },
             axisLine: {
                 lineStyle: {
-                    width: 20,
+                    width: 16, // 🌟 配合 progress 寬度
                     color: [
                         [0.2, '#b0532f'], // 0-2 紅色 (恐慌)
                         [0.8, '#d3bd92'], // 2-8 香檳色/中性
@@ -11119,16 +11124,17 @@ function drawBofAGauge(score100) {
                     ]
                 }
             },
-            axisTick: { distance: -20, length: 5, lineStyle: { color: '#fff', width: 2 } },
-            splitLine: { distance: -20, length: 20, lineStyle: { color: '#fff', width: 3 } },
-            axisLabel: { color: '#6e685c', distance: 30, fontSize: 12 },
-            detail: { valueAnimation: true, formatter: '{value}', color: '#2b261c', fontSize: 24, offsetCenter: [0, '70%'] },
+            axisTick: { distance: -16, length: 4, lineStyle: { color: '#fff', width: 2 } },
+            splitLine: { distance: -16, length: 16, lineStyle: { color: '#fff', width: 3 } },
+            // 🌟 【關鍵】將 distance 改為 12，把數字往外推貼近彩色環，並縮小字型
+            axisLabel: { color: '#6e685c', distance: 12, fontSize: 10, fontWeight: 'bold' },
+            // 🌟 【關鍵】將 offsetCenter 往下移至 85%，讓出空間給指針
+            detail: { valueAnimation: true, formatter: '{value}', color: '#2b261c', fontSize: 24, fontWeight: '900', offsetCenter: [0, '85%'] },
             data: [{ value: bofaScore }]
         }]
     };
     myChart.setOption(option);
 }
-
 // 5. 🚀 核心升級：對標 PDF 範例的「雙軸混合圖表 (Mixed Chart)」
 let sentimentMixedChartInstance = null;
 
