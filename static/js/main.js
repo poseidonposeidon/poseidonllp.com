@@ -10858,6 +10858,30 @@ async function loadSentimentMatrixData() {
                     document.getElementById('daily-vix-close').innerText = `VIX: ${parseFloat(rawObj['三大指數']['VIX']).toFixed(2)}`;
                 }
 
+                const sentimentBadge = document.getElementById('header-sentiment-badge');
+                const instBadge = document.getElementById('header-inst-badge');
+                const vixBadge = document.getElementById('header-vix-badge');
+                const analysisText = document.getElementById('header-ai-analysis');
+
+                if (sentimentBadge && latestRecord) {
+                    sentimentBadge.innerText = `情緒：${latestRecord.sentiment_label || '未知'}`;
+
+                    // 根據情緒動態改變 Badge 顏色
+                    if ((latestRecord.sentiment_label || '').includes('樂觀')) {
+                        sentimentBadge.style.background = '#3e7d5c'; // 綠色
+                    } else if ((latestRecord.sentiment_label || '').includes('恐')) {
+                        sentimentBadge.style.background = '#b0532f'; // 紅色
+                    } else {
+                        sentimentBadge.style.background = '#d3bd92'; // 中性香檳色
+                    }
+
+                    instBadge.innerText = `籌碼：${latestRecord.institutional_status || '--'}`;
+                    vixBadge.innerText = `期權：${latestRecord.derivative_status || '--'}`;
+
+                    // 結合 Headline (粗體) 與 150 字的大盤客觀結論
+                    analysisText.innerHTML = `<span style="color:#2b261c; font-size:14px;"><strong>【${latestRecord.headline || '盤勢總結'}】</strong></span><br><span style="margin-top: 5px; display: inline-block; font-weight:normal;">${latestRecord.detailed_analysis || ''}</span>`;
+                }
+
                 // --- 渲染右上角建議持股水位與指針 ---
                 const holdLevel = parseFloat(rawObj['建議持股水位']) || 75;
                 const progressBar = document.getElementById('exposure-progress-bar');
