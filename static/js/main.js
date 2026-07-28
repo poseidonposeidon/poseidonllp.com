@@ -10931,6 +10931,15 @@ async function loadSentimentMatrixData() {
                     newsFocusContainer.innerHTML = newsHtml;
                 }
 
+                const cioCard = document.getElementById('cio-trading-desk-card');
+                const cioContent = document.getElementById('cio-trading-desk-content');
+                if (cioCard && cioContent && rawObj['CIO實戰點評']) {
+                    cioContent.innerHTML = rawObj['CIO實戰點評'];
+                    cioCard.style.display = 'block';
+                } else if (cioCard) {
+                    cioCard.style.display = 'none';
+                }
+
                 // 👇 🌟 新增：渲染「四、散戶討論區溫度」
                 const retailVibeContainer = document.getElementById('daily-retail-vibe-content');
                 if (retailVibeContainer) {
