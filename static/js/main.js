@@ -11070,7 +11070,7 @@ async function loadAdvancedLiquidityData() {
     try {
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/us_advanced_liquidity` : '/api/us_advanced_liquidity';
 
-        // 🌟 恢復成您原本最正確的單純 GET 呼叫，拔除多餘的 headers 避免引發 OPTIONS 錯誤
+        // 使用最單純的 GET 請求，避免觸發 OPTIONS 預檢錯誤
         const response = await fetch(targetUrl);
 
         if (!response.ok) {
@@ -11079,27 +11079,23 @@ async function loadAdvancedLiquidityData() {
 
         const data = await response.json();
 
-        // 歷史資料反轉為由舊到新
+        // 歷史資料反轉為由舊到新 (讓圖表時間軸由左至右)
         const spyHistory = (data.spy_history || []).reverse();
         const tnxHistory = (data.tnx_history || []).reverse();
         const vixHistory = (data.vix_history || []).reverse();
-        const socialHistory = (data.social_history || []).reverse();
 
-        // 渲染圖表
-        renderInsiderTradingTable(data.smart_money || []);
+        // 依序渲染圖表
         drawLiquidityVolumeChart(spyHistory, tnxHistory);
         drawDrawdownStressChart(spyHistory, vixHistory);
-        drawRetailSpeculationChart(spyHistory, socialHistory);
 
-        // 渲染總經圖表 (直接在這裡呼叫，不再需要 Wrapper)
         if (data.macro_gdp && data.macro_cpi) {
             drawMacroEconomicChart(data.macro_gdp, data.macro_cpi);
         }
+
     } catch (error) {
-        console.error("Advanced Liquidity Error:", error);
+        console.error("US Advanced Liquidity Data Error:", error);
     }
 }
-
 // 1. 渲染內部人交易表格 (取代三大法人)
 function renderInsiderTradingTable(smartMoneyList) {
     const tbody = document.getElementById('insider-trading-body');
@@ -11139,7 +11135,7 @@ function drawLiquidityVolumeChart(spy, tnx) {
     const labels = spy.map(d => d.date.substring(5)); // MM-DD
     const volumes = spy.map(d => d.volume / 1000000); // 轉換為百萬股 (M)
 
-    // 將 TNX 日期與 SPY 對齊 (因為休市可能不同步)
+    // 將 TNX 日期與 SPY 對齊 (因債市股市休市可能不同步)
     const yields = spy.map(s => {
         const match = tnx.find(t => t.date === s.date);
         return match ? match.close : null;
@@ -11160,7 +11156,8 @@ function drawLiquidityVolumeChart(spy, tnx) {
                     borderWidth: 2,
                     yAxisID: 'y1',
                     tension: 0.2,
-                    pointRadius: 0
+                    pointRadius: 0,
+                    spanGaps: true // 允許斷線連接
                 },
                 {
                     type: 'bar',
@@ -11184,7 +11181,6 @@ function drawLiquidityVolumeChart(spy, tnx) {
         }
     });
 }
-
 // 3. 畫圖：大盤高點回撤率 vs VIX (對標：融資維持率)
 function drawDrawdownStressChart(spy, vix) {
     const canvas = document.getElementById('drawdown-stress-chart');
@@ -11229,7 +11225,8 @@ function drawDrawdownStressChart(spy, vix) {
                     borderWidth: 2,
                     borderDash: [5, 5], // 虛線
                     yAxisID: 'y1',
-                    pointRadius: 0
+                    pointRadius: 0,
+                    spanGaps: true
                 }
             ]
         },
@@ -11327,23 +11324,34 @@ function drawMacroEconomicChart(gdpData, cpiData) {
                 {
                     type: 'line',
                     label: 'CPI (%)',
-                    data: gdp.map(g => { const match = cpi.find(c => c.date.startsWith(g.date.substring(0, 7))); return match ? match.value : null; }),
-                    borderColor: '#b0532f', yAxisID: 'y1',
-                    spanGaps: true // 防斷線機制
+                    data: gdp.map(g => {
+                        const match = cpi.find(c => c.date.startsWith(g.date.substring(0, 7)));
+                        return match ? match.value : null;
+                    }),
+                    borderColor: '#b0532f',
+                    backgroundColor: '#b0532f',
+                    yAxisID: 'y1',
+                    spanGaps: true
                 },
-                { type: 'bar', label: 'GDP (%)', data: gdp.map(d => d.value), backgroundColor: 'rgba(62, 125, 92, 0.6)', yAxisID: 'y' }
+                {
+                    type: 'bar',
+                    label: 'GDP (%)',
+                    data: gdp.map(d => d.value),
+                    backgroundColor: 'rgba(62, 125, 92, 0.6)',
+                    yAxisID: 'y'
+                }
             ]
         },
         options: {
             responsive: true, maintainAspectRatio: false,
             scales: {
+                x: { grid: { display: false } },
                 y: { position: 'left', ticks: { callback: v => v + '%' } },
                 y1: { position: 'right', grid: { display: false }, ticks: { callback: v => v + '%' } }
             }
         }
     });
 }
-
 // 2. 渲染：前 20 大巨頭財報行事曆 (結構化解析升級版)
 function renderEarningsCalendar(earningsList) {
     const tbody = document.getElementById('earnings-calendar-body');
