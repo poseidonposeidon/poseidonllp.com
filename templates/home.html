@@ -889,7 +889,10 @@
 
     </div>
 
-    <div id="dd-sentiment-content" style="display: none; padding-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; align-items: start; box-sizing: border-box;">
+    <div id="dd-sentiment-content" style="display: none; padding-top: 10px; width: 100%;">
+
+        <!-- ✅ 內層 (全新新增)：絕對領域！專門負責 Grid 左右 50% 排版，不被 JS 觸碰 -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; align-items: start; box-sizing: border-box;">
         <!-- ========================================== -->
         <!-- 🇺🇸 左側：美股市場情緒日報 (維持原始 ID，不破壞既有 JS) -->
         <!-- ========================================== -->
@@ -1034,7 +1037,7 @@
 
             </div>
         </div>
-
+        </div>
     </div>
 </div>
 
