@@ -11038,33 +11038,31 @@ function renderSentimentTable(dataArray) {
 // 在全域變數區宣告一個變數來追蹤美股儀表板，避免重複渲染疊影
 let usSentimentGaugeInstance = null;
 
-// 覆蓋原本的 drawBofAGauge 函式
 function drawBofAGauge(score100) {
     const chartDom = document.getElementById('sentiment-gauge-chart');
     if (!chartDom) return;
 
-    // 銷毀舊實例，確保不疊影
     if (usSentimentGaugeInstance) usSentimentGaugeInstance.dispose();
     usSentimentGaugeInstance = echarts.init(chartDom);
 
     usSentimentGaugeInstance.setOption({
         series: [{
             type: 'gauge',
-            startAngle: 180, endAngle: 0,   // ✨ 改為乾淨的半圓形
+            startAngle: 180, endAngle: 0,
             min: 0, max: 10,
             radius: '100%',
-            center: ['50%', '75%'],         // ✨ 將圓心往下移，完美利用 90px 的高度空間
-            pointer: { width: 4, length: '60%' },
+            center: ['50%', '68%'],         // 🔼 把圓心稍微往上提一點
+            pointer: { width: 4, length: '45%' }, // 📉 縮短指針長度，才不會刺到數字
             axisLine: { lineStyle: { width: 12, color: [[0.2, '#b0532f'], [0.8, '#d3bd92'], [1, '#3e7d5c']] } },
-            axisTick: { show: false },      // ✨ 隱藏細小刻度
-            splitLine: { show: false },     // ✨ 隱藏粗分隔線
-            axisLabel: { show: false },     // ✨ 隱藏外圍的數字標籤 (解決擠在一起的主因)
+            axisTick: { show: false },
+            splitLine: { show: false },
+            axisLabel: { show: false },
             detail: {
                 formatter: '{value}',
                 fontSize: 16,
                 fontWeight: 'bold',
                 color: '#2b261c',
-                offsetCenter: [0, '25%']    // ✨ 把中心文字往下移，避開指針轉軸
+                offsetCenter: [0, '20%']    // 🔼 確保數字在畫布範圍內
             },
             data: [{ value: (score100 / 10).toFixed(1) }]
         }]
@@ -11752,7 +11750,6 @@ function drawTWSentimentGauge(score, labelText) {
     if (twSentimentGaugeInstance) twSentimentGaugeInstance.dispose();
     twSentimentGaugeInstance = echarts.init(dom);
 
-    // ✨ 動態決定台股外框顏色 (恐慌=橘紅, 中性=米色, 樂觀=綠色)
     let colorConfig = [[1, '#b0532f']];
     if (score >= 60) colorConfig = [[1, '#3e7d5c']];
     else if (score >= 40) colorConfig = [[1, '#d3bd92']];
@@ -11763,22 +11760,21 @@ function drawTWSentimentGauge(score, labelText) {
             startAngle: 180, endAngle: 0,
             min: 0, max: 100,
             radius: '100%',
-            center: ['50%', '75%'],         // ✨ 圓心下移
-            pointer: { width: 4, length: '60%' },
+            center: ['50%', '68%'],         // 🔼 把圓心稍微往上提一點
+            pointer: { width: 4, length: '45%' }, // 📉 縮短指針長度，避開文字
             axisLine: { lineStyle: { width: 12, color: colorConfig } },
-            axisTick: { show: false },      // ✨ 隱藏刻度
-            splitLine: { show: false },     // ✨ 隱藏分隔線
-            axisLabel: { show: false },     // ✨ 隱藏標籤
+            axisTick: { show: false },
+            splitLine: { show: false },
+            axisLabel: { show: false },
             detail: {
-                // ✨ 使用 rich 屬性做精美排版，強迫換行並設定間距
                 formatter: function(value) {
                     return '{score|' + value + '}\n{label|' + labelText + '}';
                 },
                 rich: {
-                    score: { fontSize: 16, color: '#2b261c', fontWeight: 'bold', padding: [0, 0, 4, 0] },
+                    score: { fontSize: 16, color: '#2b261c', fontWeight: 'bold', padding: [0, 0, 2, 0] },
                     label: { fontSize: 12, color: '#6e685c', fontWeight: 'bold' }
                 },
-                offsetCenter: [0, '35%']    // ✨ 移至指針軸心下方
+                offsetCenter: [0, '35%']    // 🔽 字體剛好掛在指針下方，且不會被切斷
             },
             data: [{ value: score }]
         }]
