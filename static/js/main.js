@@ -11070,7 +11070,7 @@ async function loadAdvancedLiquidityData() {
     try {
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/us_advanced_liquidity` : '/api/us_advanced_liquidity';
 
-        // 使用最單純的 GET 請求，避免觸發 OPTIONS 預檢錯誤
+        // 🌟 恢復最單純的 GET 請求，不加任何 headers，徹底避開 OPTIONS 預檢錯誤
         const response = await fetch(targetUrl);
 
         if (!response.ok) {
@@ -11079,7 +11079,7 @@ async function loadAdvancedLiquidityData() {
 
         const data = await response.json();
 
-        // 歷史資料反轉為由舊到新 (讓圖表時間軸由左至右)
+        // 歷史資料反轉為由舊到新
         const spyHistory = (data.spy_history || []).reverse();
         const tnxHistory = (data.tnx_history || []).reverse();
         const vixHistory = (data.vix_history || []).reverse();
@@ -11096,46 +11096,15 @@ async function loadAdvancedLiquidityData() {
         console.error("US Advanced Liquidity Data Error:", error);
     }
 }
-// 1. 渲染內部人交易表格 (取代三大法人)
-function renderInsiderTradingTable(smartMoneyList) {
-    const tbody = document.getElementById('insider-trading-body');
-    if (!tbody) return;
 
-    if (smartMoneyList.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding:10px; color:#aaa;">近期無鉅額內部人交易</td></tr>';
-        return;
-    }
-
-    let html = '';
-    smartMoneyList.forEach(trade => {
-        const isBuy = trade.type === 'BUY';
-        const typeColor = isBuy ? '#3e7d5c' : '#b0532f'; // 買綠賣紅
-        const typeText = isBuy ? '買進 (Buy)' : '賣出 (Sell)';
-
-        // 格式化金額為美金 (如 $1,234,567)
-        const formatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
-
-        html += `
-            <tr style="border-bottom: 1px solid #f0ebe1;">
-                <td style="padding: 8px; font-weight: bold; color: #2b261c;">${trade.symbol}</td>
-                <td style="padding: 8px; color: #6e685c; font-size: 11px;">${trade.title || 'Director'}</td>
-                <td style="padding: 8px; color: ${typeColor}; font-weight: bold;">${typeText}</td>
-                <td style="padding: 8px; text-align: right; color: #2b261c;">${formatter.format(trade.amount)}</td>
-            </tr>
-        `;
-    });
-    tbody.innerHTML = html;
-}
-
-// 2. 畫圖：量能 vs 10年期美債殖利率 (對標：量能與融資)
+// 3. 畫圖：S&P 500 量能 vs 10年美債殖利率
 function drawLiquidityVolumeChart(spy, tnx) {
     const canvas = document.getElementById('liquidity-volume-chart');
     if (!canvas || spy.length === 0) return;
 
-    const labels = spy.map(d => d.date.substring(5)); // MM-DD
-    const volumes = spy.map(d => d.volume / 1000000); // 轉換為百萬股 (M)
+    const labels = spy.map(d => d.date.substring(5));
+    const volumes = spy.map(d => d.volume / 1000000);
 
-    // 將 TNX 日期與 SPY 對齊 (因債市股市休市可能不同步)
     const yields = spy.map(s => {
         const match = tnx.find(t => t.date === s.date);
         return match ? match.close : null;
@@ -11181,14 +11150,14 @@ function drawLiquidityVolumeChart(spy, tnx) {
         }
     });
 }
-// 3. 畫圖：大盤高點回撤率 vs VIX (對標：融資維持率)
+
+// 4. 畫圖：S&P 500 高點回撤率 vs VIX 壓力測試
 function drawDrawdownStressChart(spy, vix) {
     const canvas = document.getElementById('drawdown-stress-chart');
     if (!canvas || spy.length === 0) return;
 
     const labels = spy.map(d => d.date.substring(5));
 
-    // 計算滾動高點回撤 (Drawdown)
     let maxPrice = 0;
     const drawdowns = spy.map(d => {
         if (d.close > maxPrice) maxPrice = d.close;
@@ -11223,7 +11192,7 @@ function drawDrawdownStressChart(spy, vix) {
                     data: vixData,
                     borderColor: '#2b261c',
                     borderWidth: 2,
-                    borderDash: [5, 5], // 虛線
+                    borderDash: [5, 5],
                     yAxisID: 'y1',
                     pointRadius: 0,
                     spanGaps: true
@@ -11243,71 +11212,7 @@ function drawDrawdownStressChart(spy, vix) {
     });
 }
 
-// 4. 畫圖：散戶投機熱度 vs 價格震幅 (對標：當沖動向)
-function drawRetailSpeculationChart(spy, social) {
-    const canvas = document.getElementById('retail-speculation-chart');
-    if (!canvas || spy.length === 0) return;
-
-    const labels = spy.map(d => d.date.substring(5));
-
-    // 計算日震幅 (High - Low) / Close * 100 做為當沖/波動熱度指標
-    const volatility = spy.map(d => ((d.high - d.low) / d.close * 100).toFixed(2));
-
-    // 匹配社群情緒分數
-    const socialScores = spy.map(s => {
-        // FMP Social API 日期格式可能包含時間，需做前綴匹配
-        const match = social.find(soc => soc.date.startsWith(s.date));
-        // 若找不到資料，預設給 50 (中性)
-        return match ? match.stocktwitsSentiment : 50;
-    });
-
-    if (retailSpecChartInstance) retailSpecChartInstance.destroy();
-
-    retailSpecChartInstance = new Chart(canvas, {
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    type: 'bar',
-                    label: '社群情緒分數 (StockTwits)',
-                    data: socialScores,
-                    backgroundColor: 'rgba(52, 152, 219, 0.4)',
-                    borderColor: 'rgba(52, 152, 219, 1)',
-                    borderWidth: 1,
-                    yAxisID: 'y1',
-                    borderRadius: 2
-                },
-                {
-                    type: 'line',
-                    label: 'S&P 500 日震幅 (%)',
-                    data: volatility,
-                    borderColor: '#8a6d3f',
-                    borderWidth: 2,
-                    yAxisID: 'y',
-                    tension: 0.3,
-                    pointRadius: 0
-                }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: { legend: { display: true, position: 'top', labels: { boxWidth: 12, font: {size: 10} } } },
-            scales: {
-                x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
-                y: { type: 'linear', position: 'left', grid: { color: '#f0ebe1' }, title: {display:true, text:'震幅 %'} },
-                y1: { type: 'linear', position: 'right', grid: { display: false }, min: 0, max: 100, title: {display:true, text:'情緒分'} }
-            }
-        }
-    });
-}
-
-/* ==========================================================================
-   🇺🇸 總經基本面與科技巨頭追蹤 (Macro & Mag 7 Tracker)
-   ========================================================================== */
-
-
-// 1. 畫圖：美國 GDP 成長率 vs CPI 通膨率 (對標：台灣 GDP 圖)
+// 5. 畫圖：美國 GDP 規模 vs CPI 通膨趨勢
 function drawMacroEconomicChart(gdpData, cpiData) {
     const canvas = document.getElementById('macro-economic-chart');
     if (!canvas || !gdpData || gdpData.length === 0) return;
