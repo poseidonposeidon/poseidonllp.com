@@ -10771,20 +10771,35 @@ function toggleSentimentMatrix() {
     const screenerContent = document.getElementById('dd-screener-content');
     const trumpContent = document.getElementById('dd-trump-content');
 
-    // 🌟 核心修復：強制解除搜尋框鎖定
+    // 🌟 1. 強制解除搜尋框鎖定
     const searchInput = document.getElementById('dd-stock-input');
     const analyzeBtn = document.querySelector('.btn-analyze') || document.querySelector('button[onclick="runDeepDive()"]');
     if (searchInput) { searchInput.disabled = false; searchInput.style.opacity = '1'; searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)"; }
     if (analyzeBtn) { analyzeBtn.disabled = false; analyzeBtn.style.opacity = '1'; }
 
-    // 恢復按鈕外觀
-    const toggleBtn = document.getElementById('screener-toggle-btn');
-    if(toggleBtn) {
-        toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
-        toggleBtn.style.background = '#3498db';
-        toggleBtn.style.color = 'white';
+    // 🌟 2. 恢復「語意選股」按鈕的預設外觀（移除藍色高亮）
+    const screenerBtn = document.getElementById('screener-toggle-btn');
+    if (screenerBtn) {
+        screenerBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
+        screenerBtn.style.background = ''; // 👈 清空行內背景色，恢復預設 CSS
+        screenerBtn.style.color = '';
     }
 
+    // 🌟 3. 恢復「川普因子」按鈕預設外觀
+    const trumpBtn = document.getElementById('trump-toggle-btn');
+    if (trumpBtn) {
+        trumpBtn.style.background = '';
+        trumpBtn.style.color = '';
+    }
+
+    // 🌟 4. 高亮顯示當前點擊的「美股情緒矩陣」按鈕
+    const sentimentBtn = document.getElementById('sentiment-toggle-btn');
+    if (sentimentBtn) {
+        sentimentBtn.style.background = '#3498db'; // 👈 讓美股情緒矩陣亮藍燈
+        sentimentBtn.style.color = 'white';
+    }
+
+    // 🌟 5. 面板顯示切換
     if (emptyState) emptyState.style.display = 'none';
     if (mainContent) mainContent.style.display = 'none';
     if (screenerContent) screenerContent.style.display = 'none';
