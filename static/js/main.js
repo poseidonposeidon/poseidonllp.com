@@ -11069,8 +11069,20 @@ function drawSentimentMixedChart(dataArray) {
 async function loadAdvancedLiquidityData() {
     try {
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/us_advanced_liquidity` : '/api/us_advanced_liquidity';
-        const response = await fetch(targetUrl);
-        if (!response.ok) throw new Error("無法取得進階流動性數據");
+
+        // 🌟 依照方案一：明確加入 method 與 headers，確保請求規格與其他 API 一致
+        const response = await fetch(targetUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+
+        // 預防伺服器回傳 HTML (例如 503 或 404 錯誤)
+        if (!response.ok) {
+            throw new Error(`伺服器回應異常，狀態碼: ${response.status}`);
+        }
 
         const data = await response.json();
 
@@ -11304,24 +11316,6 @@ function drawRetailSpeculationChart(spy, social) {
    🇺🇸 總經基本面與科技巨頭追蹤 (Macro & Mag 7 Tracker)
    ========================================================================== */
 
-// 升級：在載入進階流動性資料時，同步畫出總經圖表
-const originalLoadAdvancedLiquidityData = loadAdvancedLiquidityData;
-loadAdvancedLiquidityData = async function() {
-    await originalLoadAdvancedLiquidityData(); // 執行原本的流動性打撈
-
-    try {
-        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/us_advanced_liquidity` : '/api/us_advanced_liquidity';
-        const response = await fetch(targetUrl);
-        const data = await response.json();
-
-        // 畫出美國 GDP vs CPI 總經圖表
-        if (data.macro_gdp && data.macro_cpi) {
-            drawMacroEconomicChart(data.macro_gdp, data.macro_cpi);
-        }
-    } catch (error) {
-        console.error("Macro Data Error:", error);
-    }
-};
 
 // 1. 畫圖：美國 GDP 成長率 vs CPI 通膨率 (對標：台灣 GDP 圖)
 function drawMacroEconomicChart(gdpData, cpiData) {
@@ -11541,7 +11535,20 @@ async function loadTWSentimentMatrixData() {
 
     try {
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/tw_sentiment_history` : '/api/tw_sentiment_history';
-        const response = await fetch(targetUrl);
+
+        // 🌟 修改這裡：套用方案一 (加入 method 與 headers)
+        const response = await fetch(targetUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`伺服器回應異常，狀態碼: ${response.status}`);
+        }
+
         const data = await response.json();
 
         if (data && data.length > 0) {
@@ -11584,7 +11591,6 @@ async function loadTWSentimentMatrixData() {
         console.error("TW Sentiment Data Error:", error);
     }
 }
-
 /* ==========================================================================
    🇹🇼 台股進階籌碼與總經渲染模組
    ========================================================================== */
@@ -11596,7 +11602,20 @@ let twMacroChartInstance = null;
 async function loadTWAdvancedLiquidityData() {
     try {
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/tw_advanced_liquidity` : '/api/tw_advanced_liquidity';
-        const response = await fetch(targetUrl);
+
+        // 🌟 修改這裡：套用方案一 (加入 method 與 headers)
+        const response = await fetch(targetUrl, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`伺服器回應異常，狀態碼: ${response.status}`);
+        }
+
         const data = await response.json();
 
         if (data.twii_history && data.futures_open_int) {
@@ -11615,7 +11634,6 @@ async function loadTWAdvancedLiquidityData() {
         console.error("TW Advanced Liquidity Data Error:", error);
     }
 }
-
 // 1. 畫圖：加權指數 vs 外資期貨淨未平倉
 function drawTWLiquidityChart(twii, futures) {
     const canvas = document.getElementById('tw-liquidity-volume-chart');
