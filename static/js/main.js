@@ -10799,6 +10799,7 @@ function toggleSentimentMatrix() {
     document.getElementById('dd-stock-input').style.opacity = '1';
 
     loadSentimentMatrixData();
+    loadTWSentimentMatrixData();
 }
 
 // 2. 🚀 核心升級：解析最新資料，動態填入頂部戰情室與水位條
@@ -11832,4 +11833,246 @@ function updateSectorTimeframe(timeframe) {
     if (globalSectorData.length > 0) {
         drawSectorPerformanceChart(globalSectorData);
     }
+}
+
+/* ==========================================================================
+   🇹🇼 台股情緒雷達雙核渲染模組 (Taiwan Stock Sentiment Dashboard)
+   ========================================================================== */
+
+let twSentimentGaugeInstance = null;
+let twMixedChartInstance = null;
+
+// 1. 主控台：打撈並渲染台股 15 天情緒數據
+async function loadTWSentimentMatrixData() {
+    try {
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/tw_sentiment_history` : '/api/tw_sentiment_history';
+        const response = await fetch(targetUrl);
+        if (!response.ok) throw new Error("無法取得台股情緒歷史數據");
+
+        const data = await response.json();
+        if (!data || data.length === 0) return;
+
+        // 最新的一天 (用於更新上方看板)
+        const latestData = data[0];
+        let rawData = {};
+        try { rawData = JSON.parse(latestData.raw_data_json || "{}"); } catch(e) {}
+
+        // --- 填入頂部報價與指標 ---
+        document.getElementById('tw-daily-report-date').innerText = latestData.date_str;
+
+        // 加權指數收盤與漲跌
+        const closePrice = rawData['真實收盤價'] ? parseFloat(rawData['真實收盤價']).toFixed(2) : '--';
+        document.getElementById('tw-daily-taiex-close').innerText = closePrice;
+
+        const changePctStr = rawData['大盤表現'] || '--';
+        const changeEl = document.getElementById('tw-daily-taiex-change');
+        changeEl.innerText = changePctStr;
+        if (changePctStr.includes('-')) {
+            changeEl.style.color = '#b0532f'; // 跌顯示紅色
+        } else if (changePctStr !== '--' && parseFloat(changePctStr) > 0) {
+            changeEl.innerText = '+' + changePctStr;
+            changeEl.style.color = '#3e7d5c'; // 漲顯示綠色
+        } else {
+            changeEl.style.color = '#6e685c';
+        }
+
+        // 極端行情標籤
+        const extremeLabel = rawData['極端標籤'];
+        const labelEl = document.getElementById('tw-extreme-label');
+        if (extremeLabel) {
+            labelEl.innerText = `(${extremeLabel})`;
+            labelEl.style.display = 'inline-block';
+            labelEl.style.backgroundColor = extremeLabel.includes('跌') || extremeLabel.includes('恐慌') ? '#b0532f' : '#3e7d5c';
+        } else {
+            labelEl.style.display = 'none';
+        }
+
+        // 外資未平倉
+        const foreignOi = rawData['外資未平倉'] || '-- 口';
+        document.getElementById('tw-foreign-oi').innerText = `外資期貨淨未平倉: ${foreignOi}`;
+
+        // 建議持股水位
+        const holdLevel = rawData['建議持股水位'] || 50;
+        document.getElementById('tw-exposure-text').innerText = `${holdLevel}%`;
+        document.getElementById('tw-exposure-progress-bar').style.width = `${holdLevel}%`;
+
+        // 交易員點評
+        const cioComment = rawData['CIO實戰點評'];
+        if (cioComment) {
+            document.getElementById('tw-cio-trading-desk-content').innerHTML = cioComment;
+            document.getElementById('tw-cio-trading-desk-card').style.display = 'block';
+        }
+
+        // --- 繪製圖表與表格 ---
+        drawTWSentimentGauge(latestData.sentiment_score, latestData.sentiment_label);
+        drawTWMixedChart(data); // 傳入 15 天完整陣列
+        renderTWSentimentTable(data);
+
+    } catch (error) {
+        console.error("TW Sentiment Data Error:", error);
+    }
+}
+
+// 2. 畫圖：台股專屬半圓形儀表板 (ECharts)
+function drawTWSentimentGauge(score, labelText) {
+    const dom = document.getElementById('tw-sentiment-gauge-chart');
+    if (!dom) return;
+
+    if (twSentimentGaugeInstance) {
+        twSentimentGaugeInstance.dispose();
+    }
+    twSentimentGaugeInstance = echarts.init(dom);
+
+    const option = {
+        series: [{
+            type: 'gauge',
+            startAngle: 180, endAngle: 0,
+            min: 0, max: 100,
+            splitNumber: 4,
+            itemStyle: {
+                color: '#b0532f',
+                shadowColor: 'rgba(0,138,255,0.45)',
+                shadowBlur: 10,
+                shadowOffsetX: 2,
+                shadowOffsetY: 2
+            },
+            progress: { show: true, roundCap: true, width: 12 },
+            pointer: { icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z', length: '12%', width: 10, offsetCenter: [0, '-40%'], itemStyle: { color: '#b0532f' } },
+            axisLine: { roundCap: true, lineStyle: { width: 12, color: [[1, '#e8e3d8']] } },
+            axisTick: { show: false },
+            splitLine: { show: false },
+            axisLabel: { show: false },
+            title: { show: false },
+            detail: {
+                backgroundColor: '#ffffff',
+                borderColor: '#d3bd92',
+                borderWidth: 1,
+                width: '100%',
+                lineHeight: 20,
+                height: 30,
+                borderRadius: 4,
+                offsetCenter: [0, '25%'],
+                valueAnimation: true,
+                formatter: function (value) {
+                    return '{value|' + value.toFixed(1) + '}\n{label|' + labelText + '}';
+                },
+                rich: {
+                    value: { fontSize: 18, fontWeight: 'bolder', color: '#b0532f' },
+                    label: { fontSize: 10, color: '#8a6d3f', padding: [0, 0, 5, 0] }
+                }
+            },
+            data: [{ value: score }]
+        }]
+    };
+    twSentimentGaugeInstance.setOption(option);
+}
+
+// 3. 畫圖：台股專屬雙軸情緒折線圖 (Chart.js)
+function drawTWMixedChart(dataArray) {
+    const canvas = document.getElementById('tw-sentiment-mixed-chart');
+    if (!canvas || dataArray.length === 0) return;
+
+    // 將資料反轉為由舊到新
+    const chartData = [...dataArray].reverse();
+    const labels = chartData.map(d => d.date_str.substring(5)); // MM-DD
+    const scores = chartData.map(d => d.sentiment_score);
+    const changes = chartData.map(d => parseFloat(d.market_change_pct.replace('%', '')));
+
+    if (twMixedChartInstance) {
+        twMixedChartInstance.destroy();
+    }
+
+    twMixedChartInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'line',
+                    label: 'AI 情緒分數 (左軸)',
+                    data: scores,
+                    borderColor: '#b0532f',
+                    backgroundColor: '#b0532f',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    yAxisID: 'y',
+                    pointRadius: 4,
+                    pointBackgroundColor: '#fff',
+                    pointBorderWidth: 2
+                },
+                {
+                    type: 'bar',
+                    label: '加權指數日漲跌幅 (右軸)',
+                    data: changes,
+                    backgroundColor: changes.map(val => val >= 0 ? 'rgba(52, 152, 219, 0.6)' : 'rgba(231, 76, 60, 0.6)'),
+                    borderColor: changes.map(val => val >= 0 ? 'rgba(52, 152, 219, 1)' : 'rgba(231, 76, 60, 1)'),
+                    borderWidth: 1,
+                    yAxisID: 'y1',
+                    borderRadius: 3
+                }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: { position: 'top', labels: { boxWidth: 12, font: {size: 11} } }
+            },
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#6e685c' } },
+                y: {
+                    type: 'linear', position: 'left', min: 0, max: 100,
+                    grid: { color: '#f0ebe1' },
+                    title: { display: true, text: '情緒分數 (0-100)', color: '#b0532f', font: {weight: 'bold'} }
+                },
+                y1: {
+                    type: 'linear', position: 'right',
+                    grid: { display: false },
+                    title: { display: true, text: '漲跌幅 (%)', color: '#3498db', font: {weight: 'bold'} },
+                    ticks: { callback: function(value) { return value + '%'; } }
+                }
+            }
+        }
+    });
+}
+
+// 4. 渲染：台股 15 天歷史情緒表格
+function renderTWSentimentTable(dataArray) {
+    const tbody = document.getElementById('tw-sentiment-table-body');
+    if (!tbody) return;
+
+    let html = '';
+    dataArray.forEach((item, index) => {
+        const changeVal = parseFloat(item.market_change_pct);
+        const changeColor = changeVal > 0 ? '#3e7d5c' : (changeVal < 0 ? '#b0532f' : '#6e685c');
+        const sign = changeVal > 0 ? '+' : '';
+
+        // 摘要懸浮顯示完整分析
+        const tooltipHtml = `
+            <div class="sentiment-tooltip">
+                <strong>💡 盤後深度推演：</strong><br>${item.detailed_analysis}
+            </div>
+        `;
+
+        html += `
+            <tr style="border-bottom: 1px solid #f0ebe1; transition: background 0.2s; cursor: help;" 
+                onmouseover="this.style.background='rgba(0,0,0,0.03)'" 
+                onmouseout="this.style.background='transparent'">
+                <td style="padding: 10px; font-weight: bold; color: #2b261c;">${item.date_str.substring(5)}</td>
+                <td style="padding: 10px; font-weight: bold; color: ${changeColor};">${sign}${item.market_change_pct}</td>
+                <td style="padding: 10px; color: #6e685c; font-size: 11px;">${item.derivative_status}</td>
+                <td style="padding: 10px; color: #6e685c; font-size: 11px;">${item.institutional_status}</td>
+                <td style="padding: 10px;">
+                    <span style="background: rgba(176, 83, 47, 0.1); color: #b0532f; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 11px;">
+                        ${item.sentiment_score} (${item.sentiment_label})
+                    </span>
+                </td>
+                <td style="padding: 10px; text-align: left; position: relative;" class="has-tooltip">
+                    <span style="color: #3498db; font-weight: bold; font-size: 12px;">${item.headline}</span>
+                    ${tooltipHtml}
+                </td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
 }
