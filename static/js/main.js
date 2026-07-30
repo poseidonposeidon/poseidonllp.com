@@ -11495,6 +11495,25 @@ async function loadTWSentimentMatrixData() {
                 twProgressBar.style.width = `${holdLevel}%`;
             }
 
+            // ✨ 1. 更新台股 CIO 實戰點評
+            const cioCard = document.getElementById('tw-cio-trading-desk-card');
+            const cioContent = document.getElementById('tw-cio-trading-desk-content');
+            if (cioCard && cioContent && rawData['CIO實戰點評']) {
+                cioContent.innerHTML = rawData['CIO實戰點評'];
+                cioCard.style.display = 'block';
+            }
+
+            // ✨ 2. 更新新聞、散戶溫度與熱門個股卡片
+            const newsFocusContainer = document.getElementById('tw-daily-news-focus-content');
+            if (newsFocusContainer) {
+                let newsHtml = '';
+                if (rawData['AI新聞點評']) newsHtml += `<div style="margin-bottom: 15px;"><strong style="color:#b0532f;">🗞️ 財經新聞焦點：</strong><br>${rawData['AI新聞點評']}</div>`;
+                if (rawData['AI散戶溫度']) newsHtml += `<div style="margin-bottom: 15px;"><strong style="color:#3e7d5c;">🔥 散戶討論區溫度：</strong><br>${rawData['AI散戶溫度']}</div>`;
+                if (rawData['AI熱門個股']) newsHtml += `<div style="margin-bottom: 15px;"><strong style="color:#f39c12;">🎯 熱門個股點評：</strong><br>${rawData['AI熱門個股']}</div>`;
+
+                newsFocusContainer.innerHTML = newsHtml || "今日尚無相關動態。";
+            }
+
             drawTWSentimentGauge(latestData.sentiment_score || 50, latestData.sentiment_label || '未知');
             drawTWMixedChart(data);
             renderTWSentimentTable(data);
@@ -11747,19 +11766,36 @@ function renderTWSentimentTable(dataArray) {
     const tbody = document.getElementById('tw-sentiment-table-body');
     if (!tbody) return;
     let html = '';
+
     dataArray.forEach(item => {
         const changeStr = item.market_change_pct || '--';
         const changeColor = changeStr.includes('-') ? '#b0532f' : '#3e7d5c';
         const dateStr = item.date_str ? item.date_str.substring(5) : '--';
 
+        let rawObj = {};
+        try { rawObj = JSON.parse(item.raw_data_json || "{}"); } catch(e) {}
+
         html += `
-            <tr style="border-bottom: 1px solid #f0ebe1;">
-                <td style="padding: 10px; font-weight: bold;">${dateStr}</td>
-                <td style="padding: 10px; font-weight: bold; color: ${changeColor};">${changeStr}</td>
-                <td style="padding: 10px; font-size: 11px;">${item.derivative_status || '--'}</td>
-                <td style="padding: 10px; font-size: 11px;">${item.institutional_status || '--'}</td>
-                <td style="padding: 10px; font-weight: bold;">${item.sentiment_score || '--'} (${item.sentiment_label || '--'})</td>
-                <td style="padding: 10px; text-align: left; color: #3498db; font-weight: bold;">${item.headline || '--'}</td>
+            <tr style="border-bottom: 1px solid #f0ebe1; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 12px; font-weight: bold;">${dateStr}</td>
+                <td style="padding: 12px; font-weight: bold; color: ${changeColor};">${changeStr}</td>
+                <td style="padding: 12px; font-size: 12px; color: #6e685c;">${item.derivative_status || '--'}</td>
+                <td style="padding: 12px; font-size: 12px; color: #6e685c;">${item.institutional_status || '--'}</td>
+                <td style="padding: 12px; font-weight: bold;">${item.sentiment_score || '--'} <span style="font-size:11px; color:#888;">(${item.sentiment_label || '--'})</span></td>
+                
+                <!-- ✨ 懸浮資訊框結構 (與美股共用 sentiment-hover-cell class) -->
+                <td class="sentiment-hover-cell" style="padding: 12px; text-align: left;">
+                    <span style="border-bottom: 1px dashed #c2a26d; cursor: help; color: #3498db; font-weight: bold;">${item.headline || '--'}</span>
+                    <div class="custom-tooltip-card">
+                        <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px;">🤖 價值投資長 推演</div>
+                        <div style="color: #eee; margin-bottom: 15px; text-align: justify;">${item.detailed_analysis || '--'}</div>
+                        
+                        <div style="color: #f39c12; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📰 重點動態摘要</div>
+                        <div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">${rawObj['AI新聞點評'] || '無新聞數據'}</div>
+                        <div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">${rawObj['AI散戶溫度'] || '無散戶溫度數據'}</div>
+                        <div style="color: #ccc; font-size: 12px;">${rawObj['AI熱門個股'] || ''}</div>
+                    </div>
+                </td>
             </tr>
         `;
     });
