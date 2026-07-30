@@ -10775,224 +10775,137 @@ async function restoreFromHistory(historyId) {
 /* ==========================================================================
    🔮 美股情緒矩陣 (Sentiment Matrix) 核心邏輯
    ========================================================================== */
-// 1. 面板切換與觸發載入 (維持不變，放在這裡方便你對齊)
+let sentimentMixedChartInstance = null;
+let liquidityVolChartInstance = null;
+let drawdownStressChartInstance = null;
+let retailSpecChartInstance = null;
+let macroChartInstance = null;
+let sectorChartInstance = null;
+let globalSectorData = [];
+let currentSectorTimeframe = '1D';
+
+let twSentimentGaugeInstance = null;
+let twMixedChartInstance = null;
+
+// 1. 🚨 終極切換總管：解決 Chart.js 空白渲染與雙核資料觸發問題
 function toggleSentimentMatrix() {
-    const briefingSection = document.getElementById('daily-briefing-section');
+    const sentimentContent = document.getElementById('dd-sentiment-content');
+    const emptyState = document.getElementById('dd-empty-state');
     const mainContent = document.getElementById('dd-main-content');
     const screenerContent = document.getElementById('dd-screener-content');
     const trumpContent = document.getElementById('dd-trump-content');
-    const emptyState = document.getElementById('dd-empty-state');
 
-    if(briefingSection) briefingSection.style.display = 'none';
-    if(mainContent) mainContent.style.display = 'none';
-    if(screenerContent) screenerContent.style.display = 'none';
-    if(trumpContent) trumpContent.style.display = 'none';
-    if(emptyState) emptyState.style.display = 'none';
+    if (emptyState) emptyState.style.display = 'none';
+    if (mainContent) mainContent.style.display = 'none';
+    if (screenerContent) screenerContent.style.display = 'none';
+    if (trumpContent) trumpContent.style.display = 'none';
 
-    const sentimentContent = document.getElementById('dd-sentiment-content');
     if (sentimentContent) {
-        sentimentContent.style.display = 'block';
-        sentimentContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        // ⚠️ 絕對關鍵：必須用 flex 才能維持左右對照，絕對不能用 block！
+        sentimentContent.style.display = 'flex';
     }
 
-    document.getElementById('dd-stock-input').disabled = false;
-    document.getElementById('dd-stock-input').style.opacity = '1';
-
-    loadSentimentMatrixData();
-    loadTWSentimentMatrixData();
+    // 延遲 150 毫秒，等瀏覽器把面板畫出來後，再叫 Chart.js 畫圖，避免變空白
+    setTimeout(() => {
+        loadSentimentMatrixData();     // 觸發美股
+        loadTWSentimentMatrixData();   // 觸發台股
+        loadAdvancedLiquidityData();   // 觸發美股下半部總經與流動性
+    }, 150);
 }
 
-// 2. 🚀 核心升級：解析最新資料，動態填入頂部戰情室與水位條
+// ==========================================
+// 🇺🇸 美股核心邏輯區
+// ==========================================
 async function loadSentimentMatrixData() {
     const tableBody = document.getElementById('sentiment-table-body');
     if (!tableBody) return;
 
-    tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #6e685c;"><i class="fas fa-spinner fa-spin"></i> 正在從資料庫撈取並運算近 15 個交易日的情緒矩陣...</td></tr>';
+    tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #6e685c;"><i class="fas fa-spinner fa-spin"></i> 正在撈取美股數據...</td></tr>';
 
     try {
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/sentiment_history` : '/api/sentiment_history';
         const response = await fetch(targetUrl);
-        if (!response.ok) throw new Error("無法取得情緒歷史資料");
-
         const data = await response.json();
 
         if (data && data.length > 0) {
-            // A. 渲染底部表格與 Hover 資訊卡
             renderSentimentTable(data);
-
-            // B. 取出最新一天 (陣列第一筆) 來渲染頂部戰情報價區與表格
             const latestRecord = data[0];
-            const latestScore = latestRecord.sentiment_score;
+            const rawObj = JSON.parse(latestRecord.raw_data_json || "{}");
 
-            try {
-                const rawObj = JSON.parse(latestRecord.raw_data_json);
+            // 填入頂部報價
+            document.getElementById('daily-report-date').innerText = latestRecord.date_str;
+            document.getElementById('daily-spy-close').innerText = parseFloat(rawObj['真實收盤價'] || 0).toFixed(2);
 
-                // --- 填入頂部報價看板 ---
-                document.getElementById('daily-report-date').innerText = latestRecord.date_str;
-                document.getElementById('daily-spy-close').innerText = parseFloat(rawObj['真實收盤價']).toFixed(2);
+            const changeSpan = document.getElementById('daily-spy-change');
+            const changeVal = parseFloat(latestRecord.market_change_pct || 0);
+            changeSpan.innerText = (changeVal > 0 ? '+' : '') + latestRecord.market_change_pct;
+            changeSpan.style.color = changeVal > 0 ? '#3e7d5c' : '#b0532f';
 
-                const changeSpan = document.getElementById('daily-spy-change');
-                const changeVal = parseFloat(latestRecord.market_change_pct);
-                changeSpan.innerText = (changeVal > 0 ? '+' : '') + latestRecord.market_change_pct;
-                changeSpan.style.color = changeVal > 0 ? '#3e7d5c' : '#b0532f'; // 漲綠跌紅
-
-                // 🌟 新增：YTD 渲染
-                const ytdSpan = document.getElementById('daily-spy-ytd');
-                if (ytdSpan && rawObj['YTD']) {
-                    ytdSpan.innerText = `YTD: ${rawObj['YTD']}`;
-                }
-
-                // 🌟 新增：極端行情標籤渲染
-                const extremeSpan = document.getElementById('daily-extreme-label');
-                if (extremeSpan && rawObj['極端標籤']) {
-                    extremeSpan.innerText = `(${rawObj['極端標籤']})`;
-                    extremeSpan.style.display = 'inline-block';
-                } else if (extremeSpan) {
-                    extremeSpan.style.display = 'none';
-                }
-
-                if (rawObj['市場量能']) {
-                    document.getElementById('daily-spy-volume').innerText = `成交量: ${rawObj['市場量能']}`;
-                }
-                if (rawObj['三大指數']) {
-                    document.getElementById('daily-ndx-close').innerText = `Nasdaq: ${parseFloat(rawObj['三大指數']['NASDAQ']).toFixed(2)}`;
-                    document.getElementById('daily-vix-close').innerText = `VIX: ${parseFloat(rawObj['三大指數']['VIX']).toFixed(2)}`;
-                }
-
-                const sentimentBadge = document.getElementById('header-sentiment-badge');
-                const instBadge = document.getElementById('header-inst-badge');
-                const vixBadge = document.getElementById('header-vix-badge');
-                const analysisText = document.getElementById('header-ai-analysis');
-
-                if (sentimentBadge && latestRecord) {
-                    sentimentBadge.innerText = `情緒：${latestRecord.sentiment_label || '未知'}`;
-
-                    // 根據情緒動態改變 Badge 顏色
-                    if ((latestRecord.sentiment_label || '').includes('樂觀')) {
-                        sentimentBadge.style.background = '#3e7d5c'; // 綠色
-                    } else if ((latestRecord.sentiment_label || '').includes('恐')) {
-                        sentimentBadge.style.background = '#b0532f'; // 紅色
-                    } else {
-                        sentimentBadge.style.background = '#d3bd92'; // 中性香檳色
-                    }
-
-                    instBadge.innerText = `籌碼：${latestRecord.institutional_status || '--'}`;
-                    vixBadge.innerText = `期權：${latestRecord.derivative_status || '--'}`;
-
-                    // 結合 Headline (粗體) 與 150 字的大盤客觀結論
-                    analysisText.innerHTML = `<span style="color:#2b261c; font-size:14px;"><strong>【${latestRecord.headline || '盤勢總結'}】</strong></span><br><span style="margin-top: 5px; display: inline-block; font-weight:normal;">${latestRecord.detailed_analysis || ''}</span>`;
-                }
-
-                // --- 渲染右上角建議持股水位與指針 ---
-                const holdLevel = parseFloat(rawObj['建議持股水位']) || 75;
-                const progressBar = document.getElementById('exposure-progress-bar');
-                const progressText = document.getElementById('exposure-text');
-
-                if (progressBar && progressText) {
-                    let barColor = '#3e7d5c'; // 綠色
-                    if (holdLevel < 60) barColor = '#b0532f'; // 紅色
-                    else if (holdLevel < 80) barColor = '#d3bd92'; // 香檳色
-
-                    setTimeout(() => {
-                        progressBar.style.width = `${holdLevel}%`;
-                        progressBar.style.backgroundColor = barColor;
-                        progressText.style.color = barColor;
-                        animateValue(progressText, 0, holdLevel, 1000);
-                    }, 200);
-                }
-
-                // 🌟 新增：渲染財報行事曆與科技七雄表格
-                // if (rawObj['未來財報']) renderEarningsCalendar(rawObj['未來財報']);
-                // if (rawObj['科技七雄']) renderMag7Performance(rawObj['科技七雄']);
-                renderEarningsCalendar(rawObj['未來財報'] || []);
-                renderMag7Performance(rawObj['科技七雄'] || []);
-
-
-
-                const fallbackSectors = [
-                    { sector: "Information Technology (科技)", "1D": "1.25%", "1W": "1.8%", "1M": "4.0%", "YTD": "15.0%" },
-                    { sector: "Financials (金融)", "1D": "0.82%", "1W": "1.0%", "1M": "2.5%", "YTD": "8.5%" },
-                    { sector: "Health Care (醫療保健)", "1D": "0.45%", "1W": "0.8%", "1M": "1.5%", "YTD": "4.0%" },
-                    { sector: "Consumer Discretionary (非必需消費)", "1D": "0.18%", "1W": "0.3%", "1M": "1.0%", "YTD": "5.2%" },
-                    { sector: "Communication Services (通訊服務)", "1D": "-0.12%", "1W": "0.5%", "1M": "2.0%", "YTD": "12.0%" },
-                    { sector: "Industrials (工業)", "1D": "-0.38%", "1W": "-0.1%", "1M": "0.5%", "YTD": "3.5%" },
-                    { sector: "Consumer Staples (必需消費)", "1D": "-0.55%", "1W": "-0.8%", "1M": "-1.0%", "YTD": "1.2%" },
-                    { sector: "Energy (能源)", "1D": "-0.85%", "1W": "-1.5%", "1M": "-2.5%", "YTD": "-4.0%" },
-                    { sector: "Real Estate (房地產)", "1D": "-1.12%", "1W": "-2.0%", "1M": "-3.5%", "YTD": "-5.5%" },
-                    { sector: "Utilities (公用事業)", "1D": "-1.40%", "1W": "-2.5%", "1M": "-4.0%", "YTD": "-2.0%" },
-                    { sector: "Materials (原材料)", "1D": "-1.68%", "1W": "-3.0%", "1M": "-4.5%", "YTD": "-6.0%" }
-                ];
-
-                const sectorsToDraw = (rawObj['板塊輪動'] && rawObj['板塊輪動'].length > 0)
-                    ? rawObj['板塊輪動']
-                    : fallbackSectors;
-
-                // 存入全域變數供按鈕切換時使用，並執行首次繪製
-                globalSectorData = sectorsToDraw;
-                drawSectorPerformanceChart(globalSectorData);
-
-
-
-                // 👇 🌟 新增：渲染「三、財經新聞焦點」
-                const newsFocusContainer = document.getElementById('daily-news-focus-content');
-                if (newsFocusContainer) {
-                    let newsHtml = '<ul style="padding-left: 20px; margin: 0; color: #4a4436;">';
-                    // 1. 先列出條列式的新聞標題
-                    if (rawObj['核心催化劑'] && rawObj['核心催化劑'].length > 0) {
-                        rawObj['核心催化劑'].forEach(news => {
-                            newsHtml += `<li style="margin-bottom: 10px;">${news}</li>`;
-                        });
-                    } else {
-                        newsHtml += '<li>今日盤面無重大財經新聞催化劑。</li>';
-                    }
-                    newsHtml += '</ul>';
-
-                    // 2. 補上 AI 的專業總結 (機構感點評)
-                    if (rawObj['AI新聞點評']) {
-                        newsHtml += `<div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #d3bd92; color: #8a6d3f;">
-                                        <strong>💡 CIO 總結：</strong>${rawObj['AI新聞點評']}
-                                     </div>`;
-                    }
-                    newsFocusContainer.innerHTML = newsHtml;
-                }
-
-                const cioCard = document.getElementById('cio-trading-desk-card');
-                const cioContent = document.getElementById('cio-trading-desk-content');
-                if (cioCard && cioContent && rawObj['CIO實戰點評']) {
-                    cioContent.innerHTML = rawObj['CIO實戰點評'];
-                    cioCard.style.display = 'block';
-                } else if (cioCard) {
-                    cioCard.style.display = 'none';
-                }
-
-                // 👇 🌟 新增：渲染「四、散戶討論區溫度」
-                const retailVibeContainer = document.getElementById('daily-retail-vibe-content');
-                if (retailVibeContainer) {
-                    if (rawObj['AI散戶溫度']) {
-                        retailVibeContainer.innerHTML = `<p style="margin: 0;">${rawObj['AI散戶溫度']}</p>`;
-                    } else {
-                        retailVibeContainer.innerHTML = '<p style="margin: 0; color: #888;">社群情緒數據結算中，暫無散戶動向。</p>';
-                    }
-                }
-
-            } catch(e) {
-                console.error("解析頂部戰情室資料失敗", e);
+            if (document.getElementById('daily-spy-ytd') && rawObj['YTD']) {
+                document.getElementById('daily-spy-ytd').innerText = `YTD: ${rawObj['YTD']}`;
             }
 
-            // C. 畫圖表：美銀指針與全新雙軸圖表
-            drawBofAGauge(latestScore);
+            if (rawObj['市場量能']) document.getElementById('daily-spy-volume').innerText = `成交量: ${rawObj['市場量能']}`;
+            if (rawObj['三大指數']) {
+                document.getElementById('daily-ndx-close').innerText = `Nasdaq: ${parseFloat(rawObj['三大指數']['NASDAQ']).toFixed(2)}`;
+                document.getElementById('daily-vix-close').innerText = `VIX: ${parseFloat(rawObj['三大指數']['VIX']).toFixed(2)}`;
+            }
+
+            // 建議持股水位
+            const holdLevel = parseFloat(rawObj['建議持股水位']) || 75;
+            const progressBar = document.getElementById('exposure-progress-bar');
+            const progressText = document.getElementById('exposure-text');
+            if (progressBar && progressText) {
+                let barColor = holdLevel < 60 ? '#b0532f' : (holdLevel < 80 ? '#d3bd92' : '#3e7d5c');
+                progressBar.style.width = `${holdLevel}%`;
+                progressBar.style.backgroundColor = barColor;
+                progressText.style.color = barColor;
+                progressText.innerText = `${holdLevel.toFixed(1)}%`;
+            }
+
+            // 渲染財報與 Mag7
+            renderEarningsCalendar(rawObj['未來財報'] || []);
+            renderMag7Performance(rawObj['科技七雄'] || []);
+
+            // 渲染板塊輪動 (含預設資料防呆)
+            globalSectorData = (rawObj['板塊輪動'] && rawObj['板塊輪動'].length > 0) ? rawObj['板塊輪動'] : [
+                { sector: "Information Technology (科技)", "1D": "1.25%", "1W": "1.8%", "1M": "4.0%", "YTD": "15.0%" },
+                { sector: "Financials (金融)", "1D": "0.82%", "1W": "1.0%", "1M": "2.5%", "YTD": "8.5%" },
+                { sector: "Health Care (醫療保健)", "1D": "0.45%", "1W": "0.8%", "1M": "1.5%", "YTD": "4.0%" }
+            ];
+            drawSectorPerformanceChart(globalSectorData);
+
+            // 渲染新聞與散戶溫度
+            const newsFocusContainer = document.getElementById('daily-news-focus-content');
+            if (newsFocusContainer) {
+                let newsHtml = '<ul style="padding-left: 20px; margin: 0; color: #4a4436;">';
+                if (rawObj['核心催化劑']) {
+                    rawObj['核心催化劑'].forEach(n => newsHtml += `<li style="margin-bottom: 10px;">${n}</li>`);
+                }
+                newsHtml += '</ul>';
+                if (rawObj['AI新聞點評']) newsHtml += `<div style="margin-top: 20px; padding-top: 15px; border-top: 1px dashed #d3bd92; color: #8a6d3f;"><strong>💡 CIO 總結：</strong>${rawObj['AI新聞點評']}</div>`;
+                newsFocusContainer.innerHTML = newsHtml;
+            }
+
+            const retailVibeContainer = document.getElementById('daily-retail-vibe-content');
+            if (retailVibeContainer) {
+                retailVibeContainer.innerHTML = `<p style="margin: 0;">${rawObj['AI散戶溫度'] || '暫無散戶動向數據。'}</p>`;
+            }
+
+            const cioCard = document.getElementById('cio-trading-desk-card');
+            const cioContent = document.getElementById('cio-trading-desk-content');
+            if (cioCard && cioContent && rawObj['CIO實戰點評']) {
+                cioContent.innerHTML = rawObj['CIO實戰點評'];
+                cioCard.style.display = 'block';
+            }
+
+            // 畫圖表
+            drawBofAGauge(latestRecord.sentiment_score);
             drawSentimentMixedChart(data);
 
-            // 觸發下半部進階流動性與籌碼戰情室的資料載入
-            loadAdvancedLiquidityData();
-
-        } else {
-            tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #b0532f;">目前尚無情緒歷史資料...</td></tr>';
         }
-
     } catch (error) {
-        console.error("Sentiment Matrix Error:", error);
-        tableBody.innerHTML = `<tr><td colspan="6" style="padding: 30px; text-align: center; color: #b0532f;">⚠️ 載入失敗: ${error.message}</td></tr>`;
+        console.error("US Sentiment Error:", error);
     }
 }
 
@@ -11131,150 +11044,38 @@ function drawBofAGauge(score100) {
     const chartDom = document.getElementById('sentiment-gauge-chart');
     if (!chartDom) return;
     const myChart = echarts.init(chartDom);
-
-    let bofaScore = (score100 / 10).toFixed(1);
-
-    const option = {
+    myChart.setOption({
         series: [{
-            type: 'gauge',
-            min: 0,
-            max: 10,
-            splitNumber: 5,
-            radius: '95%', // 🌟 將圖表稍微放大，填滿小容器
-            itemStyle: { color: '#2b261c' },
-            progress: { show: true, width: 16 }, // 🌟 軸線稍微調細，讓出內部空間
-            pointer: {
-                width: 4,      // 🌟 【關鍵】把指針變細，不再像原本那麼笨重
-                length: '65%', // 🌟 【關鍵】指針縮短，避免打架
-                itemStyle: { color: 'auto' }
-            },
-            axisLine: {
-                lineStyle: {
-                    width: 16, // 🌟 配合 progress 寬度
-                    color: [
-                        [0.2, '#b0532f'], // 0-2 紅色 (恐慌)
-                        [0.8, '#d3bd92'], // 2-8 香檳色/中性
-                        [1, '#3e7d5c']    // 8-10 綠色 (樂觀)
-                    ]
-                }
-            },
-            axisTick: { distance: -16, length: 4, lineStyle: { color: '#fff', width: 2 } },
-            splitLine: { distance: -16, length: 16, lineStyle: { color: '#fff', width: 3 } },
-            // 🌟 【關鍵】將 distance 改為 12，把數字往外推貼近彩色環，並縮小字型
-            axisLabel: { color: '#6e685c', distance: 12, fontSize: 10, fontWeight: 'bold' },
-            // 🌟 【關鍵】將 offsetCenter 往下移至 85%，讓出空間給指針
-            detail: { valueAnimation: true, formatter: '{value}', color: '#2b261c', fontSize: 24, fontWeight: '900', offsetCenter: [0, '85%'] },
-            data: [{ value: bofaScore }]
+            type: 'gauge', min: 0, max: 10, splitNumber: 5, radius: '95%',
+            pointer: { width: 4, length: '65%' },
+            axisLine: { lineStyle: { width: 16, color: [[0.2, '#b0532f'], [0.8, '#d3bd92'], [1, '#3e7d5c']] } },
+            axisLabel: { distance: 12, fontSize: 10 },
+            detail: { formatter: '{value}', fontSize: 24, offsetCenter: [0, '85%'] },
+            data: [{ value: (score100 / 10).toFixed(1) }]
         }]
-    };
-    myChart.setOption(option);
+    });
 }
+
 // 5. 🚀 核心升級：對標 PDF 範例的「雙軸混合圖表 (Mixed Chart)」
 let sentimentMixedChartInstance = null;
 
 function drawSentimentMixedChart(dataArray) {
     const canvas = document.getElementById('sentiment-mixed-chart');
     if (!canvas) return;
-
-    // 將資料反轉，由舊到新
     const reversedData = [...dataArray].reverse();
-    const labels = reversedData.map(item => item.date_str.substring(5)); // 取 MM-DD
-
-    // 萃取 AI 情緒分數 (用於折線圖)
-    const scores = reversedData.map(item => item.sentiment_score);
-
-    // 萃取大盤漲跌幅 (用於柱狀圖)
-    const spyChanges = reversedData.map(item => parseFloat(item.market_change_pct));
-
-    // 決定柱子顏色：漲為綠色，跌為紅色，並加入透明度與機構感
-    const barColors = spyChanges.map(val => val > 0 ? 'rgba(62, 125, 92, 0.6)' : 'rgba(176, 83, 47, 0.6)');
-    const borderColors = spyChanges.map(val => val > 0 ? 'rgba(62, 125, 92, 1)' : 'rgba(176, 83, 47, 1)');
-
     if (sentimentMixedChartInstance) sentimentMixedChartInstance.destroy();
 
     sentimentMixedChartInstance = new Chart(canvas, {
         data: {
-            labels: labels,
+            labels: reversedData.map(item => item.date_str.substring(5)),
             datasets: [
-                {
-                    type: 'line',
-                    label: 'AI 情緒分數 (左軸)',
-                    data: scores,
-                    borderColor: '#8a6d3f', // 香檳金折線
-                    backgroundColor: '#8a6d3f',
-                    borderWidth: 3,
-                    pointBackgroundColor: '#2b261c',
-                    pointRadius: 4,
-                    yAxisID: 'y', // 對應左側 Y 軸
-                    tension: 0.3, // 讓線條平滑
-                    order: 1 // 讓折線圖浮在柱狀圖上方
-                },
-                {
-                    type: 'bar',
-                    label: 'S&P 500 單日漲跌幅 (右軸)',
-                    data: spyChanges,
-                    backgroundColor: barColors,
-                    borderColor: borderColors,
-                    borderWidth: 1,
-                    yAxisID: 'y1', // 對應右側 Y 軸
-                    borderRadius: 4, // 柱子邊角圓滑
-                    order: 2
-                }
+                { type: 'line', label: '情緒分數', data: reversedData.map(item => item.sentiment_score), borderColor: '#8a6d3f', yAxisID: 'y' },
+                { type: 'bar', label: '漲跌幅 (%)', data: reversedData.map(item => parseFloat(item.market_change_pct)), backgroundColor: 'rgba(52, 152, 219, 0.5)', yAxisID: 'y1' }
             ]
         },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-                legend: {
-                    display: true,
-                    position: 'top',
-                    labels: { color: '#2b261c', usePointStyle: true, font: { family: 'Jost' } }
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) label += ': ';
-                            if (context.dataset.type === 'bar') {
-                                return label + context.parsed.y + '%';
-                            }
-                            return label + context.parsed.y + ' 分';
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { color: '#6e685c', font: { family: 'Jost' } }
-                },
-                y: {
-                    type: 'linear',
-                    display: true,
-                    position: 'left',
-                    title: { display: true, text: '情緒分數 (0-100)', color: '#8a6d3f', font: { weight: 'bold' } },
-                    grid: { color: '#e8e3d8' },
-                    min: 0,
-                    max: 100
-                },
-                y1: {
-                    type: 'linear',
-                    display: true,
-                    position: 'right',
-                    title: { display: true, text: '漲跌幅 (%)', color: '#2b261c', font: { weight: 'bold' } },
-                    grid: { display: false }, // 隱藏右軸格線，避免畫面凌亂
-                    ticks: {
-                        callback: function(value) { return value + '%'; },
-                        color: '#6e685c'
-                    }
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left', min: 0, max: 100 }, y1: { position: 'right' } } }
     });
 }
-
 /* ==========================================================================
    🦅 下半部：華爾街流動性與聰明錢籌碼追蹤 (Advanced Liquidity & Smart Money)
    ========================================================================== */
@@ -11291,18 +11092,22 @@ async function loadAdvancedLiquidityData() {
 
         const data = await response.json();
 
-        // FMP 的歷史資料預設是由新到舊，畫圖表前需要反轉成由舊到新
+        // 歷史資料反轉為由舊到新
         const spyHistory = (data.spy_history || []).reverse();
         const tnxHistory = (data.tnx_history || []).reverse();
         const vixHistory = (data.vix_history || []).reverse();
         const socialHistory = (data.social_history || []).reverse();
 
-        // 渲染四個戰情區塊
+        // 渲染圖表
         renderInsiderTradingTable(data.smart_money || []);
         drawLiquidityVolumeChart(spyHistory, tnxHistory);
         drawDrawdownStressChart(spyHistory, vixHistory);
         drawRetailSpeculationChart(spyHistory, socialHistory);
 
+        // 渲染總經圖表
+        if (data.macro_gdp && data.macro_cpi) {
+            drawMacroEconomicChart(data.macro_gdp, data.macro_cpi);
+        }
     } catch (error) {
         console.error("Advanced Liquidity Error:", error);
     }
@@ -11541,95 +11346,32 @@ let macroChartInstance = null;
 
 function drawMacroEconomicChart(gdpData, cpiData) {
     const canvas = document.getElementById('macro-economic-chart');
-    // 🌟 優化 1：增加更嚴格的空值防呆機制
     if (!canvas || !gdpData || gdpData.length === 0) return;
 
-    // 反轉時間軸由舊到新
     const gdp = [...gdpData].reverse();
     const cpi = [...cpiData].reverse();
-
-    // 以 GDP (季) 為橫軸基準
-    const labels = gdp.map(d => d.date.substring(0, 7)); // YYYY-MM
-    const gdpValues = gdp.map(d => d.value);
-
-    // 將 CPI (月) 對齊到 GDP 的月份
-    const cpiValues = gdp.map(g => {
-        const targetMonth = g.date.substring(0, 7);
-        const match = cpi.find(c => c.date.startsWith(targetMonth));
-        return match ? match.value : null;
-    });
 
     if (macroChartInstance) macroChartInstance.destroy();
 
     macroChartInstance = new Chart(canvas, {
         data: {
-            labels: labels,
+            labels: gdp.map(d => d.date.substring(0, 7)),
             datasets: [
                 {
                     type: 'line',
-                    label: 'CPI 通膨率 (%)',
-                    data: cpiValues,
-                    borderColor: '#b0532f',
-                    backgroundColor: '#b0532f',
-                    borderWidth: 2,
-                    yAxisID: 'y1',
-                    tension: 0.3, // 讓線條稍微平滑
-                    pointRadius: 4,
-                    // 🌟 優化 2：加入 spanGaps，萬一某季找不到 CPI 數據，折線會自動連起來而不會斷掉
-                    spanGaps: true
+                    label: 'CPI (%)',
+                    data: gdp.map(g => { const match = cpi.find(c => c.date.startsWith(g.date.substring(0, 7))); return match ? match.value : null; }),
+                    borderColor: '#b0532f', yAxisID: 'y1',
+                    spanGaps: true // 防斷線機制
                 },
-                {
-                    type: 'bar',
-                    label: 'GDP 成長率 (%)',
-                    data: gdpValues,
-                    backgroundColor: 'rgba(62, 125, 92, 0.6)',
-                    borderColor: 'rgba(62, 125, 92, 1)',
-                    borderWidth: 1,
-                    yAxisID: 'y',
-                    borderRadius: 3
-                }
+                { type: 'bar', label: 'GDP (%)', data: gdp.map(d => d.value), backgroundColor: 'rgba(62, 125, 92, 0.6)', yAxisID: 'y' }
             ]
         },
         options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-                legend: { display: true, position: 'top', labels: { boxWidth: 12, font: {size: 11} } },
-                // 🌟 優化 3：客製化 Tooltip，讓滑鼠移過去時數字會自動加上 '%'，看起來更專業
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            let label = context.dataset.label || '';
-                            if (label) label += ': ';
-                            if (context.parsed.y !== null) {
-                                label += context.parsed.y.toFixed(2) + '%';
-                            }
-                            return label;
-                        }
-                    }
-                }
-            },
+            responsive: true, maintainAspectRatio: false,
             scales: {
-                x: {
-                    grid: { display: false },
-                    ticks: { color: '#6e685c' }
-                },
-                y: {
-                    type: 'linear',
-                    position: 'left',
-                    grid: { color: '#f0ebe1' },
-                    title: { display: true, text: 'GDP (%)', color: '#3e7d5c', font: {weight: 'bold'} },
-                    // 🌟 優化 4：讓左右 Y 軸的刻度數字都自動加上 '%' 符號
-                    ticks: { color: '#6e685c', callback: function(value) { return value + '%'; } }
-                },
-                y1: {
-                    type: 'linear',
-                    position: 'right',
-                    grid: { display: false },
-                    title: { display: true, text: 'CPI (%)', color: '#b0532f', font: {weight: 'bold'} },
-                    ticks: { color: '#6e685c', callback: function(value) { return value + '%'; } }
-                }
+                y: { position: 'left', ticks: { callback: v => v + '%' } },
+                y1: { position: 'right', grid: { display: false }, ticks: { callback: v => v + '%' } }
             }
         }
     });
@@ -11730,7 +11472,7 @@ function drawSectorPerformanceChart(sectorData) {
     const canvas = document.getElementById('sector-performance-chart');
     if (!canvas) return;
 
-    // 美股 11 大板塊中英文翻譯對照表
+    // 補回：美股 11 大板塊中英文翻譯對照表
     const sectorTranslation = {
         "Technology": "Information Technology (科技)",
         "Information Technology": "Information Technology (科技)",
@@ -11750,20 +11492,13 @@ function drawSectorPerformanceChart(sectorData) {
         "Materials": "Materials (原材料)"
     };
 
-    // 1. 整理與排序資料 (由大到小排序)
-    const sortedData = [...sectorData].sort((a, b) => {
-        // 優先讀取選擇的維度 (1D, 1W等)，若無則降級讀取舊版 changesPercentage
-        const valA = parseFloat(String(a[currentSectorTimeframe] || a.changesPercentage || a.changes || 0).replace('%', '')) || 0;
-        const valB = parseFloat(String(b[currentSectorTimeframe] || b.changesPercentage || b.changes || 0).replace('%', '')) || 0;
-        return valB - valA;
-    });
+    const sortedData = [...sectorData].sort((a, b) => parseFloat(String(b[currentSectorTimeframe] || 0).replace('%','')) - parseFloat(String(a[currentSectorTimeframe] || 0).replace('%','')));
 
     const labels = sortedData.map(s => sectorTranslation[s.sector] || s.sector);
-    const values = sortedData.map(s => parseFloat(String(s[currentSectorTimeframe] || s.changesPercentage || s.changes || 0).replace('%', '')) || 0);
+    const values = sortedData.map(s => parseFloat(String(s[currentSectorTimeframe] || 0).replace('%','')));
 
-    // 2. 設定顏色：漲為深綠，跌為紅褐色
-    const backgroundColors = values.map(v => v >= 0 ? 'rgba(62, 125, 92, 0.85)' : 'rgba(176, 83, 47, 0.85)');
-    const borderColors = values.map(v => v >= 0 ? 'rgba(62, 125, 92, 1)' : 'rgba(176, 83, 47, 1)');
+    // 設定漲跌顏色
+    const bgColors = values.map(v => v >= 0 ? 'rgba(62, 125, 92, 0.85)' : 'rgba(176, 83, 47, 0.85)');
 
     if (sectorChartInstance) sectorChartInstance.destroy();
 
@@ -11772,37 +11507,19 @@ function drawSectorPerformanceChart(sectorData) {
         data: {
             labels: labels,
             datasets: [{
-                label: '板塊單日漲跌幅 (%)',
+                label: '漲跌幅 (%)',
                 data: values,
-                backgroundColor: backgroundColors,
-                borderColor: borderColors,
-                borderWidth: 1,
+                backgroundColor: bgColors,
                 borderRadius: 4
             }]
         },
         options: {
-            indexAxis: 'y', // 橫向柱狀圖
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
                 legend: { display: false },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return (context.parsed.x > 0 ? '+' : '') + context.parsed.x.toFixed(2) + '%';
-                        }
-                    }
-                }
-            },
-            scales: {
-                x: {
-                    grid: { color: '#f0ebe1' },
-                    ticks: { color: '#6e685c', callback: function(value) { return value + '%'; } }
-                },
-                y: {
-                    grid: { display: false },
-                    ticks: { color: '#2b261c', font: { weight: 'bold', size: 11 } }
-                }
+                tooltip: { callbacks: { label: function(context) { return (context.parsed.x > 0 ? '+' : '') + context.parsed.x.toFixed(2) + '%'; } } }
             }
         }
     });
@@ -11844,70 +11561,51 @@ let twMixedChartInstance = null;
 
 // 1. 主控台：打撈並渲染台股 15 天情緒數據
 async function loadTWSentimentMatrixData() {
+    const tableBody = document.getElementById('tw-sentiment-table-body');
+    if (!tableBody) return;
+
+    tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #6e685c;"><i class="fas fa-spinner fa-spin"></i> 正在撈取台股數據...</td></tr>';
+
     try {
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/tw_sentiment_history` : '/api/tw_sentiment_history';
         const response = await fetch(targetUrl);
-        if (!response.ok) throw new Error("無法取得台股情緒歷史數據");
-
         const data = await response.json();
-        if (!data || data.length === 0) return;
 
-        // 最新的一天 (用於更新上方看板)
-        const latestData = data[0];
-        let rawData = {};
-        try { rawData = JSON.parse(latestData.raw_data_json || "{}"); } catch(e) {}
+        if (data && data.length > 0) {
+            const latestData = data[0];
+            let rawData = {};
+            try { rawData = JSON.parse(latestData.raw_data_json || "{}"); } catch(e) {}
 
-        // --- 填入頂部報價與指標 ---
-        document.getElementById('tw-daily-report-date').innerText = latestData.date_str;
+            if(document.getElementById('tw-daily-report-date')) document.getElementById('tw-daily-report-date').innerText = latestData.date_str || '--';
 
-        // 加權指數收盤與漲跌
-        const closePrice = rawData['真實收盤價'] ? parseFloat(rawData['真實收盤價']).toFixed(2) : '--';
-        document.getElementById('tw-daily-taiex-close').innerText = closePrice;
+            const closePrice = rawData['真實收盤價'] ? parseFloat(rawData['真實收盤價']).toFixed(2) : '--';
+            if(document.getElementById('tw-daily-taiex-close')) document.getElementById('tw-daily-taiex-close').innerText = closePrice;
 
-        const changePctStr = rawData['大盤表現'] || '--';
-        const changeEl = document.getElementById('tw-daily-taiex-change');
-        changeEl.innerText = changePctStr;
-        if (changePctStr.includes('-')) {
-            changeEl.style.color = '#b0532f'; // 跌顯示紅色
-        } else if (changePctStr !== '--' && parseFloat(changePctStr) > 0) {
-            changeEl.innerText = '+' + changePctStr;
-            changeEl.style.color = '#3e7d5c'; // 漲顯示綠色
+            const changePctStr = latestData.market_change_pct || '--';
+            const changeEl = document.getElementById('tw-daily-taiex-change');
+            if(changeEl) {
+                changeEl.innerText = (changePctStr && !changePctStr.includes('-') && changePctStr !== '--' ? '+' : '') + changePctStr;
+                changeEl.style.color = changePctStr.includes('-') ? '#b0532f' : '#3e7d5c';
+            }
+
+            if(document.getElementById('tw-foreign-oi')) {
+                document.getElementById('tw-foreign-oi').innerText = `外資期貨淨未平倉: ${rawData['外資未平倉'] || '--'}`;
+            }
+
+            const holdLevel = rawData['建議持股水位'] || 50;
+            const twProgressText = document.getElementById('tw-exposure-text');
+            const twProgressBar = document.getElementById('tw-exposure-progress-bar');
+            if(twProgressText && twProgressBar) {
+                twProgressText.innerText = `${holdLevel}%`;
+                twProgressBar.style.width = `${holdLevel}%`;
+            }
+
+            drawTWSentimentGauge(latestData.sentiment_score || 50, latestData.sentiment_label || '未知');
+            drawTWMixedChart(data);
+            renderTWSentimentTable(data);
         } else {
-            changeEl.style.color = '#6e685c';
+            tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #b0532f;">尚未建立台股數據。</td></tr>';
         }
-
-        // 極端行情標籤
-        const extremeLabel = rawData['極端標籤'];
-        const labelEl = document.getElementById('tw-extreme-label');
-        if (extremeLabel) {
-            labelEl.innerText = `(${extremeLabel})`;
-            labelEl.style.display = 'inline-block';
-            labelEl.style.backgroundColor = extremeLabel.includes('跌') || extremeLabel.includes('恐慌') ? '#b0532f' : '#3e7d5c';
-        } else {
-            labelEl.style.display = 'none';
-        }
-
-        // 外資未平倉
-        const foreignOi = rawData['外資未平倉'] || '-- 口';
-        document.getElementById('tw-foreign-oi').innerText = `外資期貨淨未平倉: ${foreignOi}`;
-
-        // 建議持股水位
-        const holdLevel = rawData['建議持股水位'] || 50;
-        document.getElementById('tw-exposure-text').innerText = `${holdLevel}%`;
-        document.getElementById('tw-exposure-progress-bar').style.width = `${holdLevel}%`;
-
-        // 交易員點評
-        const cioComment = rawData['CIO實戰點評'];
-        if (cioComment) {
-            document.getElementById('tw-cio-trading-desk-content').innerHTML = cioComment;
-            document.getElementById('tw-cio-trading-desk-card').style.display = 'block';
-        }
-
-        // --- 繪製圖表與表格 ---
-        drawTWSentimentGauge(latestData.sentiment_score, latestData.sentiment_label);
-        drawTWMixedChart(data); // 傳入 15 天完整陣列
-        renderTWSentimentTable(data);
-
     } catch (error) {
         console.error("TW Sentiment Data Error:", error);
     }
@@ -11917,160 +11615,56 @@ async function loadTWSentimentMatrixData() {
 function drawTWSentimentGauge(score, labelText) {
     const dom = document.getElementById('tw-sentiment-gauge-chart');
     if (!dom) return;
-
-    if (twSentimentGaugeInstance) {
-        twSentimentGaugeInstance.dispose();
-    }
+    if (twSentimentGaugeInstance) twSentimentGaugeInstance.dispose();
     twSentimentGaugeInstance = echarts.init(dom);
-
-    const option = {
+    twSentimentGaugeInstance.setOption({
         series: [{
-            type: 'gauge',
-            startAngle: 180, endAngle: 0,
-            min: 0, max: 100,
-            splitNumber: 4,
-            itemStyle: {
-                color: '#b0532f',
-                shadowColor: 'rgba(0,138,255,0.45)',
-                shadowBlur: 10,
-                shadowOffsetX: 2,
-                shadowOffsetY: 2
-            },
-            progress: { show: true, roundCap: true, width: 12 },
-            pointer: { icon: 'path://M12.8,0.7l12,40.1H0.7L12.8,0.7z', length: '12%', width: 10, offsetCenter: [0, '-40%'], itemStyle: { color: '#b0532f' } },
-            axisLine: { roundCap: true, lineStyle: { width: 12, color: [[1, '#e8e3d8']] } },
-            axisTick: { show: false },
-            splitLine: { show: false },
-            axisLabel: { show: false },
-            title: { show: false },
-            detail: {
-                backgroundColor: '#ffffff',
-                borderColor: '#d3bd92',
-                borderWidth: 1,
-                width: '100%',
-                lineHeight: 20,
-                height: 30,
-                borderRadius: 4,
-                offsetCenter: [0, '25%'],
-                valueAnimation: true,
-                formatter: function (value) {
-                    return '{value|' + value.toFixed(1) + '}\n{label|' + labelText + '}';
-                },
-                rich: {
-                    value: { fontSize: 18, fontWeight: 'bolder', color: '#b0532f' },
-                    label: { fontSize: 10, color: '#8a6d3f', padding: [0, 0, 5, 0] }
-                }
-            },
+            type: 'gauge', startAngle: 180, endAngle: 0, min: 0, max: 100, radius: '100%',
+            pointer: { width: 5, length: '70%' },
+            axisLine: { lineStyle: { width: 12, color: [[1, '#b0532f']] } },
+            axisLabel: { show: false }, detail: { formatter: '{value}\n' + labelText, fontSize: 16, offsetCenter: [0, '20%'] },
             data: [{ value: score }]
         }]
-    };
-    twSentimentGaugeInstance.setOption(option);
-}
-
-// 3. 畫圖：台股專屬雙軸情緒折線圖 (Chart.js)
-function drawTWMixedChart(dataArray) {
-    const canvas = document.getElementById('tw-sentiment-mixed-chart');
-    if (!canvas || dataArray.length === 0) return;
-
-    // 將資料反轉為由舊到新
-    const chartData = [...dataArray].reverse();
-    const labels = chartData.map(d => d.date_str.substring(5)); // MM-DD
-    const scores = chartData.map(d => d.sentiment_score);
-    const changes = chartData.map(d => parseFloat(d.market_change_pct.replace('%', '')));
-
-    if (twMixedChartInstance) {
-        twMixedChartInstance.destroy();
-    }
-
-    twMixedChartInstance = new Chart(canvas, {
-        type: 'line',
-        data: {
-            labels: labels,
-            datasets: [
-                {
-                    type: 'line',
-                    label: 'AI 情緒分數 (左軸)',
-                    data: scores,
-                    borderColor: '#b0532f',
-                    backgroundColor: '#b0532f',
-                    borderWidth: 3,
-                    tension: 0.4,
-                    yAxisID: 'y',
-                    pointRadius: 4,
-                    pointBackgroundColor: '#fff',
-                    pointBorderWidth: 2
-                },
-                {
-                    type: 'bar',
-                    label: '加權指數日漲跌幅 (右軸)',
-                    data: changes,
-                    backgroundColor: changes.map(val => val >= 0 ? 'rgba(52, 152, 219, 0.6)' : 'rgba(231, 76, 60, 0.6)'),
-                    borderColor: changes.map(val => val >= 0 ? 'rgba(52, 152, 219, 1)' : 'rgba(231, 76, 60, 1)'),
-                    borderWidth: 1,
-                    yAxisID: 'y1',
-                    borderRadius: 3
-                }
-            ]
-        },
-        options: {
-            responsive: true, maintainAspectRatio: false,
-            interaction: { mode: 'index', intersect: false },
-            plugins: {
-                legend: { position: 'top', labels: { boxWidth: 12, font: {size: 11} } }
-            },
-            scales: {
-                x: { grid: { display: false }, ticks: { color: '#6e685c' } },
-                y: {
-                    type: 'linear', position: 'left', min: 0, max: 100,
-                    grid: { color: '#f0ebe1' },
-                    title: { display: true, text: '情緒分數 (0-100)', color: '#b0532f', font: {weight: 'bold'} }
-                },
-                y1: {
-                    type: 'linear', position: 'right',
-                    grid: { display: false },
-                    title: { display: true, text: '漲跌幅 (%)', color: '#3498db', font: {weight: 'bold'} },
-                    ticks: { callback: function(value) { return value + '%'; } }
-                }
-            }
-        }
     });
 }
 
+// 3. 畫圖：台股專屬雙軸情緒折線圖 (Chart.js)
+
+function drawTWMixedChart(dataArray) {
+    const canvas = document.getElementById('tw-sentiment-mixed-chart');
+    if (!canvas) return;
+    const reversedData = [...dataArray].reverse();
+    if (twMixedChartInstance) twMixedChartInstance.destroy();
+
+    twMixedChartInstance = new Chart(canvas, {
+        data: {
+            labels: reversedData.map(item => item.date_str.substring(5)),
+            datasets: [
+                { type: 'line', label: '情緒分數', data: reversedData.map(item => item.sentiment_score), borderColor: '#3498db', yAxisID: 'y' },
+                { type: 'bar', label: '漲跌幅 (%)', data: reversedData.map(item => parseFloat(item.market_change_pct)), backgroundColor: 'rgba(231, 76, 60, 0.5)', yAxisID: 'y1' }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left', min: 0, max: 100 }, y1: { position: 'right' } } }
+    });
+}
 // 4. 渲染：台股 15 天歷史情緒表格
 function renderTWSentimentTable(dataArray) {
     const tbody = document.getElementById('tw-sentiment-table-body');
     if (!tbody) return;
-
     let html = '';
-    dataArray.forEach((item, index) => {
-        const changeVal = parseFloat(item.market_change_pct);
-        const changeColor = changeVal > 0 ? '#3e7d5c' : (changeVal < 0 ? '#b0532f' : '#6e685c');
-        const sign = changeVal > 0 ? '+' : '';
-
-        // 摘要懸浮顯示完整分析
-        const tooltipHtml = `
-            <div class="sentiment-tooltip">
-                <strong>💡 盤後深度推演：</strong><br>${item.detailed_analysis}
-            </div>
-        `;
+    dataArray.forEach(item => {
+        const changeStr = item.market_change_pct || '--';
+        const changeColor = changeStr.includes('-') ? '#b0532f' : '#3e7d5c';
+        const dateStr = item.date_str ? item.date_str.substring(5) : '--';
 
         html += `
-            <tr style="border-bottom: 1px solid #f0ebe1; transition: background 0.2s; cursor: help;" 
-                onmouseover="this.style.background='rgba(0,0,0,0.03)'" 
-                onmouseout="this.style.background='transparent'">
-                <td style="padding: 10px; font-weight: bold; color: #2b261c;">${item.date_str.substring(5)}</td>
-                <td style="padding: 10px; font-weight: bold; color: ${changeColor};">${sign}${item.market_change_pct}</td>
-                <td style="padding: 10px; color: #6e685c; font-size: 11px;">${item.derivative_status}</td>
-                <td style="padding: 10px; color: #6e685c; font-size: 11px;">${item.institutional_status}</td>
-                <td style="padding: 10px;">
-                    <span style="background: rgba(176, 83, 47, 0.1); color: #b0532f; padding: 3px 8px; border-radius: 12px; font-weight: bold; font-size: 11px;">
-                        ${item.sentiment_score} (${item.sentiment_label})
-                    </span>
-                </td>
-                <td style="padding: 10px; text-align: left; position: relative;" class="has-tooltip">
-                    <span style="color: #3498db; font-weight: bold; font-size: 12px;">${item.headline}</span>
-                    ${tooltipHtml}
-                </td>
+            <tr style="border-bottom: 1px solid #f0ebe1;">
+                <td style="padding: 10px; font-weight: bold;">${dateStr}</td>
+                <td style="padding: 10px; font-weight: bold; color: ${changeColor};">${changeStr}</td>
+                <td style="padding: 10px; font-size: 11px;">${item.derivative_status || '--'}</td>
+                <td style="padding: 10px; font-size: 11px;">${item.institutional_status || '--'}</td>
+                <td style="padding: 10px; font-weight: bold;">${item.sentiment_score || '--'} (${item.sentiment_label || '--'})</td>
+                <td style="padding: 10px; text-align: left; color: #3498db; font-weight: bold;">${item.headline || '--'}</td>
             </tr>
         `;
     });
