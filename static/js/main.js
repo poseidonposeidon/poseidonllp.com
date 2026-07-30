@@ -11070,16 +11070,9 @@ async function loadAdvancedLiquidityData() {
     try {
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/us_advanced_liquidity` : '/api/us_advanced_liquidity';
 
-        // 🌟 依照方案一：明確加入 method 與 headers，確保請求規格與其他 API 一致
-        const response = await fetch(targetUrl, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        });
+        // 🌟 恢復成您原本最正確的單純 GET 呼叫，拔除多餘的 headers 避免引發 OPTIONS 錯誤
+        const response = await fetch(targetUrl);
 
-        // 預防伺服器回傳 HTML (例如 503 或 404 錯誤)
         if (!response.ok) {
             throw new Error(`伺服器回應異常，狀態碼: ${response.status}`);
         }
@@ -11098,7 +11091,7 @@ async function loadAdvancedLiquidityData() {
         drawDrawdownStressChart(spyHistory, vixHistory);
         drawRetailSpeculationChart(spyHistory, socialHistory);
 
-        // 渲染總經圖表
+        // 渲染總經圖表 (直接在這裡呼叫，不再需要 Wrapper)
         if (data.macro_gdp && data.macro_cpi) {
             drawMacroEconomicChart(data.macro_gdp, data.macro_cpi);
         }
