@@ -889,11 +889,11 @@
 
     </div>
 
-    <div id="dd-sentiment-content" style="display: none; padding-top: 10px; display: flex; flex-direction: row; flex-wrap: wrap; gap: 20px; width: 100%; align-items: flex-start; box-sizing: border-box;">
+    <div id="dd-sentiment-content" style="display: none; padding-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; align-items: start; box-sizing: border-box;">
         <!-- ========================================== -->
         <!-- 🇺🇸 左側：美股市場情緒日報 (維持原始 ID，不破壞既有 JS) -->
         <!-- ========================================== -->
-        <div id="us-sentiment-panel" style="flex: 1 1 700px; min-width: 0; width: 100%; box-sizing: border-box;">
+        <div id="us-sentiment-panel" style="min-width: 0; box-sizing: border-box; overflow: hidden;">
             <div style="background: #f1ede4; border-radius: 8px; padding: 20px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
 
                 <!-- 頂部報價 -->
@@ -967,7 +967,7 @@
         <!-- ========================================== -->
         <!-- 🇹🇼 右側：台股市場情緒日報 (全新專屬 ID) -->
         <!-- ========================================== -->
-        <div id="tw-sentiment-panel" style="flex: 1 1 700px; min-width: 0; width: 100%; box-sizing: border-box;">
+        <div id="tw-sentiment-panel" style="min-width: 0; box-sizing: border-box; overflow: hidden;">
             <div style="background: #f1ede4; border-radius: 8px; padding: 20px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
 
                 <!-- 頂部報價 -->
