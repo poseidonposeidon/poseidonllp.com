@@ -893,150 +893,214 @@
 
         <!-- ✅ 內層 (全新新增)：絕對領域！專門負責 Grid 左右 50% 排版，不被 JS 觸碰 -->
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; align-items: start; box-sizing: border-box;">
-        <!-- ========================================== -->
-        <!-- 🇺🇸 左側：美股市場情緒日報 (維持原始 ID，不破壞既有 JS) -->
-        <!-- ========================================== -->
-        <div id="us-sentiment-panel" style="min-width: 0; box-sizing: border-box; overflow: hidden;">
-            <div style="background: #f1ede4; border-radius: 8px; padding: 20px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
 
-                <!-- 頂部報價 -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #d3bd92; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-                    <div style="flex: 1; min-width: 300px;">
-                        <h2 style="margin: 0 0 15px 0; font-size: 24px; font-weight: 900; display: flex; align-items: center; gap: 10px;">
-                            🇺🇸 美股情緒日報
-                            <span id="daily-report-date" style="font-size: 14px; background: #e8e3d8; padding: 2px 8px; border-radius: 4px;">載入中...</span>
-                        </h2>
-                        <div style="font-size: 16px; display: flex; gap: 15px; align-items: baseline; flex-wrap: wrap;">
-                            <span style="color: #6e685c; font-weight: bold;">S&P 500 收盤</span>
-                            <span id="daily-spy-close" style="font-size: 24px; font-weight: 900;">--</span>
-                            <span id="daily-spy-change" style="font-size: 16px; font-weight: bold;">--</span>
-                            <span id="daily-spy-ytd" style="font-size: 14px; color: #8a6d3f; font-weight: bold;">YTD: --%</span>
-                            <span id="daily-extreme-label" style="font-size: 12px; background: #b0532f; color: white; padding: 2px 6px; border-radius: 4px; display: none;">(極端)</span>
+            <!-- ========================================== -->
+            <!-- 🇺🇸 左側：美股市場情緒日報 (包含進階圖表) -->
+            <!-- ========================================== -->
+            <div id="us-sentiment-panel" style="min-width: 0; box-sizing: border-box; overflow: hidden;">
+                <div style="background: #f1ede4; border-radius: 8px; padding: 20px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
+
+                    <!-- 1. 美股頂部報價與指針 (維持原樣) -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #d3bd92; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <h2 style="margin: 0 0 15px 0; font-size: 24px; font-weight: 900; display: flex; align-items: center; gap: 10px;">
+                                🇺🇸 美股情緒日報
+                                <span id="daily-report-date" style="font-size: 14px; background: #e8e3d8; padding: 2px 8px; border-radius: 4px;">載入中...</span>
+                            </h2>
+                            <div style="font-size: 16px; display: flex; gap: 15px; align-items: baseline; flex-wrap: wrap;">
+                                <span style="color: #6e685c; font-weight: bold;">S&P 500 收盤</span>
+                                <span id="daily-spy-close" style="font-size: 24px; font-weight: 900;">--</span>
+                                <span id="daily-spy-change" style="font-size: 16px; font-weight: bold;">--</span>
+                                <span id="daily-spy-ytd" style="font-size: 14px; color: #8a6d3f; font-weight: bold;">YTD: --%</span>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 12px; color: #8a6d3f; display: flex; gap: 15px;">
+                                <span id="daily-spy-volume">成交量: -- 億</span>
+                                <span id="daily-vix-close">VIX: --</span>
+                                <span id="daily-ndx-close">Nasdaq: --</span>
+                            </div>
                         </div>
-                        <div style="margin-top: 10px; font-size: 12px; color: #8a6d3f; display: flex; gap: 15px;">
-                            <span id="daily-spy-volume">成交量: -- 億</span>
-                            <span id="daily-vix-close">VIX: --</span>
-                            <span id="daily-ndx-close">Nasdaq: --</span>
+
+                        <!-- 美銀指針 -->
+                        <div style="display: flex; flex-direction: column; align-items: center; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); width: 140px;">
+                            <div style="font-size: 11px; color: #8a6d3f; font-weight: bold;">美股建議水位</div>
+                            <div id="exposure-text" style="font-size: 26px; font-weight: 900; color: #b0532f;">--%</div>
+                            <div style="width: 80px; height: 6px; background: #e8e3d8; border-radius: 3px; margin-top: 5px;">
+                                <div id="exposure-progress-bar" style="height: 100%; width: 0%; background: #b0532f; transition: 1s;"></div>
+                            </div>
+                            <div style="width: 120px; height: 90px; position: relative; margin-top: -10px;">
+                                <div id="sentiment-gauge-chart" style="width: 100%; height: 100%; position: absolute;"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 美銀指針 -->
-                    <div style="display: flex; flex-direction: column; align-items: center; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); width: 140px;">
-                        <div style="font-size: 11px; color: #8a6d3f; font-weight: bold;">美股建議水位</div>
-                        <div id="exposure-text" style="font-size: 26px; font-weight: 900; color: #b0532f;">--%</div>
-                        <div style="width: 80px; height: 6px; background: #e8e3d8; border-radius: 3px; margin-top: 5px;">
-                            <div id="exposure-progress-bar" style="height: 100%; width: 0%; background: #b0532f; transition: 1s;"></div>
+                    <!-- 2. 美股交易員點評 -->
+                    <div id="cio-trading-desk-card" style="display: none; background: #fffdf8; border: 1px solid #d3bd92; border-left: 4px solid #b0532f; border-radius: 6px; padding: 12px; margin-bottom: 20px;">
+                        <div style="font-weight: bold; color: #b0532f; font-size: 13px; margin-bottom: 6px;"><i class="fas fa-bolt"></i> 華爾街交易員推演</div>
+                        <div id="cio-trading-desk-content" style="font-size: 13px; color: #4a4436; line-height: 1.6;">--</div>
+                    </div>
+
+                    <!-- 3. 美股雙軸圖表 -->
+                    <div style="background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px; border-left: 4px solid #b0532f; padding-left: 8px;">▌ 美股情緒走勢</h4>
+                        <div style="width: 100%; height: 250px;"><canvas id="sentiment-mixed-chart"></canvas></div>
+                    </div>
+
+                    <!-- 4. 美股歷史表格 -->
+                    <div style="background: white; border-radius: 8px; overflow: hidden; overflow-x: auto; margin-bottom: 30px;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; white-space: nowrap;">
+                            <thead>
+                            <tr style="background: #2b261c; color: white;">
+                                <th style="padding: 8px;">日期</th>
+                                <th style="padding: 8px;">漲跌</th>
+                                <th style="padding: 8px;">綜合情緒</th>
+                                <th style="padding: 8px; text-align: left;">AI 頭條</th>
+                            </tr>
+                            </thead>
+                            <tbody id="sentiment-table-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- 👇 美股進階數據區 (改為單欄垂直排列，適應 50% 寬度) 👇 -->
+                    <div style="border-top: 2px dashed #d3bd92; padding-top: 20px; display: flex; flex-direction: column; gap: 20px;">
+                        <h3 style="margin: 0; color: #2b261c; font-size: 18px;">🦅 華爾街進階流動性與總經追蹤</h3>
+
+                        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">S&P 500 量能 vs 10年美債殖利率</h4>
+                            <div style="width: 100%; height: 220px;"><canvas id="liquidity-volume-chart"></canvas></div>
                         </div>
-                        <div style="width: 120px; height: 90px; position: relative; margin-top: -10px;">
-                            <div id="sentiment-gauge-chart" style="width: 100%; height: 100%; position: absolute;"></div>
+
+                        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">S&P 500 高點回撤率 vs VIX 壓力測試</h4>
+                            <div style="width: 100%; height: 220px;"><canvas id="drawdown-stress-chart"></canvas></div>
+                        </div>
+
+                        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">美國 GDP 規模 vs CPI 通膨趨勢</h4>
+                            <div style="width: 100%; height: 220px;"><canvas id="macro-economic-chart"></canvas></div>
+                        </div>
+
+                        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                                <h4 style="margin: 0; color: #2b261c; font-size: 14px;">S&P 500 板塊資金輪動</h4>
+                                <div>
+                                    <button onclick="updateSectorTimeframe('1D')" style="font-size: 11px; padding: 2px 6px;">1D</button>
+                                    <button onclick="updateSectorTimeframe('1M')" style="font-size: 11px; padding: 2px 6px;">1M</button>
+                                </div>
+                            </div>
+                            <div style="width: 100%; height: 350px;"><canvas id="sector-performance-chart"></canvas></div>
+                        </div>
+
+                        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">科技七雄 (Mag 7) 盤後追蹤</h4>
+                            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
+                                <thead><tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;"><th>標的</th><th>單日漲跌</th><th>CIO 點評</th></tr></thead>
+                                <tbody id="mag7-performance-body"><tr><td colspan="3" style="text-align:center;">載入數據中...</td></tr></tbody>
+                            </table>
+                        </div>
+
+                        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">📰 財經新聞焦點與散戶溫度</h4>
+                            <div id="daily-news-focus-content" style="font-size: 13px; line-height: 1.6; color: #4a4436;">載入中...</div>
                         </div>
                     </div>
-                </div>
 
-                <!-- 交易員點評 -->
-                <div id="cio-trading-desk-card" style="display: none; background: #fffdf8; border: 1px solid #d3bd92; border-left: 4px solid #b0532f; border-radius: 6px; padding: 12px; margin-bottom: 20px;">
-                    <div style="font-weight: bold; color: #b0532f; font-size: 13px; margin-bottom: 6px;"><i class="fas fa-bolt"></i> 華爾街交易員推演</div>
-                    <div id="cio-trading-desk-content" style="font-size: 13px; color: #4a4436; line-height: 1.6;">--</div>
                 </div>
-
-                <!-- 雙軸圖表 -->
-                <div style="background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px; border-left: 4px solid #b0532f; padding-left: 8px;">▌ 美股情緒走勢</h4>
-                    <div style="width: 100%; height: 250px;">
-                        <canvas id="sentiment-mixed-chart"></canvas>
-                    </div>
-                </div>
-
-                <!-- 歷史表格 -->
-                <div style="background: white; border-radius: 8px; overflow: hidden; overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; white-space: nowrap;">
-                        <thead>
-                        <tr style="background: #2b261c; color: white;">
-                            <th style="padding: 8px;">日期</th>
-                            <th style="padding: 8px;">漲跌</th>
-                            <th style="padding: 8px;">期權水位</th>
-                            <th style="padding: 8px;">法人輪動</th>
-                            <th style="padding: 8px;">綜合情緒</th>
-                            <th style="padding: 8px; text-align: left;">AI 頭條</th>
-                        </tr>
-                        </thead>
-                        <tbody id="sentiment-table-body"></tbody>
-                    </table>
-                </div>
-
             </div>
-        </div>
 
-        <!-- ========================================== -->
-        <!-- 🇹🇼 右側：台股市場情緒日報 (全新專屬 ID) -->
-        <!-- ========================================== -->
-        <div id="tw-sentiment-panel" style="min-width: 0; box-sizing: border-box; overflow: hidden;">
-            <div style="background: #f1ede4; border-radius: 8px; padding: 20px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
+            <!-- ========================================== -->
+            <!-- 🇹🇼 右側：台股市場情緒日報 (包含預留進階圖表) -->
+            <!-- ========================================== -->
+            <div id="tw-sentiment-panel" style="min-width: 0; box-sizing: border-box; overflow: hidden;">
+                <div style="background: #f1ede4; border-radius: 8px; padding: 20px; border: 1px solid #c2a26d; margin-bottom: 20px; font-family: 'Jost', 'Noto Sans TC', sans-serif; color: #2b261c;">
 
-                <!-- 頂部報價 -->
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #d3bd92; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
-                    <div style="flex: 1; min-width: 300px;">
-                        <h2 style="margin: 0 0 15px 0; font-size: 24px; font-weight: 900; display: flex; align-items: center; gap: 10px;">
-                            🇹🇼 台股情緒日報
-                            <span id="tw-daily-report-date" style="font-size: 14px; background: #e8e3d8; padding: 2px 8px; border-radius: 4px;">載入中...</span>
-                        </h2>
-                        <div style="font-size: 16px; display: flex; gap: 15px; align-items: baseline; flex-wrap: wrap;">
-                            <span style="color: #6e685c; font-weight: bold;">加權指數</span>
-                            <span id="tw-daily-taiex-close" style="font-size: 24px; font-weight: 900;">--</span>
-                            <span id="tw-daily-taiex-change" style="font-size: 16px; font-weight: bold;">--</span>
-                            <span id="tw-extreme-label" style="font-size: 12px; background: #b0532f; color: white; padding: 2px 6px; border-radius: 4px; display: none;">(極端)</span>
+                    <!-- 1. 台股頂部報價與指針 (維持原樣) -->
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #d3bd92; padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px;">
+                        <div style="flex: 1; min-width: 300px;">
+                            <h2 style="margin: 0 0 15px 0; font-size: 24px; font-weight: 900; display: flex; align-items: center; gap: 10px;">
+                                🇹🇼 台股情緒日報
+                                <span id="tw-daily-report-date" style="font-size: 14px; background: #e8e3d8; padding: 2px 8px; border-radius: 4px;">載入中...</span>
+                            </h2>
+                            <div style="font-size: 16px; display: flex; gap: 15px; align-items: baseline; flex-wrap: wrap;">
+                                <span style="color: #6e685c; font-weight: bold;">加權指數</span>
+                                <span id="tw-daily-taiex-close" style="font-size: 24px; font-weight: 900;">--</span>
+                                <span id="tw-daily-taiex-change" style="font-size: 16px; font-weight: bold;">--</span>
+                            </div>
+                            <div style="margin-top: 10px; font-size: 12px; color: #8a6d3f; display: flex; gap: 15px;">
+                                <span id="tw-foreign-oi">外資期貨淨未平倉: -- 口</span>
+                            </div>
                         </div>
-                        <div style="margin-top: 10px; font-size: 12px; color: #8a6d3f; display: flex; gap: 15px;">
-                            <span id="tw-foreign-oi">外資期貨淨未平倉: -- 口</span>
+
+                        <!-- 台灣指針 -->
+                        <div style="display: flex; flex-direction: column; align-items: center; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); width: 140px;">
+                            <div style="font-size: 11px; color: #8a6d3f; font-weight: bold;">台股建議水位</div>
+                            <div id="tw-exposure-text" style="font-size: 26px; font-weight: 900; color: #b0532f;">--%</div>
+                            <div style="width: 80px; height: 6px; background: #e8e3d8; border-radius: 3px; margin-top: 5px;">
+                                <div id="tw-exposure-progress-bar" style="height: 100%; width: 0%; background: #b0532f; transition: 1s;"></div>
+                            </div>
+                            <div style="width: 120px; height: 90px; position: relative; margin-top: -10px;">
+                                <div id="tw-sentiment-gauge-chart" style="width: 100%; height: 100%; position: absolute;"></div>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- 美銀指針 -->
-                    <div style="display: flex; flex-direction: column; align-items: center; background: white; padding: 10px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); width: 140px;">
-                        <div style="font-size: 11px; color: #8a6d3f; font-weight: bold;">台股建議水位</div>
-                        <div id="tw-exposure-text" style="font-size: 26px; font-weight: 900; color: #b0532f;">--%</div>
-                        <div style="width: 80px; height: 6px; background: #e8e3d8; border-radius: 3px; margin-top: 5px;">
-                            <div id="tw-exposure-progress-bar" style="height: 100%; width: 0%; background: #b0532f; transition: 1s;"></div>
+                    <!-- 2. 台股交易員點評 -->
+                    <div id="tw-cio-trading-desk-card" style="display: none; background: #fffdf8; border: 1px solid #d3bd92; border-left: 4px solid #3498db; border-radius: 6px; padding: 12px; margin-bottom: 20px;">
+                        <div style="font-weight: bold; color: #3498db; font-size: 13px; margin-bottom: 6px;"><i class="fas fa-bolt"></i> 台北自營部推演</div>
+                        <div id="tw-cio-trading-desk-content" style="font-size: 13px; color: #4a4436; line-height: 1.6;">--</div>
+                    </div>
+
+                    <!-- 3. 台股雙軸圖表 -->
+                    <div style="background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
+                        <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px; border-left: 4px solid #3498db; padding-left: 8px;">▌ 台股情緒走勢</h4>
+                        <div style="width: 100%; height: 250px;"><canvas id="tw-sentiment-mixed-chart"></canvas></div>
+                    </div>
+
+                    <!-- 4. 台股歷史表格 -->
+                    <div style="background: white; border-radius: 8px; overflow: hidden; overflow-x: auto; margin-bottom: 30px;">
+                        <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; white-space: nowrap;">
+                            <thead>
+                            <tr style="background: #2b261c; color: white;">
+                                <th style="padding: 8px;">日期</th>
+                                <th style="padding: 8px;">漲跌</th>
+                                <th style="padding: 8px;">綜合情緒</th>
+                                <th style="padding: 8px; text-align: left;">AI 頭條</th>
+                            </tr>
+                            </thead>
+                            <tbody id="tw-sentiment-table-body"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- 👇 台股進階數據區 (與美股對稱的預留空殼) 👇 -->
+                    <div style="border-top: 2px dashed #d3bd92; padding-top: 20px; display: flex; flex-direction: column; gap: 20px;">
+                        <h3 style="margin: 0; color: #2b261c; font-size: 18px;">🇹🇼 台北自營部籌碼與總經追蹤</h3>
+
+                        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">加權指數成交量 vs 外資期貨動向 (待串接)</h4>
+                            <div style="width: 100%; height: 220px;"><canvas id="tw-liquidity-volume-chart"></canvas></div>
                         </div>
-                        <div style="width: 120px; height: 90px; position: relative; margin-top: -10px;">
-                            <div id="tw-sentiment-gauge-chart" style="width: 100%; height: 100%; position: absolute;"></div>
+
+                        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">台股高點回撤率 vs 融資維持率 (待串接)</h4>
+                            <div style="width: 100%; height: 220px;"><canvas id="tw-drawdown-stress-chart"></canvas></div>
+                        </div>
+
+                        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">台灣 GDP 規模 vs 出口數據趨勢 (待串接)</h4>
+                            <div style="width: 100%; height: 220px;"><canvas id="tw-macro-economic-chart"></canvas></div>
+                        </div>
+
+                        <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">台股前 10 大權值股動向 (待串接)</h4>
+                            <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
+                                <thead><tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;"><th>標的</th><th>單日漲跌</th><th>外資買賣超</th></tr></thead>
+                                <tbody id="tw-heavyweights-body"><tr><td colspan="3" style="text-align:center;">準備串接 FinMind 數據...</td></tr></tbody>
+                            </table>
                         </div>
                     </div>
-                </div>
 
-                <!-- 交易員點評 -->
-                <div id="tw-cio-trading-desk-card" style="display: none; background: #fffdf8; border: 1px solid #d3bd92; border-left: 4px solid #3498db; border-radius: 6px; padding: 12px; margin-bottom: 20px;">
-                    <div style="font-weight: bold; color: #3498db; font-size: 13px; margin-bottom: 6px;"><i class="fas fa-bolt"></i> 台北自營部推演</div>
-                    <div id="tw-cio-trading-desk-content" style="font-size: 13px; color: #4a4436; line-height: 1.6;">--</div>
                 </div>
-
-                <!-- 雙軸圖表 -->
-                <div style="background: white; border-radius: 8px; padding: 15px; margin-bottom: 20px;">
-                    <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px; border-left: 4px solid #3498db; padding-left: 8px;">▌ 台股情緒走勢</h4>
-                    <div style="width: 100%; height: 250px;">
-                        <canvas id="tw-sentiment-mixed-chart"></canvas>
-                    </div>
-                </div>
-
-                <!-- 歷史表格 -->
-                <div style="background: white; border-radius: 8px; overflow: hidden; overflow-x: auto;">
-                    <table style="width: 100%; border-collapse: collapse; text-align: center; font-size: 12px; white-space: nowrap;">
-                        <thead>
-                        <tr style="background: #2b261c; color: white;">
-                            <th style="padding: 8px;">日期</th>
-                            <th style="padding: 8px;">漲跌</th>
-                            <th style="padding: 8px;">期權籌碼</th>
-                            <th style="padding: 8px;">內外資動向</th>
-                            <th style="padding: 8px;">綜合情緒</th>
-                            <th style="padding: 8px; text-align: left;">AI 頭條</th>
-                        </tr>
-                        </thead>
-                        <tbody id="tw-sentiment-table-body"></tbody>
-                    </table>
-                </div>
-
             </div>
-        </div>
+
         </div>
     </div>
 </div>
