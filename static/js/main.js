@@ -11057,7 +11057,6 @@ function drawBofAGauge(score100) {
 }
 
 // 5. 🚀 核心升級：對標 PDF 範例的「雙軸混合圖表 (Mixed Chart)」
-let sentimentMixedChartInstance = null;
 
 function drawSentimentMixedChart(dataArray) {
     const canvas = document.getElementById('sentiment-mixed-chart');
@@ -11079,10 +11078,6 @@ function drawSentimentMixedChart(dataArray) {
 /* ==========================================================================
    🦅 下半部：華爾街流動性與聰明錢籌碼追蹤 (Advanced Liquidity & Smart Money)
    ========================================================================== */
-
-let liquidityVolChartInstance = null;
-let drawdownStressChartInstance = null;
-let retailSpecChartInstance = null;
 
 async function loadAdvancedLiquidityData() {
     try {
@@ -11342,8 +11337,6 @@ loadAdvancedLiquidityData = async function() {
 };
 
 // 1. 畫圖：美國 GDP 成長率 vs CPI 通膨率 (對標：台灣 GDP 圖)
-let macroChartInstance = null;
-
 function drawMacroEconomicChart(gdpData, cpiData) {
     const canvas = document.getElementById('macro-economic-chart');
     if (!canvas || !gdpData || gdpData.length === 0) return;
@@ -11466,8 +11459,6 @@ function renderMag7Performance(mag7Data) {
 /* ==========================================================================
    📊 S&P 500 十一大板塊資金輪動圖 (Sector Performance)
    ========================================================================== */
-let sectorChartInstance = null;
-
 function drawSectorPerformanceChart(sectorData) {
     const canvas = document.getElementById('sector-performance-chart');
     if (!canvas) return;
@@ -11556,8 +11547,6 @@ function updateSectorTimeframe(timeframe) {
    🇹🇼 台股情緒雷達雙核渲染模組 (Taiwan Stock Sentiment Dashboard)
    ========================================================================== */
 
-let twSentimentGaugeInstance = null;
-let twMixedChartInstance = null;
 
 // 1. 主控台：打撈並渲染台股 15 天情緒數據
 async function loadTWSentimentMatrixData() {
