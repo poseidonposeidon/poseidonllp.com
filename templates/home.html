@@ -1077,25 +1077,34 @@
                         <h3 style="margin: 0; color: #2b261c; font-size: 18px;">🇹🇼 台北自營部籌碼與總經追蹤</h3>
 
                         <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">加權指數成交量 vs 外資期貨動向 (待串接)</h4>
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">加權指數 vs 外資期貨淨未平倉</h4>
                             <div style="width: 100%; height: 220px;"><canvas id="tw-liquidity-volume-chart"></canvas></div>
                         </div>
 
                         <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">台股高點回撤率 vs 融資維持率 (待串接)</h4>
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">台股高點回撤率 vs 融資餘額 (億)</h4>
                             <div style="width: 100%; height: 220px;"><canvas id="tw-drawdown-stress-chart"></canvas></div>
                         </div>
 
                         <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">台灣 GDP 規模 vs 出口數據趨勢 (待串接)</h4>
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">台灣 GDP 成長率 vs 出口數據 (億美元)</h4>
                             <div style="width: 100%; height: 220px;"><canvas id="tw-macro-economic-chart"></canvas></div>
                         </div>
 
                         <div style="background: white; border-radius: 8px; padding: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.05);">
-                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">台股前 10 大權值股動向 (待串接)</h4>
+                            <h4 style="margin: 0 0 10px 0; color: #2b261c; font-size: 14px;">台股前 10 大權值股動向</h4>
                             <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 12px;">
-                                <thead><tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;"><th>標的</th><th>單日漲跌</th><th>外資買賣超</th></tr></thead>
-                                <tbody id="tw-heavyweights-body"><tr><td colspan="3" style="text-align:center;">準備串接 FinMind 數據...</td></tr></tbody>
+                                <thead>
+                                <tr style="border-bottom: 2px solid #e8e3d8; color: #8a6d3f;">
+                                    <th style="padding: 8px;">標的</th>
+                                    <th style="padding: 8px;">最新報價</th>
+                                    <th style="padding: 8px;">單日漲跌</th>
+                                    <th style="padding: 8px;">外資買賣超 (張)</th>
+                                </tr>
+                                </thead>
+                                <tbody id="tw-heavyweights-body">
+                                <tr><td colspan="4" style="text-align:center; padding: 15px;"><i class="fas fa-spinner fa-spin"></i> 載入中...</td></tr>
+                                </tbody>
                             </table>
                         </div>
                     </div>

@@ -11579,11 +11579,189 @@ async function loadTWSentimentMatrixData() {
         } else {
             tableBody.innerHTML = '<tr><td colspan="6" style="padding: 30px; text-align: center; color: #b0532f;">尚未建立台股數據。</td></tr>';
         }
+        loadTWAdvancedLiquidityData();
     } catch (error) {
         console.error("TW Sentiment Data Error:", error);
     }
 }
 
+/* ==========================================================================
+   🇹🇼 台股進階籌碼與總經渲染模組
+   ========================================================================== */
+let twLiquidityChartInstance = null;
+let twDrawdownChartInstance = null;
+let twMacroChartInstance = null;
+
+// 打撈台股進階數據
+async function loadTWAdvancedLiquidityData() {
+    try {
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/tw_advanced_liquidity` : '/api/tw_advanced_liquidity';
+        const response = await fetch(targetUrl);
+        const data = await response.json();
+
+        if (data.twii_history && data.futures_open_int) {
+            drawTWLiquidityChart(data.twii_history, data.futures_open_int);
+        }
+        if (data.twii_history && data.margin_balance) {
+            drawTWDrawdownChart(data.twii_history, data.margin_balance);
+        }
+        if (data.macro_gdp && data.macro_export) {
+            drawTWMacroChart(data.macro_gdp, data.macro_export);
+        }
+        if (data.smart_money) {
+            renderTWHeavyweights(data.smart_money);
+        }
+    } catch (error) {
+        console.error("TW Advanced Liquidity Data Error:", error);
+    }
+}
+
+// 1. 畫圖：加權指數 vs 外資期貨淨未平倉
+function drawTWLiquidityChart(twii, futures) {
+    const canvas = document.getElementById('tw-liquidity-volume-chart');
+    if (!canvas || twii.length === 0) return;
+
+    const labels = twii.map(d => d.date);
+    const closeData = twii.map(d => d.close);
+    const oiData = labels.map(date => {
+        const f = futures.find(x => x.date === date);
+        return f ? f.net_oi : null;
+    });
+
+    if (twLiquidityChartInstance) twLiquidityChartInstance.destroy();
+
+    twLiquidityChartInstance = new Chart(canvas, {
+        data: {
+            labels: labels,
+            datasets: [
+                { type: 'line', label: '加權指數', data: closeData, borderColor: '#3498db', yAxisID: 'y', pointRadius: 0 },
+                { type: 'bar', label: '外資淨未平倉 (口)', data: oiData, backgroundColor: 'rgba(231, 76, 60, 0.6)', yAxisID: 'y1' }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                y: { position: 'left', ticks: { color: '#3498db' } },
+                y1: { position: 'right', grid: { display: false }, ticks: { color: '#e74c3c' } }
+            }
+        }
+    });
+}
+
+// 2. 畫圖：台股高點回撤率 vs 融資餘額
+function drawTWDrawdownChart(twii, margin) {
+    const canvas = document.getElementById('tw-drawdown-stress-chart');
+    if (!canvas || twii.length === 0) return;
+
+    const labels = twii.map(d => d.date);
+    let maxSoFar = 0;
+
+    // 計算回撤率
+    const drawdownData = twii.map(d => {
+        if (d.close > maxSoFar) maxSoFar = d.close;
+        return maxSoFar > 0 ? ((d.close - maxSoFar) / maxSoFar) * 100 : 0;
+    });
+
+    // 將融資餘額轉換為「億」為單位
+    const marginData = labels.map(date => {
+        const m = margin.find(x => x.date === date);
+        return m ? (m.TodayBalance / 100000000).toFixed(2) : null;
+    });
+
+    if (twDrawdownChartInstance) twDrawdownChartInstance.destroy();
+
+    twDrawdownChartInstance = new Chart(canvas, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: '回撤率 (%)', data: drawdownData, borderColor: '#b0532f', backgroundColor: 'rgba(176, 83, 47, 0.1)', fill: true, yAxisID: 'y' },
+                { label: '融資餘額 (億)', data: marginData, borderColor: '#f39c12', yAxisID: 'y1', pointRadius: 0 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                y: { position: 'left', ticks: { callback: v => v + '%' } },
+                y1: { position: 'right', grid: { display: false } }
+            }
+        }
+    });
+}
+
+// 3. 畫圖：台灣 GDP 成長率 vs 出口數據
+function drawTWMacroChart(gdp, exp) {
+    const canvas = document.getElementById('tw-macro-economic-chart');
+    if (!canvas || exp.length === 0) return;
+
+    const labels = exp.map(d => d.date);
+    const expData = exp.map(d => d.value);
+
+    // 將季度的 GDP 映射到對應的月份 (視覺化對齊)
+    const gdpData = labels.map(date => {
+        const year = date.substring(0, 4);
+        const month = date.substring(5, 7);
+        let q = '';
+        if (['01', '02', '03'].includes(month)) q = 'Q1';
+        else if (['04', '05', '06'].includes(month)) q = 'Q2';
+        else if (['07', '08', '09'].includes(month)) q = 'Q3';
+        else if (['10', '11', '12'].includes(month)) q = 'Q4';
+
+        const g = gdp.find(x => x.date === `${year}-${q}`);
+        return g ? g.value : null;
+    });
+
+    if (twMacroChartInstance) twMacroChartInstance.destroy();
+
+    twMacroChartInstance = new Chart(canvas, {
+        data: {
+            labels: labels,
+            datasets: [
+                { type: 'line', label: 'GDP (YoY %)', data: gdpData, borderColor: '#b0532f', yAxisID: 'y1', spanGaps: true },
+                { type: 'bar', label: '出口 (億美元)', data: expData, backgroundColor: 'rgba(62, 125, 92, 0.6)', yAxisID: 'y' }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                y: { position: 'left' },
+                y1: { position: 'right', grid: { display: false }, ticks: { callback: v => v + '%' } }
+            }
+        }
+    });
+}
+
+// 4. 渲染：前 10 大權值股表格
+function renderTWHeavyweights(smartMoney) {
+    const tbody = document.getElementById('tw-heavyweights-body');
+    if (!tbody) return;
+
+    if (!smartMoney || smartMoney.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 15px;">暫無籌碼數據</td></tr>';
+        return;
+    }
+
+    let html = '';
+    smartMoney.forEach(item => {
+        const changePct = item.change_pct || 0;
+        const color = changePct > 0 ? '#3e7d5c' : (changePct < 0 ? '#b0532f' : '#6e685c');
+        const sign = changePct > 0 ? '+' : '';
+
+        const buyVolume = item.foreign_buy ? (item.foreign_buy / 1000).toFixed(0) : 0; // 轉換為「張」
+        const buyColor = buyVolume > 0 ? '#3e7d5c' : (buyVolume < 0 ? '#b0532f' : '#6e685c');
+        const buySign = buyVolume > 0 ? '+' : '';
+
+        html += `
+            <tr style="border-bottom: 1px solid #f0ebe1; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
+                <td style="padding: 10px; font-weight: bold; color: #2b261c;">${item.symbol}</td>
+                <td style="padding: 10px; color: #2b261c;">${item.price.toFixed(1)}</td>
+                <td style="padding: 10px; color: ${color}; font-weight: bold;">${sign}${changePct}%</td>
+                <td style="padding: 10px; color: ${buyColor}; font-weight: bold;">${buySign}${Number(buyVolume).toLocaleString()}</td>
+            </tr>
+        `;
+    });
+    tbody.innerHTML = html;
+}
 // 2. 畫圖：台股專屬半圓形儀表板 (ECharts)
 function drawTWSentimentGauge(score, labelText) {
     const dom = document.getElementById('tw-sentiment-gauge-chart');
