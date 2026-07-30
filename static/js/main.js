@@ -9893,6 +9893,43 @@ function triggerAnalysis(symbol, event) {
         runDeepDive(event);   // 把 event 傳遞下去
     }
 }
+// ==========================================
+// 🔘 導覽列按鈕亮燈狀態統一控管
+// ==========================================
+function updateNavButtons(activeButtonId) {
+    // 1. 先把所有按鈕恢復成預設的外觀 (清除 inline CSS)
+    const btnIds = ['screener-toggle-btn', 'trump-toggle-btn', 'sentiment-toggle-btn', 'nav-news-btn'];
+    btnIds.forEach(id => {
+        const btn = document.getElementById(id);
+        if (btn) {
+            btn.style.background = '';
+            btn.style.color = '';
+        }
+    });
+
+    // 2. 確保「語意選股」按鈕的文字恢復成預設狀態
+    const screenerBtn = document.getElementById('screener-toggle-btn');
+    if (screenerBtn && activeButtonId !== 'screener-toggle-btn') {
+        screenerBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
+    }
+
+    // 3. 把當前點擊的按鈕亮起 (傳入 null 代表回首頁，全都不亮)
+    if (activeButtonId) {
+        const activeBtn = document.getElementById(activeButtonId);
+        if (activeBtn) {
+            if (activeButtonId === 'screener-toggle-btn') {
+                // 語意選股亮黃燈，並改變文字
+                activeBtn.innerHTML = '<span style="font-size: 16px;">🔍</span> 回單股分析';
+                activeBtn.style.background = '#f0b90b';
+                activeBtn.style.color = '#1e1e1e';
+            } else {
+                // 其他功能統一亮藍燈
+                activeBtn.style.background = '#3498db';
+                activeBtn.style.color = 'white';
+            }
+        }
+    }
+}
 
 // ✨ 新增：觸發後端生成 Excel 的函式
 async function triggerExcelDownload(event) {
@@ -9945,7 +9982,6 @@ async function triggerExcelDownload(event) {
 /* ==========================================================================
    ✨ 語意選股器 (Semantic Screener) 專屬邏輯
    ========================================================================== */
-
 function toggleScreener() {
     const briefingSection = document.getElementById('daily-briefing-section');
     if (briefingSection) briefingSection.style.display = 'none';
@@ -9955,27 +9991,23 @@ function toggleScreener() {
     const screenerContent = document.getElementById('dd-screener-content');
     const trumpContent = document.getElementById('dd-trump-content');
     const sentimentContent = document.getElementById('dd-sentiment-content');
-    const toggleBtn = document.getElementById('screener-toggle-btn');
 
-    // 🌟 核心修復：無論如何，絕對不鎖定搜尋框！
     const searchInput = document.getElementById('dd-stock-input');
     const analyzeBtn = document.querySelector('.btn-analyze') || document.querySelector('button[onclick="runDeepDive()"]');
     if (searchInput) { searchInput.disabled = false; searchInput.style.opacity = '1'; searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)"; }
     if (analyzeBtn) { analyzeBtn.disabled = false; analyzeBtn.style.opacity = '1'; }
 
     if (screenerContent.style.display === 'none' || screenerContent.style.display === '') {
+        updateNavButtons('screener-toggle-btn'); // 👈 語意選股亮燈
+
         if(emptyState) emptyState.style.display = 'none';
         if(mainContent) mainContent.style.display = 'none';
         if(trumpContent) trumpContent.style.display = 'none';
         if(sentimentContent) sentimentContent.style.display = 'none';
         screenerContent.style.display = 'block';
-
-        if(toggleBtn) {
-            toggleBtn.innerHTML = '<span style="font-size: 16px;">🔍</span> 回單股分析';
-            toggleBtn.style.background = '#f0b90b';
-            toggleBtn.style.color = '#1e1e1e';
-        }
     } else {
+        updateNavButtons(null); // 👈 關閉語意選股，按鈕全熄滅
+
         screenerContent.style.display = 'none';
         if(trumpContent) trumpContent.style.display = 'none';
         if(sentimentContent) sentimentContent.style.display = 'none';
@@ -9984,12 +10016,6 @@ function toggleScreener() {
             if(mainContent) mainContent.style.display = 'block';
         } else {
             if(emptyState) emptyState.style.display = 'block';
-        }
-
-        if(toggleBtn) {
-            toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
-            toggleBtn.style.background = '#3498db';
-            toggleBtn.style.color = 'white';
         }
     }
 }
@@ -10102,18 +10128,12 @@ function toggleTrumpScreener() {
     const trumpContent = document.getElementById('dd-trump-content');
     if(trumpContent) trumpContent.style.display = 'block';
 
-    // 🌟 核心修復：強制解除搜尋框鎖定
     const searchInput = document.getElementById('dd-stock-input');
     const analyzeBtn = document.querySelector('.btn-analyze') || document.querySelector('button[onclick="runDeepDive()"]');
     if (searchInput) { searchInput.disabled = false; searchInput.style.opacity = '1'; searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)"; }
     if (analyzeBtn) { analyzeBtn.disabled = false; analyzeBtn.style.opacity = '1'; }
 
-    const toggleBtn = document.getElementById('screener-toggle-btn');
-    if(toggleBtn) {
-        toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
-        toggleBtn.style.background = '#3498db';
-        toggleBtn.style.color = 'white';
-    }
+    updateNavButtons('trump-toggle-btn'); // 👈 川普按鈕亮燈
 }
 
 
@@ -10571,21 +10591,15 @@ function switchView(targetView, event) {
     const sentimentContent = document.getElementById('dd-sentiment-content');
     const returnAnalysisBtn = document.getElementById('nav-analysis-btn');
 
-    // 🌟 核心修復：強制解除搜尋框鎖定
+    // 強制解除搜尋框鎖定
     const searchInput = document.getElementById('dd-stock-input');
     const analyzeBtn = document.querySelector('.btn-analyze') || document.querySelector('button[onclick="runDeepDive()"]');
     if (searchInput) { searchInput.disabled = false; searchInput.style.opacity = '1'; searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)"; }
     if (analyzeBtn) { analyzeBtn.disabled = false; analyzeBtn.style.opacity = '1'; }
 
-    // 恢復按鈕外觀
-    const toggleBtn = document.getElementById('screener-toggle-btn');
-    if(toggleBtn) {
-        toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
-        toggleBtn.style.background = '#3498db';
-        toggleBtn.style.color = 'white';
-    }
-
     if (targetView === 'news') {
+        updateNavButtons('nav-news-btn'); // 👈 新聞按鈕亮燈
+
         if(mainContent) mainContent.style.display = 'none';
         if(screenerContent) screenerContent.style.display = 'none';
         if(trumpContent) trumpContent.style.display = 'none';
@@ -10599,6 +10613,8 @@ function switchView(targetView, event) {
             returnAnalysisBtn.style.display = 'none';
         }
     } else if (targetView === 'analysis') {
+        updateNavButtons(null); // 👈 返回首頁分析，按鈕全熄滅
+
         if (returnAnalysisBtn) returnAnalysisBtn.style.display = 'none';
         if (newsSection) newsSection.style.display = 'none';
         if(sentimentContent) sentimentContent.style.display = 'none';
@@ -10771,35 +10787,13 @@ function toggleSentimentMatrix() {
     const screenerContent = document.getElementById('dd-screener-content');
     const trumpContent = document.getElementById('dd-trump-content');
 
-    // 🌟 1. 強制解除搜尋框鎖定
     const searchInput = document.getElementById('dd-stock-input');
     const analyzeBtn = document.querySelector('.btn-analyze') || document.querySelector('button[onclick="runDeepDive()"]');
     if (searchInput) { searchInput.disabled = false; searchInput.style.opacity = '1'; searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)"; }
     if (analyzeBtn) { analyzeBtn.disabled = false; analyzeBtn.style.opacity = '1'; }
 
-    // 🌟 2. 恢復「語意選股」按鈕的預設外觀（移除藍色高亮）
-    const screenerBtn = document.getElementById('screener-toggle-btn');
-    if (screenerBtn) {
-        screenerBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
-        screenerBtn.style.background = ''; // 👈 清空行內背景色，恢復預設 CSS
-        screenerBtn.style.color = '';
-    }
+    updateNavButtons('sentiment-toggle-btn'); // 👈 情緒矩陣亮燈
 
-    // 🌟 3. 恢復「川普因子」按鈕預設外觀
-    const trumpBtn = document.getElementById('trump-toggle-btn');
-    if (trumpBtn) {
-        trumpBtn.style.background = '';
-        trumpBtn.style.color = '';
-    }
-
-    // 🌟 4. 高亮顯示當前點擊的「美股情緒矩陣」按鈕
-    const sentimentBtn = document.getElementById('sentiment-toggle-btn');
-    if (sentimentBtn) {
-        sentimentBtn.style.background = '#3498db'; // 👈 讓美股情緒矩陣亮藍燈
-        sentimentBtn.style.color = 'white';
-    }
-
-    // 🌟 5. 面板顯示切換
     if (emptyState) emptyState.style.display = 'none';
     if (mainContent) mainContent.style.display = 'none';
     if (screenerContent) screenerContent.style.display = 'none';
