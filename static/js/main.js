@@ -9953,69 +9953,46 @@ function toggleScreener() {
     const emptyState = document.getElementById('dd-empty-state');
     const mainContent = document.getElementById('dd-main-content');
     const screenerContent = document.getElementById('dd-screener-content');
-    const trumpContent = document.getElementById('dd-trump-content'); // 👈 新增：抓取川普面板
+    const trumpContent = document.getElementById('dd-trump-content');
+    const sentimentContent = document.getElementById('dd-sentiment-content');
     const toggleBtn = document.getElementById('screener-toggle-btn');
 
-    // 獲取頂部搜尋列的元素，準備進行防呆鎖定
+    // 🌟 核心修復：無論如何，絕對不鎖定搜尋框！
     const searchInput = document.getElementById('dd-stock-input');
-    const analyzeBtn = document.querySelector('button[onclick="runDeepDive()"]');
+    const analyzeBtn = document.querySelector('.btn-analyze') || document.querySelector('button[onclick="runDeepDive()"]');
+    if (searchInput) { searchInput.disabled = false; searchInput.style.opacity = '1'; searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)"; }
+    if (analyzeBtn) { analyzeBtn.disabled = false; analyzeBtn.style.opacity = '1'; }
 
     if (screenerContent.style.display === 'none' || screenerContent.style.display === '') {
-        // --- 進入【語意選股模式】 ---
         if(emptyState) emptyState.style.display = 'none';
         if(mainContent) mainContent.style.display = 'none';
-        if(trumpContent) trumpContent.style.display = 'none'; // 👈 新增：確保川普面板被關閉
+        if(trumpContent) trumpContent.style.display = 'none';
+        if(sentimentContent) sentimentContent.style.display = 'none';
         screenerContent.style.display = 'block';
 
-        // 改變按鈕樣式提示使用者如何返回
         if(toggleBtn) {
             toggleBtn.innerHTML = '<span style="font-size: 16px;">🔍</span> 回單股分析';
             toggleBtn.style.background = '#f0b90b';
             toggleBtn.style.color = '#1e1e1e';
         }
-
-        // 鎖定頂部單股搜尋框，避免使用者搞混操作邏輯
-        if (searchInput) {
-            searchInput.disabled = true;
-            searchInput.placeholder = "請在下方選股器面板輸入主題...";
-            searchInput.style.opacity = '0.5';
-        }
-        if (analyzeBtn) {
-            analyzeBtn.disabled = true;
-            analyzeBtn.style.opacity = '0.5';
-        }
     } else {
-        // --- 回到【單股分析模式】 ---
         screenerContent.style.display = 'none';
-        if(trumpContent) trumpContent.style.display = 'none'; // 👈 新增：確保川普面板被關閉
+        if(trumpContent) trumpContent.style.display = 'none';
+        if(sentimentContent) sentimentContent.style.display = 'none';
 
-        // 判斷要顯示歡迎畫面還是先前查好的報告
         if(window.currentReportContent && window.currentReportContent !== "") {
             if(mainContent) mainContent.style.display = 'block';
         } else {
             if(emptyState) emptyState.style.display = 'block';
         }
 
-        // 恢復按鈕樣式
         if(toggleBtn) {
             toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
             toggleBtn.style.background = '#3498db';
             toggleBtn.style.color = 'white';
         }
-
-        // 解除頂部搜尋框鎖定
-        if (searchInput) {
-            searchInput.disabled = false;
-            searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)";
-            searchInput.style.opacity = '1';
-        }
-        if (analyzeBtn) {
-            analyzeBtn.disabled = false;
-            analyzeBtn.style.opacity = '1';
-        }
     }
 }
-
 // 2. 呼叫後端選股 API 並渲染表格
 async function runSemanticScreener() {
     const inputField = document.getElementById('screener-input');
@@ -10115,39 +10092,29 @@ function fillPrompt(promptText) {
 // ==========================================
 // 1. 啟動川普面板
 function toggleTrumpScreener() {
-
     const briefingSection = document.getElementById('daily-briefing-section');
     if (briefingSection) briefingSection.style.display = 'none';
-    // 隱藏其他所有面板
     if(document.getElementById('dd-main-content')) document.getElementById('dd-main-content').style.display = 'none';
     if(document.getElementById('dd-screener-content')) document.getElementById('dd-screener-content').style.display = 'none';
     if(document.getElementById('dd-empty-state')) document.getElementById('dd-empty-state').style.display = 'none';
+    if(document.getElementById('dd-sentiment-content')) document.getElementById('dd-sentiment-content').style.display = 'none';
 
-    // 顯示川普面板
     const trumpContent = document.getElementById('dd-trump-content');
     if(trumpContent) trumpContent.style.display = 'block';
 
-    // 🛡️ 防呆：將語意選股按鈕與搜尋列恢復原狀
-    const toggleBtn = document.getElementById('screener-toggle-btn');
+    // 🌟 核心修復：強制解除搜尋框鎖定
     const searchInput = document.getElementById('dd-stock-input');
-    const analyzeBtn = document.querySelector('button[onclick="runDeepDive()"]');
+    const analyzeBtn = document.querySelector('.btn-analyze') || document.querySelector('button[onclick="runDeepDive()"]');
+    if (searchInput) { searchInput.disabled = false; searchInput.style.opacity = '1'; searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)"; }
+    if (analyzeBtn) { analyzeBtn.disabled = false; analyzeBtn.style.opacity = '1'; }
 
+    const toggleBtn = document.getElementById('screener-toggle-btn');
     if(toggleBtn) {
         toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
         toggleBtn.style.background = '#3498db';
         toggleBtn.style.color = 'white';
     }
-    if (searchInput) {
-        searchInput.disabled = false;
-        searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)";
-        searchInput.style.opacity = '1';
-    }
-    if (analyzeBtn) {
-        analyzeBtn.disabled = false;
-        analyzeBtn.style.opacity = '1';
-    }
 }
-
 
 
 // ==========================================
@@ -10601,16 +10568,27 @@ function switchView(targetView, event) {
     const screenerContent = document.getElementById('dd-screener-content');
     const trumpContent = document.getElementById('dd-trump-content');
     const emptyState = document.getElementById('dd-empty-state');
-    const sentimentContent = document.getElementById('dd-sentiment-content'); // 情緒矩陣
+    const sentimentContent = document.getElementById('dd-sentiment-content');
     const returnAnalysisBtn = document.getElementById('nav-analysis-btn');
 
+    // 🌟 核心修復：強制解除搜尋框鎖定
+    const searchInput = document.getElementById('dd-stock-input');
+    const analyzeBtn = document.querySelector('.btn-analyze') || document.querySelector('button[onclick="runDeepDive()"]');
+    if (searchInput) { searchInput.disabled = false; searchInput.style.opacity = '1'; searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)"; }
+    if (analyzeBtn) { analyzeBtn.disabled = false; analyzeBtn.style.opacity = '1'; }
+
+    // 恢復按鈕外觀
+    const toggleBtn = document.getElementById('screener-toggle-btn');
+    if(toggleBtn) {
+        toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
+        toggleBtn.style.background = '#3498db';
+        toggleBtn.style.color = 'white';
+    }
 
     if (targetView === 'news') {
         if(mainContent) mainContent.style.display = 'none';
         if(screenerContent) screenerContent.style.display = 'none';
         if(trumpContent) trumpContent.style.display = 'none';
-        if(sentimentContent) sentimentContent.style.display = 'none';
-        // 👇 2. 切換到新聞時，必須隱藏情緒矩陣
         if(sentimentContent) sentimentContent.style.display = 'none';
 
         if(newsSection) newsSection.style.display = '';
@@ -10623,7 +10601,6 @@ function switchView(targetView, event) {
     } else if (targetView === 'analysis') {
         if (returnAnalysisBtn) returnAnalysisBtn.style.display = 'none';
         if (newsSection) newsSection.style.display = 'none';
-        // 👇 3. 回到單股分析時，也要隱藏情緒矩陣
         if(sentimentContent) sentimentContent.style.display = 'none';
 
         if(window.currentReportContent) {
@@ -10635,7 +10612,6 @@ function switchView(targetView, event) {
         }
     }
 }
-
 // ==========================================
 // 📜 全域共用歷史紀錄管理系統 (Database Backend)
 // ==========================================
@@ -10795,24 +10771,35 @@ function toggleSentimentMatrix() {
     const screenerContent = document.getElementById('dd-screener-content');
     const trumpContent = document.getElementById('dd-trump-content');
 
+    // 🌟 核心修復：強制解除搜尋框鎖定
+    const searchInput = document.getElementById('dd-stock-input');
+    const analyzeBtn = document.querySelector('.btn-analyze') || document.querySelector('button[onclick="runDeepDive()"]');
+    if (searchInput) { searchInput.disabled = false; searchInput.style.opacity = '1'; searchInput.placeholder = "ENTER SYMBOL (E.G. AAPL)"; }
+    if (analyzeBtn) { analyzeBtn.disabled = false; analyzeBtn.style.opacity = '1'; }
+
+    // 恢復按鈕外觀
+    const toggleBtn = document.getElementById('screener-toggle-btn');
+    if(toggleBtn) {
+        toggleBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
+        toggleBtn.style.background = '#3498db';
+        toggleBtn.style.color = 'white';
+    }
+
     if (emptyState) emptyState.style.display = 'none';
     if (mainContent) mainContent.style.display = 'none';
     if (screenerContent) screenerContent.style.display = 'none';
     if (trumpContent) trumpContent.style.display = 'none';
 
     if (sentimentContent) {
-        // ⚠️ 絕對關鍵：必須用 flex 才能維持左右對照，絕對不能用 block！
         sentimentContent.style.display = 'flex';
     }
 
-    // 延遲 150 毫秒，等瀏覽器把面板畫出來後，再叫 Chart.js 畫圖，避免變空白
     setTimeout(() => {
-        loadSentimentMatrixData();     // 觸發美股
-        loadTWSentimentMatrixData();   // 觸發台股
-        loadAdvancedLiquidityData();   // 觸發美股下半部總經與流動性
+        if (typeof loadSentimentMatrixData === 'function') loadSentimentMatrixData();
+        if (typeof loadTWSentimentMatrixData === 'function') loadTWSentimentMatrixData();
+        if (typeof loadAdvancedLiquidityData === 'function') loadAdvancedLiquidityData();
     }, 150);
 }
-
 // ==========================================
 // 🇺🇸 美股核心邏輯區
 // ==========================================
