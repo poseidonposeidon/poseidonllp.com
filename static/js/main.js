@@ -11519,9 +11519,6 @@ function drawSectorPerformanceChart(sectorData) {
 /* ==========================================================================
    🔘 資金輪動圖表：時間維度切換邏輯 (1D / 1W / 1M / YTD)
    ========================================================================== */
-let globalSectorData = []; // 儲存當下最新的板塊資料
-let currentSectorTimeframe = '1D'; // 預設顯示單日
-
 function updateSectorTimeframe(timeframe) {
     currentSectorTimeframe = timeframe;
 
