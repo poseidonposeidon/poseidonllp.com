@@ -11512,6 +11512,9 @@ async function loadTWSentimentMatrixData() {
 let twLiquidityChartInstance = null;
 let twDrawdownChartInstance = null;
 let twMacroChartInstance = null;
+let twInstChartInstance = null;
+let twDayTradeChartInstance = null;
+
 
 // 打撈台股進階數據
 async function loadTWAdvancedLiquidityData() {
@@ -11545,6 +11548,10 @@ async function loadTWAdvancedLiquidityData() {
         if (data.smart_money) {
             renderTWHeavyweights(data.smart_money);
         }
+
+        if (data.twii_history && data.institutional_total) drawTWInstitutionalChart(data.twii_history, data.institutional_total);
+        if (data.twii_history && data.day_trade_total) drawTWDayTradeChart(data.twii_history, data.day_trade_total);
+
     } catch (error) {
         console.error("TW Advanced Liquidity Data Error:", error);
     }
@@ -11670,7 +11677,7 @@ function renderTWHeavyweights(smartMoney) {
     if (!tbody) return;
 
     if (!smartMoney || smartMoney.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 15px;">暫無籌碼數據</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding: 15px;">暫無籌碼數據</td></tr>';
         return;
     }
 
@@ -11680,21 +11687,25 @@ function renderTWHeavyweights(smartMoney) {
         const color = changePct > 0 ? '#3e7d5c' : (changePct < 0 ? '#b0532f' : '#6e685c');
         const sign = changePct > 0 ? '+' : '';
 
-        const buyVolume = item.foreign_buy ? (item.foreign_buy / 1000).toFixed(0) : 0; // 轉換為「張」
+        const buyVolume = item.foreign_buy ? (item.foreign_buy / 1000).toFixed(0) : 0;
         const buyColor = buyVolume > 0 ? '#3e7d5c' : (buyVolume < 0 ? '#b0532f' : '#6e685c');
         const buySign = buyVolume > 0 ? '+' : '';
 
         html += `
             <tr style="border-bottom: 1px solid #f0ebe1; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
-                <td style="padding: 10px; font-weight: bold; color: #2b261c;">${item.symbol}</td>
+                <td style="padding: 10px; font-weight: bold; color: #2b261c;">
+                    ${item.symbol} <span style="color: #888; font-size: 12px; margin-left: 4px;">${item.companyName || ''}</span>
+                </td>
                 <td style="padding: 10px; color: #2b261c;">${item.price.toFixed(1)}</td>
                 <td style="padding: 10px; color: ${color}; font-weight: bold;">${sign}${changePct}%</td>
                 <td style="padding: 10px; color: ${buyColor}; font-weight: bold;">${buySign}${Number(buyVolume).toLocaleString()}</td>
             </tr>
         `;
     });
+    // 順便確認你的 HTML <thead> 裡的欄位數是否對應，如果原本是 4 個 <th> 就不用動
     tbody.innerHTML = html;
 }
+
 // 2. 畫圖：台股專屬半圓形儀表板 (ECharts)
 function drawTWSentimentGauge(score, labelText) {
     const dom = document.getElementById('tw-sentiment-gauge-chart');
@@ -11753,4 +11764,99 @@ function renderTWSentimentTable(dataArray) {
         `;
     });
     tbody.innerHTML = html;
+}
+
+// ✨ 畫圖：加權指數 vs 三大法人現貨買賣超
+function drawTWInstitutionalChart(twii, instData) {
+    const canvas = document.getElementById('tw-institutional-chart');
+    if (!canvas || twii.length === 0) return;
+
+    const labels = twii.map(d => d.date);
+    const closeData = twii.map(d => d.close);
+
+    // 萃取三大法人數據並轉換為「億」為單位
+    const foreignData = labels.map(date => {
+        const match = instData.find(x => x.date === date && x.name.includes('外資'));
+        return match ? (match.difference / 100000000).toFixed(2) : 0;
+    });
+
+    const trustData = labels.map(date => {
+        const match = instData.find(x => x.date === date && x.name.includes('投信'));
+        return match ? (match.difference / 100000000).toFixed(2) : 0;
+    });
+
+    const dealerData = labels.map(date => {
+        const match = instData.find(x => x.date === date && x.name.includes('自營商'));
+        return match ? (match.difference / 100000000).toFixed(2) : 0;
+    });
+
+    if (twInstChartInstance) twInstChartInstance.destroy();
+
+    twInstChartInstance = new Chart(canvas, {
+        data: {
+            labels: labels,
+            datasets: [
+                { type: 'line', label: '加權指數', data: closeData, borderColor: '#2c3e50', yAxisID: 'y', pointRadius: 0, tension: 0.2 },
+                { type: 'bar', label: '外資 (億)', data: foreignData, backgroundColor: 'rgba(52, 152, 219, 0.7)', yAxisID: 'y1' },
+                { type: 'bar', label: '投信 (億)', data: trustData, backgroundColor: 'rgba(231, 76, 60, 0.7)', yAxisID: 'y1' },
+                { type: 'bar', label: '自營商 (億)', data: dealerData, backgroundColor: 'rgba(241, 196, 15, 0.7)', yAxisID: 'y1' }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: { stacked: true, grid: { display: false }, ticks: { maxTicksLimit: 10 } },
+                y: { position: 'left', ticks: { color: '#2c3e50' } },
+                y1: { position: 'right', stacked: true, grid: { display: false } }
+            }
+        }
+    });
+}
+
+// ✨ 畫圖：大盤成交量 vs 當沖佔比 (%)
+function drawTWDayTradeChart(twii, dtData) {
+    const canvas = document.getElementById('tw-day-trade-chart');
+    if (!canvas || twii.length === 0) return;
+
+    const labels = twii.map(d => d.date);
+
+    // 大盤成交量 (億)
+    const volumeData = twii.map(d => {
+        const vol = d.Trading_Volume || d.Trading_turnover || 0;
+        return (vol / 100000000).toFixed(2);
+    });
+
+    // 計算當沖比例 (當沖買進金額 / 大盤成交總額)
+    const dtRatioData = labels.map(date => {
+        const dtMatch = dtData.find(x => x.date === date);
+        const twiiMatch = twii.find(x => x.date === date);
+        if (dtMatch && twiiMatch) {
+            const dtBuy = dtMatch.BuyAmout || 0;
+            const totalVol = twiiMatch.Trading_Volume || twiiMatch.Trading_turnover || 1;
+            return ((dtBuy / totalVol) * 100).toFixed(2);
+        }
+        return null;
+    });
+
+    if (twDayTradeChartInstance) twDayTradeChartInstance.destroy();
+
+    twDayTradeChartInstance = new Chart(canvas, {
+        data: {
+            labels: labels,
+            datasets: [
+                { type: 'line', label: '當沖比例 (%)', data: dtRatioData, borderColor: '#e67e22', backgroundColor: '#e67e22', borderWidth: 2, yAxisID: 'y1', pointRadius: 0, spanGaps: true },
+                { type: 'bar', label: '大盤成交量 (億)', data: volumeData, backgroundColor: 'rgba(189, 195, 199, 0.5)', yAxisID: 'y' }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            scales: {
+                x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
+                y: { position: 'left', grid: { color: '#f0ebe1' } },
+                y1: { position: 'right', grid: { display: false }, ticks: { callback: v => v + '%' } }
+            }
+        }
+    });
 }
