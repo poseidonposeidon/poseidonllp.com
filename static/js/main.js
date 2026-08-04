@@ -10895,6 +10895,30 @@ async function loadSentimentMatrixData() {
                 cioCard.style.display = 'block';
             }
 
+            // ==========================================
+            // ✨ 新增：將 4 大聰明錢與總經指標填入雷達面板
+            // ==========================================
+            const cotElement = document.getElementById('smart-money-cot');
+            if (cotElement) {
+                cotElement.innerText = rawObj['COT籌碼'] || '尚無數據';
+            }
+
+            const senateElement = document.getElementById('smart-money-senate');
+            if (senateElement) {
+                senateElement.innerText = rawObj['國會議員買進'] || '尚無數據';
+            }
+
+            const fundElement = document.getElementById('smart-money-fund');
+            if (fundElement) {
+                fundElement.innerText = rawObj['現金增資案'] || '尚無數據';
+            }
+
+            const mrpElement = document.getElementById('smart-money-mrp');
+            if (mrpElement) {
+                mrpElement.innerText = rawObj['市場風險溢酬'] || '尚無數據';
+            }
+            // ==========================================
+
             // 畫圖表
             drawBofAGauge(latestRecord.sentiment_score);
             drawSentimentMixedChart(data);
