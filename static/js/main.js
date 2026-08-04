@@ -11195,7 +11195,7 @@ function drawLiquidityVolumeChart(spy, tnx) {
             scales: {
                 x: { grid: { display: false }, ticks: { maxTicksLimit: 10 } },
                 y: { type: 'linear', position: 'left', grid: { color: '#f0ebe1' } },
-                y1: { type: 'linear', position: 'right', grid: { display: false }, ticks: { callback: v => v + '%' } }
+                y1: { type: 'linear', position: 'right', grid: { display: false }, ticks: { callback: v => Number(v).toFixed(2) + '%' } }
             }
         }
     });
