@@ -9127,6 +9127,10 @@ async function runDeepDive(event) {
         // 5. 渲染報告與財報防禦雷達徽章
         renderDeepDiveMarkdown(data.report, reportContainer, data.raw_data);
 
+        if (typeof renderPremiumWidgets === 'function') {
+            renderPremiumWidgets(data.raw_data);
+        }
+
         // ==========================================
         // 🌟 6. 動態推演沙盤：數據抓取與初始化
         // ==========================================
@@ -10474,6 +10478,196 @@ async function downloadDashboardPDF(event) {
         event.target.innerHTML = originalBtnText;
         event.target.disabled = false;
     }
+}
+
+// ==========================================
+// ✨ 華爾街進階數據卡片模組渲染邏輯
+// ==========================================
+let widgetConsensusChart = null;
+let widgetProductChart = null;
+let widgetGeoChart = null;
+
+function renderPremiumWidgets(rawData) {
+    const container = document.getElementById('dd-premium-widgets');
+    if (!container) return;
+
+    // 簡單防呆：只要有其中一項進階數據，就顯示區塊
+    if (rawData.wall_street_consensus || rawData.revenue_breakdown) {
+        container.style.display = 'grid';
+    } else {
+        container.style.display = 'none';
+        return;
+    }
+
+    renderValuationAndConsensus(rawData);
+    renderRevenueBreakdown(rawData);
+    renderSmartMoneyList(rawData);
+}
+
+function renderValuationAndConsensus(rawData) {
+    // 1. 處理 DCF 溫度計
+    const price = rawData.price;
+    const dcf = rawData.dcf;
+
+    if (price && dcf && dcf > 0) {
+        document.getElementById('widget-current-price').innerText = `$${price.toFixed(2)}`;
+        document.getElementById('widget-dcf-price').innerText = `理論 $${dcf.toFixed(2)}`;
+
+        // 計算進度條比例 (以最大值的 1.2 倍作為畫布盡頭)
+        const maxVal = Math.max(price, dcf) * 1.2;
+        const dcfPct = Math.min((dcf / maxVal) * 100, 100);
+        const pricePct = Math.min((price / maxVal) * 100, 100);
+
+        // 動畫呈現
+        setTimeout(() => {
+            document.getElementById('widget-dcf-bar').style.width = `${dcfPct}%`;
+            document.getElementById('widget-price-marker').style.left = `${pricePct}%`;
+        }, 100);
+
+        const diff = ((price - dcf) / dcf) * 100;
+        const statusEl = document.getElementById('widget-dcf-status');
+        if (diff > 0) {
+            statusEl.innerText = `⚠️ 估值溢價 ${Math.abs(diff).toFixed(1)}%`;
+            statusEl.style.color = "#e74c3c";
+        } else {
+            statusEl.innerText = `✅ 低估安全邊際 ${Math.abs(diff).toFixed(1)}%`;
+            statusEl.style.color = "#27ae60";
+        }
+    }
+
+    // 2. 處理機構共識甜甜圈圖
+    const consensus = rawData.wall_street_consensus || {};
+    const labelEl = document.getElementById('widget-consensus-label');
+
+    if (consensus.consensus) {
+        labelEl.innerText = consensus.consensus.toUpperCase();
+        if (consensus.consensus.includes('Buy')) labelEl.style.background = "#27ae60";
+        else if (consensus.consensus.includes('Sell')) labelEl.style.background = "#e74c3c";
+        else labelEl.style.background = "#f0b90b";
+
+        const buy = (consensus.strongBuy || 0) + (consensus.buy || 0);
+        const hold = consensus.hold || 0;
+        const sell = (consensus.sell || 0) + (consensus.strongSell || 0);
+
+        const ctx = document.getElementById('widget-consensus-chart');
+        if (widgetConsensusChart) widgetConsensusChart.destroy();
+
+        if (buy > 0 || hold > 0 || sell > 0) {
+            widgetConsensusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Buy', 'Hold', 'Sell'],
+                    datasets: [{
+                        data: [buy, hold, sell],
+                        backgroundColor: ['#27ae60', '#f0b90b', '#e74c3c'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    cutout: '70%',
+                    plugins: { legend: { display: false }, tooltip: { enabled: true } }
+                }
+            });
+        }
+    }
+}
+
+function renderRevenueBreakdown(rawData) {
+    const bd = rawData.revenue_breakdown || {};
+
+    // 繪製圓餅圖共用函式
+    const drawPie = (canvasId, dataObj, chartRef) => {
+        if (!dataObj || Object.keys(dataObj).length === 0) return chartRef;
+        // 取出最新一期的數據
+        const latestDate = Object.keys(dataObj)[0];
+        const segments = dataObj[latestDate];
+        if (!segments) return chartRef;
+
+        // 排序並取前 5 大，其餘歸類為 Others 以免圖表太擠
+        const sorted = Object.entries(segments).sort((a, b) => b[1] - a[1]);
+        const labels = [];
+        const values = [];
+        let others = 0;
+
+        sorted.forEach((item, index) => {
+            if (index < 5) { labels.push(item[0]); values.push(item[1]); }
+            else { others += item[1]; }
+        });
+        if (others > 0) { labels.push('Others'); values.push(others); }
+
+        const ctx = document.getElementById(canvasId);
+        if (chartRef) chartRef.destroy();
+
+        return new Chart(ctx, {
+            type: 'pie',
+            data: {
+                labels: labels,
+                datasets: [{
+                    data: values,
+                    backgroundColor: ['#3498db', '#9b59b6', '#2ecc71', '#f1c40f', '#e67e22', '#95a5a6'],
+                    borderWidth: 1, borderColor: '#1a1a1a'
+                }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let total = context.chart._metasets[context.datasetIndex].total;
+                                let pct = ((context.raw / total) * 100).toFixed(1) + '%';
+                                return ` ${context.label}: ${pct}`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    };
+
+    widgetProductChart = drawPie('widget-product-chart', bd.product, widgetProductChart);
+    widgetGeoChart = drawPie('widget-geo-chart', bd.geographic, widgetGeoChart);
+}
+
+function renderSmartMoneyList(rawData) {
+    const listContainer = document.getElementById('widget-smart-money-list');
+    if (!listContainer) return;
+
+    let html = '';
+    const insiders = rawData.insider_transactions || [];
+
+    // 這裡我們取內部人交易，如果後續端點有抓國會議員，也可以合併進來
+    if (insiders.length === 0) {
+        listContainer.innerHTML = '<div style="text-align: center; color: #666; margin-top: 20px;">近期無內部人或國會議員交易紀錄</div>';
+        return;
+    }
+
+    insiders.slice(0, 8).forEach(t => {
+        let typeStr = t.transactionType || "N/A";
+        let isBuy = typeStr.toLowerCase().includes('buy') || typeStr.toLowerCase().includes('purchase');
+        let color = isBuy ? '#27ae60' : '#e74c3c';
+        let action = isBuy ? '買進' : '賣出';
+
+        let date = t.transactionDate ? t.transactionDate.split(' ')[0] : 'N/A';
+        let name = t.reportingName || t.typeOfOwner || '內部高層';
+        let shares = t.securitiesTransacted ? t.securitiesTransacted.toLocaleString() : 0;
+
+        html += `
+        <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding-bottom: 6px; margin-bottom: 6px;">
+            <div>
+                <span style="color: ${color}; font-weight: bold; border: 1px solid ${color}; padding: 1px 4px; border-radius: 3px; font-size: 11px; margin-right: 8px;">${action}</span>
+                <span style="color: #ddd;">${name}</span>
+            </div>
+            <div style="text-align: right;">
+                <span style="color: #aaa;">${shares} 股</span><br>
+                <span style="color: #666; font-size: 11px;">${date}</span>
+            </div>
+        </div>`;
+    });
+
+    listContainer.innerHTML = html;
 }
 
 // ==========================================
