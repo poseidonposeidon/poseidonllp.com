@@ -968,32 +968,30 @@
                             <h4 style="margin: 0 0 12px 0; color: #2b261c; font-size: 14px; display: flex; align-items: center; gap: 8px;">
                                 <i class="fas fa-radar" style="color: #b0532f;"></i> 華爾街聰明錢雷達 (Smart Money Flow)
                             </h4>
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
-
-                                <!-- 1. COT 期貨籌碼 -->
-                                <div style="background: #fdfaf5; padding: 10px; border-radius: 6px; border: 1px solid #e8e3d8;">
-                                    <div style="font-size: 11px; color: #8a6d3f; font-weight: bold; margin-bottom: 4px;">COT 避險基金期貨部位</div>
-                                    <div id="smart-money-cot" style="font-size: 13px; color: #2b261c; font-weight: bold;">載入中...</div>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                                <!-- 格子 1：大盤狀態 -->
+                                <div style="background: #fdfbf7; border: 1px solid #e8e1d5; border-radius: 8px; padding: 15px;">
+                                    <div style="color: #8a6d3f; font-size: 12px; font-weight: bold; margin-bottom: 5px;">📊 今日大盤狀態</div>
+                                    <div id="radar-market-condition" style="color: #2b261c; font-weight: bold; font-size: 15px;">數據讀取中...</div>
                                 </div>
 
-                                <!-- 2. 國會議員動向 (裴洛西指標) -->
-                                <div style="background: #fdfaf5; padding: 10px; border-radius: 6px; border: 1px solid #e8e3d8;">
-                                    <div style="font-size: 11px; color: #8a6d3f; font-weight: bold; margin-bottom: 4px;">國會議員買進 (裴洛西指標)</div>
-                                    <div id="smart-money-senate" style="font-size: 13px; color: #2b261c; font-weight: bold;">載入中...</div>
+                                <!-- 格子 2：最強領漲板塊 -->
+                                <div style="background: #fdfbf7; border: 1px solid #e8e1d5; border-radius: 8px; padding: 15px;">
+                                    <div style="color: #8a6d3f; font-size: 12px; font-weight: bold; margin-bottom: 5px;">🚀 最強領漲板塊</div>
+                                    <div id="radar-top-sector" style="color: #2b261c; font-weight: bold; font-size: 15px;">數據讀取中...</div>
                                 </div>
 
-                                <!-- 3. 現金增資 (抽水機指標) -->
-                                <div style="background: #fdfaf5; padding: 10px; border-radius: 6px; border: 1px solid #e8e3d8;">
-                                    <div style="font-size: 11px; color: #8a6d3f; font-weight: bold; margin-bottom: 4px;">市場現金增資案 (抽水機)</div>
-                                    <div id="smart-money-fund" style="font-size: 13px; color: #2b261c; font-weight: bold;">載入中...</div>
+                                <!-- 格子 3：VIX 恐慌水位 -->
+                                <div style="background: #fdfbf7; border: 1px solid #e8e1d5; border-radius: 8px; padding: 15px;">
+                                    <div style="color: #8a6d3f; font-size: 12px; font-weight: bold; margin-bottom: 5px;">⚡ VIX 恐慌指數</div>
+                                    <div id="radar-vix" style="color: #2b261c; font-weight: bold; font-size: 15px;">數據讀取中...</div>
                                 </div>
 
-                                <!-- 4. 市場風險溢酬 (MRP) -->
-                                <div style="background: #fdfaf5; padding: 10px; border-radius: 6px; border: 1px solid #e8e3d8;">
-                                    <div style="font-size: 11px; color: #8a6d3f; font-weight: bold; margin-bottom: 4px;">美股風險溢酬 (MRP)</div>
-                                    <div id="smart-money-mrp" style="font-size: 13px; color: #2b261c; font-weight: bold;">載入中...</div>
+                                <!-- 格子 4：AI 建議持股水位 -->
+                                <div style="background: #fdfbf7; border: 1px solid #e8e1d5; border-radius: 8px; padding: 15px;">
+                                    <div style="color: #8a6d3f; font-size: 12px; font-weight: bold; margin-bottom: 5px;">🤖 AI 建議持股水位</div>
+                                    <div id="radar-exposure" style="color: #2b261c; font-weight: bold; font-size: 15px;">數據讀取中...</div>
                                 </div>
-
                             </div>
                         </div>
 

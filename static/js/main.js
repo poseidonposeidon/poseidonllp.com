@@ -10847,7 +10847,7 @@ async function loadSentimentMatrixData() {
                 document.getElementById('daily-vix-close').innerText = `VIX: ${parseFloat(rawObj['三大指數']['VIX']).toFixed(2)}`;
             }
 
-            // 建議持股水位
+            // 建議持股水位進度條
             const holdLevel = parseFloat(rawObj['建議持股水位']) || 75;
             const progressBar = document.getElementById('exposure-progress-bar');
             const progressText = document.getElementById('exposure-text');
@@ -10896,26 +10896,49 @@ async function loadSentimentMatrixData() {
             }
 
             // ==========================================
-            // ✨ 新增：將 4 大聰明錢與總經指標填入雷達面板
+            // ✨ 全新升級：實戰動能雷達 (精準渲染 4 大指標)
             // ==========================================
-            const cotElement = document.getElementById('smart-money-cot');
-            if (cotElement) {
-                cotElement.innerText = rawObj['COT籌碼'] || '尚無數據';
+
+            // 1. 大盤狀態 (從極端標籤讀取)
+            const marketCondEl = document.getElementById('radar-market-condition');
+            if (marketCondEl) {
+                marketCondEl.innerText = rawObj['極端標籤'] || '震盪整理';
             }
 
-            const senateElement = document.getElementById('smart-money-senate');
-            if (senateElement) {
-                senateElement.innerText = rawObj['國會議員買進'] || '尚無數據';
+            // 2. 最強領漲板塊 (抓取板塊輪動陣列的第一名)
+            const topSectorEl = document.getElementById('radar-top-sector');
+            if (topSectorEl) {
+                if (rawObj['板塊輪動'] && rawObj['板塊輪動'].length > 0) {
+                    const topSec = rawObj['板塊輪動'][0];
+                    topSectorEl.innerText = `${topSec.sector} (${topSec['1D']})`;
+                    topSectorEl.style.color = topSec['1D'].includes('-') ? '#b0532f' : '#3e7d5c';
+                } else {
+                    topSectorEl.innerText = '尚無板塊數據';
+                }
             }
 
-            const fundElement = document.getElementById('smart-money-fund');
-            if (fundElement) {
-                fundElement.innerText = rawObj['現金增資案'] || '尚無數據';
+            // 3. VIX 恐慌水位 (直接抓取三大指數並動態上色)
+            const radarVixEl = document.getElementById('radar-vix');
+            if (radarVixEl && rawObj['三大指數']) {
+                const vixVal = parseFloat(rawObj['三大指數']['VIX'] || 0).toFixed(2);
+                let vixComment = "(市場承平)";
+                let vixColor = "#3e7d5c";
+                if (vixVal > 25) {
+                    vixComment = "(極度恐慌)";
+                    vixColor = "#b0532f";
+                } else if (vixVal > 20) {
+                    vixComment = "(警戒狀態)";
+                    vixColor = "#e67e22";
+                }
+                radarVixEl.innerHTML = `<span style="color: ${vixColor};">${vixVal} ${vixComment}</span>`;
             }
 
-            const mrpElement = document.getElementById('smart-money-mrp');
-            if (mrpElement) {
-                mrpElement.innerText = rawObj['市場風險溢酬'] || '尚無數據';
+            // 4. AI 建議持股水位 (直接反映多因子模型數字)
+            const radarExpEl = document.getElementById('radar-exposure');
+            if (radarExpEl) {
+                const expVal = parseFloat(rawObj['建議持股水位'] || 50).toFixed(1);
+                let expColor = expVal < 50 ? '#b0532f' : '#3e7d5c';
+                radarExpEl.innerHTML = `<span style="color: ${expColor};">${expVal}%</span>`;
             }
             // ==========================================
 
