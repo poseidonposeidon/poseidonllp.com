@@ -10576,9 +10576,33 @@ function renderValuationAndConsensus(rawData) {
 function renderRevenueBreakdown(rawData) {
     const bd = rawData.revenue_breakdown || {};
 
-    // 繪製圓餅圖共用函式
-    const drawPie = (canvasId, dataObj, chartRef) => {
-        if (!dataObj || Object.keys(dataObj).length === 0) return chartRef;
+    // 繪製圓餅圖共用函式 (加入 fallbackText 防呆參數)
+    const drawPie = (canvasId, dataObj, chartRef, fallbackText) => {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return chartRef;
+        const container = canvas.parentElement;
+
+        // 🚨 防呆：如果沒有數據，顯示提示文字
+        if (!dataObj || Object.keys(dataObj).length === 0) {
+            // 隱藏 canvas
+            canvas.style.display = 'none';
+            // 檢查是否已經有提示文字
+            let noDataMsg = container.querySelector('.no-data-msg');
+            if (!noDataMsg) {
+                noDataMsg = document.createElement('div');
+                noDataMsg.className = 'no-data-msg';
+                noDataMsg.style.cssText = 'color: #666; font-size: 11px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; text-align: center;';
+                noDataMsg.innerHTML = fallbackText;
+                container.appendChild(noDataMsg);
+            }
+            return chartRef;
+        }
+
+        // 如果有數據，恢復顯示 canvas 並移除提示文字
+        canvas.style.display = 'block';
+        const existingMsg = container.querySelector('.no-data-msg');
+        if (existingMsg) existingMsg.remove();
+
         // 取出最新一期的數據
         const latestDate = Object.keys(dataObj)[0];
         const segments = dataObj[latestDate];
@@ -10596,7 +10620,7 @@ function renderRevenueBreakdown(rawData) {
         });
         if (others > 0) { labels.push('Others'); values.push(others); }
 
-        const ctx = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
         if (chartRef) chartRef.destroy();
 
         return new Chart(ctx, {
@@ -10627,8 +10651,8 @@ function renderRevenueBreakdown(rawData) {
         });
     };
 
-    widgetProductChart = drawPie('widget-product-chart', bd.product, widgetProductChart);
-    widgetGeoChart = drawPie('widget-geo-chart', bd.geographic, widgetGeoChart);
+    widgetProductChart = drawPie('widget-product-chart', bd.product, widgetProductChart, '無產品數據');
+    widgetGeoChart = drawPie('widget-geo-chart', bd.geographic, widgetGeoChart, '無地區數據');
 }
 
 function renderSmartMoneyList(rawData) {
