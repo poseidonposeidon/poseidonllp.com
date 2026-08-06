@@ -10576,17 +10576,15 @@ function renderValuationAndConsensus(rawData) {
 function renderRevenueBreakdown(rawData) {
     const bd = rawData.revenue_breakdown || {};
 
-    // 繪製圓餅圖共用函式 (加入 fallbackText 防呆參數)
-    const drawPie = (canvasId, dataObj, chartRef, fallbackText) => {
+    // 繪製圓餅圖共用函式 (加入防呆與結構過濾)
+    const drawPie = (canvasId, dataArray, chartRef, fallbackText) => {
         const canvas = document.getElementById(canvasId);
         if (!canvas) return chartRef;
         const container = canvas.parentElement;
 
-        // 🚨 防呆：如果沒有數據，顯示提示文字
-        if (!dataObj || Object.keys(dataObj).length === 0) {
-            // 隱藏 canvas
+        // 🚨 防呆：檢查是否為陣列，且排除 FMP 回傳 Error Message 的情況
+        if (!dataArray || !Array.isArray(dataArray) || dataArray.length === 0 || dataArray[0]['Error Message']) {
             canvas.style.display = 'none';
-            // 檢查是否已經有提示文字
             let noDataMsg = container.querySelector('.no-data-msg');
             if (!noDataMsg) {
                 noDataMsg = document.createElement('div');
@@ -10603,18 +10601,22 @@ function renderRevenueBreakdown(rawData) {
         const existingMsg = container.querySelector('.no-data-msg');
         if (existingMsg) existingMsg.remove();
 
-        // 取出最新一期的數據
-        const latestDate = Object.keys(dataObj)[0];
-        const segments = dataObj[latestDate];
-        if (!segments) return chartRef;
+        // 取得最新一季/年的資料 (陣列的第一筆)
+        const latestData = dataArray[0];
 
-        // 排序並取前 5 大，其餘歸類為 Others 以免圖表太擠
-        const sorted = Object.entries(segments).sort((a, b) => b[1] - a[1]);
+        // 🌟 核心修復：將資料轉成陣列，並「強制排除 date 欄位」與「非數字內容」
+        const segments = Object.entries(latestData)
+            .filter(([key, value]) => key !== 'date' && typeof value === 'number')
+            .sort((a, b) => b[1] - a[1]);
+
+        if (segments.length === 0) return chartRef;
+
         const labels = [];
         const values = [];
         let others = 0;
 
-        sorted.forEach((item, index) => {
+        // 取前 5 大，其餘歸類為 Others
+        segments.forEach((item, index) => {
             if (index < 5) { labels.push(item[0]); values.push(item[1]); }
             else { others += item[1]; }
         });
