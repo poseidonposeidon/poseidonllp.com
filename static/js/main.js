@@ -10515,6 +10515,9 @@ function renderPremiumWidgets(rawData) {
 }
 
 function renderValuationAndConsensus(rawData) {
+    // ==========================================
+    // 1. 處理 DCF 溫度計 (優化極端值的視覺呈現)
+    // ==========================================
     const price = rawData.price;
     const dcf = rawData.dcf;
 
@@ -10522,51 +10525,75 @@ function renderValuationAndConsensus(rawData) {
         document.getElementById('widget-current-price').innerText = `$${price.toFixed(2)}`;
         document.getElementById('widget-dcf-price').innerText = `理論 $${dcf.toFixed(2)}`;
 
-        // 🌟 修正進度條邏輯：色條代表「當前股價」，黃色游標代表「DCF 理論價」
         const isOvervalued = price > dcf;
-        const maxVal = Math.max(price, dcf) * 1.15; // 留 15% 邊距
-        const pricePct = Math.min((price / maxVal) * 100, 100);
-        const dcfPct = Math.min((dcf / maxVal) * 100, 100);
+
+        // 🌟 視覺優化：當溢價太過極端(大於3倍)時，稍微收斂視覺比例，防止黃線被擠成1像素
+        let visualPrice = price;
+        let visualDcf = dcf;
+        if (price / dcf > 5) visualDcf = price / 5;
+        if (dcf / price > 5) visualPrice = dcf / 5;
+
+        const maxVal = Math.max(visualPrice, visualDcf) * 1.15; // 留 15% 邊距
+        const pricePct = Math.min((visualPrice / maxVal) * 100, 100);
+        const dcfPct = Math.min((visualDcf / maxVal) * 100, 100);
 
         setTimeout(() => {
             const barEl = document.getElementById('widget-dcf-bar');
-            barEl.style.width = `${pricePct}%`;
-            // 高估亮紅燈，低估亮綠燈
-            barEl.style.background = isOvervalued ? '#e74c3c' : '#27ae60';
-
-            document.getElementById('widget-price-marker').style.left = `${dcfPct}%`;
+            if (barEl) {
+                barEl.style.width = `${pricePct}%`;
+                barEl.style.background = isOvervalued ? '#e74c3c' : '#27ae60';
+            }
+            const markerEl = document.getElementById('widget-price-marker');
+            if (markerEl) {
+                markerEl.style.left = `${dcfPct}%`;
+            }
         }, 100);
 
         const diff = ((price - dcf) / dcf) * 100;
         const statusEl = document.getElementById('widget-dcf-status');
-        if (isOvervalued) {
-            statusEl.innerText = `⚠️ 估值溢價 ${Math.abs(diff).toFixed(1)}%`;
-            statusEl.style.color = "#e74c3c";
-        } else {
-            statusEl.innerText = `✅ 低估安全邊際 ${Math.abs(diff).toFixed(1)}%`;
-            statusEl.style.color = "#27ae60";
+        if (statusEl) {
+            if (isOvervalued) {
+                statusEl.innerHTML = `⚠️ 估值溢價 <span style="font-weight:bold;">${Math.abs(diff).toFixed(1)}%</span>`;
+                statusEl.style.color = "#e74c3c";
+            } else {
+                statusEl.innerHTML = `✅ 低估安全邊際 <span style="font-weight:bold;">${Math.abs(diff).toFixed(1)}%</span>`;
+                statusEl.style.color = "#27ae60";
+            }
         }
     }
 
-    // ... (下方原本的 widgetConsensusChart 圓餅圖程式碼保持不變) ...
+    // ==========================================
+    // 2. 處理機構共識甜甜圈圖 (補上完美的空狀態)
+    // ==========================================
     const consensus = rawData.wall_street_consensus || {};
     const labelEl = document.getElementById('widget-consensus-label');
+    const chartCanvas = document.getElementById('widget-consensus-chart');
+    const chartContainer = chartCanvas ? chartCanvas.parentElement : null;
 
     if (consensus.consensus) {
-        labelEl.innerText = consensus.consensus.toUpperCase();
-        if (consensus.consensus.includes('Buy')) labelEl.style.background = "#27ae60";
-        else if (consensus.consensus.includes('Sell')) labelEl.style.background = "#e74c3c";
-        else labelEl.style.background = "#f0b90b";
+        // --- 有資料時：正常繪製圓餅圖 ---
+        if (labelEl) {
+            labelEl.innerText = consensus.consensus.toUpperCase();
+            if (consensus.consensus.includes('Buy')) labelEl.style.background = "#27ae60";
+            else if (consensus.consensus.includes('Sell')) labelEl.style.background = "#e74c3c";
+            else labelEl.style.background = "#f0b90b";
+        }
 
         const buy = (consensus.strongBuy || 0) + (consensus.buy || 0);
         const hold = consensus.hold || 0;
         const sell = (consensus.sell || 0) + (consensus.strongSell || 0);
 
-        const ctx = document.getElementById('widget-consensus-chart');
         if (widgetConsensusChart) widgetConsensusChart.destroy();
 
+        // 恢復 Canvas 顯示，並移除 Placeholder
+        if (chartCanvas) chartCanvas.style.display = 'block';
+        if (chartContainer) {
+            const placeholder = chartContainer.querySelector('.consensus-placeholder');
+            if (placeholder) placeholder.remove();
+        }
+
         if (buy > 0 || hold > 0 || sell > 0) {
-            widgetConsensusChart = new Chart(ctx, {
+            widgetConsensusChart = new Chart(chartCanvas, {
                 type: 'doughnut',
                 data: {
                     labels: ['Buy', 'Hold', 'Sell'],
@@ -10583,9 +10610,44 @@ function renderValuationAndConsensus(rawData) {
                 }
             });
         }
+    } else {
+        // --- 無資料時：畫一個 CSS 灰色空心圓來佔位 ---
+        if (labelEl) {
+            labelEl.innerText = '無評級';
+            labelEl.style.background = '#444';
+            labelEl.style.color = '#aaa';
+        }
+
+        if (chartContainer) {
+            // 隱藏真正的 Canvas
+            if (chartCanvas) chartCanvas.style.display = 'none';
+
+            // 加入一個超有質感的 CSS 空心圓佔位符
+            if (!chartContainer.querySelector('.consensus-placeholder')) {
+                const placeholder = document.createElement('div');
+                placeholder.className = 'consensus-placeholder';
+                placeholder.style.cssText = `
+                    width: 100%; 
+                    height: 100%; 
+                    border: 8px solid #333; 
+                    border-radius: 50%; 
+                    display: flex; 
+                    align-items: center; 
+                    justify-content: center; 
+                    box-sizing: border-box;
+                    color: #666;
+                    font-size: 11px;
+                    font-weight: bold;
+                    text-align: center;
+                    line-height: 1.2;
+                `;
+                placeholder.innerHTML = '無分析師<br>共識';
+                chartContainer.appendChild(placeholder);
+            }
+        }
     }
 }
-//test
+
 function renderRevenueBreakdown(rawData) {
     const bd = rawData.revenue_breakdown || {};
 
