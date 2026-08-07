@@ -10697,8 +10697,16 @@ function renderSmartMoneyList(rawData) {
     }
 
     insiders.slice(0, 8).forEach(t => {
-        let typeStr = t.transactionType || "N/A";
-        let isBuy = typeStr.toLowerCase().includes('buy') || typeStr.toLowerCase().includes('purchase');
+        // 🌟 升級版防呆寫法：涵蓋 FMP 常見的 Acquisition (A) 與 Award
+        let typeStrLower = t.transactionType ? t.transactionType.toLowerCase() : "";
+        // FMP API 有時會有拼字錯誤 (acquistionOrDisposition)，我們兩者都兼容
+        let acqDisp = t.acquistionOrDisposition || t.acquisitionOrDisposition || "";
+
+        let isBuy = typeStrLower.includes('buy') ||
+            typeStrLower.includes('purchase') ||
+            typeStrLower.includes('award') ||
+            acqDisp === 'A';
+
         let color = isBuy ? '#27ae60' : '#e74c3c';
         let action = isBuy ? '買進' : '賣出';
 
