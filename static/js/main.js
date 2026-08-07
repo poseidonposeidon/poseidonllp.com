@@ -12098,8 +12098,8 @@ async function loadTWAdvancedLiquidityData() {
         if (data.macro_gdp && data.macro_export) {
             drawTWMacroChart(data.macro_gdp, data.macro_export);
         }
-        if (data.smart_money) {
-            renderTWHeavyweights(data.smart_money);
+        if (typeof loadTWHeavyweights === 'function') {
+            loadTWHeavyweights();
         }
 
         if (data.twii_history && data.institutional_total) drawTWInstitutionalChart(data.twii_history, data.institutional_total);
