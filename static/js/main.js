@@ -12452,3 +12452,50 @@ function drawTWDayTradeChart(twii, dtData) {
         }
     });
 }
+
+// ==========================================
+// 🇹🇼 抓取並渲染台股前 10 大權值股 (接接證交所 Open API)
+// ==========================================
+async function loadTWHeavyweights() {
+    const tbody = document.getElementById('tw-heavyweights-body');
+    if (!tbody) return;
+
+    // 顯示載入中的狀態
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #8a6d3f;"><i class="fas fa-spinner fa-spin"></i> 正在從證交所抓取最新資料...</td></tr>';
+
+    try {
+        const response = await fetch('/api/tw_top10');
+        const json = await response.json();
+
+        if (json.status === 'success') {
+            tbody.innerHTML = '';
+
+            json.data.forEach(stock => {
+                // 🇹🇼 台灣專屬配色：紅漲綠跌
+                const changeColor = stock.change > 0 ? '#e74c3c' : (stock.change < 0 ? '#27ae60' : '#8a6d3f');
+                const changeSign = stock.change > 0 ? '+' : '';
+
+                // 外資買超(正)標紅，賣超(負)標綠
+                const foreignColor = stock.foreign_buy > 0 ? '#e74c3c' : (stock.foreign_buy < 0 ? '#27ae60' : '#8a6d3f');
+                const foreignSign = stock.foreign_buy > 0 ? '+' : '';
+
+                const tr = document.createElement('tr');
+                tr.style.borderBottom = '1px solid #e8e3d8'; // 配合你面板的柔和底色
+                tr.innerHTML = `
+                    <td style="padding: 12px 8px; color: #2b261c;"><strong>${stock.symbol}</strong> ${stock.name}</td>
+                    <td style="padding: 12px 8px; color: #2b261c;">${stock.price > 0 ? stock.price.toFixed(1) : '-'}</td>
+                    <td style="padding: 12px 8px; font-weight: bold; color: ${changeColor};">
+                        ${changeSign}${stock.change}%
+                    </td>
+                    <td style="padding: 12px 8px; font-weight: bold; color: ${foreignColor};">
+                        ${foreignSign}${stock.foreign_buy.toLocaleString()}
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    } catch (error) {
+        console.error("載入權值股失敗:", error);
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #e74c3c;">官方資料連線失敗，請檢查後端伺服器</td></tr>';
+    }
+}
