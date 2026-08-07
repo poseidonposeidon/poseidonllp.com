@@ -9570,7 +9570,17 @@ async function sendChatQuestion(suffix = '') {
     chatContainer.scrollTop = chatContainer.scrollHeight;
 
     const loadingId = "chat-loading-" + Date.now();
-    chatContainer.innerHTML += `<div id="${loadingId}" class="chat-bubble ai">CIO 正在檢索資料並思考中...</div>`;
+    const loadingHTML = `
+    <div id="${loadingId}" class="chat-bubble ai" style="display: flex; align-items: center;">
+        <div class="chat-typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        <div class="chat-loading-text">CIO 正在跨維度檢索智庫與沙盤推演中...</div>
+    </div>
+`;
+    chatContainer.innerHTML += loadingHTML;
 
     try {
         // 🚨 這裡務必使用「反引號 ( ` )」 (鍵盤左上角 Esc 下面那顆)，才能正確解析變數！
