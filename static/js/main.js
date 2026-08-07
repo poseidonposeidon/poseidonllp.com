@@ -10613,11 +10613,29 @@ function renderRevenueBreakdown(rawData) {
         if (wrapper) wrapper.style.display = 'flex';
 
         const latestData = dataArray[0];
-        const segments = Object.entries(latestData)
-            .filter(([key, value]) => key !== 'date' && typeof value === 'number')
+
+        // 🌟 核心修復：精準定位！真正的營收數字被包在 `data` 物件裡面
+        const revenueData = latestData.data || {};
+
+        // 將資料轉成陣列並由大到小排序 (不用黑名單了，因為 revenueData 裡面非常乾淨)
+        const segments = Object.entries(revenueData)
+            .filter(([key, value]) => typeof value === 'number' && value > 0)
             .sort((a, b) => b[1] - a[1]);
 
-        if (segments.length === 0) return chartRef;
+        // 如果過濾後沒有真正的營收資料，就不畫圖
+        if (segments.length === 0) {
+            if (wrapper) wrapper.style.display = 'none';
+
+            const container = canvas.closest('div[style*="display: flex; justify-content: space-between"]');
+            if (container && !container.querySelector('.no-data-msg-' + canvasId)) {
+                const noDataMsg = document.createElement('div');
+                noDataMsg.className = 'no-data-msg-' + canvasId;
+                noDataMsg.style.cssText = 'color: #666; font-size: 12px; flex: 1; text-align: center; padding: 20px 0;';
+                noDataMsg.innerHTML = fallbackText;
+                container.appendChild(noDataMsg);
+            }
+            return chartRef;
+        }
 
         const labels = [];
         const values = [];
