@@ -10884,7 +10884,8 @@ async function openHistoryModal(event) {
                 <div style="background: #2a2a2a; border: 1px solid #444; border-radius: 8px; padding: 15px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; transition: 0.2s; cursor: pointer;" onmouseover="this.style.borderColor='#f0b90b'" onmouseout="this.style.borderColor='#444'" onclick="restoreFromHistory(${item.id})">
                     <div>
                         <strong style="color: #f0b90b; font-size: 18px;">${item.symbol}</strong>
-                        <div style="color: #888; font-size: 12px; margin-top: 4px;">📅 全域分析時間：${item.date} (UTC)</div>
+                        <!-- 🌟 修正這裡：把 (UTC) 換成 (台灣時間) -->
+                        <div style="color: #888; font-size: 12px; margin-top: 4px;">📅 全域分析時間：${item.date} (台灣時間)</div>
                     </div>
                     <button style="background: #3498db; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-weight: bold; font-size: 12px;">
                         載入還原 ⚡
