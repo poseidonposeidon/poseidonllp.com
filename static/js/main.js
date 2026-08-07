@@ -10639,14 +10639,19 @@ function renderPremiumWidgets(rawData) {
     const container = document.getElementById('dd-premium-widgets');
     if (!container) return;
 
-    // 簡單防呆：只要有其中一項進階數據，就顯示區塊
-    if (rawData.wall_street_consensus || rawData.revenue_breakdown) {
+    // 🌟 升級版防呆：只要有「估值共識」、「營收拆解」或「內部人交易」其中一項進階數據，就顯示區塊
+    if (
+        rawData.wall_street_consensus ||
+        rawData.revenue_breakdown ||
+        (rawData.insider_transactions && rawData.insider_transactions.length > 0)
+    ) {
         container.style.display = 'grid';
     } else {
         container.style.display = 'none';
         return;
     }
 
+    // 依序呼叫三個子渲染函式，繪製各自的卡片
     renderValuationAndConsensus(rawData);
     renderRevenueBreakdown(rawData);
     renderSmartMoneyList(rawData);
@@ -11171,6 +11176,11 @@ async function restoreFromHistory(historyId) {
 
         // 5. 渲染 Markdown 與雷達徽章
         renderDeepDiveMarkdown(item.report, reportContainer, item.raw_data);
+
+        // 👇 🌟 核心修復：把這段補上去，歷史紀錄就會重新畫出這三個進階卡片了！
+        if (typeof renderPremiumWidgets === 'function') {
+            renderPremiumWidgets(item.raw_data);
+        }
 
         // 6. 重啟沙盤監聽
         let currentEps = 0;
