@@ -10505,7 +10505,6 @@ function renderPremiumWidgets(rawData) {
 }
 
 function renderValuationAndConsensus(rawData) {
-    // 1. 處理 DCF 溫度計
     const price = rawData.price;
     const dcf = rawData.dcf;
 
@@ -10513,20 +10512,24 @@ function renderValuationAndConsensus(rawData) {
         document.getElementById('widget-current-price').innerText = `$${price.toFixed(2)}`;
         document.getElementById('widget-dcf-price').innerText = `理論 $${dcf.toFixed(2)}`;
 
-        // 計算進度條比例 (以最大值的 1.2 倍作為畫布盡頭)
-        const maxVal = Math.max(price, dcf) * 1.2;
-        const dcfPct = Math.min((dcf / maxVal) * 100, 100);
+        // 🌟 修正進度條邏輯：色條代表「當前股價」，黃色游標代表「DCF 理論價」
+        const isOvervalued = price > dcf;
+        const maxVal = Math.max(price, dcf) * 1.15; // 留 15% 邊距
         const pricePct = Math.min((price / maxVal) * 100, 100);
+        const dcfPct = Math.min((dcf / maxVal) * 100, 100);
 
-        // 動畫呈現
         setTimeout(() => {
-            document.getElementById('widget-dcf-bar').style.width = `${dcfPct}%`;
-            document.getElementById('widget-price-marker').style.left = `${pricePct}%`;
+            const barEl = document.getElementById('widget-dcf-bar');
+            barEl.style.width = `${pricePct}%`;
+            // 高估亮紅燈，低估亮綠燈
+            barEl.style.background = isOvervalued ? '#e74c3c' : '#27ae60';
+
+            document.getElementById('widget-price-marker').style.left = `${dcfPct}%`;
         }, 100);
 
         const diff = ((price - dcf) / dcf) * 100;
         const statusEl = document.getElementById('widget-dcf-status');
-        if (diff > 0) {
+        if (isOvervalued) {
             statusEl.innerText = `⚠️ 估值溢價 ${Math.abs(diff).toFixed(1)}%`;
             statusEl.style.color = "#e74c3c";
         } else {
@@ -10535,7 +10538,7 @@ function renderValuationAndConsensus(rawData) {
         }
     }
 
-    // 2. 處理機構共識甜甜圈圖
+    // ... (下方原本的 widgetConsensusChart 圓餅圖程式碼保持不變) ...
     const consensus = rawData.wall_street_consensus || {};
     const labelEl = document.getElementById('widget-consensus-label');
 
@@ -10576,35 +10579,30 @@ function renderValuationAndConsensus(rawData) {
 function renderRevenueBreakdown(rawData) {
     const bd = rawData.revenue_breakdown || {};
 
-    // 繪製圓餅圖共用函式 (加入防呆與結構過濾)
-    const drawPie = (canvasId, dataArray, chartRef, fallbackText) => {
+    const drawPie = (canvasId, dataArray, chartRef, fallbackText, wrapperId) => {
         const canvas = document.getElementById(canvasId);
+        const wrapper = document.getElementById(wrapperId);
         if (!canvas) return chartRef;
-        const container = canvas.parentElement;
 
-        // 🚨 防呆：檢查是否為陣列，且排除 FMP 回傳 Error Message 的情況
+        // 🌟 防呆：如果沒有數據，連同下方的文字標籤一起隱藏，只顯示提示
         if (!dataArray || !Array.isArray(dataArray) || dataArray.length === 0 || dataArray[0]['Error Message']) {
-            canvas.style.display = 'none';
-            let noDataMsg = container.querySelector('.no-data-msg');
-            if (!noDataMsg) {
-                noDataMsg = document.createElement('div');
-                noDataMsg.className = 'no-data-msg';
-                noDataMsg.style.cssText = 'color: #666; font-size: 11px; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 100%; text-align: center;';
+            if (wrapper) wrapper.style.display = 'none'; // 隱藏整個區塊防止破圖
+
+            // 在外層容器插入空資料提示
+            const container = canvas.closest('div[style*="display: flex; justify-content: space-between"]');
+            if (container && !container.querySelector('.no-data-msg-' + canvasId)) {
+                const noDataMsg = document.createElement('div');
+                noDataMsg.className = 'no-data-msg-' + canvasId;
+                noDataMsg.style.cssText = 'color: #666; font-size: 12px; flex: 1; text-align: center; padding: 20px 0;';
                 noDataMsg.innerHTML = fallbackText;
                 container.appendChild(noDataMsg);
             }
             return chartRef;
         }
 
-        // 如果有數據，恢復顯示 canvas 並移除提示文字
-        canvas.style.display = 'block';
-        const existingMsg = container.querySelector('.no-data-msg');
-        if (existingMsg) existingMsg.remove();
+        if (wrapper) wrapper.style.display = 'flex';
 
-        // 取得最新一季/年的資料 (陣列的第一筆)
         const latestData = dataArray[0];
-
-        // 🌟 核心修復：將資料轉成陣列，並「強制排除 date 欄位」與「非數字內容」
         const segments = Object.entries(latestData)
             .filter(([key, value]) => key !== 'date' && typeof value === 'number')
             .sort((a, b) => b[1] - a[1]);
@@ -10615,7 +10613,6 @@ function renderRevenueBreakdown(rawData) {
         const values = [];
         let others = 0;
 
-        // 取前 5 大，其餘歸類為 Others
         segments.forEach((item, index) => {
             if (index < 5) { labels.push(item[0]); values.push(item[1]); }
             else { others += item[1]; }
@@ -10653,8 +10650,9 @@ function renderRevenueBreakdown(rawData) {
         });
     };
 
-    widgetProductChart = drawPie('widget-product-chart', bd.product, widgetProductChart, '無產品數據');
-    widgetGeoChart = drawPie('widget-geo-chart', bd.geographic, widgetGeoChart, '無地區數據');
+    // 呼叫時傳入 wrapper 的 ID
+    widgetProductChart = drawPie('widget-product-chart', bd.product, widgetProductChart, '無產品分類數據', 'product-chart-wrapper');
+    widgetGeoChart = drawPie('widget-geo-chart', bd.geographic, widgetGeoChart, '無地區營收數據', 'geo-chart-wrapper');
 }
 
 function renderSmartMoneyList(rawData) {
