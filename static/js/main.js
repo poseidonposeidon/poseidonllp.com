@@ -9175,7 +9175,10 @@ async function runDeepDive(event) {
             drawMarginsChart(symbol),
             drawGrowthChart(symbol),
             drawCashflowChart(symbol),
-            drawTechChart(symbol)
+            drawTechChart(symbol),
+            drawSurpriseChart(symbol),
+            drawSolvencyChart(symbol),
+            drawEfficiencyChart(symbol)
         ]);
 
         // 8. 綁定其他交互功能
@@ -9499,6 +9502,138 @@ async function drawTechChart(symbol, suffix = '') {
                 x: { display: true, grid: { display: false }, ticks: { color: '#888', maxRotation: 45, minRotation: 45, maxTicksLimit: 12 } },
                 y: { type: 'linear', display: true, position: 'right', grid: { color: '#333' }, ticks: { color: '#ccc' } },
                 y1: { type: 'linear', display: false, position: 'left', min: 0, suggestedMax: Math.max(...volume) * 5 }
+            },
+            plugins: { legend: { labels: { color: '#ccc' } } }
+        }
+    });
+}
+
+// ==========================================
+// 📈 1. 繪製：財報驚喜與預期落差 (Earnings Surprise)
+// ==========================================
+async function drawSurpriseChart(symbol, suffix = '') {
+    const canvas = document.getElementById('dd-surprise-chart' + suffix);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const instanceKey = 'surprise' + suffix;
+    if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
+
+    // 呼叫 FMP 歷史財報日曆 API
+    const response = await fetch(`${BASE_URL}historical/earning_calendar/${symbol}?limit=16&apikey=${API_KEY}`);
+    let data = await response.json();
+
+    // 過濾掉還沒發布的未來財報，並反轉為由舊到新
+    const pastData = data.filter(d => d.eps !== null && d.epsEstimated !== null).reverse();
+
+    const labels = pastData.map(d => d.date);
+    const epsActual = pastData.map(d => d.eps);
+    const epsEst = pastData.map(d => d.epsEstimated);
+
+    // 計算驚喜幅度 (%)
+    const surprisePct = pastData.map(d => {
+        if (d.epsEstimated === 0) return 0;
+        return ((d.eps - d.epsEstimated) / Math.abs(d.epsEstimated)) * 100;
+    });
+
+    window.deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: '實際 EPS', data: epsActual, backgroundColor: '#f0b90b', yAxisID: 'y', order: 2 },
+                { label: '預估 EPS', data: epsEst, backgroundColor: 'rgba(255, 255, 255, 0.2)', yAxisID: 'y', order: 3 },
+                { type: 'line', label: 'Surprise % (驚喜度)', data: surprisePct, borderColor: '#2ecc71', borderWidth: 2, pointRadius: 3, yAxisID: 'y1', order: 1 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#888' } },
+                y: { type: 'linear', position: 'left', grid: { color: '#333' }, ticks: { color: '#888' } },
+                y1: { type: 'linear', position: 'right', grid: { display: false }, ticks: { color: '#2ecc71', callback: v => v + '%' } }
+            },
+            plugins: { legend: { labels: { color: '#ccc' } } }
+        }
+    });
+}
+
+// ==========================================
+// 🛡️ 2. 繪製：資產負債健康度 (Debt vs Cash)
+// ==========================================
+async function drawSolvencyChart(symbol, suffix = '') {
+    const canvas = document.getElementById('dd-solvency-chart' + suffix);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const instanceKey = 'solvency' + suffix;
+    if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
+
+    const response = await fetch(`${BASE_URL}balance-sheet-statement/${symbol}?period=annual&limit=10&apikey=${API_KEY}`);
+    const data = await response.json();
+    const sortedData = data.reverse();
+
+    const labels = sortedData.map(d => d.calendarYear);
+    // 總現金 = 現金 + 短期投資
+    const totalCash = sortedData.map(d => (d.cashAndCashEquivalents + (d.shortTermInvestments || 0)));
+    const totalDebt = sortedData.map(d => d.totalDebt);
+    // 淨負債 = 總負債 - 總現金 (若為負數代表淨現金)
+    const netDebt = sortedData.map((d, i) => totalDebt[i] - totalCash[i]);
+
+    window.deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'Total Cash (總現金)', data: totalCash, backgroundColor: 'rgba(46, 204, 113, 0.7)', yAxisID: 'y' },
+                { label: 'Total Debt (總負債)', data: totalDebt, backgroundColor: 'rgba(231, 76, 60, 0.7)', yAxisID: 'y' },
+                { type: 'line', label: 'Net Debt (淨負債)', data: netDebt, borderColor: '#3498db', borderWidth: 2, yAxisID: 'y', fill: false }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#888' } },
+                y: { grid: { color: '#333' }, ticks: { color: '#888', callback: v => (v / 1000000000).toFixed(1) + 'B' } }
+            },
+            plugins: { legend: { labels: { color: '#ccc' } } }
+        }
+    });
+}
+
+// ==========================================
+// 🧠 3. 繪製：資本回報與經營效率 (ROE & ROIC)
+// ==========================================
+async function drawEfficiencyChart(symbol, suffix = '') {
+    const canvas = document.getElementById('dd-efficiency-chart' + suffix);
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    const instanceKey = 'efficiency' + suffix;
+    if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
+
+    const response = await fetch(`${BASE_URL}ratios/${symbol}?period=annual&limit=10&apikey=${API_KEY}`);
+    const data = await response.json();
+    const sortedData = data.reverse();
+
+    const labels = sortedData.map(d => d.date.substring(0, 4));
+    const roe = sortedData.map(d => d.returnOnEquity * 100);
+    const roic = sortedData.map(d => d.returnOnCapitalEmployed * 100); // FMP 將 ROIC 標示為 ROCE
+
+    window.deepDiveChartInstances[instanceKey] = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [
+                { label: 'ROE (%)', data: roe, borderColor: '#9b59b6', backgroundColor: 'rgba(155, 89, 182, 0.1)', borderWidth: 2, fill: true, tension: 0.2 },
+                { label: 'ROIC (%)', data: roic, borderColor: '#f1c40f', borderWidth: 2, borderDash: [5, 5], tension: 0.2 }
+            ]
+        },
+        options: {
+            responsive: true, maintainAspectRatio: false,
+            scales: {
+                x: { grid: { display: false }, ticks: { color: '#888' } },
+                y: { grid: { color: '#333' }, ticks: { color: '#888', callback: v => v + '%' } }
             },
             plugins: { legend: { labels: { color: '#ccc' } } }
         }
@@ -10393,7 +10528,10 @@ async function downloadDashboardPDF(event) {
             { id: 'dd-financial-chart', title: 'Margins Trend (三率趨勢)' },
             { id: 'dd-growth-chart', title: 'Revenue & EPS Trend (營收與獲利)' },
             { id: 'dd-cashflow-chart', title: 'Cash Flow Structure (現金流)' },
-            { id: 'dd-tech-chart', title: 'Price & Volume (量價動能)' }
+            { id: 'dd-tech-chart', title: 'Price & Volume (量價動能)' },
+            { id: 'dd-surprise-chart', title: 'Expectations: Earnings Surprise (財報驚喜與預期落差)' },
+            { id: 'dd-solvency-chart', title: 'Solvency: Debt vs Cash (資產負債健康度)' },
+            { id: 'dd-efficiency-chart', title: 'Efficiency: ROE & ROIC (資本回報與經營效率)' }
         ];
 
         for (const item of canvasIds) {
@@ -11067,7 +11205,10 @@ async function restoreFromHistory(historyId) {
             drawMarginsChart(item.symbol),
             drawGrowthChart(item.symbol),
             drawCashflowChart(item.symbol),
-            drawTechChart(item.symbol)
+            drawTechChart(item.symbol),
+            drawSurpriseChart(item.symbol),
+            drawSolvencyChart(item.symbol),
+            drawEfficiencyChart(item.symbol)
         ]);
 
         if (typeof attachChartClickListeners === 'function') attachChartClickListeners();
