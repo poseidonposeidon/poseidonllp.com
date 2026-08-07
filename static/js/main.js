@@ -10585,7 +10585,7 @@ function renderValuationAndConsensus(rawData) {
         }
     }
 }
-
+//test
 function renderRevenueBreakdown(rawData) {
     const bd = rawData.revenue_breakdown || {};
 
