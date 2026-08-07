@@ -10527,7 +10527,7 @@ function renderValuationAndConsensus(rawData) {
 
         const isOvervalued = price > dcf;
 
-        // 🌟 視覺優化：當溢價太過極端(大於3倍)時，稍微收斂視覺比例，防止黃線被擠成1像素
+        // 🌟 視覺優化：當溢價太過極端(大於 5 倍)時，稍微收斂視覺比例，防止黃線被擠成 1 像素
         let visualPrice = price;
         let visualDcf = dcf;
         if (price / dcf > 5) visualDcf = price / 5;
@@ -10549,6 +10549,7 @@ function renderValuationAndConsensus(rawData) {
             }
         }, 100);
 
+        // 真實的數字與溢價百分比依然使用原本的 precise 數字計算
         const diff = ((price - dcf) / dcf) * 100;
         const statusEl = document.getElementById('widget-dcf-status');
         if (statusEl) {
@@ -10563,7 +10564,7 @@ function renderValuationAndConsensus(rawData) {
     }
 
     // ==========================================
-    // 2. 處理機構共識甜甜圈圖 (補上完美的空狀態)
+    // 2. 處理機構共識甜甜圈圖 (包含完美防呆佔位符)
     // ==========================================
     const consensus = rawData.wall_street_consensus || {};
     const labelEl = document.getElementById('widget-consensus-label');
@@ -10583,7 +10584,8 @@ function renderValuationAndConsensus(rawData) {
         const hold = consensus.hold || 0;
         const sell = (consensus.sell || 0) + (consensus.strongSell || 0);
 
-        if (widgetConsensusChart) widgetConsensusChart.destroy();
+        // 確保使用全域變數 window.widgetConsensusChart 來管理實例
+        if (window.widgetConsensusChart) window.widgetConsensusChart.destroy();
 
         // 恢復 Canvas 顯示，並移除 Placeholder
         if (chartCanvas) chartCanvas.style.display = 'block';
@@ -10593,7 +10595,7 @@ function renderValuationAndConsensus(rawData) {
         }
 
         if (buy > 0 || hold > 0 || sell > 0) {
-            widgetConsensusChart = new Chart(chartCanvas, {
+            window.widgetConsensusChart = new Chart(chartCanvas, {
                 type: 'doughnut',
                 data: {
                     labels: ['Buy', 'Hold', 'Sell'],
@@ -10622,7 +10624,7 @@ function renderValuationAndConsensus(rawData) {
             // 隱藏真正的 Canvas
             if (chartCanvas) chartCanvas.style.display = 'none';
 
-            // 加入一個超有質感的 CSS 空心圓佔位符
+            // 加入一個超有質感的 CSS 空心圓佔位符 (防重複加入)
             if (!chartContainer.querySelector('.consensus-placeholder')) {
                 const placeholder = document.createElement('div');
                 placeholder.className = 'consensus-placeholder';
