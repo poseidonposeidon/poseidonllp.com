@@ -12018,7 +12018,9 @@ async function loadTWSentimentMatrixData() {
             }
 
             if(document.getElementById('tw-foreign-oi')) {
-                document.getElementById('tw-foreign-oi').innerText = `外資期貨淨未平倉: ${rawData['外資未平倉'] || '--'}`;
+                // 優先從 rawData 讀取我們在後端封裝好的「外資未平倉」欄位
+                const foreignOiStr = rawData['外資未平倉'] || '--';
+                document.getElementById('tw-foreign-oi').innerText = `外資期貨淨未平倉: ${foreignOiStr}`;
             }
 
             const holdLevel = rawData['建議持股水位'] || 50;
@@ -12346,10 +12348,11 @@ function renderTWSentimentTable(dataArray) {
                         <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px;">🤖 價值投資長 推演</div>
                         <div style="color: #eee; margin-bottom: 15px; text-align: justify;">${item.detailed_analysis || '--'}</div>
                         
-                        <div style="color: #f39c12; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📰 重點動態摘要</div>
-                        <div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">${rawObj['AI新聞點評'] || '無新聞數據'}</div>
-                        <div style="color: #ccc; font-size: 12px; margin-bottom: 8px;">${rawObj['AI散戶溫度'] || '無散戶溫度數據'}</div>
-                        <div style="color: #ccc; font-size: 12px;">${rawObj['AI熱門個股'] || ''}</div>
+                        <div style="color: #f39c12; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📰 重點動態與點評</div>
+                        <div style="color: #ccc; font-size: 12px; margin-bottom: 6px;"><b>新聞焦點：</b>${rawObj['AI新聞點評'] || '無新聞數據'}</div>
+                        <div style="color: #ccc; font-size: 12px; margin-bottom: 6px;"><b>散戶溫度：</b>${rawObj['AI散戶溫度'] || '無散戶溫度數據'}</div>
+                        <div style="color: #ccc; font-size: 12px; margin-bottom: 6px;"><b>熱門個股：</b>${rawObj['AI熱門個股'] || ''}</div>
+                        <div style="color: #f0b90b; font-size: 12px; margin-top: 8px; border-top: 1px dashed #444; padding-top: 6px;"><b>實戰推演：</b><br>${rawObj['CIO實戰點評'] || ''}</div>
                     </div>
                 </td>
             </tr>
