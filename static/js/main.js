@@ -12074,9 +12074,9 @@ let twDayTradeChartInstance = null;
 // 打撈台股進階數據
 async function loadTWAdvancedLiquidityData() {
     try {
+        // 🌟 核心修正：採用動態路徑寫法
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/tw_advanced_liquidity` : '/api/tw_advanced_liquidity';
 
-        // 🌟 修改這裡：套用方案一 (加入 method 與 headers)
         const response = await fetch(targetUrl, {
             method: 'GET',
             headers: {
@@ -12091,18 +12091,13 @@ async function loadTWAdvancedLiquidityData() {
 
         const data = await response.json();
 
-        if (data.twii_history && data.futures_open_int) {
-            drawTWLiquidityChart(data.twii_history, data.futures_open_int);
-        }
-        if (data.twii_history && data.margin_balance) {
-            drawTWDrawdownChart(data.twii_history, data.margin_balance);
-        }
-        if (data.macro_gdp && data.macro_export) {
-            drawTWMacroChart(data.macro_gdp, data.macro_export);
-        }
-        if (typeof loadTWHeavyweights === 'function') {
-            loadTWHeavyweights();
-        }
+        // 依序渲染圖表
+        if (data.twii_history && data.futures_open_int) drawTWLiquidityChart(data.twii_history, data.futures_open_int);
+        if (data.twii_history && data.margin_balance) drawTWDrawdownChart(data.twii_history, data.margin_balance);
+        if (data.macro_gdp && data.macro_export) drawTWMacroChart(data.macro_gdp, data.macro_export);
+
+        // 觸發權值股表格渲染
+        if (typeof loadTWHeavyweights === 'function') loadTWHeavyweights();
 
         if (data.twii_history && data.institutional_total) drawTWInstitutionalChart(data.twii_history, data.institutional_total);
         if (data.twii_history && data.day_trade_total) drawTWDayTradeChart(data.twii_history, data.day_trade_total);
@@ -12464,11 +12459,12 @@ async function loadTWHeavyweights() {
     const tbody = document.getElementById('tw-heavyweights-body');
     if (!tbody) return;
 
+    // 顯示載入中的狀態
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #8a6d3f;"><i class="fas fa-spinner fa-spin"></i> 正在從證交所抓取最新資料...</td></tr>';
 
     try {
-        // 🌟 強制指定 Flask 伺服器的 Port 5000，解決 404 找不到路徑的問題
-        const targetUrl = 'http://127.0.0.1:5000/api/tw_top10';
+        // 🌟 核心修正：採用你原本最穩定的動態路徑寫法
+        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/tw_top10` : '/api/tw_top10';
 
         const response = await fetch(targetUrl);
 
@@ -12481,7 +12477,7 @@ async function loadTWHeavyweights() {
         if (json.status === 'success') {
             tbody.innerHTML = '';
 
-            // 🌟 加入防呆：如果陣列是空的
+            // 防呆：如果陣列是空的
             if (json.data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #888;">目前查無盤後資料 (請確認是否為交易日)</td></tr>';
                 return;
@@ -12507,6 +12503,8 @@ async function loadTWHeavyweights() {
                 `;
                 tbody.appendChild(tr);
             });
+        } else {
+            throw new Error(json.message || "伺服器內部錯誤");
         }
     } catch (error) {
         console.error("載入權值股失敗:", error);
