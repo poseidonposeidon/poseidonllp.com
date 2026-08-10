@@ -12459,30 +12459,33 @@ async function loadTWHeavyweights() {
     const tbody = document.getElementById('tw-heavyweights-body');
     if (!tbody) return;
 
-    // 顯示載入中的狀態
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #8a6d3f;"><i class="fas fa-spinner fa-spin"></i> 正在從證交所抓取最新資料...</td></tr>';
 
     try {
-        // 🌟 核心修正：採用你原本最穩定的動態路徑寫法
         const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/tw_top10` : '/api/tw_top10';
-
         const response = await fetch(targetUrl);
 
-        if (!response.ok) {
-            throw new Error(`伺服器回應狀態碼: ${response.status}`);
-        }
-
+        if (!response.ok) throw new Error(`伺服器回應狀態碼: ${response.status}`);
         const json = await response.json();
 
         if (json.status === 'success') {
             tbody.innerHTML = '';
 
-            // 防呆：如果陣列是空的
             if (json.data.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #888;">目前查無盤後資料 (請確認是否為交易日)</td></tr>';
                 return;
             }
 
+            // 🌟 核心新增：在表格最上方加入一個小巧的日期標籤列
+            const dateRow = document.createElement('tr');
+            dateRow.innerHTML = `
+                <td colspan="4" style="text-align: right; font-size: 11px; color: #b0532f; padding: 6px 12px; background: #fdfbf7; border-bottom: 1px dashed #e8e3d8;">
+                    <i class="fas fa-clock"></i> 籌碼結算基準日：<b>${json.date}</b>
+                </td>
+            `;
+            tbody.appendChild(dateRow);
+
+            // 接下來維持原本渲染股票的邏輯
             json.data.forEach(stock => {
                 const changeColor = stock.change > 0 ? '#e74c3c' : (stock.change < 0 ? '#27ae60' : '#8a6d3f');
                 const changeSign = stock.change > 0 ? '+' : '';
@@ -12503,8 +12506,6 @@ async function loadTWHeavyweights() {
                 `;
                 tbody.appendChild(tr);
             });
-        } else {
-            throw new Error(json.message || "伺服器內部錯誤");
         }
     } catch (error) {
         console.error("載入權值股失敗:", error);
