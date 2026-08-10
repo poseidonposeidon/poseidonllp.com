@@ -12220,7 +12220,8 @@ function drawTWMacroChart(gdp, exp) {
             responsive: true, maintainAspectRatio: false,
             scales: {
                 y: { position: 'left' },
-                y1: { position: 'right', grid: { display: false }, ticks: { callback: v => v + '%' } }
+                // 🌟 修正點：加上 Number(v).toFixed(1) 強制進位，解決浮點數過長問題
+                y1: { position: 'right', grid: { display: false }, ticks: { callback: v => Number(v).toFixed(1) + '%' } }
             }
         }
     });
@@ -12479,6 +12480,12 @@ async function loadTWHeavyweights() {
 
         if (json.status === 'success') {
             tbody.innerHTML = '';
+
+            // 🌟 加入防呆：如果陣列是空的
+            if (json.data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" style="text-align:center; padding: 20px; color: #888;">目前查無盤後資料 (請確認是否為交易日)</td></tr>';
+                return;
+            }
 
             json.data.forEach(stock => {
                 const changeColor = stock.change > 0 ? '#e74c3c' : (stock.change < 0 ? '#27ae60' : '#8a6d3f');
