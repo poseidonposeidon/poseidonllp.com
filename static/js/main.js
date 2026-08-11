@@ -11760,8 +11760,9 @@ function drawMacroEconomicChart(gdpData, cpiData) {
     const canvas = document.getElementById('macro-economic-chart');
     if (!canvas || !gdpData || gdpData.length === 0) return;
 
-    const gdp = [...gdpData].reverse();
-    const cpi = [...cpiData].reverse();
+    // 🌟 終極解法：不要用 reverse()，直接用 sort() 強制按日期「由舊到新」排序
+    const gdp = [...gdpData].sort((a, b) => new Date(a.date) - new Date(b.date));
+    const cpi = [...cpiData].sort((a, b) => new Date(a.date) - new Date(b.date));
 
     if (macroChartInstance) macroChartInstance.destroy();
 
@@ -11773,13 +11774,16 @@ function drawMacroEconomicChart(gdpData, cpiData) {
                     type: 'line',
                     label: 'CPI (%)',
                     data: gdp.map(g => {
+                        // 確保 CPI 能對齊 GDP 的年月
                         const match = cpi.find(c => c.date.startsWith(g.date.substring(0, 7)));
                         return match ? match.value : null;
                     }),
                     borderColor: '#b0532f',
                     backgroundColor: '#b0532f',
                     yAxisID: 'y1',
-                    spanGaps: true
+                    spanGaps: true,
+                    borderWidth: 2,
+                    pointRadius: 3
                 },
                 {
                     type: 'bar',
@@ -11792,10 +11796,12 @@ function drawMacroEconomicChart(gdpData, cpiData) {
         },
         options: {
             responsive: true, maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
             scales: {
                 x: { grid: { display: false } },
-                y: { position: 'left', ticks: { callback: v => v + '%' } },
-                y1: { position: 'right', grid: { display: false }, ticks: { callback: v => v + '%' } }
+                // 🌟 順便加上 toFixed(1) 防呆，解決浮點數過長問題
+                y: { position: 'left', ticks: { callback: v => Number(v).toFixed(1) + '%' } },
+                y1: { position: 'right', grid: { display: false }, ticks: { callback: v => Number(v).toFixed(1) + '%' } }
             }
         }
     });
