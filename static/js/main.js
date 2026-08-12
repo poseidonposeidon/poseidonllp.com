@@ -11500,6 +11500,7 @@ function renderSentimentTable(dataArray) {
     }
 
     const tbody = document.getElementById('sentiment-table-body');
+    if (!tbody) return;
     tbody.innerHTML = '';
 
     dataArray.forEach(item => {
@@ -11517,14 +11518,17 @@ function renderSentimentTable(dataArray) {
         }
 
         let dataHtml = "";
+        // 🌟 核心修復：把 rawObj 宣告在 try 區塊的外面，讓整段程式碼都能讀取到它！
+        let rawObj = {};
+
         try {
-            const rawObj = JSON.parse(item.raw_data_json);
+            rawObj = JSON.parse(item.raw_data_json || "{}");
 
             if (rawObj['三大指數']) {
                 const indices = rawObj['三大指數'];
                 dataHtml = `
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 6px; border: 1px solid #444;">
-                        <div><span style="color:#aaa; font-size:12px;">S&P 500:</span><br><b style="color:#ddd;">${parseFloat(indices.SP500).toFixed(2)}</b> <span style="color:${rawObj['大盤表現'].includes('-') ? '#e74c3c' : '#2ecc71'}; font-size:11px;">(${rawObj['大盤表現']})</span></div>
+                        <div><span style="color:#aaa; font-size:12px;">S&P 500:</span><br><b style="color:#ddd;">${parseFloat(indices.SP500).toFixed(2)}</b> <span style="color:${(rawObj['大盤表現'] || '').includes('-') ? '#e74c3c' : '#2ecc71'}; font-size:11px;">(${rawObj['大盤表現'] || '--'})</span></div>
                         <div><span style="color:#aaa; font-size:12px;">Nasdaq:</span><br><b style="color:#ddd;">${parseFloat(indices.NASDAQ).toFixed(2)}</b></div>
                         <div><span style="color:#aaa; font-size:12px;">費城半導體:</span><br><b style="color:#ddd;">${parseFloat(indices.SOX).toFixed(2)}</b></div>
                         <div><span style="color:#aaa; font-size:12px;">VIX 恐慌指數:</span><br><b style="color:#f0b90b;">${parseFloat(indices.VIX).toFixed(2)}</b></div>
@@ -11553,31 +11557,37 @@ function renderSentimentTable(dataArray) {
         tr.onmouseover = () => tr.style.backgroundColor = 'rgba(0,0,0,0.05)';
         tr.onmouseout = () => tr.style.backgroundColor = bgOpacity;
 
-        tr.innerHTML = `
-            <td style="padding: 12px; font-weight: 500;">${item.date_str}</td>
-            <td style="padding: 12px; font-weight: bold; color: ${item.market_change_pct.includes('-') ? '#b0532f' : '#3e7d5c'};">${item.market_change_pct}</td>
-            <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.derivative_status || '數據不足'}</td>
-            <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.institutional_status || '數據不足'}</td>
-            <td style="padding: 12px; font-weight: bold; color: ${labelColor};">${item.sentiment_label}</td>
-            <td class="sentiment-hover-cell" style="padding: 12px; text-align: left;">
-                    <span style="border-bottom: 1px dashed #c2a26d; cursor: help; color: #2b261c;">${item.headline}</span>
-                    <div class="custom-tooltip-card">
-                        <div style="color: #f0b90b; font-weight: bold; margin-bottom: 8px; font-size: 14.5px;">🤖 CIO 深度推演</div>
-                        <div style="color: #eee; margin-bottom: 15px; text-align: justify;">${item.detailed_analysis}</div>
-                        
-                        <!-- 🚀 核心升級：新增美股歷史量化指紋 -->
-                        <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📈 總經與流動性特徵</div>
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px;">
-                            <div><span style="color:#aaa; font-size:11px;">馬爾可夫狀態:</span><br><b style="color:#ddd;">${(rawObj['馬爾可夫狀態'] || '--').split(' ')[0]}</b></div>
-                            <div><span style="color:#aaa; font-size:11px;">巨頭遮罩效應:</span><br><b style="color:#ddd;">${(rawObj['巨頭遮罩效應'] || '--').split(' ')[0]}</b></div>
-                            <div><span style="color:#aaa; font-size:11px;">真實波動(HV20):</span><br><b style="color:#ddd;">${rawObj['真實波動率(HV20)'] || '--'}</b></div>
-                            <div><span style="color:#aaa; font-size:11px;">VIX 收盤:</span><br><b style="color:#ddd;">${(rawObj['三大指數'] ? parseFloat(rawObj['三大指數']['VIX']).toFixed(2) : '--')}</b></div>
-                        </div>
+        const changeStr = item.market_change_pct || '--';
+        const changeColor = changeStr.includes('-') ? '#b0532f' : '#3e7d5c';
+        const dateStr = item.date_str ? item.date_str.substring(5) : '--';
 
-                        <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📊 底層觸發數據</div>
-                        <div style="text-align: left;">${dataHtml}</div>
+        tr.innerHTML = `
+            <td style="padding: 12px; font-weight: 500;">${dateStr}</td>
+            <td style="padding: 12px; font-weight: bold; color: ${changeColor};">${changeStr}</td>
+            <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.derivative_status || '--'}</td>
+            <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.institutional_status || '--'}</td>
+            <td style="padding: 12px; font-weight: bold; color: ${labelColor};">${item.sentiment_label || '--'}</td>
+            
+            <!-- ✨ 懸浮資訊框結構 -->
+            <td class="sentiment-hover-cell" style="padding: 12px; text-align: left;">
+                <span style="border-bottom: 1px dashed #c2a26d; cursor: help; color: #2b261c;">${item.headline || '--'}</span>
+                <div class="custom-tooltip-card">
+                    <div style="color: #f0b90b; font-weight: bold; margin-bottom: 8px; font-size: 14.5px;">🤖 CIO 深度推演</div>
+                    <div style="color: #eee; margin-bottom: 15px; text-align: justify;">${item.detailed_analysis || '--'}</div>
+                    
+                    <!-- 🚀 核心升級：新增美股歷史量化指紋 -->
+                    <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📈 總經與流動性特徵</div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px;">
+                        <div><span style="color:#aaa; font-size:11px;">馬爾可夫狀態:</span><br><b style="color:#ddd;">${(rawObj['馬爾可夫狀態'] || '--').split(' ')[0]}</b></div>
+                        <div><span style="color:#aaa; font-size:11px;">巨頭遮罩效應:</span><br><b style="color:#ddd;">${(rawObj['巨頭遮罩效應'] || '--').split(' ')[0]}</b></div>
+                        <div><span style="color:#aaa; font-size:11px;">真實波動(HV20):</span><br><b style="color:#ddd;">${rawObj['真實波動率(HV20)'] || '--'}</b></div>
+                        <div><span style="color:#aaa; font-size:11px;">VIX 收盤:</span><br><b style="color:#ddd;">${(rawObj['三大指數'] && rawObj['三大指數']['VIX'] ? parseFloat(rawObj['三大指數']['VIX']).toFixed(2) : '--')}</b></div>
                     </div>
-                </td>
+
+                    <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📊 底層觸發數據</div>
+                    <div style="text-align: left;">${dataHtml}</div>
+                </div>
+            </td>
         `;
         tbody.appendChild(tr);
     });
