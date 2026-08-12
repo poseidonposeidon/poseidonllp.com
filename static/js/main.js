@@ -11317,6 +11317,27 @@ async function loadSentimentMatrixData() {
                 document.getElementById('daily-vix-close').innerText = `VIX: ${parseFloat(rawObj['三大指數']['VIX']).toFixed(2)}`;
             }
 
+            // ==========================================
+            // 🚀 核心升級對接：將後端新算出的美股量化指標填入 HTML
+            // ==========================================
+            if(document.getElementById('us-regime-status')) {
+                const regime = rawData['馬爾可夫狀態'] || '--';
+                document.getElementById('us-regime-status').innerText = regime;
+                document.getElementById('us-regime-status').style.color = regime.includes('熊') || regime.includes('恐慌') ? '#b0532f' : '#2b261c';
+            }
+            if(document.getElementById('us-breadth-status')) {
+                const breadth = rawData['巨頭遮罩效應'] || '--';
+                document.getElementById('us-breadth-status').innerText = breadth;
+                document.getElementById('us-breadth-status').style.color = breadth.includes('背離') || breadth.includes('出貨') ? '#b0532f' : '#2b261c';
+            }
+            if(document.getElementById('us-hv20')) {
+                document.getElementById('us-hv20').innerText = rawData['真實波動率(HV20)'] || '--';
+            }
+            if(document.getElementById('us-cot-status')) {
+                document.getElementById('us-cot-status').innerText = (rawData['COT籌碼'] || '--').replace('S&P 500 避險基金部位: ', '');
+            }
+            // ==========================================
+
             // 建議持股水位進度條
             const holdLevel = parseFloat(rawObj['建議持股水位']) || 75;
             const progressBar = document.getElementById('exposure-progress-bar');
@@ -11539,14 +11560,24 @@ function renderSentimentTable(dataArray) {
             <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.institutional_status || '數據不足'}</td>
             <td style="padding: 12px; font-weight: bold; color: ${labelColor};">${item.sentiment_label}</td>
             <td class="sentiment-hover-cell" style="padding: 12px; text-align: left;">
-                <span style="border-bottom: 1px dashed #c2a26d; cursor: help; color: #2b261c;">${item.headline}</span>
-                <div class="custom-tooltip-card">
-                    <div style="color: #f0b90b; font-weight: bold; margin-bottom: 8px; font-size: 14.5px;">🤖 CIO 深度推演</div>
-                    <div style="color: #eee; margin-bottom: 15px; text-align: justify;">${item.detailed_analysis}</div>
-                    <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📊 底層觸發數據</div>
-                    <div style="text-align: left;">${dataHtml}</div>
-                </div>
-            </td>
+                    <span style="border-bottom: 1px dashed #c2a26d; cursor: help; color: #2b261c;">${item.headline}</span>
+                    <div class="custom-tooltip-card">
+                        <div style="color: #f0b90b; font-weight: bold; margin-bottom: 8px; font-size: 14.5px;">🤖 CIO 深度推演</div>
+                        <div style="color: #eee; margin-bottom: 15px; text-align: justify;">${item.detailed_analysis}</div>
+                        
+                        <!-- 🚀 核心升級：新增美股歷史量化指紋 -->
+                        <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📈 總經與流動性特徵</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px;">
+                            <div><span style="color:#aaa; font-size:11px;">馬爾可夫狀態:</span><br><b style="color:#ddd;">${(rawObj['馬爾可夫狀態'] || '--').split(' ')[0]}</b></div>
+                            <div><span style="color:#aaa; font-size:11px;">巨頭遮罩效應:</span><br><b style="color:#ddd;">${(rawObj['巨頭遮罩效應'] || '--').split(' ')[0]}</b></div>
+                            <div><span style="color:#aaa; font-size:11px;">真實波動(HV20):</span><br><b style="color:#ddd;">${rawObj['真實波動率(HV20)'] || '--'}</b></div>
+                            <div><span style="color:#aaa; font-size:11px;">VIX 收盤:</span><br><b style="color:#ddd;">${(rawObj['三大指數'] ? parseFloat(rawObj['三大指數']['VIX']).toFixed(2) : '--')}</b></div>
+                        </div>
+
+                        <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📊 底層觸發數據</div>
+                        <div style="text-align: left;">${dataHtml}</div>
+                    </div>
+                </td>
         `;
         tbody.appendChild(tr);
     });

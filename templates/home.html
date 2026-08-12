@@ -1017,6 +1017,36 @@
                         </div>
                     </div>
 
+                    <!-- ========================================== -->
+                    <!-- 🚀 全新插入：美股專屬機構級量化指標面板 -->
+                    <!-- ========================================== -->
+                    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+                        <!-- 馬爾可夫狀態 -->
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🏛️ 馬爾可夫狀態 (Regime)</div>
+                            <div id="us-regime-status" style="color: #2b261c; font-size: 13px; font-weight: bold; white-space: nowrap; line-height: 1.2;">--</div>
+                        </div>
+
+                        <!-- 巨頭遮罩效應 -->
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🎭 巨頭遮罩 (SPY vs RSP)</div>
+                            <div id="us-breadth-status" style="color: #2b261c; font-size: 13px; font-weight: bold; line-height: 1.2;">--</div>
+                        </div>
+
+                        <!-- 真實波動率 -->
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🌪️ 波動率 (HV20)</div>
+                            <div id="us-hv20" style="color: #2b261c; font-size: 16px; font-weight: bold;">--</div>
+                        </div>
+
+                        <!-- COT 避險籌碼 -->
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🐋 COT 避險籌碼</div>
+                            <div id="us-cot-status" style="color: #2b261c; font-size: 13px; font-weight: bold; line-height: 1.2;">--</div>
+                        </div>
+                    </div>
+                    <!-- ========================================== -->
+
                     <!-- 2. 美股交易員點評 -->
                     <div id="cio-trading-desk-card" style="display: none; background: #fffdf8; border: 1px solid #d3bd92; border-left: 4px solid #b0532f; border-radius: 6px; padding: 12px; margin-bottom: 20px;">
                         <div style="font-weight: bold; color: #b0532f; font-size: 13px; margin-bottom: 6px;"><i class="fas fa-bolt"></i> 華爾街交易員推演</div>
