@@ -12029,6 +12029,25 @@ async function loadTWSentimentMatrixData() {
                 document.getElementById('tw-foreign-oi').innerText = `外資期貨淨未平倉: ${foreignOiStr}`;
             }
 
+            if(document.getElementById('tw-retail-ratio')) {
+                const ratio = rawData['散戶小台多空比'] || '--';
+                document.getElementById('tw-retail-ratio').innerText = ratio;
+                // 散戶做多(正數)顯示危險紅色，做空(負數)顯示安全綠色
+                document.getElementById('tw-retail-ratio').style.color = ratio.includes('-') ? '#3e7d5c' : '#b0532f';
+            }
+            if(document.getElementById('tw-margin-ratio')) {
+                const margin = rawData['估計融資維持率'] || '--';
+                document.getElementById('tw-margin-ratio').innerText = margin;
+                // 斷頭警戒或恐慌字眼亮紅燈
+                document.getElementById('tw-margin-ratio').style.color = margin.includes('恐慌') || margin.includes('斷頭') || margin.includes('警戒') ? '#b0532f' : '#2b261c';
+            }
+            if(document.getElementById('tw-hv20')) {
+                document.getElementById('tw-hv20').innerText = rawData['真實波動率(HV20)'] || '--';
+            }
+            if(document.getElementById('tw-ma')) {
+                document.getElementById('tw-ma').innerText = rawData['長短期均線'] || '--';
+            }
+
             const holdLevel = rawData['建議持股水位'] || 50;
             const twProgressText = document.getElementById('tw-exposure-text');
             const twProgressBar = document.getElementById('tw-exposure-progress-bar');
@@ -12349,6 +12368,15 @@ function renderTWSentimentTable(dataArray) {
                     <div class="custom-tooltip-card">
                         <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px;">🤖 價值投資長 推演</div>
                         <div style="color: #eee; margin-bottom: 15px; text-align: justify;">${item.detailed_analysis || '--'}</div>
+                        
+                        <!-- 🚀 核心升級：新增歷史量化指紋 -->
+                        <div style="color: #e74c3c; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📈 量化與籌碼特徵</div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px;">
+                            <div><span style="color:#aaa; font-size:11px;">散戶多空比:</span><br><b style="color:#ddd;">${rawObj['散戶小台多空比'] || '--'}</b></div>
+                            <div><span style="color:#aaa; font-size:11px;">融資維持率:</span><br><b style="color:#ddd;">${(rawObj['估計融資維持率'] || '--').split(' ')[0]}</b></div>
+                            <div><span style="color:#aaa; font-size:11px;">真實波動(HV20):</span><br><b style="color:#ddd;">${rawObj['真實波動率(HV20)'] || '--'}</b></div>
+                            <div><span style="color:#aaa; font-size:11px;">外資未平倉:</span><br><b style="color:#ddd;">${rawObj['外資未平倉'] || '--'}</b></div>
+                        </div>
                         
                         <div style="color: #f39c12; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📰 重點動態與點評</div>
                         <div style="color: #ccc; font-size: 12px; margin-bottom: 6px;"><b>新聞焦點：</b>${rawObj['AI新聞點評'] || '無新聞數據'}</div>
