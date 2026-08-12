@@ -11321,20 +11321,20 @@ async function loadSentimentMatrixData() {
             // 🚀 核心升級對接：將後端新算出的美股量化指標填入 HTML
             // ==========================================
             if(document.getElementById('us-regime-status')) {
-                const regime = rawData['馬爾可夫狀態'] || '--';
+                const regime = rawObj['馬爾可夫狀態'] || '--';
                 document.getElementById('us-regime-status').innerText = regime;
                 document.getElementById('us-regime-status').style.color = regime.includes('熊') || regime.includes('恐慌') ? '#b0532f' : '#2b261c';
             }
             if(document.getElementById('us-breadth-status')) {
-                const breadth = rawData['巨頭遮罩效應'] || '--';
+                const breadth = rawObj['巨頭遮罩效應'] || '--';
                 document.getElementById('us-breadth-status').innerText = breadth;
                 document.getElementById('us-breadth-status').style.color = breadth.includes('背離') || breadth.includes('出貨') ? '#b0532f' : '#2b261c';
             }
             if(document.getElementById('us-hv20')) {
-                document.getElementById('us-hv20').innerText = rawData['真實波動率(HV20)'] || '--';
+                document.getElementById('us-hv20').innerText = rawObj['真實波動率(HV20)'] || '--';
             }
             if(document.getElementById('us-cot-status')) {
-                document.getElementById('us-cot-status').innerText = (rawData['COT籌碼'] || '--').replace('S&P 500 避險基金部位: ', '');
+                document.getElementById('us-cot-status').innerText = (rawObj['COT籌碼'] || '--').replace('S&P 500 避險基金部位: ', '');
             }
             // ==========================================
 
