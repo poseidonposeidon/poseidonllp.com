@@ -11333,8 +11333,11 @@ async function loadSentimentMatrixData() {
             if(document.getElementById('us-hv20')) {
                 document.getElementById('us-hv20').innerText = rawObj['真實波動率(HV20)'] || '--';
             }
-            if(document.getElementById('us-cot-status')) {
-                document.getElementById('us-cot-status').innerText = (rawObj['COT籌碼'] || '--').replace('S&P 500 避險基金部位: ', '');
+            if(document.getElementById('us-congress-status')) {
+                const congress = rawObj['國會議員買進'] || '--';
+                document.getElementById('us-congress-status').innerText = congress.replace('國會買進: ', '');
+                // 若有股票代碼則標示為藍色，無則標示為一般顏色
+                document.getElementById('us-congress-status').style.color = congress.includes('無') ? '#2b261c' : '#3498db';
             }
             // ==========================================
 
@@ -11578,11 +11581,11 @@ function renderSentimentTable(dataArray) {
                     <!-- 🚀 核心升級：新增美股歷史量化指紋 -->
                     <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📈 總經與流動性特徵</div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px;">
-                        <div><span style="color:#aaa; font-size:11px;">馬爾可夫狀態:</span><br><b style="color:#ddd;">${(rawObj['馬爾可夫狀態'] || '--').split(' ')[0]}</b></div>
-                        <div><span style="color:#aaa; font-size:11px;">巨頭遮罩效應:</span><br><b style="color:#ddd;">${(rawObj['巨頭遮罩效應'] || '--').split(' ')[0]}</b></div>
-                        <div><span style="color:#aaa; font-size:11px;">真實波動(HV20):</span><br><b style="color:#ddd;">${rawObj['真實波動率(HV20)'] || '--'}</b></div>
-                        <div><span style="color:#aaa; font-size:11px;">VIX 收盤:</span><br><b style="color:#ddd;">${(rawObj['三大指數'] && rawObj['三大指數']['VIX'] ? parseFloat(rawObj['三大指數']['VIX']).toFixed(2) : '--')}</b></div>
-                    </div>
+                            <div><span style="color:#aaa; font-size:11px;">馬爾可夫狀態:</span><br><b style="color:#ddd;">${(rawObj['馬爾可夫狀態'] || '--').split(' ')[0]}</b></div>
+                            <div><span style="color:#aaa; font-size:11px;">巨頭遮罩效應:</span><br><b style="color:#ddd;">${(rawObj['巨頭遮罩效應'] || '--').split(' ')[0]}</b></div>
+                            <div><span style="color:#aaa; font-size:11px;">真實波動(HV20):</span><br><b style="color:#ddd;">${rawObj['真實波動率(HV20)'] || '--'}</b></div>
+                            <div><span style="color:#aaa; font-size:11px;">國會買盤:</span><br><b style="color:#3498db;">${(rawObj['國會議員買進'] || '--').replace('國會買進: ', '')}</b></div>
+                        </div>
 
                     <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📊 底層觸發數據</div>
                     <div style="text-align: left;">${dataHtml}</div>
