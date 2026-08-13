@@ -11600,11 +11600,20 @@ function renderSentimentTable(dataArray) {
         tr.innerHTML = `
             <td style="padding: 12px; font-weight: 500;">${dateStr}</td>
             <td style="padding: 12px; font-weight: bold; color: ${changeColor};">${changeStr}</td>
-            <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.derivative_status || '--'}</td>
-            <td style="padding: 12px; font-size: 13px; color: #6e685c;">${item.institutional_status || '--'}</td>
+            
+            <!-- 🌟 修正：加入 max-width、隱藏溢出字元，並加上 title 屬性提供懸浮閱讀 -->
+            <td style="padding: 12px; font-size: 13px; color: #6e685c; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: help;" title="${item.derivative_status || '--'}">
+                ${item.derivative_status || '--'}
+            </td>
+            
+            <!-- 🌟 修正：加入 max-width、隱藏溢出字元，並加上 title 屬性提供懸浮閱讀 -->
+            <td style="padding: 12px; font-size: 13px; color: #6e685c; max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: help;" title="${item.institutional_status || '--'}">
+                ${item.institutional_status || '--'}
+            </td>
+            
             <td style="padding: 12px; font-weight: bold; color: ${labelColor};">${item.sentiment_label || '--'}</td>
             
-            <!-- ✨ 懸浮資訊框結構 -->
+            <!-- ✨ 懸浮資訊框結構 (維持不變) -->
             <td class="sentiment-hover-cell" style="padding: 12px; text-align: left;">
                 <span style="border-bottom: 1px dashed #c2a26d; cursor: help; color: #2b261c;">${item.headline || '--'}</span>
                 <div class="custom-tooltip-card">
@@ -11614,11 +11623,11 @@ function renderSentimentTable(dataArray) {
                     <!-- 🚀 核心升級：新增美股歷史量化指紋 -->
                     <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📈 總經與流動性特徵</div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px;">
-                            <div><span style="color:#aaa; font-size:11px;">馬爾可夫狀態:</span><br><b style="color:#ddd;">${(rawObj['馬爾可夫狀態'] || '--').split(' ')[0]}</b></div>
-                            <div><span style="color:#aaa; font-size:11px;">巨頭遮罩效應:</span><br><b style="color:#ddd;">${(rawObj['巨頭遮罩效應'] || '--').split(' ')[0]}</b></div>
-                            <div><span style="color:#aaa; font-size:11px;">真實波動(HV20):</span><br><b style="color:#ddd;">${rawObj['真實波動率(HV20)'] || '--'}</b></div>
-                            <div><span style="color:#aaa; font-size:11px;">國會買盤:</span><br><b style="color:#3498db;">${(rawObj['國會議員買進'] || '--').replace('國會買進: ', '')}</b></div>
-                        </div>
+                        <div><span style="color:#aaa; font-size:11px;">馬爾可夫狀態:</span><br><b style="color:#ddd;">${(rawObj['馬爾可夫狀態'] || '--').split(' ')[0]}</b></div>
+                        <div><span style="color:#aaa; font-size:11px;">巨頭遮罩效應:</span><br><b style="color:#ddd;">${(rawObj['巨頭遮罩效應'] || '--').split(' ')[0]}</b></div>
+                        <div><span style="color:#aaa; font-size:11px;">真實波動(HV20):</span><br><b style="color:#ddd;">${rawObj['真實波動率(HV20)'] || '--'}</b></div>
+                        <div><span style="color:#aaa; font-size:11px;">國會買盤:</span><br><b style="color:#3498db;">${(rawObj['國會議員買進'] || '--').replace('國會買進: ', '')}</b></div>
+                    </div>
 
                     <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📊 底層觸發數據</div>
                     <div style="text-align: left;">${dataHtml}</div>
