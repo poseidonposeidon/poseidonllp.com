@@ -1022,27 +1022,31 @@
                     <!-- ========================================== -->
                     <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
                         <!-- 馬爾可夫狀態 -->
-                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 140px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
                             <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🏛️ 馬爾可夫狀態 (Regime)</div>
-                            <div id="us-regime-status" style="color: #2b261c; font-size: 13px; font-weight: bold; white-space: nowrap; line-height: 1.2;">--</div>
+                            <div id="us-regime-status" style="color: #b0532f; font-size: 15px; font-weight: bold; line-height: 1.2;">--</div>
+                            <div id="us-regime-sub" style="color: #888; font-size: 11px; border-top: 1px dashed #e8e3d8; padding-top: 4px; margin-top: 4px;">↳ 近30日: --</div>
                         </div>
 
                         <!-- 巨頭遮罩效應 -->
-                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 140px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
                             <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🎭 巨頭遮罩 (SPY vs RSP)</div>
-                            <div id="us-breadth-status" style="color: #2b261c; font-size: 13px; font-weight: bold; line-height: 1.2;">--</div>
+                            <div id="us-breadth-status" style="color: #b0532f; font-size: 15px; font-weight: bold; line-height: 1.2;">--</div>
+                            <div id="us-breadth-sub" style="color: #888; font-size: 11px; border-top: 1px dashed #e8e3d8; padding-top: 4px; margin-top: 4px;">↳ 近30日: --</div>
                         </div>
 
                         <!-- 真實波動率 -->
-                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
-                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🌪️ 波動率 (HV20)</div>
-                            <div id="us-hv20" style="color: #2b261c; font-size: 16px; font-weight: bold;">--</div>
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 140px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🌪️ 真實波動率 (HV20)</div>
+                            <div id="us-hv20" style="color: #2b261c; font-size: 18px; font-weight: bold; line-height: 1.2;">--</div>
+                            <div id="us-hv20-sub" style="color: #888; font-size: 11px; border-top: 1px dashed #e8e3d8; padding-top: 4px; margin-top: 4px;">↳ 狀態: --</div>
                         </div>
 
-                        <!-- 國會議員動向 (Smart Money) -->
-                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
-                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🦅 國會議員買盤 (Smart Money)</div>
-                            <div id="us-congress-status" style="color: #2b261c; font-size: 13px; font-weight: bold; line-height: 1.2;">--</div>
+                        <!-- 國會議員動向 -->
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 140px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🦅 聰明錢與國會買盤</div>
+                            <div id="us-congress-status" style="color: #2b261c; font-size: 14px; font-weight: bold; line-height: 1.2;">--</div>
+                            <div id="us-congress-sub" style="color: #888; font-size: 11px; border-top: 1px dashed #e8e3d8; padding-top: 4px; margin-top: 4px;">↳ 動向: 近30日淨變動</div>
                         </div>
                     </div>
                     <!-- ========================================== -->

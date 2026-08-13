@@ -11321,23 +11321,56 @@ async function loadSentimentMatrixData() {
             // 🚀 核心升級對接：將後端新算出的美股量化指標填入 HTML
             // ==========================================
             if(document.getElementById('us-regime-status')) {
-                const regime = rawObj['馬爾可夫狀態'] || '--';
-                document.getElementById('us-regime-status').innerText = regime;
-                document.getElementById('us-regime-status').style.color = regime.includes('熊') || regime.includes('恐慌') ? '#b0532f' : '#2b261c';
+                // 後端傳來的格式如："熊市高波 (近30日波動率飆升至 95% 極端高位)"
+                const regimeFull = rawObj['馬爾可夫狀態'] || '--';
+                const parts = regimeFull.split(' (');
+                const mainText = parts[0]; // 熊市高波
+                const subText = parts[1] ? parts[1].replace(')', '') : '--'; // 近30日波動率...
+
+                document.getElementById('us-regime-status').innerText = mainText;
+                document.getElementById('us-regime-status').style.color = mainText.includes('熊') || mainText.includes('恐慌') ? '#b0532f' : '#2b261c';
+
+                const subEl = document.getElementById('us-regime-sub');
+                if (subEl) subEl.innerHTML = `↳ 近30日: <span style="color: ${mainText.includes('熊') ? '#b0532f' : '#888'}">${subText}</span>`;
             }
+
             if(document.getElementById('us-breadth-status')) {
-                const breadth = rawObj['巨頭遮罩效應'] || '--';
-                document.getElementById('us-breadth-status').innerText = breadth;
-                document.getElementById('us-breadth-status').style.color = breadth.includes('背離') || breadth.includes('出貨') ? '#b0532f' : '#2b261c';
+                // 後端傳來的格式如："嚴重背離 (近30日巨頭拉抬掩護出貨，剪刀差 +3.5%)"
+                const breadthFull = rawObj['巨頭遮罩效應'] || '--';
+                const parts = breadthFull.split(' (');
+                const mainText = parts[0];
+                const subText = parts[1] ? parts[1].replace(')', '') : '--';
+
+                document.getElementById('us-breadth-status').innerText = mainText;
+                document.getElementById('us-breadth-status').style.color = mainText.includes('背離') || mainText.includes('出貨') ? '#b0532f' : '#2b261c';
+
+                const subEl = document.getElementById('us-breadth-sub');
+                if (subEl) subEl.innerHTML = `↳ 近30日: <span style="color: ${mainText.includes('背離') ? '#b0532f' : '#888'}">${subText}</span>`;
             }
+
             if(document.getElementById('us-hv20')) {
-                document.getElementById('us-hv20').innerText = rawObj['真實波動率(HV20)'] || '--';
+                const hv20Val = rawObj['真實波動率(HV20)'] || '--';
+                document.getElementById('us-hv20').innerText = hv20Val;
+
+                const subEl = document.getElementById('us-hv20-sub');
+                if (subEl && hv20Val !== '--') {
+                    const num = parseFloat(hv20Val);
+                    let statusText = "平穩區間";
+                    let colorCode = "#888";
+                    if (num >= 25) { statusText = "極端高波 (風控警戒)"; colorCode = "#b0532f"; }
+                    else if (num >= 20) { statusText = "高波段 (擴張期)"; colorCode = "#e67e22"; }
+                    subEl.innerHTML = `↳ 狀態: <span style="color: ${colorCode}; font-weight:bold;">${statusText}</span>`;
+                }
             }
+
             if(document.getElementById('us-congress-status')) {
                 const congress = rawObj['國會議員買進'] || '--';
-                document.getElementById('us-congress-status').innerText = congress.replace('國會買進: ', '');
-                // 若有股票代碼則標示為藍色，無則標示為一般顏色
-                document.getElementById('us-congress-status').style.color = congress.includes('無') ? '#2b261c' : '#3498db';
+                const mainText = congress.replace('國會買進: ', '');
+                document.getElementById('us-congress-status').innerText = mainText;
+                document.getElementById('us-congress-status').style.color = mainText.includes('無') ? '#2b261c' : '#3498db';
+
+                const subEl = document.getElementById('us-congress-sub');
+                if (subEl) subEl.innerHTML = `↳ 動向: 近30日內部交易清算`;
             }
             // ==========================================
 
