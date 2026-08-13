@@ -11339,7 +11339,7 @@ async function loadSentimentMatrixData() {
                 const breadthFull = rawObj['巨頭遮罩效應'] || '--';
                 const parts = breadthFull.split(' (');
                 const mainText = parts[0];
-                const subText = parts[1] ? parts[1].replace(')', '') : '--';
+                const subText = parts[1] ? parts[1].replace(')', '') : '剪刀差處於安全區間';
 
                 document.getElementById('us-breadth-status').innerText = mainText;
                 document.getElementById('us-breadth-status').style.color = mainText.includes('背離') || mainText.includes('出貨') ? '#b0532f' : '#2b261c';
