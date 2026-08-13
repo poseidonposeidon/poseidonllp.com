@@ -12511,8 +12511,14 @@ function renderTWSentimentTable(dataArray) {
             <tr style="border-bottom: 1px solid #f0ebe1; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
                 <td style="padding: 12px; font-weight: bold;">${dateStr}</td>
                 <td style="padding: 12px; font-weight: bold; color: ${changeColor};">${changeStr}</td>
-                <td style="padding: 12px; font-size: 12px; color: #6e685c;">${item.derivative_status || '--'}</td>
-                <td style="padding: 12px; font-size: 12px; color: #6e685c;">${item.institutional_status || '--'}</td>
+                <td style="padding: 12px; font-size: 12px; color: #6e685c; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: help;" title="${item.derivative_status || '--'}">
+                    ${item.derivative_status || '--'}
+                </td>
+                
+                <!-- 🌟 修正：加入 max-width 防跑版，並套用 title 懸浮 -->
+                <td style="padding: 12px; font-size: 12px; color: #6e685c; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: help;" title="${item.institutional_status || '--'}">
+                    ${item.institutional_status || '--'}
+                </td>
                 <td style="padding: 12px; font-weight: bold;">${item.sentiment_score || '--'} <span style="font-size:11px; color:#888;">(${item.sentiment_label || '--'})</span></td>
                 
                 <!-- ✨ 懸浮資訊框結構 (與美股共用 sentiment-hover-cell class) -->
