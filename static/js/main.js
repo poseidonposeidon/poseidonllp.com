@@ -12115,24 +12115,91 @@ async function loadTWSentimentMatrixData() {
                 document.getElementById('tw-foreign-oi').innerText = `外資期貨淨未平倉: ${foreignOiStr}`;
             }
 
+            // ==========================================
+            // 🚀 核心升級對接：將後端新算出的台股量化指標填入 HTML (支援副標題)
+            // ==========================================
+
+            // 1. 溫斯坦階段與均線
+            if(document.getElementById('tw-ma')) {
+                // 後端傳來的格式: "20MA: 22100, 150MA: 21800 (第二階段 (主升段))"
+                const maStr = rawData['長短期均線'] || '--';
+                let mainText = "--";
+                let subText = maStr;
+
+                if(maStr.includes('(')) {
+                    const parts = maStr.split(' (');
+                    subText = parts[0]; // "20MA: 22100, 150MA: 21800"
+                    // 拔出溫斯坦階段，並把最後多餘的 ')' 拿掉
+                    mainText = parts.slice(1).join(' (').replace(/\)$/, '');
+                }
+
+                const maEl = document.getElementById('tw-ma');
+                maEl.innerText = mainText;
+                // 若跌破半年線或進入第四階段，給予紅色警戒
+                maEl.style.color = mainText.includes('四') || mainText.includes('跌') ? '#b0532f' : '#2b261c';
+
+                const subEl = document.getElementById('tw-ma-sub');
+                if (subEl) subEl.innerHTML = `↳ 均線: <span style="color: #888">${subText}</span>`;
+            }
+
+            // 2. 散戶小台多空比
             if(document.getElementById('tw-retail-ratio')) {
                 const ratio = rawData['散戶小台多空比'] || '--';
-                document.getElementById('tw-retail-ratio').innerText = ratio;
-                // 散戶做多(正數)顯示危險紅色，做空(負數)顯示安全綠色
-                document.getElementById('tw-retail-ratio').style.color = ratio.includes('-') ? '#3e7d5c' : '#b0532f';
+                const ratioEl = document.getElementById('tw-retail-ratio');
+                ratioEl.innerText = ratio;
+
+                // 判斷散戶是否做多 (正數危險，負數安全)
+                const isDanger = !ratio.includes('-') && parseFloat(ratio) > 0;
+                ratioEl.style.color = isDanger ? '#b0532f' : '#3e7d5c';
+
+                const subEl = document.getElementById('tw-retail-sub');
+                if (subEl && ratio !== '--') {
+                    const status = isDanger ? '散戶做多 (籌碼凌亂)' : '散戶做空 (軋空燃料)';
+                    subEl.innerHTML = `↳ 動向: <span style="color: ${isDanger ? '#b0532f' : '#3e7d5c'}">${status}</span>`;
+                }
             }
+
+            // 3. 融資維持率與斷頭警戒
             if(document.getElementById('tw-margin-ratio')) {
-                const margin = rawData['估計融資維持率'] || '--';
-                document.getElementById('tw-margin-ratio').innerText = margin;
-                // 斷頭警戒或恐慌字眼亮紅燈
-                document.getElementById('tw-margin-ratio').style.color = margin.includes('恐慌') || margin.includes('斷頭') || margin.includes('警戒') ? '#b0532f' : '#2b261c';
+                // 後端傳來的格式: "152.0% (健康水準)"
+                const marginStr = rawData['估計融資維持率'] || '--';
+                let mainText = marginStr;
+                let subText = "計算中";
+
+                if(marginStr.includes('(')) {
+                    const parts = marginStr.split(' (');
+                    mainText = parts[0]; // "152.0%"
+                    subText = parts[1].replace(')', ''); // "健康水準" 或 "斷頭警戒"
+                }
+
+                const marginEl = document.getElementById('tw-margin-ratio');
+                marginEl.innerText = mainText;
+
+                const isWarning = subText.includes('警戒') || subText.includes('斷頭') || subText.includes('過熱');
+                marginEl.style.color = isWarning ? '#b0532f' : '#2b261c';
+
+                const subEl = document.getElementById('tw-margin-sub');
+                if (subEl) {
+                    subEl.innerHTML = `↳ 狀態: <span style="color: ${isWarning ? '#b0532f' : '#888'}; font-weight: ${isWarning ? 'bold' : 'normal'}">${subText}</span>`;
+                }
             }
+
+            // 4. 真實波動率 (HV20)
             if(document.getElementById('tw-hv20')) {
-                document.getElementById('tw-hv20').innerText = rawData['真實波動率(HV20)'] || '--';
+                const hv20 = rawData['真實波動率(HV20)'] || '--';
+                document.getElementById('tw-hv20').innerText = hv20;
+
+                const subEl = document.getElementById('tw-hv20-sub');
+                if (subEl && hv20 !== '--') {
+                    const val = parseFloat(hv20);
+                    let status = "平穩區間";
+                    let color = "#888";
+                    if (val > 25) { status = "極端高波 (強迫降碼)"; color = "#b0532f"; }
+                    else if (val > 20) { status = "波動擴張"; color = "#e67e22"; }
+                    subEl.innerHTML = `↳ 狀態: <span style="color: ${color}; font-weight:bold;">${status}</span>`;
+                }
             }
-            if(document.getElementById('tw-ma')) {
-                document.getElementById('tw-ma').innerText = rawData['長短期均線'] || '--';
-            }
+            // ==========================================
 
             const holdLevel = rawData['建議持股水位'] || 50;
             const twProgressText = document.getElementById('tw-exposure-text');

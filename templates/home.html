@@ -1194,31 +1194,36 @@
                         </div>
                     </div>
 
-                    <!-- 🚀 全新插入：台股專屬機構級量化指標面板 -->
-
+                    <!-- ========================================== -->
+                    <!-- 🚀 升級版：台股專屬機構級量化指標面板 (帶副標題) -->
+                    <!-- ========================================== -->
                     <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px;">
+                        <!-- 溫斯坦階段與均線 -->
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 140px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🏛️ 溫斯坦階段 (Weinstein)</div>
+                            <div id="tw-ma" style="color: #b0532f; font-size: 15px; font-weight: bold; line-height: 1.2;">--</div>
+                            <div id="tw-ma-sub" style="color: #888; font-size: 11px; border-top: 1px dashed #e8e3d8; padding-top: 4px; margin-top: 4px;">↳ 均線: --</div>
+                        </div>
+
                         <!-- 散戶小台多空比 -->
-                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 140px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
                             <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🐑 散戶小台多空比</div>
-                            <div id="tw-retail-ratio" style="color: #2b261c; font-size: 16px; font-weight: bold;">--</div>
+                            <div id="tw-retail-ratio" style="color: #2b261c; font-size: 18px; font-weight: bold; line-height: 1.2;">--</div>
+                            <div id="tw-retail-sub" style="color: #888; font-size: 11px; border-top: 1px dashed #e8e3d8; padding-top: 4px; margin-top: 4px;">↳ 動向: --</div>
                         </div>
 
                         <!-- 融資維持率 -->
-                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
-                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">⚠️ 估計融資維持率</div>
-                            <div id="tw-margin-ratio" style="color: #2b261c; font-size: 14px; font-weight: bold; white-space: nowrap;">--</div>
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 140px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">⚠️ 大盤融資維持率</div>
+                            <div id="tw-margin-ratio" style="color: #2b261c; font-size: 18px; font-weight: bold; line-height: 1.2;">--</div>
+                            <div id="tw-margin-sub" style="color: #888; font-size: 11px; border-top: 1px dashed #e8e3d8; padding-top: 4px; margin-top: 4px;">↳ 狀態: --</div>
                         </div>
 
                         <!-- 真實波動率 -->
-                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
-                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🌪️ 波動率 (HV20)</div>
-                            <div id="tw-hv20" style="color: #2b261c; font-size: 16px; font-weight: bold;">--</div>
-                        </div>
-
-                        <!-- 長短期均線 -->
-                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 130px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
-                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">📊 均線位階</div>
-                            <div id="tw-ma" style="color: #2b261c; font-size: 13px; font-weight: bold; white-space: nowrap; line-height: 1.2;">--</div>
+                        <div style="background: white; border: 1px solid #e8e3d8; border-radius: 8px; padding: 10px 15px; flex: 1; min-width: 140px; box-shadow: 0 2px 5px rgba(0,0,0,0.02);">
+                            <div style="color: #8a6d3f; font-size: 11px; font-weight: bold; margin-bottom: 4px;">🌪️ 真實波動率 (HV20)</div>
+                            <div id="tw-hv20" style="color: #2b261c; font-size: 18px; font-weight: bold; line-height: 1.2;">--</div>
+                            <div id="tw-hv20-sub" style="color: #888; font-size: 11px; border-top: 1px dashed #e8e3d8; padding-top: 4px; margin-top: 4px;">↳ 近30日位階: --</div>
                         </div>
                     </div>
 
