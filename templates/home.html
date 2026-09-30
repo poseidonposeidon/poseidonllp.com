@@ -119,38 +119,59 @@
 
 <!--/////////////////////////////////美股/////////////////////////////////-->
 
-<div id="info-section" class="info-section" style="display: none;">
-    <div class="info-input">
-        <input type="text" id="stockSymbol" placeholder="Input U.S Stock" pattern="[A-Z]*" autocomplete="off">
+<div id="info-section" class="info-section us-stock-workspace" style="display: none;">
+    <header class="market-workspace-header">
+        <div>
+            <span class="market-eyebrow">POSEIDON MARKET INTELLIGENCE</span>
+            <h2>United States Equities</h2>
+            <p>即時報價、基本面、財報、法說會與內部人交易的一站式研究工作區</p>
+        </div>
+        <button class="market-workspace-close" type="button" aria-label="Close U.S. stock workspace" onclick="toggleSection(event, '#info-section')">×</button>
+    </header>
 
-        <button id="usStockButton" onclick="fetchStock() ;clearSuggestions(); ">
-            <img src="/static/img/arrow-right.png" alt="Confirm" class="confirm-icon">
-        </button>
+    <section class="market-search-panel" aria-label="U.S. stock search">
+        <label for="stockSymbol">股票代碼或公司名稱</label>
+        <div class="market-search-row">
+            <div class="market-search-field">
+                <span aria-hidden="true">⌕</span>
+                <input type="text" id="stockSymbol" placeholder="例如 AAPL、NVDA、Microsoft" pattern="[A-Za-z.\-]*" autocomplete="off">
+                <div id="suggestions" class="suggestions-list"></div>
+            </div>
+            <button id="usStockButton" class="market-search-button" type="button" onclick="fetchStock(); clearSuggestions();">
+                <span>查詢股票</span><span aria-hidden="true">→</span>
+            </button>
+        </div>
+        <p id="outputSymbol" class="market-query-status" data-last-symbol="">尚未選擇股票</p>
+    </section>
+
+    <div class="market-summary-grid">
+        <div id="companyProfileContainer" class="market-summary-card market-company-card">
+            <div class="market-card-placeholder"><span>🏢</span><div><strong>公司資訊</strong><small>搜尋股票後顯示公司概況</small></div></div>
+        </div>
+        <div id="PriceContainer" class="market-summary-card market-price-card">
+            <div class="market-card-placeholder"><span>📈</span><div><strong>市場快照</strong><small>搜尋股票後顯示即時報價</small></div></div>
+        </div>
     </div>
-    <div id="suggestions" class="suggestions-list"></div>
-    <p id="outputSymbol" data-last-symbol="">Current query : </p>
 
-    <div id="companyProfileContainer"></div>
-    <div id="PriceContainer"></div> <!-- 新增的價格容器 -->
+    <section class="market-report-nav" aria-label="Available U.S. stock reports">
+        <div class="market-section-heading">
+            <div><span class="market-eyebrow">RESEARCH MODULES</span><h3>選擇研究報表</h3></div>
+            <p>點選卡片載入資料；寬表格可左右捲動</p>
+        </div>
+        <div class="info-content">
+            <a class="market-report-link" href="#" onclick="loadSection('income-statement')"><span>▤</span><div><strong>損益表</strong><small>Income Statement</small></div><b>→</b></a>
+            <a class="market-report-link" href="#" onclick="loadSection('balance-sheet')"><span>▥</span><div><strong>資產負債表</strong><small>Balance Sheet</small></div><b>→</b></a>
+            <a class="market-report-link" href="#" onclick="loadSection('cashflow-statement')"><span>⌁</span><div><strong>現金流量表</strong><small>Cash Flow</small></div><b>→</b></a>
+            <a class="market-report-link" href="#" onclick="loadSection('earnings-call-transcript'); fetchEarningsCallTranscript();"><span>◉</span><div><strong>法說會逐字稿</strong><small>Earnings Transcript</small></div><b>→</b></a>
+            <a class="market-report-link" href="#" onclick="loadSection('earnings-call-calendar'); fetchEarningsCallCalendar();"><span>▦</span><div><strong>財報行事曆</strong><small>Earnings Calendar</small></div><b>→</b></a>
+            <a class="market-report-link" href="#" onclick="loadSection('historical-earnings'); fetch_historical_earning_calendar();"><span>⌚</span><div><strong>歷史與預估獲利</strong><small>Historical Earnings</small></div><b>→</b></a>
+            <a class="market-report-link" href="#" onclick="loadSection('dividend-calendar'); fetch_stock_dividend_calendar();"><span>◆</span><div><strong>股利行事曆</strong><small>Dividend Calendar</small></div><b>→</b></a>
+            <a class="market-report-link" href="#" onclick="loadSection('insider-trades'); fetchInsiderTrades();"><span>♙</span><div><strong>內部人交易</strong><small>Insider Trades</small></div><b>→</b></a>
+        </div>
+    </section>
 
-    <div class="info-content">
-        <div class="info-column">
-            <a href="#" onclick="loadSection('income-statement')">Income Statement</a>
-            <a href="#" onclick="loadSection('balance-sheet')">Balance Sheet</a>
-            <a href="#" onclick="loadSection('cashflow-statement')">Cash Flow Statement</a>
-        </div>
-        <div class="info-column">
-            <a href="#" onclick="loadSection('earnings-call-transcript') ; fetchEarningsCallTranscript();">Earnings Call Transcript</a>
-            <a href="#" onclick="loadSection('earnings-call-calendar');fetchEarningsCallCalendar();">Earnings Call Calendar</a>
-            <a href="#" onclick="loadSection('historical-earnings');fetch_historical_earning_calendar();">Historical and Future Earnings</a>
-        </div>
-        <div class="info-column">
-            <a href="#" onclick="loadSection('dividend-calendar');fetch_stock_dividend_calendar();">Dividend Calendar</a>
-            <a href="#" onclick="loadSection('insider-trades');fetchInsiderTrades();">Insider Trades</a>
-        </div>
-    </div>
-    <div id="section-container" class="section-container">
-        <!-- Dynamic content loading -->
+    <div id="section-container" class="section-container market-report-output">
+        <div class="market-report-empty"><span>◫</span><strong>選擇上方研究報表</strong><small>報表、圖表與詳細數據會顯示在這裡</small></div>
     </div>
 </div>
 

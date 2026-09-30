@@ -656,6 +656,13 @@ function loadSection(sectionId) {
 
     const sectionContainer = document.getElementById('section-container');
     sectionContainer.innerHTML = sections[sectionId] || '<p>Section not found</p>';
+
+    document.querySelectorAll('#info-section .market-report-link').forEach(link => {
+        const handler = link.getAttribute('onclick') || '';
+        link.classList.toggle('active', handler.includes(`'${sectionId}'`));
+    });
+
+    sectionContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
 function loadSectionJP(sectionId) {
@@ -2606,18 +2613,18 @@ function fetchStock() {
     if (stockSymbol && (stockSymbol !== previousSymbol)) {
         logUserQuery('US', stockSymbol); // **記錄查詢**
 
-        outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
+        outputSymbolElement.innerText = '目前查詢：' + stockSymbol;
         outputSymbolElement.setAttribute('data-last-symbol', stockSymbol);
 
         // Clear previous company data
         const companyProfileContainer = document.getElementById('companyProfileContainer');
         if (companyProfileContainer) {
-            companyProfileContainer.innerHTML = '';
+            companyProfileContainer.innerHTML = '<div class="market-loading-state">正在載入公司資訊...</div>';
         }
 
         const priceContainer = document.getElementById('PriceContainer');
         if (priceContainer) {
-            priceContainer.innerHTML = ''; // Clear previous price data
+            priceContainer.innerHTML = '<div class="market-loading-state">正在載入即時報價...</div>';
         }
 
         const containers = [
@@ -4563,13 +4570,18 @@ function drawChart(labels, dataSets, type) {
 //////////////////////////////Profile//////////////////////////////////////////////
 ///123///
 function fetchCompanyProfile(stockSymbol) {
-    const apiKey = API_KEY;
     const apiUrl = `${BASE_URL}profile?symbol=${stockSymbol}`;
 
     fetch(apiUrl)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error(`Profile API ${response.status}`);
+            return response.json();
+        })
         .then(data => displayCompanyProfile(data, document.getElementById('companyProfileContainer')))
-        .catch(error => console.error('Error fetching data:', error));
+        .catch(error => {
+            console.error('Error fetching company profile:', error);
+            displayCompanyProfile([], document.getElementById('companyProfileContainer'));
+        });
 }
 
 function fetchJPCompanyProfile(stockSymbol) {
@@ -4634,26 +4646,50 @@ function fetchCNCompanyProfile(stockSymbol) {
 
 function displayCompanyProfile(data, container) {
     if (!data || !Array.isArray(data) || data.length === 0) {
-        container.innerHTML = '<p>Data not available.</p>';
+        container.innerHTML = '<div class="market-card-placeholder"><span>!</span><div><strong>找不到公司資訊</strong><small>請確認股票代碼後重新查詢</small></div></div>';
         return;
     }
 
-    const company = data[0];  // 假設返回的數據是一個包含單個公司信息的數組
-    const website = company.website || 'N/A';
+    const company = data[0];
+    const safeText = value => String(value ?? '').replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[char]);
+    const website = /^https?:\/\//i.test(company.website || '') ? company.website : '';
+    const companyName = safeText(company.companyName || company.name || company.symbol || 'Unknown Company');
+    const symbol = safeText(company.symbol || '—');
+    const exchange = safeText(company.exchangeShortName || company.exchange || 'U.S. Market');
+    const sector = safeText(company.sector || 'Sector N/A');
+    const industry = safeText(company.industry || 'Industry N/A');
+    const country = safeText(company.country || 'US');
+    const logo = /^https?:\/\//i.test(company.image || '') ? company.image : '';
 
-    // 清除之前的資料
-    container.innerHTML = '';
-
-    // 插入新的資料到 container 中
-    container.innerHTML = `<p>Official Website: <a href="${website}" target="_blank">${website}</a></p>`;
+    container.innerHTML = `
+        <div class="market-company-head">
+            <div class="market-company-identity">
+                ${logo ? `<img class="market-company-logo" src="${safeText(logo)}" alt="${companyName} logo" loading="lazy">` : ''}
+                <div>
+                    <span class="market-company-symbol">${symbol}</span>
+                    <h3 title="${companyName}">${companyName}</h3>
+                    <p>${exchange} · ${country}</p>
+                </div>
+            </div>
+            ${website ? `<a class="market-company-link" href="${safeText(website)}" target="_blank" rel="noopener noreferrer">官方網站 ↗</a>` : ''}
+        </div>
+        <div class="market-company-tags">
+            <span>${sector}</span>
+            <span>${industry}</span>
+            ${company.ceo ? `<span>CEO · ${safeText(company.ceo)}</span>` : ''}
+        </div>`;
 }
 //////////////////////////////Price//////////////////////////////////////////////
 function fetchCompanyPrice(stockSymbol) {
-    const apiKey = API_KEY;
     const apiUrl = `${BASE_URL}quote?symbol=${stockSymbol}`;
 
     fetch(apiUrl)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) throw new Error(`Quote API ${response.status}`);
+            return response.json();
+        })
         .then(data => {
             const priceContainer = document.getElementById('PriceContainer');
             if (data && data.length > 0) {
@@ -4662,7 +4698,10 @@ function fetchCompanyPrice(stockSymbol) {
                 priceContainer.innerHTML = '<p>No data found.</p>';
             }
         })
-        .catch(error => console.error('Error fetching data:', error));
+        .catch(error => {
+            console.error('Error fetching company price:', error);
+            displayCompanyPrice(null, document.getElementById('PriceContainer'));
+        });
 }
 
 function fetchJPCompanyPrice(stockSymbol) {
@@ -4769,23 +4808,41 @@ function fetchCNCompanyPrice(stockSymbol) {
 
 function displayCompanyPrice(data, container) {
     if (!data || typeof data !== 'object') {
-        container.innerHTML = '<p>Data not available.</p>';
+        container.innerHTML = '<div class="market-card-placeholder"><span>!</span><div><strong>找不到報價</strong><small>市場資料暫時無法取得</small></div></div>';
         return;
     }
 
-    const price = data.price || 'N/A';
-    const yearHigh = data.yearHigh || 'N/A';
-    const yearLow = data.yearLow || 'N/A';
+    const number = (value, digits = 2) => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? parsed.toLocaleString('en-US', { maximumFractionDigits: digits }) : '—';
+    };
+    const compact = value => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) ? new Intl.NumberFormat('en-US', { notation: 'compact', maximumFractionDigits: 2 }).format(parsed) : '—';
+    };
+    const price = Number(data.price);
+    const change = Number(data.change);
+    const changePct = Number(data.changePercentage ?? data.changesPercentage);
+    const directionClass = change >= 0 ? 'positive' : 'negative';
+    const sign = change >= 0 ? '+' : '';
 
-    // 清除之前的資料
-    container.innerHTML = '';
-
-    // 插入新的資料到 container 中
     container.innerHTML = `
-        <p><strong>Current Price:</strong> $${price}</p>
-        <p><strong>Year High:</strong> $${yearHigh}</p>
-        <p><strong>Year Low:</strong> $${yearLow}</p>
-    `;
+        <div class="market-price-head">
+            <div><span class="market-eyebrow">MARKET SNAPSHOT</span><h3>${data.symbol || '即時報價'}</h3></div>
+            <p>${data.exchange || data.exchangeShortName || 'USD'}</p>
+        </div>
+        <div class="market-price-value">
+            ${Number.isFinite(price) ? '$' + number(price) : '—'}
+            ${Number.isFinite(change) ? `<span class="market-price-change ${directionClass}">${sign}${number(change)} (${sign}${number(changePct)}%)</span>` : ''}
+        </div>
+        <div class="market-stat-grid">
+            <div><small>今日高點</small><strong>$${number(data.dayHigh)}</strong></div>
+            <div><small>今日低點</small><strong>$${number(data.dayLow)}</strong></div>
+            <div><small>成交量</small><strong>${compact(data.volume)}</strong></div>
+            <div><small>52 週高點</small><strong>$${number(data.yearHigh)}</strong></div>
+            <div><small>52 週低點</small><strong>$${number(data.yearLow)}</strong></div>
+            <div><small>市值</small><strong>${compact(data.marketCap)}</strong></div>
+        </div>`;
 }
 
 /////////////////////////////財務收入 Income Statement////////////////////////////////////////
@@ -9105,9 +9162,10 @@ async function runDeepDive(event) {
 
     try {
         // 3. 呼叫後端 API (支援環境變數 baseUrl 防呆)
-        const targetUrl = typeof baseUrl !== 'undefined' ? `${baseUrl}/api/ai_deep_dive` : '/api/ai_deep_dive';
+        const apiRoot = typeof baseUrl !== 'undefined' ? baseUrl : '';
+        const targetUrl = `${apiRoot}/api/ai_deep_dive/start`;
 
-        const response = await fetch(targetUrl, {
+        const startResponse = await fetch(targetUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -9115,8 +9173,39 @@ async function runDeepDive(event) {
             body: JSON.stringify({ symbol: symbol })
         });
 
-        if (!response.ok) throw new Error(`Analysis Failed: 伺服器狀態碼 ${response.status}`);
-        const data = await response.json();
+        if (!startResponse.ok) {
+            throw new Error(`Analysis Failed: 伺服器狀態碼 ${startResponse.status}`);
+        }
+        const startData = await startResponse.json();
+        if (!startData.job_id) throw new Error('伺服器未建立分析工作');
+
+        let data = null;
+        const pollStartedAt = Date.now();
+        const maxWaitMs = 10 * 60 * 1000;
+        while (Date.now() - pollStartedAt < maxWaitMs) {
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            const statusResponse = await fetch(
+                `${apiRoot}/api/ai_deep_dive/status/${encodeURIComponent(startData.job_id)}`,
+                { cache: 'no-store' }
+            );
+
+            if (statusResponse.status === 202) {
+                const progress = await statusResponse.json();
+                if (loadingText) {
+                    loadingText.innerText = `AI 正在分析 ${symbol}：已執行 ${progress.elapsed_seconds || 0} 秒...`;
+                }
+                continue;
+            }
+
+            const responseData = await statusResponse.json().catch(() => ({}));
+            if (!statusResponse.ok) {
+                throw new Error(responseData.error || `Analysis Failed: 伺服器狀態碼 ${statusResponse.status}`);
+            }
+            data = responseData;
+            break;
+        }
+
+        if (!data) throw new Error('分析等待逾時，請稍後再試');
 
         // 4. 儲存至全域變數供後續 Chat 或沙盤使用
         window.currentDeepDiveData = data.raw_data;
