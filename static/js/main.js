@@ -663,6 +663,53 @@ function loadSection(sectionId) {
     });
 
     sectionContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    // 點選研究模組後，立即載入最合理的預設資料；控制項仍保留供進階調整。
+    window.requestAnimationFrame(() => autoLoadUSReport(sectionId));
+}
+
+function autoLoadUSReport(sectionId) {
+    const symbol = document.getElementById('stockSymbol')?.value.trim().toUpperCase();
+    const sectionContainer = document.getElementById('section-container');
+    if (!symbol) {
+        const content = sectionContainer?.querySelector('.content');
+        if (content) {
+            content.insertAdjacentHTML('afterbegin', '<div class="market-inline-notice">請先在上方搜尋並選擇股票，再查看研究報表。</div>');
+        }
+        return;
+    }
+
+    const today = new Date();
+    const formatDate = date => date.toISOString().slice(0, 10);
+    const sixMonthsAgo = new Date(today);
+    sixMonthsAgo.setMonth(today.getMonth() - 6);
+    const sixMonthsLater = new Date(today);
+    sixMonthsLater.setMonth(today.getMonth() + 6);
+
+    if (sectionId === 'earnings-call-calendar') {
+        const from = document.getElementById('fromDate');
+        const to = document.getElementById('toDate');
+        if (from) from.value = formatDate(sixMonthsAgo);
+        if (to) to.value = formatDate(sixMonthsLater);
+    }
+    if (sectionId === 'dividend-calendar') {
+        const from = document.getElementById('fromDate_2');
+        const to = document.getElementById('toDate_2');
+        if (from) from.value = formatDate(sixMonthsAgo);
+        if (to) to.value = formatDate(sixMonthsLater);
+    }
+
+    const loaders = {
+        'income-statement': fetchIncomeStatement,
+        'balance-sheet': fetchBalanceSheet,
+        'cashflow-statement': fetchCashflow,
+        'earnings-call-transcript': fetchEarningsCallTranscript,
+        'earnings-call-calendar': fetchEarningsCallCalendar,
+        'historical-earnings': fetch_historical_earning_calendar,
+        'dividend-calendar': fetch_stock_dividend_calendar,
+        'insider-trades': fetchInsiderTrades
+    };
+    if (typeof loaders[sectionId] === 'function') loaders[sectionId]();
 }
 
 function loadSectionJP(sectionId) {
@@ -7188,43 +7235,22 @@ function formatNumber(value) {
 
 //////////////法說會逐字稿 Earnings Call Transcript/////////////////
 async function fetchEarningsCallTranscript() {
-    var stockSymbol = fetchStock();
-    var yearInput = document.getElementById('yearInput');
-    var quarterInput = document.getElementById('quarterInput');
-    var year = yearInput.value;
-    var quarter = quarterInput.value;
-    const apiKey = API_KEY;
+    const stockSymbol = fetchStock();
+    const yearInput = document.getElementById('yearInput');
+    const quarterInput = document.getElementById('quarterInput');
+    const year = yearInput?.value.trim() || '';
+    const quarter = quarterInput?.value.trim() || '';
 
-    if (stockSymbol.length === 0) {
-        alert('請輸入股票代碼。');
+    if (!stockSymbol) {
         return;
     }
 
-    // 如果使用者沒有輸入年份或季度，則自動抓取最新的逐字稿資料
-    if (year.length === 0 || quarter.length === 0) {
-        const latestApiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&limit=1`;
-        try {
-            const response = await fetch(latestApiUrl);
-            const data = await response.json();
-            if (data && data.length > 0) {
-                year = data[0].year;
-                quarter = data[0].quarter;
-
-                // 自動填入最新的年份和季度到表單中
-                yearInput.value = year;
-                quarterInput.value = quarter;
-            } else {
-                alert('未找到最新的法說會逐字稿。');
-                return;
-            }
-        } catch (error) {
-            console.error('Error fetching latest transcript:', error);
-            alert('無法獲取最新的法說會逐字稿。');
-            return;
-        }
+    const params = new URLSearchParams({ symbol: stockSymbol });
+    if (year && quarter) {
+        params.set('year', year);
+        params.set('quarter', quarter);
     }
-
-    const apiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&year=${year}&quarter=${quarter}`;
+    const apiUrl = `${BASE_URL}earning-call-transcript?${params.toString()}`;
     fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainer');
 }
 
@@ -7557,19 +7583,28 @@ function copyTranscript() {
 
 function fetchData_Transcript(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
-    container.innerHTML = '<p>Loading...</p>';
+    container.innerHTML = '<div class="market-loading-state">正在尋找最新一季法說會逐字稿...</div>';
     fetch(apiUrl)
-        .then(response => response.json())
-        .then(data => {
-            if (data && data.length > 0) {
+        .then(async response => ({ response, data: await response.json().catch(() => ({})) }))
+        .then(({ response, data }) => {
+            if (!response.ok || data?.error) {
+                const message = data?.error || `逐字稿服務回傳 ${response.status}`;
+                const planHint = data?.plan_required ? `<small>需要 FMP ${data.plan_required} 方案</small>` : '';
+                container.innerHTML = `<div class="market-inline-notice market-inline-warning"><strong>${message}</strong>${planHint}</div>`;
+            } else if (Array.isArray(data) && data.length > 0) {
+                const latest = data[0];
+                const yearInput = document.getElementById('yearInput');
+                const quarterInput = document.getElementById('quarterInput');
+                if (yearInput) yearInput.value = latest.year || latest.fiscalYear || '';
+                if (quarterInput) quarterInput.value = String(latest.quarter || latest.period || '').replace(/^Q/i, '');
                 callback(data[0], container);
             } else {
-                container.innerHTML = '<p>無相關數據。</p>';
+                container.innerHTML = '<div class="market-inline-notice">目前找不到這檔股票的法說會逐字稿。</div>';
             }
         })
         .catch(error => {
             console.error('數據加載錯誤: ', error);
-            container.innerHTML = '<p>數據加載錯誤。請檢查控制台了解更多詳情。</p>';
+            container.innerHTML = '<div class="market-inline-notice market-inline-warning">逐字稿載入失敗，請稍後再試。</div>';
         });
 }
 

@@ -3549,6 +3549,32 @@ body:has(#info-section.active) .overlay.active {
 #info-section .market-report-output tr:hover td { background: rgba(57, 169, 255, .045); }
 #info-section .market-report-output canvas { max-width: 100% !important; }
 
+#info-section .market-inline-notice {
+    margin: 0 0 16px;
+    padding: 13px 15px;
+    color: #b9c9d8;
+    background: rgba(57, 169, 255, .075);
+    border: 1px solid rgba(57, 169, 255, .2);
+    border-radius: 10px;
+    line-height: 1.55;
+}
+
+#info-section .market-inline-notice strong,
+#info-section .market-inline-notice small {
+    display: block;
+}
+
+#info-section .market-inline-notice small {
+    margin-top: 5px;
+    color: var(--market-muted);
+}
+
+#info-section .market-inline-warning {
+    color: #ffd4a3;
+    background: rgba(245, 158, 11, .09);
+    border-color: rgba(245, 158, 11, .28);
+}
+
 body.light-mode #info-section.us-stock-workspace {
     --market-bg: #eef3f8;
     --market-panel: #fff;
