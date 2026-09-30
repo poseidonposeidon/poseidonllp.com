@@ -538,8 +538,8 @@ function loadSection(sectionId) {
                 <div class="content">  
                     <label for="period">Select Period:</label>
                     <select id="period">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -561,8 +561,8 @@ function loadSection(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="period_2">Select Period:</label>
                     <select id="period_2">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     <!-- 添加年份範圍選單 -->
                     <label for="yearRange_2">Select Year Range:</label>
@@ -582,8 +582,8 @@ function loadSection(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="period_3">Select Period:</label>
                     <select id="period_3">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -832,8 +832,8 @@ function loadSectionJP(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="periodJP">Select Period:</label>
                     <select id="periodJP">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     <label for="yearRangeJP">Select Year Range:</label>
                     <select id="yearRangeJP" onchange="fetchJPIncomeStatement()">
@@ -853,8 +853,8 @@ function loadSectionJP(sectionId) {
             <div class="content scroll-container-x">
                 <label for="periodJP_2">Select Period:</label>
                 <select id="periodJP_2">
+                    <option value="quarter" selected>Quarter</option>
                     <option value="annual">Annual</option>
-                    <option value="quarter">Quarter</option>
                 </select>
                 
                 <!-- 添加年份範圍選單 -->
@@ -876,8 +876,8 @@ function loadSectionJP(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="periodJP_3">Select Period:</label>
                     <select id="periodJP_3">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -963,8 +963,8 @@ function loadSectionTW(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="periodTW">Select Period:</label>
                     <select id="periodTW">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <label for="yearRangeTW">Select Year Range:</label>
@@ -985,8 +985,8 @@ function loadSectionTW(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="periodTW_2">Select Period:</label>
                     <select id="periodTW_2">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -1006,8 +1006,8 @@ function loadSectionTW(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="periodTW_3">Select Period:</label>
                     <select id="periodTW_3">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -1059,8 +1059,8 @@ function loadSectionEU(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="periodEU">Select Period:</label>
                     <select id="periodEU">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <label for="yearRangeEU">Select Year Range:</label>
@@ -1081,8 +1081,8 @@ function loadSectionEU(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="period_2EU">Select Period:</label>
                     <select id="period_2EU">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -1102,8 +1102,8 @@ function loadSectionEU(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="period_3EU">Select Period:</label>
                     <select id="period_3EU">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -1190,8 +1190,8 @@ function loadSectionKR(sectionId)   {
                 <div class="content scroll-container-x">
                     <label for="periodKR">Select Period:</label>
                     <select id="periodKR">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <label for="yearRangeKR">Select Year Range:</label>
@@ -1211,8 +1211,8 @@ function loadSectionKR(sectionId)   {
                 <div class="content scroll-container-x">
                     <label for="period_2KR">Select Period:</label>
                     <select id="period_2KR">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -1232,8 +1232,8 @@ function loadSectionKR(sectionId)   {
                 <div class="content scroll-container-x">
                     <label for="period_3KR">Select Period:</label>
                     <select id="period_3KR">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -1319,8 +1319,8 @@ function loadSectionHK(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="periodHK">Select Period:</label>
                     <select id="periodHK">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <label for="yearRangeHK">Select Year Range:</label>
@@ -1340,8 +1340,8 @@ function loadSectionHK(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="period_2HK">Select Period:</label>
                     <select id="period_2HK">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -1361,8 +1361,8 @@ function loadSectionHK(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="period_3HK">Select Period:</label>
                     <select id="period_3HK">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -1449,8 +1449,8 @@ function loadSectionCN(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="periodCN">Select Period:</label>
                     <select id="periodCN">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <label for="yearRangeCN">Select Year Range:</label>             
@@ -1470,8 +1470,8 @@ function loadSectionCN(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="period_2CN">Select Period:</label>
                     <select id="period_2CN">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -1492,8 +1492,8 @@ function loadSectionCN(sectionId) {
                 <div class="content scroll-container-x">
                     <label for="period_3CN">Select Period:</label>
                     <select id="period_3CN">
+                        <option value="quarter" selected>Quarter</option>
                         <option value="annual">Annual</option>
-                        <option value="quarter">Quarter</option>
                     </select>
                     
                     <!-- 添加年份範圍選單 -->
@@ -5027,6 +5027,103 @@ let peBandChartInstances = {};
 
 let technicalAnalysisChartInstances = {};
 
+function financialStatementLimit(period, yearRange) {
+    if (yearRange === 'all') return period === 'quarter' ? 160 : 40;
+    const years = Number.parseInt(yearRange, 10);
+    if (!Number.isFinite(years) || years <= 0) return period === 'quarter' ? 24 : 6;
+    // 多取一個比較基期，確保最舊一期仍可計算年增率。
+    return period === 'quarter' ? (years * 4) + 4 : years + 1;
+}
+
+function normalizeFinancialStatementEntry(entry) {
+    const normalized = {
+        ...entry,
+        fillingDate: entry.fillingDate ?? entry.filingDate,
+        epsdiluted: entry.epsdiluted ?? entry.epsDiluted,
+        othertotalStockholdersEquity: entry.othertotalStockholdersEquity ?? entry.otherTotalStockholdersEquity,
+        totalLiabilitiesAndStockholdersEquity: entry.totalLiabilitiesAndStockholdersEquity ?? entry.totalLiabilitiesAndTotalEquity,
+        commonStockIssued: entry.commonStockIssued ?? entry.commonStockIssuance,
+        dividendsPaid: entry.dividendsPaid ?? entry.commonDividendsPaid ?? entry.netDividendsPaid,
+        otherInvestingActivites: entry.otherInvestingActivites ?? entry.otherInvestingActivities,
+        netCashUsedForInvestingActivites: entry.netCashUsedForInvestingActivites ?? entry.netCashProvidedByInvestingActivities,
+        otherFinancingActivites: entry.otherFinancingActivites ?? entry.otherFinancingActivities,
+        netCashUsedProvidedByFinancingActivities: entry.netCashUsedProvidedByFinancingActivities ?? entry.netCashProvidedByFinancingActivities
+    };
+    const revenue = Number(normalized.revenue);
+    const ratio = value => Number.isFinite(revenue) && revenue !== 0 && Number.isFinite(Number(value))
+        ? Number(value) / revenue
+        : null;
+    normalized.grossProfitRatio = normalized.grossProfitRatio ?? ratio(normalized.grossProfit);
+    normalized.ebitdaratio = normalized.ebitdaratio ?? normalized.ebitdaRatio ?? ratio(normalized.ebitda);
+    normalized.operatingIncomeRatio = normalized.operatingIncomeRatio ?? ratio(normalized.operatingIncome);
+    normalized.incomeBeforeTaxRatio = normalized.incomeBeforeTaxRatio ?? ratio(normalized.incomeBeforeTax);
+    normalized.netIncomeRatio = normalized.netIncomeRatio ?? ratio(normalized.netIncome);
+    return normalized;
+}
+
+function selectFinancialPeriods(data, period, yearRange) {
+    const sorted = (Array.isArray(data) ? data : [])
+        .filter(entry => entry && entry.date && !Number.isNaN(new Date(entry.date).getTime()))
+        .map(normalizeFinancialStatementEntry)
+        .slice()
+        .sort((a, b) => new Date(b.date) - new Date(a.date));
+    if (yearRange === 'all') return sorted;
+    const years = Number.parseInt(yearRange, 10);
+    const count = period === 'quarter' ? years * 4 : years;
+    return Number.isFinite(count) && count > 0 ? sorted.slice(0, count) : sorted;
+}
+
+function financialPeriodLabel(entry, period) {
+    if (!entry) return 'Latest period';
+    const fiscalPeriod = period === 'quarter' ? (entry.period || 'Quarter') : 'FY';
+    return `${entry.calendarYear || ''} ${fiscalPeriod}`.trim();
+}
+
+function financialMetricValue(value, options = {}) {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) return '—';
+    const number = Number(value);
+    if (options.percent) return `${number.toFixed(1)}%`;
+    if (options.decimal) return number.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    return new Intl.NumberFormat('en-US', {
+        notation: 'compact',
+        maximumFractionDigits: 2
+    }).format(number);
+}
+
+function financialSnapshotMarkup(entry, period, metrics) {
+    return `
+        <section class="financial-snapshot" aria-label="Latest ${period} snapshot">
+            <div class="financial-snapshot-heading">
+                <span>Latest reported period</span>
+                <strong>${financialPeriodLabel(entry, period)}</strong>
+                <small>${entry?.date || 'Date unavailable'} · ${entry?.reportedCurrency || 'Currency unavailable'}</small>
+            </div>
+            <div class="financial-snapshot-metrics">
+                ${metrics.map(metric => `
+                    <div class="financial-snapshot-metric">
+                        <span>${metric.label}</span>
+                        <strong>${financialMetricValue(metric.value, metric.options)}</strong>
+                    </div>
+                `).join('')}
+            </div>
+        </section>`;
+}
+
+const FINANCIAL_PERIOD_RELOADERS = {
+    period: 'fetchIncomeStatement', period_2: 'fetchBalanceSheet', period_3: 'fetchCashflow',
+    periodJP: 'fetchJPIncomeStatement', periodJP_2: 'fetchJPBalanceSheet', periodJP_3: 'fetchJPCashflow',
+    periodTW: 'fetchTWIncomeStatement', periodTW_2: 'fetchTWBalanceSheet', periodTW_3: 'fetchTWCashflow',
+    periodEU: 'fetchEUIncomeStatement', period_2EU: 'fetchEUBalanceSheet', period_3EU: 'fetchEUCashflow',
+    periodKR: 'fetchKRIncomeStatement', period_2KR: 'fetchKRBalanceSheet', period_3KR: 'fetchKRCashflow',
+    periodHK: 'fetchHKIncomeStatement', period_2HK: 'fetchHKBalanceSheet', period_3HK: 'fetchHKCashflow',
+    periodCN: 'fetchCNIncomeStatement', period_2CN: 'fetchCNBalanceSheet', period_3CN: 'fetchCNCashflow'
+};
+
+document.addEventListener('change', event => {
+    const reloaderName = FINANCIAL_PERIOD_RELOADERS[event.target?.id];
+    if (reloaderName && typeof window[reloaderName] === 'function') window[reloaderName]();
+});
+
 function fetchIncomeStatement() {
     const stockSymbol = fetchStock();
     const period = document.getElementById('period').value;
@@ -5038,7 +5135,7 @@ function fetchIncomeStatement() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     // === 傳入美股的圖表 ID 'technicalAnalysisChart' ===
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainer', 'incomeStatementChart', 'operatingChart', period, yearRange, 'technicalAnalysisChart');
 }
@@ -5087,13 +5184,8 @@ function fetchJPIncomeStatement() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period , yearRange);
-
-    // 請求本益比河流圖的資料
-    const priceApiUrl = `${BASE_URL}historical-price-eod/full?symbol=${stockSymbol}&timeseries=3650`;
-    const epsApiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&limit=40&period=quarter`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartJP'); // 傳入對應的 chartId
+    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerJP', 'incomeStatementChartJP', 'operatingChartJP', period, yearRange, 'technicalAnalysisChartJP');
 }
 
 async function fetchTWIncomeStatement() {
@@ -5107,7 +5199,7 @@ async function fetchTWIncomeStatement() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     // === 傳入一個新的、專屬於台股的圖表 ID 'technicalAnalysisChartTW' ===
     fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerTW', 'incomeStatementChartTW', 'operatingChartTW', period, yearRange, 'technicalAnalysisChartTW');
 }
@@ -5123,12 +5215,8 @@ function fetchEUIncomeStatement() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period ,yearRange);
-
-    const priceApiUrl = `${BASE_URL}historical-price-eod/full?symbol=${stockSymbol}&timeseries=3650`;
-    const epsApiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&limit=40&period=quarter`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartEU');
+    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerEU', 'incomeStatementChartEU', 'operatingChartEU', period, yearRange, 'technicalAnalysisChartEU');
 }
 
 function fetchKRIncomeStatement() {
@@ -5146,16 +5234,8 @@ function fetchKRIncomeStatement() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', chartId, operatingChartId, period ,yearRange);
-
-    // 請求本益比河流圖的資料
-    const priceApiUrl = `${BASE_URL}historical-price-eod/full?symbol=${stockSymbol}&timeseries=3650`;
-    const epsApiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&limit=40&period=quarter`;
-
-    // 使用與 displayIncomeStatement 中相同的邏輯來產生 peBandCanvasId
-    const peBandCanvasId = `peBandChart_${chartId}`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, peBandCanvasId); // 傳入正確的 ID
+    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerKR', chartId, operatingChartId, period, yearRange, 'technicalAnalysisChartKR');
 }
 
 function fetchHKIncomeStatement() {
@@ -5169,12 +5249,8 @@ function fetchHKIncomeStatement() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period ,yearRange);
-
-    const priceApiUrl = `${BASE_URL}historical-price-eod/full?symbol=${stockSymbol}&timeseries=3650`;
-    const epsApiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&limit=40&period=quarter`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartHK');
+    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerHK', 'incomeStatementChartHK', 'operatingChartHK', period, yearRange, 'technicalAnalysisChartHK');
 }
 
 function fetchCNIncomeStatement() {
@@ -5188,12 +5264,8 @@ function fetchCNIncomeStatement() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}`;
-    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period ,yearRange);
-
-    const priceApiUrl = `${BASE_URL}historical-price-eod/full?symbol=${stockSymbol}&timeseries=3650`;
-    const epsApiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&limit=40&period=quarter`;
-    fetchPEBandData(priceApiUrl, epsApiUrl, 'peBandChartCN');
+    const apiUrl = `${BASE_URL}income-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
+    fetchData_IncomeStatement(apiUrl, displayIncomeStatement, 'incomeStatementContainerCN', 'incomeStatementChartCN', 'operatingChartCN', period, yearRange, 'technicalAnalysisChartCN');
 }
 
 function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
@@ -5301,6 +5373,12 @@ async function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
 
     } catch (error) {
         console.error('Error fetching technical analysis data:', error);
+        const canvas = document.getElementById(chartId);
+        if (canvas?.parentElement) {
+            canvas.parentElement.classList.add('chart-panel-unavailable');
+            canvas.parentElement.insertAdjacentHTML('beforeend', '<p class="chart-unavailable-message">Technical data is unavailable for this symbol or market.</p>');
+            canvas.style.display = 'none';
+        }
     }
 }
 
@@ -5610,23 +5688,27 @@ function addNavigatorDragHandlers(navigatorChart, mainChart) {
 
 
 function calculatePEData(priceData, epsData) {
-    const peData = priceData.map(priceEntry => {
+    const orderedPrices = (Array.isArray(priceData) ? priceData : []).slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+    const orderedEps = (Array.isArray(epsData) ? epsData : []).slice().sort((a, b) => new Date(b.date) - new Date(a.date));
+    const peData = orderedPrices.map(priceEntry => {
         const date = priceEntry.date;
         const priceDate = new Date(date);
 
         // 尋找過去四季的 EPS 數據，將其累加起來
-        const cumulativeEPS = epsData.reduce((acc, epsEntry) => {
+        const cumulativeEPS = orderedEps.reduce((acc, epsEntry) => {
             const epsDate = new Date(epsEntry.date);
             if (epsDate <= priceDate && acc.count < 4) {
-                acc.total += epsEntry.eps;
+                const eps = Number(epsEntry.epsdiluted ?? epsEntry.eps);
+                if (!Number.isFinite(eps)) return acc;
+                acc.total += eps;
                 acc.count += 1;
             }
             return acc;
-        }, { total: 0, count: 0 }).total;
+        }, { total: 0, count: 0 });
 
         // 確保有對應的 EPS 數據，並計算本益比
-        if (cumulativeEPS > 0) {
-            const peRatio = priceEntry.close / cumulativeEPS;
+        if (cumulativeEPS.count === 4 && cumulativeEPS.total > 0) {
+            const peRatio = Number(priceEntry.close) / cumulativeEPS.total;
             return {
                 date: date,
                 peRatio: peRatio,
@@ -5680,18 +5762,8 @@ function fetchData_IncomeStatement(apiUrl, callback, containerId, chartId, opera
 }
 
 function displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange,techChartId) {
-    const currentYear = new Date().getFullYear();
-
-    // 過濾數據以包含多兩年的數據
-    const filteredDataForTable = data.filter(entry => {
-        const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 1));
-    });
-
-    const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
-        // 移除第一筆沒有增長率的數據，避免圖表顯示問題
-        return !(index === 0 && entry.growthRate === 'N/A');
-    });
+    // 表格固定由新到舊；圖表稍後使用獨立副本由舊到新，避免排序互相污染。
+    const filteredDataForTable = selectFinancialPeriods(data, period, yearRange);
 
     if (!filteredDataForTable || !Array.isArray(filteredDataForTable) || filteredDataForTable.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
@@ -5702,8 +5774,20 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         return;
     }
 
-    // 按日期升序排序
-    filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
+    const byFiscalPeriod = new Map(
+        filteredDataForTable.map(entry => [`${entry.calendarYear}|${entry.period || 'FY'}`, entry])
+    );
+    filteredDataForTable.forEach((entry, index) => {
+        const comparison = period === 'quarter'
+            ? byFiscalPeriod.get(`${Number(entry.calendarYear) - 1}|${entry.period}`)
+            : filteredDataForTable[index + 1];
+        const revenue = Number(entry.revenue);
+        const previousRevenue = Number(comparison?.revenue);
+        entry.growthRate = Number.isFinite(revenue) && Number.isFinite(previousRevenue) && previousRevenue !== 0
+            ? Number((((revenue - previousRevenue) / Math.abs(previousRevenue)) * 100).toFixed(2))
+            : null;
+    });
+    const filteredDataForChart = filteredDataForTable.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let rows = {
         date: ['Date'],
@@ -5746,8 +5830,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         growthRate: [period === 'annual' ? 'YoY Growth' : 'YoY Growth']
     };
 
-    // 填充行數據並計算增長率
-    filteredDataForTable.forEach((entry, index) => {
+    // 填充行數據；第一個資料欄即為最新季度。
+    filteredDataForTable.forEach((entry) => {
         rows.date.push(entry.date || 'N/A');
         rows.symbol.push(entry.symbol || 'N/A');
         rows.reportedCurrency.push(entry.reportedCurrency || 'N/A');
@@ -5758,7 +5842,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.revenue.push(formatNumber(entry.revenue));
         rows.costOfRevenue.push(formatNumber(entry.costOfRevenue));
         rows.grossProfit.push(formatNumber(entry.grossProfit));
-        rows.grossProfitRatio.push(entry.grossProfitRatio ? (entry.grossProfitRatio * 100).toFixed(2) + '%' : 'N/A');
+        rows.grossProfitRatio.push(entry.grossProfitRatio != null && Number.isFinite(Number(entry.grossProfitRatio)) ? (Number(entry.grossProfitRatio) * 100).toFixed(2) + '%' : 'N/A');
         rows.researchAndDevelopmentExpenses.push(formatNumber(entry.researchAndDevelopmentExpenses));
         rows.generalAndAdministrativeExpenses.push(formatNumber(entry.generalAndAdministrativeExpenses));
         rows.sellingAndMarketingExpenses.push(formatNumber(entry.sellingAndMarketingExpenses));
@@ -5770,55 +5854,23 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         rows.interestExpense.push(formatNumber(entry.interestExpense));
         rows.depreciationAndAmortization.push(formatNumber(entry.depreciationAndAmortization));
         rows.ebitda.push(formatNumber(entry.ebitda));
-        rows.ebitdaratio.push(entry.ebitdaratio ? (entry.ebitdaratio * 100).toFixed(2) + '%' : 'N/A');
+        rows.ebitdaratio.push(entry.ebitdaratio != null && Number.isFinite(Number(entry.ebitdaratio)) ? (Number(entry.ebitdaratio) * 100).toFixed(2) + '%' : 'N/A');
         rows.operatingIncome.push(formatNumber(entry.operatingIncome));
-        rows.operatingIncomeRatio.push(entry.operatingIncomeRatio ? (entry.operatingIncomeRatio * 100).toFixed(2) + '%' : 'N/A');
+        rows.operatingIncomeRatio.push(entry.operatingIncomeRatio != null && Number.isFinite(Number(entry.operatingIncomeRatio)) ? (Number(entry.operatingIncomeRatio) * 100).toFixed(2) + '%' : 'N/A');
         rows.totalOtherIncomeExpensesNet.push(formatNumber(entry.totalOtherIncomeExpensesNet));
         rows.incomeBeforeTax.push(formatNumber(entry.incomeBeforeTax));
-        rows.incomeBeforeTaxRatio.push(entry.incomeBeforeTaxRatio ? (entry.incomeBeforeTaxRatio * 100).toFixed(2) + '%' : 'N/A');
+        rows.incomeBeforeTaxRatio.push(entry.incomeBeforeTaxRatio != null && Number.isFinite(Number(entry.incomeBeforeTaxRatio)) ? (Number(entry.incomeBeforeTaxRatio) * 100).toFixed(2) + '%' : 'N/A');
         rows.incomeTaxExpense.push(formatNumber(entry.incomeTaxExpense));
         rows.netIncome.push(formatNumber(entry.netIncome));
-        rows.netIncomeRatio.push(entry.netIncomeRatio ? (entry.netIncomeRatio * 100).toFixed(2) + '%' : 'N/A');
-        rows.eps.push(entry.eps || 'N/A');
-        rows.epsdiluted.push(entry.epsdiluted || 'N/A');
+        rows.netIncomeRatio.push(entry.netIncomeRatio != null && Number.isFinite(Number(entry.netIncomeRatio)) ? (Number(entry.netIncomeRatio) * 100).toFixed(2) + '%' : 'N/A');
+        rows.eps.push(entry.eps ?? 'N/A');
+        rows.epsdiluted.push(entry.epsdiluted ?? 'N/A');
         rows.weightedAverageShsOut.push(formatNumber(entry.weightedAverageShsOut));
         rows.weightedAverageShsOutDil.push(formatNumber(entry.weightedAverageShsOutDil));
         rows.link.push(entry.link ? `<a class="styled-link" href="${entry.link}" target="_blank">Link</a>` : 'N/A');
         rows.finalLink.push(entry.finalLink ? `<a class="styled-link" href="${entry.finalLink}" target="_blank">Final Link</a>` : 'N/A');
 
-        // 計算增長率
-        if (index > 0) {
-            if (period === 'annual') {
-                let lastRevenue = filteredDataForTable[index - 1].revenue;
-                if (entry.revenue && lastRevenue) {
-                    let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                    entry.growthRate = parseFloat(growthRate.toFixed(2));
-                    rows.growthRate.push(entry.growthRate);
-                } else {
-                    entry.growthRate = null;
-                    rows.growthRate.push('N/A');
-                }
-            } else {
-                let previousYearSameQuarterIndex = filteredDataForTable.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
-                if (previousYearSameQuarterIndex !== -1) {
-                    let lastRevenue = filteredDataForTable[previousYearSameQuarterIndex].revenue;
-                    if (entry.revenue && lastRevenue) {
-                        let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
-                        entry.growthRate = parseFloat(growthRate.toFixed(2));
-                        rows.growthRate.push(entry.growthRate);
-                    } else {
-                        entry.growthRate = null;
-                        rows.growthRate.push('N/A');
-                    }
-                } else {
-                    entry.growthRate = null;
-                    rows.growthRate.push('N/A');
-                }
-            }
-        } else {
-            entry.growthRate = null;
-            rows.growthRate.push('N/A');
-        }
+        rows.growthRate.push(entry.growthRate === null ? 'N/A' : `${entry.growthRate.toFixed(2)}%`);
     });
 
     // let tableHtml = `
@@ -5853,6 +5905,24 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     const downloadButtonId = `downloadBtn_${chartId}`;
     const peBandCanvasId = `peBandChart_${chartId}`;
+    const latest = filteredDataForTable[0];
+    const snapshotHtml = financialSnapshotMarkup(latest, period, [
+        { label: 'Revenue', value: latest.revenue },
+        { label: 'Gross Profit', value: latest.grossProfit },
+        { label: 'Net Income', value: latest.netIncome },
+        { label: 'Diluted EPS', value: latest.epsdiluted, options: { decimal: true } },
+        { label: 'Gross Margin', value: latest.grossProfitRatio == null ? null : Number(latest.grossProfitRatio) * 100, options: { percent: true } },
+        { label: 'Revenue YoY', value: latest.growthRate, options: { percent: true } }
+    ]);
+    const technicalPanelHtml = techChartId ? `
+        <div class="chart-panel chart-panel-wide" id="technicalAnalysisContainer_${techChartId}">
+            <div class="panel-header">
+                <div><h2>Technical Analysis</h2><p>Price, volume, MA5 and MA10</p></div>
+                <button id="resetZoomBtn_Tech_${techChartId}">Reset Zoom</button>
+            </div>
+            <canvas id="${techChartId}"></canvas>
+            <div class="navigator-container"><canvas id="${techChartId}_nav"></canvas></div>
+        </div>` : '';
 
     // --- 修改後的 HTML 結構 ---
     container.innerHTML = `
@@ -5860,8 +5930,11 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         <div class="financial-report-section">
     
             <div class="report-header">
-                <button id="${downloadButtonId}">Download as Excel</button>
+                <div><strong>${period === 'quarter' ? 'Quarterly' : 'Annual'} income statement</strong><span>Latest period appears first; swipe horizontally for history.</span></div>
+                <button id="${downloadButtonId}">Download Excel</button>
             </div>
+
+            ${snapshotHtml}
     
             <!-- 2. 為表格和每個圖表都套用 .chart-panel class -->
             <div class="chart-panel">
@@ -5872,9 +5945,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                 </div>
             </div>
     
+            <div class="financial-chart-grid">
             <div class="chart-panel" id="operatingChartContainer">
                 <div class="panel-header">
-                    <h2>Operating Performance</h2>
+                    <div><h2>Operating Performance</h2><p>Revenue, costs and operating income with YoY growth</p></div>
                     <button id="resetZoomBtn_Operating_${operatingChartId}">Reset Zoom</button> 
                 </div>
                 <canvas id="${operatingChartId}"></canvas>
@@ -5882,43 +5956,25 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     
             <div class="chart-panel" id="chartContainer">
                 <div class="panel-header">
-                    <h2>Profitability & Growth</h2>
+                    <div><h2>Profitability & Growth</h2><p>EPS and key profit margins</p></div>
                     <button id="resetZoomBtn_Income_${chartId}">Reset Zoom</button> 
                 </div>
                 <canvas id="${chartId}"></canvas>
             </div>
+            </div>
     
             <div class="chart-panel" id="peBandContainer">
                 <div class="panel-header">
-                    <h2>P/E Ratio History</h2>
+                    <div><h2>P/E Ratio History</h2><p>Price divided by trailing four-quarter EPS</p></div>
                     <button id="resetZoomBtn_PEBand_${peBandCanvasId}">Reset Zoom</button> 
                 </div>
                 <canvas id="${peBandCanvasId}"></canvas>
             </div>
-    
-            <div class="chart-panel" id="technicalAnalysisContainer_${techChartId}">
-                <div class="panel-header">
-                    <h2>Technical Analysis (Price & Volume)</h2>
-                    <button id="resetZoomBtn_Tech_${techChartId}">Reset Zoom</button> 
-                </div>
-                <canvas id="${techChartId}"></canvas>
-                <div class="navigator-container">
-                     <canvas id="${techChartId}_nav"></canvas>
-                </div>
-            </div>
+
+            ${technicalPanelHtml}
     
         </div>
     `;
-
-    setTimeout(() => {
-        const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
-        if (scrollContainer) {
-            scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-            if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
-                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-            }
-        }
-    }, 100);
 
     // 創建圖表
     createOperatingChart(filteredDataForChart, operatingChartId);
@@ -5933,7 +5989,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     }, 500);
 
     const stockSymbol = data[0].symbol;
-    fetchTechnicalAnalysisData(stockSymbol, techChartId, yearRange);
+    if (techChartId) fetchTechnicalAnalysisData(stockSymbol, techChartId, yearRange);
 
     // --- 修改後的事件綁定邏輯 ---
     setTimeout(() => {
@@ -6027,22 +6083,11 @@ function updateDisplayedYears(data, container, chartId, operatingChartId, period
         return;
     }
 
-    const currentYear = new Date().getFullYear();
-    const filteredData = data.filter(entry => {
-        const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= parseInt(yearRange)); // 確保 yearRange 轉為數字比較
-    });
-
-    // 2. 在呼叫時，將 techChartId 參數傳遞下去
-    displayIncomeStatement(filteredData, container, chartId, operatingChartId, period, yearRange, techChartId);
+    displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange, techChartId);
 }
 
 function createOperatingChart(data, chartId) {
-    // 排序資料，確保按日期順序排列
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    // 過濾掉 growthRate 為 null 的資料
-    const validData = data.filter(entry => entry.growthRate !== null);
+    const validData = data.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
 
     // 取得畫布上下文
     const ctx = document.getElementById(chartId).getContext('2d');
@@ -6066,6 +6111,7 @@ function createOperatingChart(data, chartId) {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 x: { title: { display: true, text: 'Date' }, reverse: false },
                 y: { beginAtZero: true, title: { display: true, text: 'Value' }, position: 'left' },
@@ -6093,10 +6139,8 @@ function createOperatingChart(data, chartId) {
 }
 
 function createIncomeStatementChart(data, chartId) {
-    data.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-    // 过滤掉增长率为 null 的数据
-    const validData = data.filter(entry => entry.growthRate !== null);
+    const validData = data.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
+    const percentOrNull = value => value != null && Number.isFinite(Number(value)) ? Number(value) * 100 : null;
 
     const ctx = document.getElementById(chartId).getContext('2d');
 
@@ -6109,14 +6153,15 @@ function createIncomeStatementChart(data, chartId) {
             labels: validData.map(entry => entry.date),
             datasets: [
                 { type: 'bar', label: 'EPS', data: validData.map(entry => entry.eps), borderColor: 'rgb(253,206,170,1)', backgroundColor: 'rgb(225,167,121,0.7)', yAxisID: 'y' },
-                { type: 'line', label: 'Gross Profit Ratio', data: validData.map(entry => entry.grossProfitRatio * 100), borderColor: 'rgba(102, 204, 204, 1)', backgroundColor: 'rgba(102, 204, 204, 0.7)', yAxisID: 'y1' },
-                { type: 'line', label: 'Operating Income Ratio', data: validData.map(entry => entry.operatingIncomeRatio * 100), borderColor: 'rgba(153, 204, 255, 1)', backgroundColor: 'rgba(153, 204, 255, 0.7)', yAxisID: 'y1' },
-                { type: 'line', label: 'Net Income Ratio', data: validData.map(entry => entry.netIncomeRatio * 100), borderColor: 'rgba(232, 232, 232, 1)', backgroundColor: 'rgba(232, 232, 232, 0.7)', yAxisID: 'y1' },
+                { type: 'line', label: 'Gross Profit Ratio', data: validData.map(entry => percentOrNull(entry.grossProfitRatio)), borderColor: 'rgba(102, 204, 204, 1)', backgroundColor: 'rgba(102, 204, 204, 0.7)', yAxisID: 'y1' },
+                { type: 'line', label: 'Operating Income Ratio', data: validData.map(entry => percentOrNull(entry.operatingIncomeRatio)), borderColor: 'rgba(153, 204, 255, 1)', backgroundColor: 'rgba(153, 204, 255, 0.7)', yAxisID: 'y1' },
+                { type: 'line', label: 'Net Income Ratio', data: validData.map(entry => percentOrNull(entry.netIncomeRatio)), borderColor: 'rgba(232, 232, 232, 1)', backgroundColor: 'rgba(232, 232, 232, 0.7)', yAxisID: 'y1' },
                 { type: 'line', label: 'Growth Rate', data: validData.map(entry => entry.growthRate), borderColor: 'rgba(255, 153, 0, 1)', backgroundColor: 'rgba(255, 153, 0, 0.9)', yAxisID: 'y1' }
             ]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 x: { title: { display: true, text: 'Date' }, reverse: false },
                 y: { beginAtZero: true, title: { display: true, text: 'Value' }, position: 'left' },
@@ -6170,6 +6215,7 @@ function displayPEBandChart(peData, chartId) {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 x: { type: 'time', time: { unit: 'year', tooltipFormat: 'yyyy-MM-dd' }, title: { display: true, text: 'Date' } },
                 y: { title: { display: true, text: 'P/E Ratio' } }
@@ -6204,7 +6250,7 @@ function fetchBalanceSheet() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainer', 'balanceSheetChartUS', period, yearRange);
 }
 
@@ -6219,7 +6265,7 @@ function fetchJPBalanceSheet() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerJP', 'balanceSheetChartJP', period, yearRange);
 }
 
@@ -6234,7 +6280,7 @@ async function fetchTWBalanceSheet() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerTW', 'balanceSheetChartTW', period, yearRange);
 }
 
@@ -6249,7 +6295,7 @@ function fetchEUBalanceSheet() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerEU', 'balanceSheetChartEU', period, yearRange);
 }
 
@@ -6264,7 +6310,7 @@ function fetchKRBalanceSheet() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerKR', 'balanceSheetChartKR', period, yearRange);
 }
 
@@ -6279,7 +6325,7 @@ function fetchHKBalanceSheet() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerHK', 'balanceSheetChartHK', period, yearRange);
 }
 
@@ -6294,7 +6340,7 @@ function fetchCNBalanceSheet() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}balance-sheet-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_BalanceSheet(apiUrl, displayBalanceSheet, 'balanceSheetContainerCN', 'balanceSheetChartCN', period, yearRange);
 }
 
@@ -6348,24 +6394,13 @@ function updateDisplayedYears_BS(data, container, chartId, period, yearRange) {
 }
 
 function displayBalanceSheet(data, container, chartId, period, yearRange) {
-    const currentYear = new Date().getFullYear();
-
-    // 過濾數據以包含多兩年的數據
-    const filteredDataForTable = data.filter(entry => {
-        const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 2)); // 表格顯示多兩年的數據
-    });
-
-    // 保持图表数据与表格数据一致
-    const filteredDataForChart = filteredDataForTable;
+    const filteredDataForTable = selectFinancialPeriods(data, period, yearRange);
+    const filteredDataForChart = filteredDataForTable.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
 
     if (!filteredDataForTable || !Array.isArray(filteredDataForTable) || filteredDataForTable.length === 0) {
         container.innerHTML = '<p>Data not available.</p>';
         return;
     }
-
-    // 按日期升序排序
-    filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let rows = {
         date: ['Date'],
@@ -6487,40 +6522,51 @@ function displayBalanceSheet(data, container, chartId, period, yearRange) {
     });
 
     let tableHtml = `
-    <div style="display: flex; overflow-x: auto;">
-        <div class="fixed-header-column">
-            <table class="financial-table">
-                ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
-            </table>
-        </div>
-        <div class="scroll-right" style="overflow-x: auto;">
-            <table class="financial-table">
-                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
-            </table>
-        </div>
-    </div>
-    `;
+        <div class="table-scroll-wrapper">
+            <table class="financial-table"><tbody>
+                ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
+            </tbody></table>
+        </div>`;
 
     // 創建容器結構，並綁定唯一的下載按鈕ID
     const downloadButtonId = `downloadBtn_${chartId}`;
     const pieChartId = `${chartId}Pie`;
+    const latest = filteredDataForTable[0];
+    const debtRate = Number(latest.totalAssets) !== 0
+        ? (Number(latest.totalLiabilities) / Number(latest.totalAssets)) * 100
+        : null;
+    const snapshotHtml = financialSnapshotMarkup(latest, period, [
+        { label: 'Total Assets', value: latest.totalAssets },
+        { label: 'Total Liabilities', value: latest.totalLiabilities },
+        { label: 'Total Equity', value: latest.totalEquity },
+        { label: 'Cash & Equivalents', value: latest.cashAndCashEquivalents },
+        { label: 'Total Debt', value: latest.totalDebt },
+        { label: 'Debt / Assets', value: debtRate, options: { percent: true } }
+    ]);
     container.innerHTML = `
-        <button id="${downloadButtonId}">Download as Excel</button>
+        <div class="financial-report-section">
+        <div class="report-header">
+            <div><strong>${period === 'quarter' ? 'Quarterly' : 'Annual'} balance sheet</strong><span>Latest period appears first; swipe horizontally for history.</span></div>
+            <button id="${downloadButtonId}">Download Excel</button>
+        </div>
+        ${snapshotHtml}
+        <div class="chart-panel">
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div id="${chartId}Container">
                 ${tableHtml}
             </div>
         </div>
-        <div id="chartContainer" style="margin-top: 20px;">
-            
-            <!-- +++ 新增的部分 +++ -->
-            <button id="resetZoomBtn_BS_${chartId}">重設縮放</button> 
-            <!-- +++ 新增結束 +++ -->
-
+        </div>
+        <div class="financial-chart-grid">
+        <div class="chart-panel">
+            <div class="panel-header"><div><h2>Capital Structure</h2><p>Assets, liabilities, equity and debt-to-assets</p></div><button id="resetZoomBtn_BS_${chartId}">Reset Zoom</button></div>
             <canvas id="${chartId}"></canvas>
         </div>
-        <div id="pieChartContainer" style="margin-top: 20px; display: flex; justify-content: center; align-items: center;">
-            <canvas id="${pieChartId}" width="600" height="600"></canvas>
+        <div class="chart-panel financial-pie-panel">
+            <div class="panel-header"><div><h2>Latest Balance Mix</h2><p>Liabilities and equity for ${financialPeriodLabel(latest, period)}</p></div></div>
+            <canvas id="${pieChartId}"></canvas>
+        </div>
+        </div>
         </div>
     `;
 
@@ -6652,6 +6698,7 @@ function createCombinedBalanceSheetChart(data, chartId) {
         },
         options: {
             responsive: true, // 圖表會自適應容器大小
+            maintainAspectRatio: false,
             scales: {
                 x: {
                     title: {
@@ -6853,7 +6900,7 @@ function fetchCashflow() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainer', 'cashflowChartUS', period, yearRange);
 }
 
@@ -6868,7 +6915,7 @@ function fetchJPCashflow() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerJP', 'cashflowChartJP', period, yearRange);
 }
 
@@ -6883,7 +6930,7 @@ async function fetchTWCashflow() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerTW', 'cashflowChartTW', period, yearRange);
 }
 
@@ -6898,7 +6945,7 @@ function fetchEUCashflow() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerEU', 'cashflowChartEU', period, yearRange);
 }
 
@@ -6913,7 +6960,7 @@ function fetchKRCashflow() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerKR', 'cashflowChartKR', period, yearRange);
 }
 
@@ -6928,7 +6975,7 @@ function fetchHKCashflow() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerHK', 'cashflowChartHK', period, yearRange);
 }
 
@@ -6943,7 +6990,7 @@ function fetchCNCashflow() {
         return;
     }
 
-    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}`;
+    const apiUrl = `${BASE_URL}cash-flow-statement?symbol=${stockSymbol}&period=${period}&limit=${financialStatementLimit(period, yearRange)}`;
     fetchData_Cashflow(apiUrl, displayCashflow, 'cashflowContainerCN', 'cashflowChartCN', period, yearRange);
 }
 
@@ -6976,11 +7023,7 @@ function fetchData_Cashflow(apiUrl, callback, containerId, chartId, period, year
                 return;
             }
 
-            // 使用传入的 yearRange 参数，并调用 updateDisplayedYears_CF
-            const filteredData = updateDisplayedYears_CF(data, containerId, chartId, period, yearRange);
-
-            // 调用 displayCashflow 并传入所有需要的参数
-            callback(filteredData, containerId, chartId, period, yearRange); // 确保这里传递的是 containerId
+            callback(data, containerId, chartId, period, yearRange);
         })
         .catch(error => {
             console.error('Error fetching data: ', error);
@@ -7013,16 +7056,8 @@ function updateDisplayedYears_CF(data, container, chartId, period, yearRange) {
 }
 
 function displayCashflow(data, containerId, chartId, period, yearRange) {
-    const currentYear = new Date().getFullYear();
-
-    // 過濾數據以包含多兩年的數據
-    const filteredDataForTable = data.filter(entry => {
-        const entryYear = parseInt(entry.calendarYear);
-        return yearRange === 'all' || (currentYear - entryYear <= (parseInt(yearRange) + 2)); // 表格顯示多兩年的數據
-    });
-
-    // 保持图表数据与表格数据一致
-    const filteredDataForChart = filteredDataForTable;
+    const filteredDataForTable = selectFinancialPeriods(data, period, yearRange);
+    const filteredDataForChart = filteredDataForTable.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
 
     const container = document.getElementById(containerId);
     if (!container) {
@@ -7034,8 +7069,6 @@ function displayCashflow(data, containerId, chartId, period, yearRange) {
         container.innerHTML = '<p>Data not available.</p>';
         return;
     }
-
-    filteredDataForTable.sort((a, b) => new Date(a.date) - new Date(b.date));
 
     let rows = {
         date: ['Date'],
@@ -7132,46 +7165,46 @@ function displayCashflow(data, containerId, chartId, period, yearRange) {
 
     // 構建 HTML 表格
     let tableHtml = `
-    <div style="display: flex; overflow-x: auto;">
-
-        <div class="fixed-header-column">
-            <table class="financial-table">
-                ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th></tr>`).join('')}
-            </table>
-        </div>
-        <div class="scroll-right" style="overflow-x: auto;">
-            <table class="financial-table">
-                ${Object.keys(rows).map(key => `<tr>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
-            </table>
-        </div>
-    </div>
-    `;
+        <div class="table-scroll-wrapper">
+            <table class="financial-table"><tbody>
+                ${Object.keys(rows).map(key => `<tr><th>${rows[key][0]}</th>${rows[key].slice(1).map(value => `<td>${value}</td>`).join('')}</tr>`).join('')}
+            </tbody></table>
+        </div>`;
 
     // --- ✨ 修改處：在 HTML 結構中加入重設按鈕 ---
     const downloadButtonId = `downloadBtn_${chartId}`;
+    const latest = filteredDataForTable[0];
+    const latestCapexRatio = Number(latest.operatingCashFlow) !== 0
+        ? Math.abs(Number(latest.capitalExpenditure) / Number(latest.operatingCashFlow)) * 100
+        : null;
+    const snapshotHtml = financialSnapshotMarkup(latest, period, [
+        { label: 'Operating Cash Flow', value: latest.operatingCashFlow },
+        { label: 'Capital Expenditure', value: latest.capitalExpenditure },
+        { label: 'Free Cash Flow', value: latest.freeCashFlow },
+        { label: 'Net Change in Cash', value: latest.netChangeInCash },
+        { label: 'Cash at Period End', value: latest.cashAtEndOfPeriod },
+        { label: 'Capex / OCF', value: latestCapexRatio, options: { percent: true } }
+    ]);
     container.innerHTML = `
-        <button id="${downloadButtonId}">Download as Excel</button>
+        <div class="financial-report-section">
+        <div class="report-header">
+            <div><strong>${period === 'quarter' ? 'Quarterly' : 'Annual'} cash flow</strong><span>Latest period appears first; swipe horizontally for history.</span></div>
+            <button id="${downloadButtonId}">Download Excel</button>
+        </div>
+        ${snapshotHtml}
+        <div class="chart-panel">
         <div class="scroll-container-x" id="${chartId}ScrollContainer">
             <div id="${chartId}Container">
                 ${tableHtml}
             </div>
         </div>
-        <div id="cashflowChartContainer" style="margin-top: 20px;">
-            <button id="resetZoomBtn_CF_${chartId}">重設縮放</button> 
+        </div>
+        <div class="chart-panel chart-panel-wide">
+            <div class="panel-header"><div><h2>Cash Generation</h2><p>Operating cash flow, investment, free cash flow and reinvestment ratio</p></div><button id="resetZoomBtn_CF_${chartId}">Reset Zoom</button></div>
             <canvas id="${chartId}"></canvas>
         </div>
+        </div>
     `;
-
-    // 設置scroll位置
-    setTimeout(() => {
-        const scrollContainer = document.getElementById(`${chartId}ScrollContainer`);
-        if (scrollContainer) {
-            scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-            if (scrollContainer.scrollLeft < scrollContainer.scrollWidth - scrollContainer.clientWidth) {
-                scrollContainer.scrollLeft = scrollContainer.scrollWidth;
-            }
-        }
-    }, 100);
 
     // 繪製圖表
     createCashflowChart(filteredDataForChart, chartId);
@@ -7281,6 +7314,7 @@ function createCashflowChart(data, chartId) {
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 x: {
                     title: {
