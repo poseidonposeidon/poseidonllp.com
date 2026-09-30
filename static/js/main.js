@@ -415,7 +415,7 @@ let activeSection = null;
 
 function collapseSection(element) {
     const content = element.querySelector('.content');
-    if (content & !element.classList.contains('fixed')) {
+    if (content && !element.classList.contains('fixed')) {
         content.style.maxHeight = '0px';
         content.style.opacity = '0';
         content.style.paddingTop = '0';
@@ -436,7 +436,7 @@ function toggleSection(event, sectionId) {
     const overlay = document.querySelector('.overlay');
     const blurElements = document.querySelectorAll('body > *:not(.overlay):not(.navbar):not(.info-section):not(.ai-box-section):not(#compare):not(#explore-section)');
 
-    if (activeSection & activeSection === section) {
+    if (activeSection && activeSection === section) {
         // 如果當前 activeSection 是被點擊的 section，那麼應該隱藏它
         hideSection(section);
         activeSection = null; // 將 activeSection 設置為 null
@@ -2339,7 +2339,7 @@ function calculateCumulativeChange(data, fromDate, toDate) {
     console.log(`Adjusted From Date: ${adjustedFromDate}`);
 
     const relevantData = data.filter(entry =>
-        new Date(entry.date) >= new Date(adjustedFromDate) & new Date(entry.date) <= new Date(toDate)
+        new Date(entry.date) >= new Date(adjustedFromDate) && new Date(entry.date) <= new Date(toDate)
     );
 
     function computeGrowthRate(changes) {
@@ -2461,7 +2461,7 @@ function transformDataForTreemap(marketData) {
 
     marketData.forEach(stock => {
         // 確保有產業名稱和市值數據
-        if (stock.industry & stock.marketCap) {
+        if (stock.industry && stock.marketCap) {
             // 如果這個產業還沒在 Map 中，就初始化一個
             if (!industryMap.has(stock.industry)) {
                 industryMap.set(stock.industry, {
@@ -2581,7 +2581,7 @@ async function logUserQuery(market, queryText) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            ...(token & { 'Authorization': `Bearer ${token}` })
+            ...(token && { 'Authorization': `Bearer ${token}` })
         },
         body: JSON.stringify(payload)
     });
@@ -2603,7 +2603,7 @@ function fetchStock() {
 
     // 只有當股票代碼有效且與上次不同時才執行主要邏輯
     // 或者當股票代碼與上次相同但仍然希望記錄並可能刷新數據時
-    if (stockSymbol & (stockSymbol !== previousSymbol)) {
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
         logUserQuery('US', stockSymbol); // **記錄查詢**
 
         outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
@@ -2657,7 +2657,7 @@ function fetchStock() {
                 }
             }, 1500); // 延迟1秒后清除建议框
         });
-    } else if (stockSymbol & stockSymbol === previousSymbol) {
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
         // 如果代碼相同，選擇性記錄重複查詢
         logUserQuery('US', stockSymbol); // **記錄重複查詢 (可選)**
         console.log("US Stock: Same symbol as previous, query logged again (optional).");
@@ -2680,7 +2680,7 @@ function fetchJPStock() {
 
     const stockSymbol = rawSymbol + ".T";
 
-    if (stockSymbol & (stockSymbol !== previousSymbol)) {
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
         logUserQuery('JP', rawSymbol); // **記錄查詢 (使用原始輸入)**
 
         outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
@@ -2732,7 +2732,7 @@ function fetchJPStock() {
                 }
             }, 1500);
         });
-    } else if (stockSymbol & stockSymbol === previousSymbol) {
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
         logUserQuery('JP', rawSymbol); // **記錄重複查詢 (可選)**
         console.log("JP Stock: Same symbol as previous, query logged again (optional).");
     }
@@ -2754,7 +2754,7 @@ async function fetchStockExchange(stockSymbol) {
             console.error('API did not return an array for stock exchange search:', data);
             return null;
         }
-        const filteredData = data.filter(item => item.symbol & (item.symbol.endsWith('.TW') || item.symbol.endsWith('.TWO')));
+        const filteredData = data.filter(item => item.symbol && (item.symbol.endsWith('.TW') || item.symbol.endsWith('.TWO')));
         if (filteredData.length > 0) {
             const match = filteredData.find(item => item.symbol.split('.')[0] === stockSymbol);
             return match ? match.exchangeShortName : null;
@@ -2794,7 +2794,7 @@ async function fetchTWStock() {
         return null;
     }
 
-    if (fullStockSymbol & (fullStockSymbol !== previousSymbol)) {
+    if (fullStockSymbol && (fullStockSymbol !== previousSymbol)) {
         logUserQuery('TW', stockSymbol); // **記錄查詢 (使用原始輸入)**
 
         outputSymbolElement.innerText = 'Current query: ' + fullStockSymbol;
@@ -2837,7 +2837,7 @@ async function fetchTWStock() {
                 }
             }, 1500);
         });
-    } else if (fullStockSymbol & fullStockSymbol === previousSymbol) {
+    } else if (fullStockSymbol && fullStockSymbol === previousSymbol) {
         logUserQuery('TW', stockSymbol); // **記錄重複查詢 (可選)**
         console.log("TW Stock: Same symbol as previous, query logged again (optional).");
     }
@@ -2856,7 +2856,7 @@ function fetchEUStock() {
         return null;
     }
 
-    if (stockSymbol & (stockSymbol !== previousSymbol)) {
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
         logUserQuery('EU', stockSymbol); // **記錄查詢**
 
         outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
@@ -2899,7 +2899,7 @@ function fetchEUStock() {
                 }
             }, 1500);
         });
-    } else if (stockSymbol & stockSymbol === previousSymbol) {
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
         logUserQuery('EU', stockSymbol); // **記錄重複查詢 (可選)**
         console.log("EU Stock: Same symbol as previous, query logged again (optional).");
     }
@@ -2918,7 +2918,7 @@ function fetchKRStock() {
         return null;
     }
 
-    if (stockSymbol & (stockSymbol !== previousSymbol)) {
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
         logUserQuery('KR', stockSymbol); // **記錄查詢**
 
         outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
@@ -2961,7 +2961,7 @@ function fetchKRStock() {
                 }
             }, 1500);
         });
-    } else if (stockSymbol & stockSymbol === previousSymbol) {
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
         logUserQuery('KR', stockSymbol); // **記錄重複查詢 (可選)**
         console.log("KR Stock: Same symbol as previous, query logged again (optional).");
     }
@@ -2981,7 +2981,7 @@ function fetchHKStock() {
     }
     const stockSymbol = rawSymbol + ".HK";
 
-    if (stockSymbol & (stockSymbol !== previousSymbol)) {
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
         logUserQuery('HK', rawSymbol); // **記錄查詢 (使用原始輸入)**
 
         outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
@@ -3024,7 +3024,7 @@ function fetchHKStock() {
                 }
             }, 1500);
         });
-    } else if (stockSymbol & stockSymbol === previousSymbol) {
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
         logUserQuery('HK', rawSymbol); // **記錄重複查詢 (可選)**
         console.log("HK Stock: Same symbol as previous, query logged again (optional).");
     }
@@ -3043,7 +3043,7 @@ function fetchCNStock() {
         return null;
     }
 
-    if (stockSymbol & (stockSymbol !== previousSymbol)) {
+    if (stockSymbol && (stockSymbol !== previousSymbol)) {
         logUserQuery('CN', stockSymbol); // **記錄查詢**
 
         outputSymbolElement.innerText = 'Current query: ' + stockSymbol;
@@ -3086,7 +3086,7 @@ function fetchCNStock() {
                 }
             }, 1500);
         });
-    } else if (stockSymbol & stockSymbol === previousSymbol) {
+    } else if (stockSymbol && stockSymbol === previousSymbol) {
         logUserQuery('CN', stockSymbol); // **記錄重複查詢 (可選)**
         console.log("CN Stock: Same symbol as previous, query logged again (optional).");
     }
@@ -3760,8 +3760,8 @@ async function fetchStockWithExchangeSuffixGlobal(stockCode, apiKey) {
         if (stockCode.includes('.')) {
             const filteredData = data.filter(item =>
                 item.symbol.toUpperCase() === stockCode.toUpperCase() ||
-                (item.exchange & item.exchange.toLowerCase().includes('euronext')) ||
-                (item.exchange & item.exchange.toLowerCase().includes('xetra')) // XETRA (德國)
+                (item.exchange && item.exchange.toLowerCase().includes('euronext')) ||
+                (item.exchange && item.exchange.toLowerCase().includes('xetra')) // XETRA (德國)
             );
 
             const match = filteredData.find(item => item.symbol.toUpperCase() === stockCode.toUpperCase());
@@ -3792,7 +3792,7 @@ async function fetchStockWithExchangeSuffixEU(stockCode, apiKey) {
         // 過濾歐股相關數據，確保 item.exchange 存在並進行匹配
         const filteredData = data.filter(item =>
             item.symbol.toUpperCase() === stockCode.toUpperCase() || // 精確匹配完整代碼（如 MC.PA）
-            (item.exchange & item.exchange.toLowerCase().includes('euronext')) // 匹配 EURONEXT
+            (item.exchange && item.exchange.toLowerCase().includes('euronext')) // 匹配 EURONEXT
         );
 
         // 嘗試精確匹配輸入的股票代碼
@@ -3838,7 +3838,7 @@ async function fetchEPSData(stockSymbol, apiKey) {
         // 確保 EPS 數據非空且格式正確
         return data.map(item => ({
             date: item.date,
-            eps: item.eps !== null & item.eps !== undefined ? item.eps : null  // 處理空值情況
+            eps: item.eps !== null && item.eps !== undefined ? item.eps : null  // 處理空值情況
         })).filter(item => item.eps !== null).reverse();  // 只返回非空的 EPS 並倒序排列
     } catch (error) {
         console.error('Error fetching EPS data:', error);
@@ -4053,7 +4053,7 @@ async function fetchQuarterlyRevenueGrowthRate(stockSymbol, apiKey) {
                 const currentDate = new Date(item.date);
                 const prevDate = new Date(prevItem.date);
                 return (
-                    currentDate.getFullYear() - 1 === prevDate.getFullYear() &
+                    currentDate.getFullYear() - 1 === prevDate.getFullYear() &&
                     currentDate.getMonth() === prevDate.getMonth()
                 );
             });
@@ -4229,7 +4229,7 @@ async function fetchCostOfRevenueData(stockSymbol, apiKey) {
 
         return data.map(item => ({
             date: item.date,
-            revenue: item.costOfRevenue !== null & item.costOfRevenue !== undefined ? item.costOfRevenue : null
+            revenue: item.costOfRevenue !== null && item.costOfRevenue !== undefined ? item.costOfRevenue : null
         })).filter(item => item.revenue !== null).reverse(); // 只返回非空的 Cost of Revenue 並倒序排列
     } catch (error) {
         console.error('Error fetching cost of revenue data:', error);
@@ -4249,7 +4249,7 @@ async function fetchOperatingExpensesData(stockSymbol, apiKey) {
 
         return data.map(item => ({
             date: item.date,
-            revenue: item.operatingExpenses !== null & item.operatingExpenses !== undefined ? item.operatingExpenses : null
+            revenue: item.operatingExpenses !== null && item.operatingExpenses !== undefined ? item.operatingExpenses : null
         })).filter(item => item.revenue !== null).reverse(); // 只返回非空的 Operating Expenses 並倒序排列
     } catch (error) {
         console.error('Error fetching operating expenses data:', error);
@@ -4656,7 +4656,7 @@ function fetchCompanyPrice(stockSymbol) {
         .then(response => response.json())
         .then(data => {
             const priceContainer = document.getElementById('PriceContainer');
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 displayCompanyPrice(data[0], priceContainer);  // Pass the first item in the array to the display function
             } else {
                 priceContainer.innerHTML = '<p>No data found.</p>';
@@ -4673,7 +4673,7 @@ function fetchJPCompanyPrice(stockSymbol) {
         .then(response => response.json())
         .then(data => {
             const priceContainerJP = document.getElementById('PriceContainerJP');
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 displayCompanyPrice(data[0], priceContainerJP);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
             } else {
                 priceContainerJP.innerHTML = '<p>No data found.</p>';
@@ -4690,7 +4690,7 @@ function fetchTWCompanyPrice(stockSymbol) {
         .then(response => response.json())
         .then(data => {
             const priceContainerTW = document.getElementById('PriceContainerTW');
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 displayCompanyPrice(data[0], priceContainerTW);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
             } else {
                 priceContainerTW.innerHTML = '<p>No data found.</p>';
@@ -4707,7 +4707,7 @@ function fetchEUCompanyPrice(stockSymbol) {
         .then(response => response.json())
         .then(data => {
             const priceContainerEU = document.getElementById('PriceContainerEU');
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 displayCompanyPrice(data[0], priceContainerEU);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
             } else {
                 priceContainerEU.innerHTML = '<p>No data found.</p>';
@@ -4724,7 +4724,7 @@ function fetchKRCompanyPrice(stockSymbol) {
         .then(response => response.json())
         .then(data => {
             const priceContainerKR = document.getElementById('PriceContainerKR');
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 displayCompanyPrice(data[0], priceContainerKR);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
             } else {
                 priceContainerKR.innerHTML = '<p>No data found.</p>';
@@ -4741,7 +4741,7 @@ function fetchHKCompanyPrice(stockSymbol) {
         .then(response => response.json())
         .then(data => {
             const priceContainerHK = document.getElementById('PriceContainerHK');
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 displayCompanyPrice(data[0], priceContainerHK);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
             } else {
                 priceContainerHK.innerHTML = '<p>No data found.</p>';
@@ -4758,7 +4758,7 @@ function fetchCNCompanyPrice(stockSymbol) {
         .then(response => response.json())
         .then(data => {
             const priceContainerCN = document.getElementById('PriceContainerCN');
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 displayCompanyPrice(data[0], priceContainerCN);  // 传递数组中的第一个项目给 displayCompanyPrice 函数
             } else {
                 priceContainerCN.innerHTML = '<p>No data found.</p>';
@@ -4981,9 +4981,9 @@ function fetchPEBandData(priceApiUrl, epsApiUrl, chartId) {
             console.log("Price Data (Expected 10 years):", priceData);
             console.log("EPS Data (Expected 10 years of quarterly data):", epsData);
 
-            if (priceData.historical & Array.isArray(epsData)) {
+            if (priceData.historical && Array.isArray(epsData)) {
                 const peData = calculatePEData(priceData.historical, epsData);
-                if (peData & peData.length > 0) {
+                if (peData && peData.length > 0) {
                     displayPEBandChart(peData, chartId);
                 } else {
                     console.error("No P/E data available.");
@@ -5062,7 +5062,7 @@ async function fetchTechnicalAnalysisData(stockSymbol, chartId, yearRange) {
             return;
         }
 
-        if (priceData & priceData.historical & priceData.historical.length > 0) {
+        if (priceData && priceData.historical && priceData.historical.length > 0) {
             // ✨ 核心修改：將所有獲取到的數據傳遞給圖表創建函式
             // 注意：API 返回的數據都是從新到舊，我們需要反轉它們
             createTechnicalAnalysisChart(
@@ -5113,8 +5113,8 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
 
     const candlestickData = priceHistory.map(entry => ({ x: new Date(entry.date).valueOf(), o: entry.open, h: entry.high, l: entry.low, c: entry.close }));
     const volumeData = priceHistory.map(entry => ({ x: new Date(entry.date).valueOf(), y: entry.volume }));
-    const ma5LineData = (ma5History & Array.isArray(ma5History)) ? ma5History.map(entry => ({ x: new Date(entry.date).valueOf(), y: entry.sma })) : [];
-    const ma10LineData = (ma10History & Array.isArray(ma10History)) ? ma10History.map(entry => ({ x: new Date(entry.date).valueOf(), y: entry.sma })) : [];
+    const ma5LineData = (ma5History && Array.isArray(ma5History)) ? ma5History.map(entry => ({ x: new Date(entry.date).valueOf(), y: entry.sma })) : [];
+    const ma10LineData = (ma10History && Array.isArray(ma10History)) ? ma10History.map(entry => ({ x: new Date(entry.date).valueOf(), y: entry.sma })) : [];
 
     // 邊界與邊距計算
     const firstDataPointX = candlestickData[0]?.x;
@@ -5339,7 +5339,7 @@ function addNavigatorDragHandlers(navigatorChart, mainChart) {
         const boxLeft = navigatorChart.scales.x.getPixelForValue(annotation.xMin);
         const boxRight = navigatorChart.scales.x.getPixelForValue(annotation.xMax);
 
-        if (mouseX >= boxLeft & mouseX <= boxRight) {
+        if (mouseX >= boxLeft && mouseX <= boxRight) {
             isDragging = true;
             dragStartX = mouseX;
             initialMin = mainChart.scales.x.min;
@@ -5391,7 +5391,7 @@ function calculatePEData(priceData, epsData) {
         // 尋找過去四季的 EPS 數據，將其累加起來
         const cumulativeEPS = epsData.reduce((acc, epsEntry) => {
             const epsDate = new Date(epsEntry.date);
-            if (epsDate <= priceDate & acc.count < 4) {
+            if (epsDate <= priceDate && acc.count < 4) {
                 acc.total += epsEntry.eps;
                 acc.count += 1;
             }
@@ -5464,7 +5464,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
 
     const filteredDataForChart = filteredDataForTable.filter((entry, index) => {
         // 移除第一筆沒有增長率的數據，避免圖表顯示問題
-        return !(index === 0 & entry.growthRate === 'N/A');
+        return !(index === 0 && entry.growthRate === 'N/A');
     });
 
     if (!filteredDataForTable || !Array.isArray(filteredDataForTable) || filteredDataForTable.length === 0) {
@@ -5564,7 +5564,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         if (index > 0) {
             if (period === 'annual') {
                 let lastRevenue = filteredDataForTable[index - 1].revenue;
-                if (entry.revenue & lastRevenue) {
+                if (entry.revenue && lastRevenue) {
                     let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                     entry.growthRate = parseFloat(growthRate.toFixed(2));
                     rows.growthRate.push(entry.growthRate);
@@ -5573,10 +5573,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
                     rows.growthRate.push('N/A');
                 }
             } else {
-                let previousYearSameQuarterIndex = filteredDataForTable.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() & e.period === entry.period);
+                let previousYearSameQuarterIndex = filteredDataForTable.findIndex(e => e.calendarYear === (entry.calendarYear - 1).toString() && e.period === entry.period);
                 if (previousYearSameQuarterIndex !== -1) {
                     let lastRevenue = filteredDataForTable[previousYearSameQuarterIndex].revenue;
-                    if (entry.revenue & lastRevenue) {
+                    if (entry.revenue && lastRevenue) {
                         let growthRate = ((entry.revenue - lastRevenue) / lastRevenue) * 100;
                         entry.growthRate = parseFloat(growthRate.toFixed(2));
                         rows.growthRate.push(entry.growthRate);
@@ -5961,7 +5961,7 @@ function displayPEBandChart(peData, chartId) {
 
 function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
-    return value != null & !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
+    return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
 //////////////////////////////////////////////////資產負債表Balance Sheet Statements////////////////////////////////
@@ -6610,7 +6610,7 @@ function createPieChart(data, chartId) {
 }
 
 function formatNumber(value) {
-    return value != null & !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
+    return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
 ///////////////////////////////////現金流表Cashflow///////////////
@@ -7125,7 +7125,7 @@ function createCashflowChart(data, chartId) {
 
 function formatNumber(value) {
     // Check if the value is numeric and format it, otherwise return 'N/A'
-    return value != null & !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
+    return value != null && !isNaN(value) ? parseFloat(value).toLocaleString('en-US') : 'N/A';
 }
 
 
@@ -7149,7 +7149,7 @@ async function fetchEarningsCallTranscript() {
         try {
             const response = await fetch(latestApiUrl);
             const data = await response.json();
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
 
@@ -7189,7 +7189,7 @@ async function fetchJPEarningsCallTranscript() {
         try {
             const response = await fetch(latestApiUrl);
             const data = await response.json();
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
 
@@ -7229,7 +7229,7 @@ async function fetchTWEarningsCallTranscript() {
         try {
             const response = await fetch(latestApiUrl);
             const data = await response.json();
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
 
@@ -7269,7 +7269,7 @@ async function fetchEUEarningsCallTranscript() {
         try {
             const response = await fetch(latestApiUrl);
             const data = await response.json();
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
 
@@ -7309,7 +7309,7 @@ async function fetchKREarningsCallTranscript() {
         try {
             const response = await fetch(latestApiUrl);
             const data = await response.json();
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
 
@@ -7349,7 +7349,7 @@ async function fetchHKEarningsCallTranscript() {
         try {
             const response = await fetch(latestApiUrl);
             const data = await response.json();
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
 
@@ -7389,7 +7389,7 @@ async function fetchCNEarningsCallTranscript() {
         try {
             const response = await fetch(latestApiUrl);
             const data = await response.json();
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 year = data[0].year;
                 quarter = data[0].quarter;
 
@@ -7504,7 +7504,7 @@ function fetchData_Transcript(apiUrl, callback, containerId) {
     fetch(apiUrl)
         .then(response => response.json())
         .then(data => {
-            if (data & data.length > 0) {
+            if (data && data.length > 0) {
                 callback(data[0], container);
             } else {
                 container.innerHTML = '<p>無相關數據。</p>';
@@ -8218,7 +8218,7 @@ function display_historical_earning_calendar(data, container) {
         rows.estimatedEPS.push(item.epsEstimated != null ? item.epsEstimated : 'N/A');
 
         // 計算 EPS 差異
-        if (item.eps != null & item.epsEstimated != null & item.epsEstimated !== 0) {
+        if (item.eps != null && item.epsEstimated != null && item.epsEstimated !== 0) {
             const epsDifference = ((item.eps - item.epsEstimated) / item.epsEstimated * 100).toFixed(2) + '%';
             rows.epsDifference.push(epsDifference);
         } else {
@@ -8230,7 +8230,7 @@ function display_historical_earning_calendar(data, container) {
         rows.estimatedRevenue.push(item.revenueEstimated != null ? item.revenueEstimated.toLocaleString() : 'N/A');
 
         // 計算營收差異
-        if (item.revenue != null & item.revenueEstimated != null & item.revenueEstimated !== 0) {
+        if (item.revenue != null && item.revenueEstimated != null && item.revenueEstimated !== 0) {
             const revenueDifference = ((item.revenue - item.revenueEstimated) / item.revenueEstimated * 100).toFixed(2) + '%';
             rows.revenueDifference.push(revenueDifference);
         } else {
@@ -8325,7 +8325,7 @@ async function fetch_stock_dividend_calendar() {
     try {
         let allData = [];
 
-        if (!fromDateInput & !toDateInput) {
+        if (!fromDateInput && !toDateInput) {
             // 自動查詢過去9個月和未來6個月，每3個月查詢一次
             const pastApiUrl1 = `${BASE_URL}dividends-calendar?from=${nineMonthsAgoStr}&to=${sixMonthsAgoStr}`;
             const pastApiUrl2 = `${BASE_URL}dividends-calendar?from=${sixMonthsAgoStr}&to=${threeMonthsAgoStr}`;
@@ -9136,9 +9136,9 @@ async function runDeepDive(event) {
         // ==========================================
         // 尋找 EPS (涵蓋 FMP 常見的幾種資料結構，防止找不到資料)
         let currentEps = 0;
-        if (data.raw_data.quote & data.raw_data.quote.length > 0 & data.raw_data.quote[0].eps) {
+        if (data.raw_data.quote && data.raw_data.quote.length > 0 && data.raw_data.quote[0].eps) {
             currentEps = data.raw_data.quote[0].eps;
-        } else if (data.raw_data.income_statement & data.raw_data.income_statement.length > 0) {
+        } else if (data.raw_data.income_statement && data.raw_data.income_statement.length > 0) {
             currentEps = data.raw_data.income_statement[0].eps;
         } else {
             currentEps = data.raw_data.eps || 1; // 給定底線值，避免乘法歸零
@@ -9146,7 +9146,7 @@ async function runDeepDive(event) {
 
         // 尋找當前股價
         let currentPrice = 1;
-        if (data.raw_data.quote & data.raw_data.quote.length > 0 & data.raw_data.quote[0].price) {
+        if (data.raw_data.quote && data.raw_data.quote.length > 0 && data.raw_data.quote[0].price) {
             currentPrice = data.raw_data.quote[0].price;
         } else {
             currentPrice = data.raw_data.price || 1;
@@ -9209,13 +9209,13 @@ function renderDeepDiveMarkdown(text, container, raw_data = null) {
     // 2. 🛡️ 繪製視覺化財報雷達徽章 (Anomaly Detection Radar)
     let healthBadgeHTML = '';
 
-    if (raw_data & raw_data.health_scores) {
+    if (raw_data && raw_data.health_scores) {
         let z = raw_data.health_scores.altman_z_score;
         let f = raw_data.health_scores.piotroski_f_score;
 
         // 判斷紅綠燈顏色 (Z-Score < 1.8 危險，F-Score < 4 危險)
-        let zColor = (z !== "N/A" & z < 1.8) ? "#e74c3c" : ((z !== "N/A" & z > 3) ? "#27ae60" : "#f0b90b");
-        let fColor = (f !== "N/A" & f < 4) ? "#e74c3c" : ((f !== "N/A" & f > 6) ? "#27ae60" : "#f0b90b");
+        let zColor = (z !== "N/A" && z < 1.8) ? "#e74c3c" : ((z !== "N/A" && z > 3) ? "#27ae60" : "#f0b90b");
+        let fColor = (f !== "N/A" && f < 4) ? "#e74c3c" : ((f !== "N/A" && f > 6) ? "#27ae60" : "#f0b90b");
 
         // 格式化數字 (保留兩位小數)
         let zDisplay = (typeof z === 'number') ? z.toFixed(2) : z;
@@ -9524,7 +9524,7 @@ async function drawSurpriseChart(symbol, suffix = '') {
     let data = await response.json();
 
     // 過濾掉還沒發布的未來財報，並反轉為由舊到新
-    const pastData = data.filter(d => d.eps !== null & d.epsEstimated !== null).reverse();
+    const pastData = data.filter(d => d.eps !== null && d.epsEstimated !== null).reverse();
 
     const labels = pastData.map(d => d.date);
     const epsActual = pastData.map(d => d.eps);
@@ -9841,7 +9841,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // 點擊畫面其他空白處時，關閉所有的推薦框
     document.addEventListener('click', (e) => {
         document.querySelectorAll('.dd-suggestions-list').forEach(box => {
-            if (!box.contains(e.target) & !e.target.classList.contains('dd-search-input')) {
+            if (!box.contains(e.target) && !e.target.classList.contains('dd-search-input')) {
                 box.classList.remove('active');
             }
         });
@@ -9911,7 +9911,7 @@ function initResizeHandle() {
         const minHeight = 100;
         const maxHeight = leftPanel.clientHeight - 150; // 留 150px 給聊天室
 
-        if (newHeight >= minHeight & newHeight <= maxHeight) {
+        if (newHeight >= minHeight && newHeight <= maxHeight) {
             reportArea.style.height = `${newHeight}px`;
         }
     });
@@ -10020,7 +10020,7 @@ function initResizeHandle() {
         let newHeight = e.clientY - panelTop;
         const minHeight = 100;
         const maxHeight = leftPanel.clientHeight - 150;
-        if (newHeight >= minHeight & newHeight <= maxHeight) reportArea.style.height = `${newHeight}px`;
+        if (newHeight >= minHeight && newHeight <= maxHeight) reportArea.style.height = `${newHeight}px`;
     });
 
     document.addEventListener('mouseup', () => {
@@ -10067,7 +10067,7 @@ function updateNavButtons(activeButtonId) {
 
     // 2. 確保「語意選股」按鈕的文字恢復成預設狀態
     const screenerBtn = document.getElementById('screener-toggle-btn');
-    if (screenerBtn & activeButtonId !== 'screener-toggle-btn') {
+    if (screenerBtn && activeButtonId !== 'screener-toggle-btn') {
         screenerBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
     }
 
@@ -10170,7 +10170,7 @@ function toggleScreener() {
         if(trumpContent) trumpContent.style.display = 'none';
         if(sentimentContent) sentimentContent.style.display = 'none';
 
-        if(window.currentReportContent & window.currentReportContent !== "") {
+        if(window.currentReportContent && window.currentReportContent !== "") {
             if(mainContent) mainContent.style.display = 'block';
         } else {
             if(emptyState) emptyState.style.display = 'block';
@@ -10215,7 +10215,7 @@ async function runSemanticScreener() {
         table.style.display = 'table';
 
         // 確保後端有回傳 results 陣列
-        if (data.results & data.results.length > 0) {
+        if (data.results && data.results.length > 0) {
             data.results.forEach(item => {
                 // 生成安全的 HTML 結構 (支援點擊標的直接跳轉單股分析)
                 tbody.innerHTML += `
@@ -10326,11 +10326,11 @@ async function runTrumpStrategy(strategyName) {
         });
 
         const contentType = response.headers.get("content-type");
-        if (contentType & contentType.indexOf("application/json") !== -1) {
+        if (contentType && contentType.indexOf("application/json") !== -1) {
             const data = await response.json();
             loading.style.display = 'none'; // 隱藏 loading
 
-            if (response.ok & data.results) {
+            if (response.ok && data.results) {
                 let tableHTML = `<table style="width: 100%; border-collapse: collapse; color: #ddd; text-align: left; font-size: 15px;">
                                     <thead>
                                         <tr style="border-bottom: 2px solid #e74c3c; background: #252525;">
@@ -10412,7 +10412,7 @@ function initScenarioModeling(currentEps, currentPrice, currentPe) {
         peVal.innerText = pe + 'x';
 
         // 核心公式：5 年後 EPS = 現在 EPS * (1 + CAGR)^5
-        if (currentEps & currentEps !== "N/A") {
+        if (currentEps && currentEps !== "N/A") {
             // 如果 EPS 是負的，給個防呆計算 (假設它能轉虧為盈)
             const baseEps = currentEps > 0 ? currentEps : 0.5;
             const futureEps = baseEps * Math.pow((1 + cagr), 5);
@@ -10486,7 +10486,7 @@ function getScenarioAiComment(cagr, pe) {
             return response.json();
         })
         .then(data => {
-            if (data & data.comment) {
+            if (data && data.comment) {
                 commentBox.innerHTML = `🦅 <strong>CIO:</strong> <span style="color: #ccc;">${data.comment}</span>`;
             }
         })
@@ -10545,7 +10545,7 @@ async function downloadDashboardPDF(event) {
 
         for (const item of canvasIds) {
             const canvas = document.getElementById(item.id);
-            if (canvas & canvas.toDataURL) {
+            if (canvas && canvas.toDataURL) {
                 chartData.push({
                     title: item.title,
                     image: canvas.toDataURL('image/png')
@@ -10557,7 +10557,7 @@ async function downloadDashboardPDF(event) {
         let chatHistoryText = "";
         const chatContainer = document.getElementById('dd-chat-messages');
 
-        if (chatContainer & chatContainer.children.length > 0) {
+        if (chatContainer && chatContainer.children.length > 0) {
             chatHistoryText += "\n\n## 💬 附錄：CIO 深度問答紀錄\n\n";
 
             Array.from(chatContainer.children).forEach(msg => {
@@ -10652,7 +10652,7 @@ function renderPremiumWidgets(rawData) {
     if (
         rawData.wall_street_consensus ||
         rawData.revenue_breakdown ||
-        (rawData.insider_transactions & rawData.insider_transactions.length > 0)
+        (rawData.insider_transactions && rawData.insider_transactions.length > 0)
     ) {
         container.style.display = 'grid';
     } else {
@@ -10673,7 +10673,7 @@ function renderValuationAndConsensus(rawData) {
     const price = rawData.price;
     const dcf = rawData.dcf;
 
-    if (price & dcf & dcf > 0) {
+    if (price && dcf && dcf > 0) {
         document.getElementById('widget-current-price').innerText = `$${price.toFixed(2)}`;
         document.getElementById('widget-dcf-price').innerText = `理論 $${dcf.toFixed(2)}`;
 
@@ -10816,7 +10816,7 @@ function renderRevenueBreakdown(rawData) {
 
             // 在外層容器插入空資料提示
             const container = canvas.closest('div[style*="display: flex; justify-content: space-between"]');
-            if (container & !container.querySelector('.no-data-msg-' + canvasId)) {
+            if (container && !container.querySelector('.no-data-msg-' + canvasId)) {
                 const noDataMsg = document.createElement('div');
                 noDataMsg.className = 'no-data-msg-' + canvasId;
                 noDataMsg.style.cssText = 'color: #666; font-size: 12px; flex: 1; text-align: center; padding: 20px 0;';
@@ -10835,7 +10835,7 @@ function renderRevenueBreakdown(rawData) {
 
         // 將資料轉成陣列並由大到小排序 (不用黑名單了，因為 revenueData 裡面非常乾淨)
         const segments = Object.entries(revenueData)
-            .filter(([key, value]) => typeof value === 'number' & value > 0)
+            .filter(([key, value]) => typeof value === 'number' && value > 0)
             .sort((a, b) => b[1] - a[1]);
 
         // 如果過濾後沒有真正的營收資料，就不畫圖
@@ -10843,7 +10843,7 @@ function renderRevenueBreakdown(rawData) {
             if (wrapper) wrapper.style.display = 'none';
 
             const container = canvas.closest('div[style*="display: flex; justify-content: space-between"]');
-            if (container & !container.querySelector('.no-data-msg-' + canvasId)) {
+            if (container && !container.querySelector('.no-data-msg-' + canvasId)) {
                 const noDataMsg = document.createElement('div');
                 noDataMsg.className = 'no-data-msg-' + canvasId;
                 noDataMsg.style.cssText = 'color: #666; font-size: 12px; flex: 1; text-align: center; padding: 20px 0;';
@@ -10979,7 +10979,7 @@ async function loadMarketNews(page, query = '') {
         currentNewsPage = data.current_page;
         totalNewsPages = data.total_pages;
 
-        if (data.news & data.news.length > 0) {
+        if (Array.isArray(data.news) && data.news.length > 0) {
             let html = '';
             data.news.forEach(news => {
                 // 如果有震撼分數，可以給個小火焰圖示
@@ -11024,7 +11024,7 @@ function executeNewsSearch() {
 // 🌟 翻頁時記得帶上目前的搜尋字詞
 function changeNewsPage(direction) {
     const newPage = currentNewsPage + direction;
-    if (newPage >= 1 & newPage <= totalNewsPages) {
+    if (newPage >= 1 && newPage <= totalNewsPages) {
         loadMarketNews(newPage, currentNewsQuery);
     }
 }
@@ -11077,7 +11077,7 @@ function switchView(targetView, event) {
 
         if(newsSection) newsSection.style.display = '';
         if(emptyState) emptyState.style.display = '';
-        if (window.currentReportContent & returnAnalysisBtn) {
+        if (window.currentReportContent && returnAnalysisBtn) {
             returnAnalysisBtn.style.display = 'inline-block';
         } else if (returnAnalysisBtn) {
             returnAnalysisBtn.style.display = 'none';
@@ -11193,16 +11193,16 @@ async function restoreFromHistory(historyId) {
 
         // 6. 重啟沙盤監聽
         let currentEps = 0;
-        if (item.raw_data.quote & item.raw_data.quote.length > 0 & item.raw_data.quote[0].eps) {
+        if (item.raw_data.quote && item.raw_data.quote.length > 0 && item.raw_data.quote[0].eps) {
             currentEps = item.raw_data.quote[0].eps;
-        } else if (item.raw_data.income_statement & item.raw_data.income_statement.length > 0) {
+        } else if (item.raw_data.income_statement && item.raw_data.income_statement.length > 0) {
             currentEps = item.raw_data.income_statement[0].eps;
         } else {
             currentEps = item.raw_data.eps || 1;
         }
 
         let currentPrice = 1;
-        if (item.raw_data.quote & item.raw_data.quote.length > 0 & item.raw_data.quote[0].price) {
+        if (item.raw_data.quote && item.raw_data.quote.length > 0 && item.raw_data.quote[0].price) {
             currentPrice = item.raw_data.quote[0].price;
         } else {
             currentPrice = item.raw_data.price || 1;
@@ -11302,7 +11302,7 @@ async function loadSentimentMatrixData() {
         const response = await fetch(targetUrl);
         const data = await response.json();
 
-        if (data & data.length > 0) {
+        if (data && data.length > 0) {
             renderSentimentTable(data);
             const latestRecord = data[0];
             const rawObj = JSON.parse(latestRecord.raw_data_json || "{}");
@@ -11316,7 +11316,7 @@ async function loadSentimentMatrixData() {
             changeSpan.innerText = (changeVal > 0 ? '+' : '') + latestRecord.market_change_pct;
             changeSpan.style.color = changeVal > 0 ? '#3e7d5c' : '#b0532f';
 
-            if (document.getElementById('daily-spy-ytd') & rawObj['YTD']) {
+            if (document.getElementById('daily-spy-ytd') && rawObj['YTD']) {
                 document.getElementById('daily-spy-ytd').innerText = `YTD: ${rawObj['YTD']}`;
             }
 
@@ -11362,7 +11362,7 @@ async function loadSentimentMatrixData() {
                 document.getElementById('us-hv20').innerText = hv20Val;
 
                 const subEl = document.getElementById('us-hv20-sub');
-                if (subEl & hv20Val !== '--') {
+                if (subEl && hv20Val !== '--') {
                     const num = parseFloat(hv20Val);
                     let statusText = "平穩區間";
                     let colorCode = "#888";
@@ -11387,7 +11387,7 @@ async function loadSentimentMatrixData() {
             const holdLevel = parseFloat(rawObj['建議持股水位']) || 75;
             const progressBar = document.getElementById('exposure-progress-bar');
             const progressText = document.getElementById('exposure-text');
-            if (progressBar & progressText) {
+            if (progressBar && progressText) {
                 let barColor = holdLevel < 60 ? '#b0532f' : (holdLevel < 80 ? '#d3bd92' : '#3e7d5c');
                 progressBar.style.width = `${holdLevel}%`;
                 progressBar.style.backgroundColor = barColor;
@@ -11400,7 +11400,7 @@ async function loadSentimentMatrixData() {
             renderMag7Performance(rawObj['科技七雄'] || []);
 
             // 渲染板塊輪動 (含預設資料防呆)
-            globalSectorData = (rawObj['板塊輪動'] & rawObj['板塊輪動'].length > 0) ? rawObj['板塊輪動'] : [
+            globalSectorData = (rawObj['板塊輪動'] && rawObj['板塊輪動'].length > 0) ? rawObj['板塊輪動'] : [
                 { sector: "Information Technology (科技)", "1D": "1.25%", "1W": "1.8%", "1M": "4.0%", "YTD": "15.0%" },
                 { sector: "Financials (金融)", "1D": "0.82%", "1W": "1.0%", "1M": "2.5%", "YTD": "8.5%" },
                 { sector: "Health Care (醫療保健)", "1D": "0.45%", "1W": "0.8%", "1M": "1.5%", "YTD": "4.0%" }
@@ -11426,7 +11426,7 @@ async function loadSentimentMatrixData() {
 
             const cioCard = document.getElementById('cio-trading-desk-card');
             const cioContent = document.getElementById('cio-trading-desk-content');
-            if (cioCard & cioContent & rawObj['CIO實戰點評']) {
+            if (cioCard && cioContent && rawObj['CIO實戰點評']) {
                 cioContent.innerHTML = rawObj['CIO實戰點評'];
                 cioCard.style.display = 'block';
             }
@@ -11444,7 +11444,7 @@ async function loadSentimentMatrixData() {
             // 2. 最強領漲板塊 (抓取板塊輪動陣列的第一名)
             const topSectorEl = document.getElementById('radar-top-sector');
             if (topSectorEl) {
-                if (rawObj['板塊輪動'] & rawObj['板塊輪動'].length > 0) {
+                if (rawObj['板塊輪動'] && rawObj['板塊輪動'].length > 0) {
                     const topSec = rawObj['板塊輪動'][0];
                     topSectorEl.innerText = `${topSec.sector} (${topSec['1D']})`;
                     topSectorEl.style.color = topSec['1D'].includes('-') ? '#b0532f' : '#3e7d5c';
@@ -11455,7 +11455,7 @@ async function loadSentimentMatrixData() {
 
             // 3. VIX 恐慌水位 (直接抓取三大指數並動態上色)
             const radarVixEl = document.getElementById('radar-vix');
-            if (radarVixEl & rawObj['三大指數']) {
+            if (radarVixEl && rawObj['三大指數']) {
                 const vixVal = parseFloat(rawObj['三大指數']['VIX'] || 0).toFixed(2);
                 let vixComment = "(市場承平)";
                 let vixColor = "#3e7d5c";
@@ -11726,7 +11726,7 @@ async function loadAdvancedLiquidityData() {
         drawLiquidityVolumeChart(spyHistory, tnxHistory);
         drawDrawdownStressChart(spyHistory, vixHistory);
 
-        if (data.macro_gdp & data.macro_cpi) {
+        if (data.macro_gdp && data.macro_cpi) {
             drawMacroEconomicChart(data.macro_gdp, data.macro_cpi);
         }
 
@@ -11916,7 +11916,7 @@ function renderEarningsCalendar(earningsList) {
         let symbol = '--', date = '--', eps = '--', revenue = '--';
 
         // 🌟 防呆：如果後端傳來的是新的 JSON 物件結構
-        if (typeof item === 'object' & item !== null) {
+        if (typeof item === 'object' && item !== null) {
             symbol = item.symbol || '--';
             date = item.date || '--';
             eps = item.eps || '--';
@@ -12101,7 +12101,7 @@ async function loadTWSentimentMatrixData() {
 
         const data = await response.json();
 
-        if (data & data.length > 0) {
+        if (data && data.length > 0) {
             const latestData = data[0];
             let rawData = {};
             try { rawData = JSON.parse(latestData.raw_data_json || "{}"); } catch(e) {}
@@ -12114,7 +12114,7 @@ async function loadTWSentimentMatrixData() {
             const changePctStr = latestData.market_change_pct || '--';
             const changeEl = document.getElementById('tw-daily-taiex-change');
             if(changeEl) {
-                changeEl.innerText = (changePctStr & !changePctStr.includes('-') & changePctStr !== '--' ? '+' : '') + changePctStr;
+                changeEl.innerText = (changePctStr && !changePctStr.includes('-') && changePctStr !== '--' ? '+' : '') + changePctStr;
                 changeEl.style.color = changePctStr.includes('-') ? '#b0532f' : '#3e7d5c';
             }
 
@@ -12158,11 +12158,11 @@ async function loadTWSentimentMatrixData() {
                 ratioEl.innerText = ratio;
 
                 // 判斷散戶是否做多 (正數危險，負數安全)
-                const isDanger = !ratio.includes('-') & parseFloat(ratio) > 0;
+                const isDanger = !ratio.includes('-') && parseFloat(ratio) > 0;
                 ratioEl.style.color = isDanger ? '#b0532f' : '#3e7d5c';
 
                 const subEl = document.getElementById('tw-retail-sub');
-                if (subEl & ratio !== '--') {
+                if (subEl && ratio !== '--') {
                     const status = isDanger ? '散戶做多 (籌碼凌亂)' : '散戶做空 (軋空燃料)';
                     subEl.innerHTML = `↳ 動向: <span style="color: ${isDanger ? '#b0532f' : '#3e7d5c'}">${status}</span>`;
                 }
@@ -12199,7 +12199,7 @@ async function loadTWSentimentMatrixData() {
                 document.getElementById('tw-hv20').innerText = hv20;
 
                 const subEl = document.getElementById('tw-hv20-sub');
-                if (subEl & hv20 !== '--') {
+                if (subEl && hv20 !== '--') {
                     const val = parseFloat(hv20);
                     let status = "平穩區間";
                     let color = "#888";
@@ -12213,7 +12213,7 @@ async function loadTWSentimentMatrixData() {
             const holdLevel = rawData['建議持股水位'] || 50;
             const twProgressText = document.getElementById('tw-exposure-text');
             const twProgressBar = document.getElementById('tw-exposure-progress-bar');
-            if(twProgressText & twProgressBar) {
+            if(twProgressText && twProgressBar) {
                 twProgressText.innerText = `${holdLevel}%`;
                 twProgressBar.style.width = `${holdLevel}%`;
             }
@@ -12221,7 +12221,7 @@ async function loadTWSentimentMatrixData() {
             // ✨ 1. 更新台股 CIO 實戰點評
             const cioCard = document.getElementById('tw-cio-trading-desk-card');
             const cioContent = document.getElementById('tw-cio-trading-desk-content');
-            if (cioCard & cioContent & rawData['CIO實戰點評']) {
+            if (cioCard && cioContent && rawData['CIO實戰點評']) {
                 cioContent.innerHTML = rawData['CIO實戰點評'];
                 cioCard.style.display = 'block';
             }
@@ -12279,15 +12279,15 @@ async function loadTWAdvancedLiquidityData() {
         const data = await response.json();
 
         // 依序渲染圖表
-        if (data.twii_history & data.futures_open_int) drawTWLiquidityChart(data.twii_history, data.futures_open_int);
-        if (data.twii_history & data.margin_balance) drawTWDrawdownChart(data.twii_history, data.margin_balance);
-        if (data.macro_gdp & data.macro_export) drawTWMacroChart(data.macro_gdp, data.macro_export);
+        if (data.twii_history && data.futures_open_int) drawTWLiquidityChart(data.twii_history, data.futures_open_int);
+        if (data.twii_history && data.margin_balance) drawTWDrawdownChart(data.twii_history, data.margin_balance);
+        if (data.macro_gdp && data.macro_export) drawTWMacroChart(data.macro_gdp, data.macro_export);
 
         // 觸發權值股表格渲染
         if (typeof loadTWHeavyweights === 'function') loadTWHeavyweights();
 
-        if (data.twii_history & data.institutional_total) drawTWInstitutionalChart(data.twii_history, data.institutional_total);
-        if (data.twii_history & data.day_trade_total) drawTWDayTradeChart(data.twii_history, data.day_trade_total);
+        if (data.twii_history && data.institutional_total) drawTWInstitutionalChart(data.twii_history, data.institutional_total);
+        if (data.twii_history && data.day_trade_total) drawTWDayTradeChart(data.twii_history, data.day_trade_total);
 
     } catch (error) {
         console.error("TW Advanced Liquidity Data Error:", error);
@@ -12569,17 +12569,17 @@ function drawTWInstitutionalChart(twii, instData) {
 
     // 萃取三大法人數據並轉換為「億」為單位
     const foreignData = labels.map(date => {
-        const match = instData.find(x => x.date === date & x.name.includes('外資'));
+        const match = instData.find(x => x.date === date && x.name.includes('外資'));
         return match ? (match.difference / 100000000).toFixed(2) : 0;
     });
 
     const trustData = labels.map(date => {
-        const match = instData.find(x => x.date === date & x.name.includes('投信'));
+        const match = instData.find(x => x.date === date && x.name.includes('投信'));
         return match ? (match.difference / 100000000).toFixed(2) : 0;
     });
 
     const dealerData = labels.map(date => {
-        const match = instData.find(x => x.date === date & x.name.includes('自營商'));
+        const match = instData.find(x => x.date === date && x.name.includes('自營商'));
         return match ? (match.difference / 100000000).toFixed(2) : 0;
     });
 
@@ -12624,7 +12624,7 @@ function drawTWDayTradeChart(twii, dtData) {
     const dtRatioData = labels.map(date => {
         const dtMatch = dtData.find(x => x.date === date);
         const twiiMatch = twii.find(x => x.date === date);
-        if (dtMatch & twiiMatch) {
+        if (dtMatch && twiiMatch) {
             const dtBuy = dtMatch.BuyAmout || 0;
             const totalVol = twiiMatch.Trading_Volume || twiiMatch.Trading_turnover || 1;
             return ((dtBuy / totalVol) * 100).toFixed(2);
