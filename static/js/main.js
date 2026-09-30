@@ -1,4 +1,5 @@
-const baseUrl = 'https://api.poseidonllp.com';
+const isLocalFlask = ['localhost', '127.0.0.1'].includes(window.location.hostname);
+const baseUrl = isLocalFlask ? window.location.origin : 'https://api.poseidonllp.com';
 const API_KEY = ''; // FMP key is server-side only.
 const BASE_URL = `${baseUrl}/api/fmp/`;
 const ALTERNATE_URL = `${BASE_URL}fmp-articles`;
@@ -761,6 +762,24 @@ function upgradeRegionalStockWorkspaces() {
         section.classList.add('stock-market-workspace', 'global-stock-workspace');
         section.innerHTML = regionalWorkspaceMarkup(region, config);
         section.dataset.workspaceReady = 'true';
+        const input = document.getElementById(config.input);
+        const suggestionLoaders = {
+            JP: fetchStockSuggestionsJP, TW: fetchStockSuggestionsTW,
+            EU: fetchStockSuggestionsEU, KR: fetchStockSuggestionsKR,
+            HK: fetchStockSuggestionsHK, CN: fetchStockSuggestionsCN
+        };
+        if (input && typeof suggestionLoaders[region] === 'function') {
+            input.addEventListener('input', debounce(async function () {
+                const query = this.value.trim().toUpperCase();
+                const suggestions = document.getElementById(config.suggestions);
+                if (!query) { clearSuggestions(suggestions); return; }
+                showLoadingSuggestions(suggestions);
+                const symbols = await suggestionLoaders[region](query);
+                if (this.value.trim().toUpperCase() === query) {
+                    displaySuggestions(symbols, suggestions, config.input);
+                }
+            }, 150));
+        }
     });
 }
 
@@ -2834,7 +2853,7 @@ function fetchJPStock() {
         return null;
     }
 
-    const stockSymbol = rawSymbol + ".T";
+    const stockSymbol = rawSymbol.toUpperCase().endsWith('.T') ? rawSymbol.toUpperCase() : `${rawSymbol}.T`;
 
     if (stockSymbol && (stockSymbol !== previousSymbol)) {
         logUserQuery('JP', rawSymbol); // **記錄查詢 (使用原始輸入)**
@@ -2899,7 +2918,7 @@ function fetchJPStock() {
 async function fetchStockExchange(stockSymbol) {
     // 此函數保持不變，因為它不直接由用戶觸發查詢記錄
     const apiKey = API_KEY;
-    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}`;
+    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}&market=TW`;
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -3065,7 +3084,8 @@ function fetchEUStock() {
 
 function fetchKRStock() {
     const stockSymbolInput = document.getElementById('krStockSymbol');
-    const stockSymbol = stockSymbolInput.value.trim().toUpperCase();
+    const rawSymbol = stockSymbolInput.value.trim().toUpperCase();
+    const stockSymbol = rawSymbol && !/\.(KS|KQ)$/i.test(rawSymbol) ? `${rawSymbol}.KS` : rawSymbol;
     const outputSymbolElement = document.getElementById('outputSymbolKR');
     const previousSymbol = outputSymbolElement.getAttribute('data-last-symbol');
 
@@ -3135,7 +3155,8 @@ function fetchHKStock() {
         // alert('Please enter a Hong Kong stock symbol.');
         return null;
     }
-    const stockSymbol = rawSymbol + ".HK";
+    const normalizedCode = rawSymbol.replace(/^0+(?=\d{4}$)/, '');
+    const stockSymbol = /\.HK$/i.test(normalizedCode) ? normalizedCode.toUpperCase() : `${normalizedCode}.HK`;
 
     if (stockSymbol && (stockSymbol !== previousSymbol)) {
         logUserQuery('HK', rawSymbol); // **記錄查詢 (使用原始輸入)**
@@ -3190,7 +3211,11 @@ function fetchHKStock() {
 
 function fetchCNStock() {
     const stockSymbolInput = document.getElementById('cnStockSymbol');
-    const stockSymbol = stockSymbolInput.value.trim();
+    const rawSymbol = stockSymbolInput.value.trim().toUpperCase();
+    let stockSymbol = rawSymbol;
+    if (rawSymbol && !/\.(SS|SZ)$/i.test(rawSymbol)) {
+        stockSymbol = `${rawSymbol}.${rawSymbol.startsWith('6') ? 'SS' : 'SZ'}`;
+    }
     const outputSymbolElement = document.getElementById('outputSymbolCN');
     const previousSymbol = outputSymbolElement.getAttribute('data-last-symbol');
 
@@ -3532,7 +3557,7 @@ document.addEventListener('input', debounce(async function (event) {
 
 async function fetchStockSuggestionsEU(stockSymbol) {
     const apiKey = API_KEY;
-    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}`;
+    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}&market=EU`;
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -3569,7 +3594,7 @@ if (jpStockSymbolInput) {
 
 async function fetchStockSuggestionsJP(stockSymbol) {
     const apiKey = API_KEY;
-    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}`;
+    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}&market=JP`;
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -3607,7 +3632,7 @@ if (twStockSymbolInput) {
 
 async function fetchStockSuggestionsTW(stockSymbol) {
     const apiKey = API_KEY;
-    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}`;
+    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}&market=TW`;
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -3645,7 +3670,7 @@ if (krStockSymbolInput) {
 
 async function fetchStockSuggestionsKR(stockSymbol) {
     const apiKey = API_KEY;
-    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}`;
+    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}&market=KR`;
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -3682,7 +3707,7 @@ if (hkStockSymbolInput) {
 
 async function fetchStockSuggestionsHK(stockSymbol) {
     const apiKey = API_KEY;
-    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}`;
+    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}&market=HK`;
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
@@ -3719,7 +3744,7 @@ if (cnStockSymbolInput) {
 
 async function fetchStockSuggestionsCN(stockSymbol) {
     const apiKey = API_KEY;
-    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}`;
+    const apiUrl = `${BASE_URL}search-symbol?query=${stockSymbol}&market=CN`;
     try {
         const response = await fetch(apiUrl);
         if (!response.ok) {
