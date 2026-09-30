@@ -5301,7 +5301,8 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                         enabled: true,
                         mode: 'x',
                         onPan: ({chart}) => { // 在平移的每一刻都更新導航器
-                            updateNavigator(chart, chartSync[chart.id].navigator);
+                            const navigator = chartSync[chart.id]?.navigator;
+                            if (navigator) updateNavigator(chart, navigator);
                         }
                     },
                     zoom: {
@@ -5309,7 +5310,8 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                         pinch: { enabled: true },
                         mode: 'x',
                         onZoom: ({chart}) => { // 在縮放的每一刻都更新導航器
-                            updateNavigator(chart, chartSync[chart.id].navigator);
+                            const navigator = chartSync[chart.id]?.navigator;
+                            if (navigator) updateNavigator(chart, navigator);
                         }
                     },
                     limits: {
@@ -5320,10 +5322,12 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                         },
                     },
                     onPanComplete: ({chart}) => { // 保留 onComplete 以防萬一
-                        updateNavigator(chart, chartSync[chart.id].navigator);
+                        const navigator = chartSync[chart.id]?.navigator;
+                        if (navigator) updateNavigator(chart, navigator);
                     },
                     onZoomComplete: ({chart}) => {
-                        updateNavigator(chart, chartSync[chart.id].navigator);
+                        const navigator = chartSync[chart.id]?.navigator;
+                        if (navigator) updateNavigator(chart, navigator);
                     }
                 },
             }
