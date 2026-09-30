@@ -712,6 +712,108 @@ function autoLoadUSReport(sectionId) {
     if (typeof loaders[sectionId] === 'function') loaders[sectionId]();
 }
 
+const REGIONAL_MARKET_WORKSPACES = {
+    JP: { section: 'jp-info-section', title: 'Japan Equities', subtitle: '日股報價、財報與法說會研究工作區', input: 'jpStockSymbol', button: 'jpStockButton', suggestions: 'suggestionsJP', output: 'outputSymbolJP', profile: 'companyProfileContainerJP', price: 'PriceContainerJP', report: 'section-container-JP', placeholder: '例如 7203、6758', pattern: '[0-9]*', fetchStock: 'fetchJPStock', loadSection: 'loadSectionJP' },
+    TW: { section: 'tw-info-section', title: 'Taiwan Equities', subtitle: '台股上市櫃報價、財報與法說會研究工作區', input: 'twStockSymbol', button: 'twStockButton', suggestions: 'suggestionsTW', output: 'outputSymbolTW', profile: 'companyProfileContainerTW', price: 'PriceContainerTW', report: 'section-container-TW', placeholder: '例如 2330、2454', pattern: '[0-9]*', fetchStock: 'fetchTWStock', loadSection: 'loadSectionTW' },
+    EU: { section: 'eu-info-section', title: 'European Equities', subtitle: '歐洲股票報價、財報與法說會研究工作區', input: 'euStockSymbol', button: 'euStockButton', suggestions: 'suggestionsEU', output: 'outputSymbolEU', profile: 'companyProfileContainerEU', price: 'PriceContainerEU', report: 'section-container-EU', placeholder: '例如 SAP.DE、ASML.AS', pattern: '[A-Za-z0-9.\\-]*', fetchStock: 'fetchEUStock', loadSection: 'loadSectionEU' },
+    KR: { section: 'kr-info-section', title: 'Korea Equities', subtitle: '韓股報價、財報與法說會研究工作區', input: 'krStockSymbol', button: 'krStockButton', suggestions: 'suggestionsKR', output: 'outputSymbolKR', profile: 'companyProfileContainerKR', price: 'PriceContainerKR', report: 'section-container-KR', placeholder: '例如 005930.KS', pattern: '[A-Za-z0-9.\\-]*', fetchStock: 'fetchKRStock', loadSection: 'loadSectionKR' },
+    HK: { section: 'hk-info-section', title: 'Hong Kong Equities', subtitle: '港股報價、財報與法說會研究工作區', input: 'hkStockSymbol', button: 'hkStockButton', suggestions: 'suggestionsHK', output: 'outputSymbolHK', profile: 'companyProfileContainerHK', price: 'PriceContainerHK', report: 'section-container-HK', placeholder: '例如 00700、09988', pattern: '[0-9]{1,5}', fetchStock: 'fetchHKStock', loadSection: 'loadSectionHK' },
+    CN: { section: 'cn-info-section', title: 'China Equities', subtitle: '中國 A 股報價、財報與法說會研究工作區', input: 'cnStockSymbol', button: 'cnStockButton', suggestions: 'suggestionsCN', output: 'outputSymbolCN', profile: 'companyProfileContainerCN', price: 'PriceContainerCN', report: 'section-container-CN', placeholder: '例如 600519、000001', pattern: '[0-9]{6}', fetchStock: 'fetchCNStock', loadSection: 'loadSectionCN' }
+};
+
+function regionalWorkspaceMarkup(region, config) {
+    const reportCards = [
+        ['income-statement', '▤', '損益表', 'Income Statement'],
+        ['balance-sheet', '▥', '資產負債表', 'Balance Sheet'],
+        ['cashflow-statement', '⌁', '現金流量表', 'Cash Flow'],
+        ['earnings-call-transcript', '◉', '法說會逐字稿', 'Earnings Transcript'],
+        ['earnings-call-calendar', '▦', '財報行事曆', 'Earnings Calendar']
+    ].map(([id, icon, title, english]) => `
+        <a class="market-report-link" href="#" data-report="${id}" onclick="loadRegionalSection(event, '${region}', '${id}')">
+            <span>${icon}</span><div><strong>${title}</strong><small>${english}</small></div><b>→</b>
+        </a>`).join('');
+
+    return `
+        <header class="market-workspace-header">
+            <div><span class="market-eyebrow">POSEIDON GLOBAL MARKET INTELLIGENCE</span><h2>${config.title}</h2><p>${config.subtitle}</p></div>
+            <button class="market-workspace-close" type="button" aria-label="Close stock workspace" onclick="toggleSection(event, '#${config.section}')">×</button>
+        </header>
+        <section class="market-search-panel" aria-label="${config.title} search">
+            <label for="${config.input}">股票代碼或公司名稱</label>
+            <div class="market-search-row"><div class="market-search-field"><span aria-hidden="true">⌕</span>
+                <input type="text" id="${config.input}" placeholder="${config.placeholder}" pattern="${config.pattern}" autocomplete="off">
+                <div id="${config.suggestions}" class="suggestions-list"></div>
+            </div><button id="${config.button}" class="market-search-button" type="button" onclick="runRegionalStockSearch('${region}')"><span>查詢股票</span><span aria-hidden="true">→</span></button></div>
+            <p id="${config.output}" class="market-query-status" data-last-symbol="">尚未選擇股票</p>
+        </section>
+        <div class="market-summary-grid">
+            <div id="${config.profile}" class="market-summary-card market-company-card"><div class="market-card-placeholder"><span>🏢</span><div><strong>公司資訊</strong><small>搜尋股票後顯示公司概況</small></div></div></div>
+            <div id="${config.price}" class="market-summary-card market-price-card"><div class="market-card-placeholder"><span>📈</span><div><strong>市場快照</strong><small>搜尋股票後顯示即時報價</small></div></div></div>
+        </div>
+        <section class="market-report-nav"><div class="market-section-heading"><div><span class="market-eyebrow">RESEARCH MODULES</span><h3>選擇研究報表</h3></div><p>點選後自動載入最新可用資料</p></div><div class="info-content">${reportCards}</div></section>
+        <div id="${config.report}" class="section-container market-report-output"><div class="market-report-empty"><span>◫</span><strong>選擇上方研究報表</strong><small>報表、圖表與詳細數據會顯示在這裡</small></div></div>`;
+}
+
+function upgradeRegionalStockWorkspaces() {
+    Object.entries(REGIONAL_MARKET_WORKSPACES).forEach(([region, config]) => {
+        const section = document.getElementById(config.section);
+        if (!section || section.dataset.workspaceReady === 'true') return;
+        section.classList.add('stock-market-workspace', 'global-stock-workspace');
+        section.innerHTML = regionalWorkspaceMarkup(region, config);
+        section.dataset.workspaceReady = 'true';
+    });
+}
+
+async function runRegionalStockSearch(region) {
+    const config = REGIONAL_MARKET_WORKSPACES[region];
+    const fetcher = config && window[config.fetchStock];
+    if (typeof fetcher !== 'function') return null;
+    const symbol = await fetcher();
+    if (typeof clearSuggestions === 'function') clearSuggestions();
+    return symbol;
+}
+
+function loadRegionalSection(event, region, sectionId) {
+    if (event) event.preventDefault();
+    const config = REGIONAL_MARKET_WORKSPACES[region];
+    const loader = config && window[config.loadSection];
+    if (typeof loader !== 'function') return;
+    loader(sectionId);
+    document.querySelectorAll(`#${config.section} .market-report-link`).forEach(link => {
+        link.classList.toggle('active', link.dataset.report === sectionId);
+    });
+    const report = document.getElementById(config.report);
+    if (report) report.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    window.requestAnimationFrame(() => autoLoadRegionalReport(region, sectionId));
+}
+
+function autoLoadRegionalReport(region, sectionId) {
+    const config = REGIONAL_MARKET_WORKSPACES[region];
+    const rawSymbol = config ? document.getElementById(config.input)?.value.trim() : '';
+    if (!rawSymbol) {
+        const report = config && document.getElementById(config.report);
+        const content = report?.querySelector('.content');
+        if (content) content.insertAdjacentHTML('afterbegin', '<div class="market-inline-notice">請先在上方搜尋並選擇股票，再查看研究報表。</div>');
+        return;
+    }
+    const prefix = region;
+    const functions = {
+        'income-statement': `fetch${prefix}IncomeStatement`,
+        'balance-sheet': `fetch${prefix}BalanceSheet`,
+        'cashflow-statement': `fetch${prefix}Cashflow`,
+        'earnings-call-transcript': `fetch${prefix}EarningsCallTranscript`,
+        'earnings-call-calendar': `fetch${prefix}EarningsCallCalendar`
+    };
+    const fn = window[functions[sectionId]];
+    if (typeof fn === 'function') fn();
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', upgradeRegionalStockWorkspaces);
+} else {
+    upgradeRegionalStockWorkspaces();
+}
+
 function loadSectionJP(sectionId) {
     const sections = {
         'income-statement': `
@@ -7258,245 +7360,36 @@ async function fetchEarningsCallTranscript() {
     fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainer');
 }
 
-async function fetchJPEarningsCallTranscript() {
-    var stockSymbol = fetchJPStock();
-    var yearInput = document.getElementById('yearInputJP');
-    var quarterInput = document.getElementById('quarterInputJP');
-    var year = yearInput.value;
-    var quarter = quarterInput.value;
-    const apiKey = API_KEY;
+async function fetchRegionalEarningsCallTranscript(region) {
+    const config = REGIONAL_MARKET_WORKSPACES[region];
+    const stockFetcher = config && window[config.fetchStock];
+    if (typeof stockFetcher !== 'function') return;
+    const stockSymbol = await stockFetcher();
+    if (!stockSymbol) return;
 
-    if (stockSymbol.length === 0) {
-        alert('請輸入股票代碼。');
-        return;
+    const yearInput = document.getElementById(`yearInput${region}`);
+    const quarterInput = document.getElementById(`quarterInput${region}`);
+    const year = yearInput?.value.trim() || '';
+    const quarter = quarterInput?.value.trim() || '';
+    const params = new URLSearchParams({ symbol: stockSymbol });
+    if (year && quarter) {
+        params.set('year', year);
+        params.set('quarter', quarter);
     }
-
-    if (year.length === 0 || quarter.length === 0) {
-        const latestApiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&limit=1`;
-        try {
-            const response = await fetch(latestApiUrl);
-            const data = await response.json();
-            if (data && data.length > 0) {
-                year = data[0].year;
-                quarter = data[0].quarter;
-
-                // 填入自動取得的年份和季度
-                yearInput.value = year;
-                quarterInput.value = quarter;
-            } else {
-                alert('未找到最新的法說會逐字稿。');
-                return;
-            }
-        } catch (error) {
-            console.error('Error fetching latest transcript:', error);
-            alert('無法獲取最新的法說會逐字稿。');
-            return;
-        }
-    }
-
-    const apiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&year=${year}&quarter=${quarter}`;
-    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerJP');
+    fetchData_Transcript(
+        `${BASE_URL}earning-call-transcript?${params.toString()}`,
+        displayEarningsCallTranscript,
+        `earningsCallTranscriptContainer${region}`,
+        region
+    );
 }
 
-async function fetchTWEarningsCallTranscript() {
-    const stockSymbol = await fetchTWStock();
-    var yearInput = document.getElementById('yearInputTW');
-    var quarterInput = document.getElementById('quarterInputTW');
-    var year = yearInput.value;
-    var quarter = quarterInput.value;
-    const apiKey = API_KEY;
-
-    if (stockSymbol.length === 0) {
-        alert('請輸入股票代碼。');
-        return;
-    }
-
-    if (year.length === 0 || quarter.length === 0) {
-        const latestApiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&limit=1`;
-        try {
-            const response = await fetch(latestApiUrl);
-            const data = await response.json();
-            if (data && data.length > 0) {
-                year = data[0].year;
-                quarter = data[0].quarter;
-
-                // 填入自動取得的年份和季度
-                yearInput.value = year;
-                quarterInput.value = quarter;
-            } else {
-                alert('未找到最新的法說會逐字稿。');
-                return;
-            }
-        } catch (error) {
-            console.error('Error fetching latest transcript:', error);
-            alert('無法獲取最新的法說會逐字稿。');
-            return;
-        }
-    }
-
-    const apiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&year=${year}&quarter=${quarter}`;
-    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerTW');
-}
-
-async function fetchEUEarningsCallTranscript() {
-    const stockSymbol = fetchEUStock();
-    var yearInput = document.getElementById('yearInputEU');
-    var quarterInput = document.getElementById('quarterInputEU');
-    var year = yearInput.value;
-    var quarter = quarterInput.value;
-    const apiKey = API_KEY;
-
-    if (stockSymbol.length === 0) {
-        alert('請輸入股票代碼。');
-        return;
-    }
-
-    if (year.length === 0 || quarter.length === 0) {
-        const latestApiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&limit=1`;
-        try {
-            const response = await fetch(latestApiUrl);
-            const data = await response.json();
-            if (data && data.length > 0) {
-                year = data[0].year;
-                quarter = data[0].quarter;
-
-                // 填入自動取得的年份和季度
-                yearInput.value = year;
-                quarterInput.value = quarter;
-            } else {
-                alert('未找到最新的法說會逐字稿。');
-                return;
-            }
-        } catch (error) {
-            console.error('Error fetching latest transcript:', error);
-            alert('無法獲取最新的法說會逐字稿。');
-            return;
-        }
-    }
-
-    const apiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&year=${year}&quarter=${quarter}`;
-    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerEU');
-}
-
-async function fetchKREarningsCallTranscript() {
-    const stockSymbol = fetchKRStock();
-    var yearInput = document.getElementById('yearInputKR');
-    var quarterInput = document.getElementById('quarterInputKR');
-    var year = yearInput.value;
-    var quarter = quarterInput.value;
-    const apiKey = API_KEY;
-
-    if (stockSymbol.length === 0) {
-        alert('請輸入股票代碼。');
-        return;
-    }
-
-    if (year.length === 0 || quarter.length === 0) {
-        const latestApiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&limit=1`;
-        try {
-            const response = await fetch(latestApiUrl);
-            const data = await response.json();
-            if (data && data.length > 0) {
-                year = data[0].year;
-                quarter = data[0].quarter;
-
-                // 填入自動取得的年份和季度
-                yearInput.value = year;
-                quarterInput.value = quarter;
-            } else {
-                alert('未找到最新的法說會逐字稿。');
-                return;
-            }
-        } catch (error) {
-            console.error('Error fetching latest transcript:', error);
-            alert('無法獲取最新的法說會逐字稿。');
-            return;
-        }
-    }
-
-    const apiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&year=${year}&quarter=${quarter}`;
-    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerKR');
-}
-
-async function fetchHKEarningsCallTranscript() {
-    const stockSymbol = fetchHKStock();
-    var yearInput = document.getElementById('yearInputHK');
-    var quarterInput = document.getElementById('quarterInputHK');
-    var year = yearInput.value;
-    var quarter = quarterInput.value;
-    const apiKey = API_KEY;
-
-    if (stockSymbol.length === 0) {
-        alert('請輸入股票代碼。');
-        return;
-    }
-
-    if (year.length === 0 || quarter.length === 0) {
-        const latestApiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&limit=1`;
-        try {
-            const response = await fetch(latestApiUrl);
-            const data = await response.json();
-            if (data && data.length > 0) {
-                year = data[0].year;
-                quarter = data[0].quarter;
-
-                // 填入自動取得的年份和季度
-                yearInput.value = year;
-                quarterInput.value = quarter;
-            } else {
-                alert('未找到最新的法說會逐字稿。');
-                return;
-            }
-        } catch (error) {
-            console.error('Error fetching latest transcript:', error);
-            alert('無法獲取最新的法說會逐字稿。');
-            return;
-        }
-    }
-
-    const apiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&year=${year}&quarter=${quarter}`;
-    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerHK');
-}
-
-async function fetchCNEarningsCallTranscript() {
-    const stockSymbol = fetchCNStock();
-    var yearInput = document.getElementById('yearInputCN');
-    var quarterInput = document.getElementById('quarterInputCN');
-    var year = yearInput.value;
-    var quarter = quarterInput.value;
-    const apiKey = API_KEY;
-
-    if (stockSymbol.length === 0) {
-        alert('請輸入股票代碼。');
-        return;
-    }
-
-    if (year.length === 0 || quarter.length === 0) {
-        const latestApiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&limit=1`;
-        try {
-            const response = await fetch(latestApiUrl);
-            const data = await response.json();
-            if (data && data.length > 0) {
-                year = data[0].year;
-                quarter = data[0].quarter;
-
-                // 填入自動取得的年份和季度
-                yearInput.value = year;
-                quarterInput.value = quarter;
-            } else {
-                alert('未找到最新的法說會逐字稿。');
-                return;
-            }
-        } catch (error) {
-            console.error('Error fetching latest transcript:', error);
-            alert('無法獲取最新的法說會逐字稿。');
-            return;
-        }
-    }
-
-    const apiUrl = `${BASE_URL}earning-call-transcript?symbol=${stockSymbol}&year=${year}&quarter=${quarter}`;
-    fetchData_Transcript(apiUrl, displayEarningsCallTranscript, 'earningsCallTranscriptContainerCN');
-}
+function fetchJPEarningsCallTranscript() { return fetchRegionalEarningsCallTranscript('JP'); }
+function fetchTWEarningsCallTranscript() { return fetchRegionalEarningsCallTranscript('TW'); }
+function fetchEUEarningsCallTranscript() { return fetchRegionalEarningsCallTranscript('EU'); }
+function fetchKREarningsCallTranscript() { return fetchRegionalEarningsCallTranscript('KR'); }
+function fetchHKEarningsCallTranscript() { return fetchRegionalEarningsCallTranscript('HK'); }
+function fetchCNEarningsCallTranscript() { return fetchRegionalEarningsCallTranscript('CN'); }
 
 function splitTranscriptIntoParagraphs(content) {
     // 使用正則表達式檢測常見的講者名稱或段落開頭
@@ -7585,7 +7478,7 @@ function copyTranscript() {
     alert('Transcript copied to clipboard!');
 }
 
-function fetchData_Transcript(apiUrl, callback, containerId) {
+function fetchData_Transcript(apiUrl, callback, containerId, region = '') {
     const container = document.getElementById(containerId);
     container.innerHTML = '<div class="market-loading-state">正在尋找最新一季法說會逐字稿...</div>';
     fetch(apiUrl)
@@ -7597,11 +7490,14 @@ function fetchData_Transcript(apiUrl, callback, containerId) {
                 container.innerHTML = `<div class="market-inline-notice market-inline-warning"><strong>${message}</strong>${planHint}</div>`;
             } else if (Array.isArray(data) && data.length > 0) {
                 const latest = data[0];
-                const yearInput = document.getElementById('yearInput');
-                const quarterInput = document.getElementById('quarterInput');
+                const yearInput = document.getElementById(`yearInput${region}`);
+                const quarterInput = document.getElementById(`quarterInput${region}`);
                 if (yearInput) yearInput.value = latest.year || latest.fiscalYear || '';
                 if (quarterInput) quarterInput.value = String(latest.quarter || latest.period || '').replace(/^Q/i, '');
                 callback(data[0], container);
+                if (latest.cacheFallback) {
+                    container.insertAdjacentHTML('afterbegin', '<div class="market-inline-notice">目前顯示本機快取版本；FMP 即時來源暫時無法使用。</div>');
+                }
             } else {
                 container.innerHTML = '<div class="market-inline-notice">目前找不到這檔股票的法說會逐字稿。</div>';
             }
