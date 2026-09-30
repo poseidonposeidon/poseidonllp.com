@@ -7417,16 +7417,23 @@ function fetchHKEarningsCallTranscript() { return fetchRegionalEarningsCallTrans
 function fetchCNEarningsCallTranscript() { return fetchRegionalEarningsCallTranscript('CN'); }
 
 function splitTranscriptIntoParagraphs(content) {
-    // 使用正則表達式檢測常見的講者名稱或段落開頭
-    const regex = /(Operator:|[A-Z][a-z]+ [A-Z][a-z]+:)/g;
-    let parts = content.split(regex);
+    const escapeText = value => String(value ?? '').replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    }[char]));
+    const normalized = String(content || '').replace(/\r\n?/g, '\n').trim();
+    if (!normalized) return [];
 
-    // 組裝段落
-    let paragraphs = [];
-    for (let i = 1; i < parts.length; i += 2) {
-        paragraphs.push(`<p><strong>${parts[i]}</strong> ${parts[i + 1] ? parts[i + 1] : ''}</p>`);
-    }
-    return paragraphs;
+    // FMP transcripts are not uniform. Some use "Name:" while TSLA and
+    // several newer records use "Name :". Parse paragraph blocks first and
+    // always preserve unmatched text so a formatting change can never hide it.
+    const blocks = normalized.split(/\n\s*\n+/).map(block => block.trim()).filter(Boolean);
+    return blocks.map(block => {
+        const speakerMatch = block.match(/^([A-Za-z][A-Za-z0-9 .,'’&()\/-]{0,100}?)\s*:\s*([\s\S]*)$/);
+        if (speakerMatch) {
+            return `<p class="transcript-paragraph"><strong class="transcript-speaker">${escapeText(speakerMatch[1])}</strong><span>${escapeText(speakerMatch[2])}</span></p>`;
+        }
+        return `<p class="transcript-paragraph"><span>${escapeText(block)}</span></p>`;
+    });
 }
 
 function displayEarningsCallTranscript(transcript, container) {
@@ -7435,30 +7442,35 @@ function displayEarningsCallTranscript(transcript, container) {
         return;
     }
 
-    // 將日期時間顯示在逐字稿內容之前
-    let transcriptDate = new Date(transcript.date).toLocaleString(); // 格式化日期時間
-    let dateContent = `<p><strong>Date ：</strong> ${transcriptDate}</p>`;
-
-    // 將逐字稿內容分段
-    let paragraphs = splitTranscriptIntoParagraphs(transcript.content);
-
-    // 組裝HTML內容
-    let htmlContent = dateContent; // 加上日期內容
-    htmlContent += `<div id="transcriptPreview">${paragraphs.slice(0, 3).join('')}...</div>`;
-    htmlContent += `<div id="fullTranscript" style="display:none; white-space: normal;">${paragraphs.join('')}</div>`;
-    htmlContent += '<button id="expandButton" class="transcript-button" onclick="expandTranscript(event)">Read More</button>';
-    htmlContent += '<button id="collapseButton" class="transcript-button" style="display: none;" onclick="collapseTranscript(event)">Read Less</button>';
-    htmlContent += '<button id="copyButton" class="transcript-button" onclick="copyTranscript()">Copy</button>';
-    htmlContent += `<button id="downloadButton" class="transcript-button" onclick="downloadTranscript('${transcript.symbol}', \`${transcript.content.replace(/`/g, '\\`')}\`)">Download Txt</button>`;
-    container.innerHTML = htmlContent;
+    const parsedDate = transcript.date ? new Date(transcript.date) : null;
+    const transcriptDate = parsedDate && !Number.isNaN(parsedDate.getTime())
+        ? parsedDate.toLocaleString('zh-TW') : '日期未提供';
+    const paragraphs = splitTranscriptIntoParagraphs(transcript.content);
+    const previewCount = Math.min(3, paragraphs.length);
+    container._transcriptData = transcript;
+    container.innerHTML = `
+        <div class="transcript-meta">
+            <div><span>發布時間</span><strong>${transcriptDate}</strong></div>
+            <div class="transcript-period">FY ${transcript.year || '—'} · Q${transcript.quarter || '—'}</div>
+        </div>
+        <div class="transcript-reading-surface">
+            <div class="transcript-preview">${paragraphs.slice(0, previewCount).join('')}${paragraphs.length > previewCount ? '<div class="transcript-fade" aria-hidden="true"></div>' : ''}</div>
+            <div class="transcript-full" hidden>${paragraphs.join('')}</div>
+        </div>
+        <div class="transcript-toolbar" role="group" aria-label="逐字稿工具">
+            <button type="button" class="transcript-action transcript-action-primary expand-transcript" onclick="expandTranscript(event)"><span aria-hidden="true">▤</span>閱讀全文</button>
+            <button type="button" class="transcript-action collapse-transcript" hidden onclick="collapseTranscript(event)"><span aria-hidden="true">⌃</span>收合內容</button>
+            <button type="button" class="transcript-action" onclick="copyTranscript(event)"><span aria-hidden="true">⧉</span>複製全文</button>
+            <button type="button" class="transcript-action" onclick="downloadTranscript(event)"><span aria-hidden="true">⇩</span>下載 TXT</button>
+        </div>`;
 }
 
-function downloadTranscript(stockSymbol, content) {
-    // 檔案名稱
-    const fileName = `${stockSymbol}_Transcript.txt`;
-
-    // 建立檔案內容
-    const fileContent = `Stock Symbol: ${stockSymbol}\n\n${content}`;
+function downloadTranscript(event) {
+    const container = event.currentTarget.closest('[id^="earningsCallTranscriptContainer"]');
+    const transcript = container?._transcriptData;
+    if (!transcript?.content) return;
+    const fileName = `${transcript.symbol || 'Earnings'}_${transcript.year || ''}_Q${transcript.quarter || ''}_Transcript.txt`;
+    const fileContent = `Stock Symbol: ${transcript.symbol || ''}\nFiscal Period: ${transcript.year || ''} Q${transcript.quarter || ''}\nDate: ${transcript.date || ''}\n\n${transcript.content}`;
 
     // 創建 Blob 對象
     const blob = new Blob([fileContent], { type: "text/plain;charset=utf-8" });
@@ -7470,37 +7482,50 @@ function downloadTranscript(stockSymbol, content) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+    URL.revokeObjectURL(link.href);
 }
 
 function expandTranscript(event) {
-    event.stopPropagation(); // 防止觸發區塊固定功能
-    const section = event.target.closest('.section');
-    section.classList.add('fixed'); // 固定区块展开
-    document.getElementById('transcriptPreview').style.display = 'none';
-    document.getElementById('fullTranscript').style.display = 'block';
-    document.getElementById('expandButton').style.display = 'none';
-    document.getElementById('collapseButton').style.display = 'inline';
+    event.stopPropagation();
+    const container = event.currentTarget.closest('[id^="earningsCallTranscriptContainer"]');
+    if (!container) return;
+    container.querySelector('.transcript-preview').hidden = true;
+    container.querySelector('.transcript-full').hidden = false;
+    container.querySelector('.expand-transcript').hidden = true;
+    container.querySelector('.collapse-transcript').hidden = false;
+    container.classList.add('transcript-expanded');
 }
 
 function collapseTranscript(event) {
-    event.stopPropagation(); // 防止觸發區塊固定功能
-    const section = event.target.closest('.section');
-    section.classList.remove('fixed'); // 取消区块固定
-    document.getElementById('transcriptPreview').style.display = 'block';
-    document.getElementById('fullTranscript').style.display = 'none';
-    document.getElementById('expandButton').style.display = 'inline';
-    document.getElementById('collapseButton').style.display = 'none';
+    event.stopPropagation();
+    const container = event.currentTarget.closest('[id^="earningsCallTranscriptContainer"]');
+    if (!container) return;
+    container.querySelector('.transcript-preview').hidden = false;
+    container.querySelector('.transcript-full').hidden = true;
+    container.querySelector('.expand-transcript').hidden = false;
+    container.querySelector('.collapse-transcript').hidden = true;
+    container.classList.remove('transcript-expanded');
+    container.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 }
 
-function copyTranscript() {
-    const fullTranscript = document.getElementById('fullTranscript').innerText;
-    const textArea = document.createElement('textarea');
-    textArea.value = fullTranscript;
-    document.body.appendChild(textArea);
-    textArea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textArea);
-    alert('Transcript copied to clipboard!');
+async function copyTranscript(event) {
+    const container = event.currentTarget.closest('[id^="earningsCallTranscriptContainer"]');
+    const content = container?._transcriptData?.content;
+    if (!content) return;
+    try {
+        await navigator.clipboard.writeText(content);
+    } catch (_) {
+        const textArea = document.createElement('textarea');
+        textArea.value = content;
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        textArea.remove();
+    }
+    const button = event.currentTarget;
+    const original = button.innerHTML;
+    button.innerHTML = '<span aria-hidden="true">✓</span>已複製';
+    setTimeout(() => { button.innerHTML = original; }, 1600);
 }
 
 function fetchData_Transcript(apiUrl, callback, containerId, region = '') {

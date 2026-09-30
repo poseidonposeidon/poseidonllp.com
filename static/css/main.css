@@ -3811,3 +3811,84 @@ body.light-mode .global-stock-workspace .market-report-output select { color: #1
     .global-stock-workspace .market-search-button { width: 100%; }
     .global-stock-workspace .info-content { grid-template-columns: minmax(0,1fr); }
 }
+
+/* Earnings transcript reader and action toolbar */
+.stock-market-workspace .transcript-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+    color: #dbe7f2;
+    background: rgba(57, 169, 255, .065);
+    border: 1px solid rgba(57, 169, 255, .16);
+    border-radius: 11px;
+}
+.stock-market-workspace .transcript-meta > div:first-child { display: flex; align-items: center; gap: 10px; }
+.stock-market-workspace .transcript-meta span { color: var(--market-muted); font-size: 12px; }
+.stock-market-workspace .transcript-meta strong { font-size: 13px; }
+.stock-market-workspace .transcript-period {
+    padding: 5px 9px;
+    color: var(--market-accent);
+    background: rgba(57, 169, 255, .1);
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 800;
+}
+.stock-market-workspace .transcript-reading-surface {
+    position: relative;
+    padding: 4px 16px;
+    color: #d6e0ea;
+    background: rgba(4, 10, 16, .38);
+    border: 1px solid rgba(148, 163, 184, .12);
+    border-radius: 12px;
+}
+.stock-market-workspace .transcript-preview { position: relative; max-height: 260px; overflow: hidden; }
+.stock-market-workspace .transcript-full { max-height: min(58vh, 720px); overflow: auto; padding-right: 10px; scrollbar-gutter: stable; }
+.stock-market-workspace .transcript-paragraph { display: grid; grid-template-columns: minmax(130px, 190px) minmax(0, 1fr); gap: 16px; margin: 16px 0; line-height: 1.75; }
+.stock-market-workspace .transcript-speaker { color: #67bfff; font-size: 13px; }
+.stock-market-workspace .transcript-paragraph span { min-width: 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.stock-market-workspace .transcript-fade { position: absolute; right: 0; bottom: 0; left: 0; height: 90px; background: linear-gradient(transparent, #0d1721); pointer-events: none; }
+.stock-market-workspace .transcript-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 9px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(148, 163, 184, .13);
+}
+.stock-market-workspace .transcript-action {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    min-height: 38px !important;
+    margin: 0 !important;
+    padding: 8px 13px !important;
+    color: #c9d7e5 !important;
+    background: rgba(255, 255, 255, .045) !important;
+    border: 1px solid rgba(148, 163, 184, .2) !important;
+    border-radius: 9px !important;
+    box-shadow: none !important;
+    font-size: 12px;
+    font-weight: 750 !important;
+}
+.stock-market-workspace .transcript-action:hover { color: #fff !important; background: rgba(57, 169, 255, .11) !important; border-color: rgba(57, 169, 255, .42) !important; transform: translateY(-1px); }
+.stock-market-workspace .transcript-action-primary { color: #06111b !important; background: linear-gradient(135deg, #62c1ff, #2c94df) !important; border-color: transparent !important; }
+.stock-market-workspace .transcript-action[hidden],
+.stock-market-workspace [hidden] { display: none !important; }
+
+body.light-mode .stock-market-workspace .transcript-meta,
+body.light-mode .stock-market-workspace .transcript-reading-surface { color: #26374a; background: #f7fafc; }
+body.light-mode .stock-market-workspace .transcript-fade { background: linear-gradient(transparent, #f7fafc); }
+body.light-mode .stock-market-workspace .transcript-action { color: #334155 !important; background: #f8fafc !important; }
+
+@media (max-width: 700px) {
+    .stock-market-workspace .transcript-meta { align-items: flex-start; flex-direction: column; }
+    .stock-market-workspace .transcript-paragraph { display: block; }
+    .stock-market-workspace .transcript-speaker { display: block; margin-bottom: 5px; }
+    .stock-market-workspace .transcript-toolbar { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); }
+    .stock-market-workspace .transcript-action { width: 100%; }
+}
