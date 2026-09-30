@@ -3854,17 +3854,20 @@ body.light-mode .global-stock-workspace .market-report-output select { color: #1
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: 9px;
+    gap: 12px;
     margin-top: 14px;
-    padding-top: 14px;
-    border-top: 1px solid rgba(148, 163, 184, .13);
+    padding: 14px;
+    background: rgba(7, 14, 22, .52);
+    border: 1px solid rgba(148, 163, 184, .13);
+    border-radius: 12px;
 }
 .stock-market-workspace .transcript-action {
     display: inline-flex !important;
     align-items: center;
     justify-content: center;
     gap: 7px;
-    min-height: 38px !important;
+    min-width: 118px;
+    min-height: 40px !important;
     margin: 0 !important;
     padding: 8px 13px !important;
     color: #c9d7e5 !important;

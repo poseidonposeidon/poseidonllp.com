@@ -1,5 +1,7 @@
 const isLocalFlask = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const baseUrl = isLocalFlask ? window.location.origin : 'https://api.poseidonllp.com';
+const POSEIDON_FRONTEND_BUILD = '20260930-transcript2';
+console.info(`[Poseidon] frontend build ${POSEIDON_FRONTEND_BUILD}`);
 const API_KEY = ''; // FMP key is server-side only.
 const BASE_URL = `${baseUrl}/api/fmp/`;
 const ALTERNATE_URL = `${BASE_URL}fmp-articles`;
@@ -7426,7 +7428,12 @@ function splitTranscriptIntoParagraphs(content) {
     // FMP transcripts are not uniform. Some use "Name:" while TSLA and
     // several newer records use "Name :". Parse paragraph blocks first and
     // always preserve unmatched text so a formatting change can never hide it.
-    const blocks = normalized.split(/\n\s*\n+/).map(block => block.trim()).filter(Boolean);
+    const speakerAhead = /(?=(?:Operator|[A-Z][A-Za-z.'’\-]+(?:\s+[A-Z][A-Za-z.'’\-]+){0,5})\s*:\s*)/;
+    const blocks = normalized
+        .split(/\n\s*\n+/)
+        .flatMap(block => block.split(new RegExp(`\\n+${speakerAhead.source}`, 'g')))
+        .map(block => block.trim())
+        .filter(Boolean);
     return blocks.map(block => {
         const speakerMatch = block.match(/^([A-Za-z][A-Za-z0-9 .,'’&()\/-]{0,100}?)\s*:\s*([\s\S]*)$/);
         if (speakerMatch) {
