@@ -75,12 +75,7 @@ input:focus {
     background-color: #212121;
 }
 
-div {
-    /* 移除 background-color, padding, border-radius */
-    margin-top: 10px;
-    /* 背景和邊框等樣式應由具體的 class (如 .chart-panel) 來定義 */
-    /* 而不是強制應用於所有 div */
-}
+/* 元件自行管理間距；全域 div margin 會破壞 flex/grid 對齊。 */
 
 /* Navbar 基本樣式 */
 .navbar {
@@ -590,9 +585,7 @@ button:not(.info-input button):hover {
         flex-wrap: nowrap;
     }
 
-    .logo {
-        margin-right: 500px;
-    }
+    .logo { margin-right: 0; }
 }
 
 /* 新增的樣式 */
@@ -2743,4 +2736,281 @@ body.light-mode {
 @keyframes pulseText {
     0%, 100% { opacity: 0.6; }
     50% { opacity: 1; }
+}
+
+/* =========================================================
+   Layout stabilization
+   Keep page, Deep Dive, reports and dialogs inside viewport.
+   ========================================================= */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+img, svg, video, canvas {
+    max-width: 100%;
+}
+
+.navbar {
+    width: min(100% - 20px, 1600px);
+    margin: 10px auto;
+    justify-content: space-between;
+    gap: 16px;
+}
+
+.logo-container,
+.logo {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.navbar-links {
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+.body-container,
+#main-deep-dive-container,
+.dd-content,
+.dd-top-layout,
+.dd-report-column,
+.dd-charts-column,
+.dd-bottom-chat-layout,
+.section-container {
+    min-width: 0;
+    max-width: 100%;
+}
+
+#main-deep-dive-container {
+    width: min(95%, 1800px) !important;
+}
+
+.dd-header {
+    height: auto;
+    min-height: 0;
+}
+
+.dd-top-layout {
+    width: 100%;
+    align-items: stretch;
+}
+
+.dd-report-column,
+.dd-charts-column {
+    flex: 1 1 0;
+}
+
+.dd-report-area {
+    overflow-wrap: anywhere;
+}
+
+.dd-report-area table,
+.dd-chat-messages-wide table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+.dd-chart-card:first-child {
+    height: auto;
+}
+
+.chart-wrapper {
+    height: clamp(240px, 28vw, 380px);
+    min-height: 0;
+}
+
+.chart-wrapper canvas {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.dd-premium-widgets,
+.sentiment-reports-grid {
+    min-width: 0;
+}
+
+.sentiment-reports-grid > *,
+.dd-premium-widgets > * {
+    min-width: 0;
+}
+
+.chart-popup-overlay {
+    padding: 20px;
+}
+
+.chart-popup-content {
+    width: min(1100px, 100%);
+    height: min(85dvh, 900px);
+    max-height: calc(100dvh - 40px);
+}
+
+.info-section,
+.ai-box-section,
+.compare,
+#compare {
+    width: min(1000px, calc(100vw - 32px));
+    max-height: calc(100dvh - 32px);
+}
+
+@media (max-width: 1100px) {
+    .dd-top-layout,
+    .sentiment-reports-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+        flex-direction: column;
+    }
+
+    .dd-report-column,
+    .dd-charts-column {
+        width: 100%;
+    }
+
+    .dd-premium-widgets {
+        grid-template-columns: minmax(0, 1fr) !important;
+    }
+
+    .dd-premium-widgets > [style*="grid-column"] {
+        grid-column: auto !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .navbar {
+        align-items: flex-start;
+        padding: 10px;
+    }
+
+    .navbar-links {
+        gap: 4px;
+    }
+
+    .navbar-links a {
+        margin: 0;
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .dropdown-content {
+        position: fixed;
+        left: 12px;
+        right: 12px;
+        top: auto;
+        width: auto;
+        max-height: 60dvh;
+        overflow-y: auto;
+    }
+
+    #main-deep-dive-container {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 10px !important;
+    }
+
+    .dd-header {
+        padding: 14px !important;
+    }
+
+    .dd-header > div,
+    .dd-search-box,
+    .dd-search-box[style] {
+        width: 100% !important;
+        max-width: 100%;
+    }
+
+    .dd-top-layout {
+        gap: 16px;
+        margin-bottom: 24px;
+    }
+
+    .dd-report-column,
+    .dd-chart-card {
+        padding: 12px;
+    }
+
+    .dd-wide-chat-interface {
+        height: min(70dvh, 520px);
+    }
+
+    .dd-chat-messages-wide,
+    .dd-chat-input-box-wide {
+        padding: 12px;
+    }
+
+    .dd-chat-input-box-wide {
+        gap: 8px;
+    }
+
+    .dd-chat-input-box-wide input {
+        min-width: 0;
+        margin-right: 0;
+    }
+
+    .dd-chat-input-box-wide button {
+        padding: 0 16px;
+    }
+
+    #dd-screener-content [style*="display: flex"][style*="gap: 15px"] {
+        flex-wrap: wrap;
+    }
+
+    #screener-input {
+        flex-basis: 100%;
+        width: 100%;
+    }
+
+    .prompt-chips-container,
+    .suggested-tags,
+    .sector-explorer {
+        align-items: stretch;
+    }
+
+    .prompt-chip {
+        width: 100%;
+    }
+
+    .chart-popup-overlay {
+        padding: 8px;
+    }
+
+    .chart-popup-content {
+        width: 100%;
+        height: calc(100dvh - 16px);
+        padding: 12px;
+    }
+}
+
+@media (max-width: 520px) {
+    .navbar {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .navbar-links {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .dd-chat-input-box-wide {
+        flex-direction: column;
+    }
+
+    .dd-chat-input-box-wide button {
+        min-height: 44px;
+    }
+
+    .info-section,
+    .ai-box-section,
+    .compare,
+    #compare {
+        width: calc(100vw - 16px);
+        padding: 16px;
+    }
 }

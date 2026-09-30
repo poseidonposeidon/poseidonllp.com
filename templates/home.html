@@ -5,24 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" type="text/css" href="/static/css/main.css">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
-    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@2.0.1/dist/chartjs-plugin-zoom.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns@3.0.0/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
 
     <!-- 3. ✨ 新增：引入 K 線圖插件 -->
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial/dist/chartjs-chart-financial.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chartjs-chart-financial/dist/chartjs-chart-financial.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation/dist/chartjs-plugin-annotation.min.js"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pizzip@3.2.2/dist/pizzip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/docxtemplater@3.25.4/build/docxtemplater.min.js"></script>
-    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/pizzip@3.2.2/dist/pizzip.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/docxtemplater@3.25.4/build/docxtemplater.min.js"></script>
+    <script defer src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <!--    <script src="stockData.js"></script>-->
     <title>Poseidon Capital</title>
 </head>
@@ -754,7 +752,7 @@
                 </div>
 
                 <!-- ✨ 新增：華爾街進階數據卡片模組 (Premium Widgets) -->
-                <div id="dd-premium-widgets" style="display: none; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
+                <div id="dd-premium-widgets" class="dd-premium-widgets" style="display: none; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px;">
 
                     <!-- 卡片 1：估值與華爾街共識 -->
                     <div style="background: #1a1a1a; border-radius: 8px; padding: 15px; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">
@@ -976,7 +974,7 @@
     <div id="dd-sentiment-content" style="display: none; padding-top: 10px; width: 100%;">
 
         <!-- ✅ 內層 (全新新增)：絕對領域！專門負責 Grid 左右 50% 排版，不被 JS 觸碰 -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; align-items: start; box-sizing: border-box;">
+        <div class="sentiment-reports-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; width: 100%; align-items: start; box-sizing: border-box;">
 
             <!-- ========================================== -->
             <!-- 🇺🇸 左側：美股市場情緒日報 (包含進階圖表) -->
@@ -1332,7 +1330,7 @@
     </div>
 </div>
 
-<script src="/static/js/main.js"></script>
+<script defer src="/static/js/main.js"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
