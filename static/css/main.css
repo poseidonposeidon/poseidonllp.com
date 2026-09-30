@@ -3027,8 +3027,9 @@ img, svg, video, canvas {
     --market-text: #e7edf5;
     --market-accent: #39a9ff;
     --market-gold: #f2c14e;
-    width: min(1440px, calc(100vw - 48px));
-    height: min(90dvh, 980px);
+    --workspace-gutter: clamp(14px, 1.6vw, 28px);
+    width: min(1800px, calc(100vw - 24px));
+    height: min(94dvh, 1080px);
     max-width: none;
     max-height: none;
     padding: 0;
@@ -3110,7 +3111,7 @@ body:has(#info-section.active) .overlay.active {
 #info-section .market-search-panel,
 #info-section .market-report-nav,
 #info-section .market-report-output {
-    margin: 22px 28px 0;
+    margin: 20px var(--workspace-gutter) 0;
     padding: 22px;
     background: rgba(17, 26, 36, 0.86);
     border: 1px solid var(--market-border);
@@ -3218,7 +3219,7 @@ body:has(#info-section.active) .overlay.active {
     display: grid;
     grid-template-columns: minmax(0, 1.25fr) minmax(340px, .75fr);
     gap: 16px;
-    margin: 16px 28px 0;
+    margin: 16px var(--workspace-gutter) 0;
 }
 
 #info-section #companyProfileContainer,
@@ -3646,8 +3647,9 @@ body.light-mode #info-section .market-report-output input { color: #172033; back
     --market-muted: #8ea0b5;
     --market-text: #e7edf5;
     --market-accent: #39a9ff;
-    width: min(1440px, calc(100vw - 48px)) !important;
-    height: min(90dvh, 980px) !important;
+    --workspace-gutter: clamp(14px, 1.6vw, 28px);
+    width: min(1800px, calc(100vw - 24px)) !important;
+    height: min(94dvh, 1080px) !important;
     max-width: none !important;
     max-height: none !important;
     padding: 0 !important;
@@ -3659,6 +3661,19 @@ body.light-mode #info-section .market-report-output input { color: #172033; back
     box-shadow: 0 30px 90px rgba(0, 0, 0, .72), 0 0 0 1px rgba(255, 255, 255, .025) inset !important;
     scrollbar-gutter: stable;
     z-index: 10000;
+}
+
+/* Apply the wider shell immediately, including while deferred scripts are still loading. */
+#jp-info-section,
+#tw-info-section,
+#eu-info-section,
+#kr-info-section,
+#hk-info-section,
+#cn-info-section {
+    width: min(1800px, calc(100vw - 24px));
+    height: min(94dvh, 1080px);
+    max-width: none;
+    max-height: none;
 }
 
 body:has(.global-stock-workspace.active) .overlay.active {
@@ -3700,7 +3715,7 @@ body:has(.global-stock-workspace.active) .overlay.active {
 .global-stock-workspace .market-search-panel,
 .global-stock-workspace .market-report-nav,
 .global-stock-workspace .market-report-output {
-    margin: 22px 28px 0;
+    margin: 20px var(--workspace-gutter) 0;
     padding: 22px;
     background: rgba(17,26,36,.86);
     border: 1px solid var(--market-border);
@@ -3730,7 +3745,7 @@ body:has(.global-stock-workspace.active) .overlay.active {
 }
 .global-stock-workspace .market-query-status { margin: 12px 2px 0; color: var(--market-muted); text-align: left; font-size: 13px; }
 
-.global-stock-workspace .market-summary-grid { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(340px,.75fr); gap: 16px; margin: 16px 28px 0; }
+.global-stock-workspace .market-summary-grid { display: grid; grid-template-columns: minmax(0,1.25fr) minmax(340px,.75fr); gap: 16px; margin: 16px var(--workspace-gutter) 0; }
 .global-stock-workspace .market-summary-card {
     min-width: 0; min-height: 150px; margin: 0 !important; padding: 22px !important;
     color: var(--market-text); background: linear-gradient(145deg,rgba(22,33,45,.96),rgba(14,23,32,.96)) !important;
@@ -3894,4 +3909,187 @@ body.light-mode .stock-market-workspace .transcript-action { color: #334155 !imp
     .stock-market-workspace .transcript-speaker { display: block; margin-bottom: 5px; }
     .stock-market-workspace .transcript-toolbar { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); }
     .stock-market-workspace .transcript-action { width: 100%; }
+}
+
+/* =========================================================
+   Wide research workspace and dense financial-data layout
+   ========================================================= */
+.stock-market-workspace .market-report-output {
+    overflow: hidden;
+    padding: clamp(16px, 1.35vw, 24px);
+}
+
+.stock-market-workspace .market-report-output .content {
+    width: 100%;
+    max-width: 100%;
+}
+
+.stock-market-workspace .market-report-output .content > label {
+    margin-right: 6px;
+}
+
+.stock-market-workspace .market-report-output .content > input,
+.stock-market-workspace .market-report-output .content > select,
+.stock-market-workspace .market-report-output .content > button {
+    vertical-align: middle;
+}
+
+.stock-market-workspace .financial-report-section {
+    width: 100%;
+    max-width: none;
+    margin: 14px 0 0;
+    padding: 0;
+    gap: 18px;
+}
+
+.stock-market-workspace .chart-panel {
+    width: 100%;
+    min-width: 0;
+    padding: clamp(14px, 1.3vw, 22px);
+    overflow: hidden;
+    background: rgba(10, 18, 27, .62);
+    border-color: rgba(148, 163, 184, .16);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .18);
+}
+
+.stock-market-workspace .chart-panel:hover {
+    transform: none;
+    border-color: rgba(57, 169, 255, .28);
+    box-shadow: 0 10px 28px rgba(0, 0, 0, .24);
+}
+
+.stock-market-workspace .table-scroll-wrapper,
+.stock-market-workspace .scroll-container-x,
+.stock-market-workspace [id*="StatementContainer"],
+.stock-market-workspace [id*="CalendarContainer"],
+.stock-market-workspace [id*="TradesContainer"] {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-gutter: stable;
+}
+
+.stock-market-workspace .table-scroll-wrapper {
+    border: 1px solid rgba(148, 163, 184, .14);
+    border-radius: 11px;
+}
+
+.stock-market-workspace .financial-table {
+    width: max-content;
+    min-width: 100%;
+    margin: 0;
+    border: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.stock-market-workspace .market-report-output table:not(.financial-table) {
+    min-width: 820px;
+    font-variant-numeric: tabular-nums;
+}
+
+.stock-market-workspace .financial-table th,
+.stock-market-workspace .financial-table td {
+    min-width: 112px;
+    padding: 11px 14px;
+    line-height: 1.35;
+}
+
+.stock-market-workspace .financial-table th:first-child {
+    left: 0;
+    z-index: 4;
+    min-width: clamp(180px, 15vw, 260px);
+    max-width: 300px;
+    white-space: normal;
+    background: #172431;
+    box-shadow: 8px 0 16px rgba(2, 8, 14, .18);
+}
+
+.stock-market-workspace .financial-table tr:nth-child(even) td {
+    background: rgba(255, 255, 255, .018);
+}
+
+.stock-market-workspace .financial-table tr:hover td {
+    background: rgba(57, 169, 255, .07);
+}
+
+.stock-market-workspace .panel-header {
+    gap: 16px;
+    margin-bottom: 14px;
+}
+
+.stock-market-workspace .panel-header h2 {
+    min-width: 0;
+    font-size: clamp(16px, 1.2vw, 20px);
+}
+
+.stock-market-workspace .panel-header button,
+.stock-market-workspace .report-header button {
+    flex: 0 0 auto;
+    margin: 0;
+}
+
+.stock-market-workspace .chart-panel canvas {
+    width: 100% !important;
+    min-height: 300px;
+}
+
+body.light-mode .stock-market-workspace .chart-panel {
+    background: #f8fafc;
+}
+
+body.light-mode .stock-market-workspace .financial-table th:first-child {
+    background: #eef3f8;
+    box-shadow: 8px 0 16px rgba(51, 65, 85, .08);
+}
+
+@media (min-width: 1500px) {
+    #info-section .market-summary-grid,
+    .global-stock-workspace .market-summary-grid {
+        grid-template-columns: minmax(0, 1.45fr) minmax(420px, .55fr);
+    }
+
+    #info-section .market-report-link,
+    .global-stock-workspace .market-report-link {
+        min-height: 70px;
+        padding-inline: 16px;
+    }
+}
+
+@media (max-width: 700px) {
+    .stock-market-workspace .market-report-output {
+        overflow: hidden;
+    }
+
+    .stock-market-workspace .market-report-output .content > label {
+        display: block;
+        margin: 0 0 6px;
+    }
+
+    .stock-market-workspace .market-report-output .content > input,
+    .stock-market-workspace .market-report-output .content > select,
+    .stock-market-workspace .market-report-output .content > button {
+        width: 100%;
+        margin: 0 0 10px;
+    }
+
+    .stock-market-workspace .financial-table th,
+    .stock-market-workspace .financial-table td {
+        min-width: 104px;
+        padding: 10px 12px;
+    }
+
+    .stock-market-workspace .financial-table th:first-child {
+        min-width: 154px;
+        max-width: 190px;
+    }
+
+    .stock-market-workspace .panel-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .stock-market-workspace .chart-panel canvas {
+        min-height: 240px;
+    }
 }
