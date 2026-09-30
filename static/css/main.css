@@ -3761,7 +3761,7 @@ body:has(.global-stock-workspace.active) .overlay.active {
 
 .global-stock-workspace .market-section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 16px; }
 .global-stock-workspace .market-section-heading h3 { font-size: 20px; }
-.global-stock-workspace .info-content { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: 10px; margin: 0; }
+.global-stock-workspace .info-content { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 10px; margin: 0; }
 .global-stock-workspace .market-report-link {
     display: flex; align-items: center; gap: 11px; min-width: 0; min-height: 74px; padding: 13px;
     color: #e4ebf3; background: rgba(255,255,255,.035); border: 1px solid rgba(148,163,184,.13);
@@ -4092,4 +4092,290 @@ body.light-mode .stock-market-workspace .financial-table th:first-child {
     .stock-market-workspace .chart-panel canvas {
         min-height: 240px;
     }
+}
+
+/* =========================================================
+   Minimal company calendar: earnings, calls and dividends
+   ========================================================= */
+.stock-market-workspace .market-calendar-section > h2 {
+    display: none;
+}
+
+.stock-market-workspace .market-calendar-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    padding-bottom: 18px;
+    border-bottom: 1px solid var(--market-border);
+}
+
+.stock-market-workspace .market-calendar-heading h2 {
+    margin: 4px 0 3px;
+    padding: 0;
+    color: #f5f8fb;
+    border: 0;
+    font-size: 22px;
+}
+
+.stock-market-workspace .market-calendar-heading p {
+    margin: 0;
+    color: var(--market-muted);
+    font-size: 13px;
+}
+
+.stock-market-workspace .market-calendar-tabs {
+    display: inline-flex;
+    gap: 4px;
+    padding: 4px;
+    background: rgba(4, 10, 16, .45);
+    border: 1px solid rgba(148, 163, 184, .14);
+    border-radius: 10px;
+}
+
+.stock-market-workspace .market-calendar-tab {
+    min-height: 34px;
+    margin: 0;
+    padding: 7px 13px;
+    color: var(--market-muted);
+    background: transparent;
+    border: 0;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 750;
+    box-shadow: none;
+}
+
+.stock-market-workspace .market-calendar-tab:hover,
+.stock-market-workspace .market-calendar-tab.active {
+    color: #eaf5ff;
+    background: rgba(57, 169, 255, .14);
+}
+
+.stock-market-workspace .market-calendar-controls {
+    display: grid;
+    grid-template-columns: minmax(160px, 210px) minmax(160px, 210px) auto;
+    align-items: end;
+    gap: 10px;
+    margin: 16px 0;
+}
+
+.stock-market-workspace .market-calendar-controls label {
+    display: grid;
+    gap: 6px;
+    margin: 0;
+}
+
+.stock-market-workspace .market-calendar-controls label span {
+    color: var(--market-muted);
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.stock-market-workspace .market-calendar-controls input,
+.stock-market-workspace .market-calendar-refresh {
+    width: 100%;
+    min-height: 40px;
+    margin: 0;
+}
+
+.stock-market-workspace .market-calendar-refresh {
+    width: auto;
+    min-width: 110px;
+    padding-inline: 16px;
+}
+
+.stock-market-workspace .market-calendar-results {
+    min-height: 150px;
+}
+
+.stock-market-workspace .market-calendar-list {
+    overflow: hidden;
+    border: 1px solid rgba(148, 163, 184, .14);
+    border-radius: 12px;
+}
+
+.stock-market-workspace .market-calendar-row {
+    display: grid;
+    grid-template-columns: minmax(150px, .7fr) 76px minmax(220px, 1.45fr) minmax(300px, 1fr);
+    align-items: center;
+    gap: 16px;
+    min-height: 78px;
+    padding: 14px 16px;
+    background: rgba(7, 14, 22, .34);
+    border-bottom: 1px solid rgba(148, 163, 184, .1);
+}
+
+.stock-market-workspace .market-calendar-row:last-child {
+    border-bottom: 0;
+}
+
+.stock-market-workspace .market-calendar-row:hover {
+    background: rgba(57, 169, 255, .045);
+}
+
+.stock-market-workspace .market-calendar-row time {
+    color: #c7d3df;
+    font-size: 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.stock-market-workspace .market-event-badge {
+    display: inline-flex;
+    justify-content: center;
+    width: fit-content;
+    min-width: 60px;
+    padding: 5px 8px;
+    border-radius: 999px;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.stock-market-workspace .market-event-badge.earnings { color: #7dd3fc; background: rgba(14, 165, 233, .12); }
+.stock-market-workspace .market-event-badge.call { color: #c4b5fd; background: rgba(139, 92, 246, .13); }
+.stock-market-workspace .market-event-badge.dividend { color: #86efac; background: rgba(34, 197, 94, .12); }
+
+.stock-market-workspace .market-calendar-main {
+    min-width: 0;
+}
+
+.stock-market-workspace .market-calendar-main strong,
+.stock-market-workspace .market-calendar-main small {
+    display: block;
+}
+
+.stock-market-workspace .market-calendar-main strong {
+    overflow: hidden;
+    color: #e5edf5;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stock-market-workspace .market-calendar-main small {
+    margin-top: 5px;
+    color: var(--market-muted);
+    font-size: 11px;
+}
+
+.stock-market-workspace .market-calendar-metrics {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin: 0;
+}
+
+.stock-market-workspace .market-calendar-metrics div {
+    min-width: 0;
+    padding: 8px 10px;
+    background: rgba(255, 255, 255, .03);
+    border-radius: 8px;
+}
+
+.stock-market-workspace .market-calendar-metrics dt {
+    overflow: hidden;
+    color: var(--market-muted);
+    font-size: 9px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stock-market-workspace .market-calendar-metrics dd {
+    margin: 4px 0 0;
+    overflow: hidden;
+    color: #dce6ef;
+    font-size: 12px;
+    font-weight: 750;
+    font-variant-numeric: tabular-nums;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stock-market-workspace .market-calendar-period {
+    justify-self: end;
+    padding: 7px 10px;
+    color: #c4b5fd;
+    background: rgba(139, 92, 246, .1);
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 800;
+}
+
+.stock-market-workspace .market-calendar-loading,
+.stock-market-workspace .market-calendar-empty {
+    display: flex;
+    min-height: 150px;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    color: var(--market-muted);
+    text-align: center;
+}
+
+.stock-market-workspace .market-calendar-loading span {
+    width: 22px;
+    height: 22px;
+    border: 2px solid rgba(57, 169, 255, .18);
+    border-top-color: var(--market-accent);
+    border-radius: 50%;
+    animation: market-calendar-spin .8s linear infinite;
+}
+
+.stock-market-workspace .market-calendar-loading p,
+.stock-market-workspace .market-calendar-empty p {
+    max-width: 520px;
+    margin: 9px 0 0;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.stock-market-workspace .market-calendar-empty > span {
+    color: #557087;
+    font-size: 25px;
+}
+
+.stock-market-workspace .market-calendar-empty strong {
+    margin-top: 8px;
+    color: #cbd7e3;
+}
+
+@keyframes market-calendar-spin { to { transform: rotate(360deg); } }
+
+body.light-mode .stock-market-workspace .market-calendar-tabs,
+body.light-mode .stock-market-workspace .market-calendar-row { background: #f7fafc; }
+body.light-mode .stock-market-workspace .market-calendar-heading h2,
+body.light-mode .stock-market-workspace .market-calendar-main strong { color: #1e293b; }
+body.light-mode .stock-market-workspace .market-calendar-row time,
+body.light-mode .stock-market-workspace .market-calendar-metrics dd { color: #334155; }
+
+@media (max-width: 980px) {
+    .stock-market-workspace .market-calendar-row {
+        grid-template-columns: 140px 70px minmax(180px, 1fr);
+    }
+    .stock-market-workspace .market-calendar-metrics,
+    .stock-market-workspace .market-calendar-period {
+        grid-column: 1 / -1;
+        justify-self: stretch;
+    }
+}
+
+@media (max-width: 700px) {
+    .stock-market-workspace .market-calendar-heading {
+        align-items: stretch;
+        flex-direction: column;
+    }
+    .stock-market-workspace .market-calendar-tabs { width: 100%; }
+    .stock-market-workspace .market-calendar-tab { flex: 1; }
+    .stock-market-workspace .market-calendar-controls { grid-template-columns: 1fr 1fr; }
+    .stock-market-workspace .market-calendar-refresh { grid-column: 1 / -1; width: 100%; }
+    .stock-market-workspace .market-calendar-row {
+        grid-template-columns: 1fr auto;
+        gap: 10px;
+    }
+    .stock-market-workspace .market-calendar-row time { grid-column: 1; }
+    .stock-market-workspace .market-event-badge { grid-column: 2; grid-row: 1; }
+    .stock-market-workspace .market-calendar-main,
+    .stock-market-workspace .market-calendar-metrics,
+    .stock-market-workspace .market-calendar-period { grid-column: 1 / -1; }
 }

@@ -609,18 +609,7 @@ function loadSection(sectionId) {
                     </div>
                 </div>
             </div>`,
-        'earnings-call-calendar': `
-            <div class="section" id="earnings-call-calendar">
-                <h2>Earnings Call Calendar</h2>
-                <div class="content">
-                    <input type="date" id="fromDate" placeholder="From Date">
-                    <input type="date" id="toDate" placeholder="To Date">
-                    <button onclick="fetchEarningsCallCalendar()">Load Calendar</button>
-                    
-                       <div id="earningsCallCalendarContainer"></div>
-                    
-                </div>
-            </div>`,
+        'earnings-call-calendar': marketCalendarPanelMarkup('US', 'events'),
         'historical-earnings': `
             <div class="section" id="historical-earnings">
                 <h2>Historical and Future Earnings</h2>
@@ -633,18 +622,7 @@ function loadSection(sectionId) {
                     </div>
                 </div>
             </div>`,
-        'dividend-calendar': `
-            <div class="section" id="dividend-calendar">
-                <h2>Dividend Calendar</h2>
-                <div class="content">
-                    <input type="date" id="fromDate_2" placeholder="From Date">
-                    <input type="date" id="toDate_2" placeholder="To Date">
-                    <button onclick="fetch_stock_dividend_calendar()">Load Calendar</button>
-                    <div id="stockDividendCalendarContainer">
-                        <!-- Data table will be displayed here -->
-                    </div>
-                </div>
-            </div>`,
+        'dividend-calendar': marketCalendarPanelMarkup('US', 'dividends'),
         'insider-trades': `
             <div class="section" id="insider-trades">
                 <h2>Insider Trades</h2>
@@ -730,7 +708,8 @@ function regionalWorkspaceMarkup(region, config) {
         ['balance-sheet', '▥', '資產負債表', 'Balance Sheet'],
         ['cashflow-statement', '⌁', '現金流量表', 'Cash Flow'],
         ['earnings-call-transcript', '◉', '法說會逐字稿', 'Earnings Transcript'],
-        ['earnings-call-calendar', '▦', '財報行事曆', 'Earnings Calendar']
+        ['earnings-call-calendar', '▦', '財報與法說會', 'Earnings & Calls'],
+        ['dividend-calendar', '◆', '股利行事曆', 'Dividend Calendar']
     ].map(([id, icon, title, english]) => `
         <a class="market-report-link" href="#" data-report="${id}" onclick="loadRegionalSection(event, '${region}', '${id}')">
             <span>${icon}</span><div><strong>${title}</strong><small>${english}</small></div><b>→</b>
@@ -800,6 +779,12 @@ function loadRegionalSection(event, region, sectionId) {
     const loader = config && window[config.loadSection];
     if (typeof loader !== 'function') return;
     loader(sectionId);
+    if (sectionId === 'earnings-call-calendar' || sectionId === 'dividend-calendar') {
+        const report = document.getElementById(config.report);
+        if (report) report.innerHTML = marketCalendarPanelMarkup(
+            region, sectionId === 'dividend-calendar' ? 'dividends' : 'events'
+        );
+    }
     document.querySelectorAll(`#${config.section} .market-report-link`).forEach(link => {
         link.classList.toggle('active', link.dataset.report === sectionId);
     });
@@ -815,6 +800,10 @@ function autoLoadRegionalReport(region, sectionId) {
         const report = config && document.getElementById(config.report);
         const content = report?.querySelector('.content');
         if (content) content.insertAdjacentHTML('afterbegin', '<div class="market-inline-notice">請先在上方搜尋並選擇股票，再查看研究報表。</div>');
+        return;
+    }
+    if (sectionId === 'earnings-call-calendar' || sectionId === 'dividend-calendar') {
+        loadCompanyCalendar(region, sectionId === 'dividend-calendar' ? 'dividends' : 'events');
         return;
     }
     const prefix = region;
@@ -8467,6 +8456,191 @@ function display_stock_dividend_calendar(data, container) {
 
     container.innerHTML = tableHtml;
 }
+
+// Unified, company-specific calendar used by every regional stock workspace.
+const companyCalendarState = new Map();
+
+function marketCalendarPanelMarkup(region = 'US', initialView = 'events') {
+    const suffix = region === 'US' ? '' : region;
+    const eventsActive = initialView === 'events' ? ' active' : '';
+    const dividendsActive = initialView === 'dividends' ? ' active' : '';
+    return `
+        <div class="section market-calendar-section" data-region="${region}" data-calendar-view="${initialView}">
+            <div class="market-calendar-heading">
+                <div><span class="market-eyebrow">COMPANY EVENTS</span><h2>公司行事曆</h2><p>財報公布、法說會與股利事件集中檢視</p></div>
+                <div class="market-calendar-tabs" role="tablist" aria-label="行事曆類型">
+                    <button class="market-calendar-tab${eventsActive}" type="button" onclick="switchCompanyCalendarView('${region}', 'events')">財報與法說會</button>
+                    <button class="market-calendar-tab${dividendsActive}" type="button" onclick="switchCompanyCalendarView('${region}', 'dividends')">股利</button>
+                </div>
+            </div>
+            <div class="market-calendar-controls">
+                <label><span>起始日期</span><input type="date" id="marketCalendarFrom${suffix}"></label>
+                <label><span>結束日期</span><input type="date" id="marketCalendarTo${suffix}"></label>
+                <button class="market-calendar-refresh" type="button" onclick="loadCompanyCalendar('${region}')">更新行事曆</button>
+            </div>
+            <div id="marketCalendarContainer${suffix}" class="market-calendar-results" aria-live="polite"></div>
+        </div>`;
+}
+
+function marketCalendarConfig(region = 'US') {
+    if (region === 'US') {
+        return { input: 'stockSymbol', output: 'outputSymbol', suffix: '', market: 'US' };
+    }
+    const config = REGIONAL_MARKET_WORKSPACES[region];
+    return config ? { input: config.input, output: config.output, suffix: region, market: region } : null;
+}
+
+function marketCalendarSymbol(region = 'US') {
+    const config = marketCalendarConfig(region);
+    if (!config) return '';
+    const output = document.getElementById(config.output);
+    const selected = output?.dataset?.lastSymbol?.trim().toUpperCase();
+    if (selected) return selected;
+    const raw = document.getElementById(config.input)?.value?.trim().toUpperCase() || '';
+    if (!raw) return '';
+    if (region === 'JP') return raw.endsWith('.T') ? raw : `${raw}.T`;
+    if (region === 'KR') return /\.(KS|KQ)$/.test(raw) ? raw : `${raw}.KS`;
+    if (region === 'HK') return raw.endsWith('.HK') ? raw : `${raw.replace(/^0+(?=\d{4}$)/, '')}.HK`;
+    if (region === 'CN') return /\.(SS|SZ)$/.test(raw) ? raw : `${raw}.${raw.startsWith('6') ? 'SS' : 'SZ'}`;
+    return raw;
+}
+
+function marketCalendarEscape(value) {
+    return String(value ?? '').replace(/[&<>'"]/g, char => ({
+        '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+    })[char]);
+}
+
+function marketCalendarDate(value) {
+    if (!value) return '日期未提供';
+    const date = new Date(`${String(value).slice(0, 10)}T00:00:00`);
+    if (Number.isNaN(date.getTime())) return marketCalendarEscape(value);
+    return new Intl.DateTimeFormat('zh-TW', { year: 'numeric', month: 'short', day: 'numeric', weekday: 'short' }).format(date);
+}
+
+function marketCalendarNumber(value, options = {}) {
+    if (value === null || value === undefined || value === '') return '—';
+    const number = Number(value);
+    if (!Number.isFinite(number)) return marketCalendarEscape(value);
+    return new Intl.NumberFormat('en-US', options).format(number);
+}
+
+function ensureMarketCalendarDates(region = 'US') {
+    const config = marketCalendarConfig(region);
+    if (!config) return null;
+    const fromInput = document.getElementById(`marketCalendarFrom${config.suffix}`);
+    const toInput = document.getElementById(`marketCalendarTo${config.suffix}`);
+    if (!fromInput || !toInput) return null;
+    const today = new Date();
+    const from = new Date(today);
+    const to = new Date(today);
+    from.setMonth(from.getMonth() - 15);
+    to.setMonth(to.getMonth() + 9);
+    const iso = date => date.toISOString().slice(0, 10);
+    if (!fromInput.value) fromInput.value = iso(from);
+    if (!toInput.value) toInput.value = iso(to);
+    return { from: fromInput.value, to: toInput.value };
+}
+
+function companyCalendarEmpty(title, detail) {
+    return `<div class="market-calendar-empty"><span>○</span><strong>${marketCalendarEscape(title)}</strong><p>${marketCalendarEscape(detail)}</p></div>`;
+}
+
+function renderCompanyCalendar(region = 'US') {
+    const config = marketCalendarConfig(region);
+    const state = companyCalendarState.get(region);
+    const section = document.querySelector(`.market-calendar-section[data-region="${region}"]`);
+    const container = document.getElementById(`marketCalendarContainer${config?.suffix || ''}`);
+    if (!state || !section || !container) return;
+    const view = section.dataset.calendarView || 'events';
+    section.querySelectorAll('.market-calendar-tab').forEach((button, index) => {
+        button.classList.toggle('active', (view === 'events' && index === 0) || (view === 'dividends' && index === 1));
+    });
+
+    if (view === 'dividends') {
+        const dividends = Array.isArray(state.dividends) ? state.dividends : [];
+        if (!dividends.length) {
+            container.innerHTML = companyCalendarEmpty('此期間沒有股利事件', '部分海外公司不提供完整股利日期，可調整日期範圍後再查詢。');
+            return;
+        }
+        container.innerHTML = `<div class="market-calendar-list">${dividends.map(item => `
+            <article class="market-calendar-row">
+                <time>${marketCalendarDate(item.date)}</time>
+                <span class="market-event-badge dividend">股利</span>
+                <div class="market-calendar-main"><strong>${marketCalendarEscape(item.label || `${item.symbol} 股利`)}</strong><small>除息日 · ${marketCalendarEscape(item.date || '—')}</small></div>
+                <dl class="market-calendar-metrics">
+                    <div><dt>每股股利</dt><dd>${marketCalendarNumber(item.adjDividend ?? item.dividend, { maximumFractionDigits: 6 })}</dd></div>
+                    <div><dt>公告日</dt><dd>${marketCalendarEscape(item.declarationDate || '—')}</dd></div>
+                    <div><dt>發放日</dt><dd>${marketCalendarEscape(item.paymentDate || '—')}</dd></div>
+                </dl>
+            </article>`).join('')}</div>`;
+        return;
+    }
+
+    const events = [
+        ...(Array.isArray(state.earnings) ? state.earnings.map(item => ({ ...item, eventType: 'earnings' })) : []),
+        ...(Array.isArray(state.calls) ? state.calls.map(item => ({ ...item, eventType: 'call' })) : [])
+    ].sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')));
+    if (!events.length) {
+        container.innerHTML = companyCalendarEmpty('此期間沒有財報或法說會資料', 'FMP 對部分海外股票沒有完整事件覆蓋，可拉長日期範圍查看歷史資料。');
+        return;
+    }
+    container.innerHTML = `<div class="market-calendar-list">${events.map(item => {
+        const isCall = item.eventType === 'call';
+        const period = item.year && item.quarter ? `${item.year} Q${item.quarter}` : (item.fiscalDateEnding || '季度未提供');
+        return `<article class="market-calendar-row">
+            <time>${marketCalendarDate(item.date)}</time>
+            <span class="market-event-badge ${isCall ? 'call' : 'earnings'}">${isCall ? '法說會' : '財報'}</span>
+            <div class="market-calendar-main"><strong>${isCall ? `${marketCalendarEscape(period)} 法說會` : `${marketCalendarEscape(item.symbol)} ${item.eventBasis === 'filing' ? '財報申報' : '財報公布'}`}</strong><small>${isCall ? 'Earnings call transcript period' : item.eventBasis === 'filing' ? `實際申報日期 · 財務季度 ${marketCalendarEscape(item.fiscalDateEnding || '—')}` : `${marketCalendarEscape(item.time || '時間未定')} · 財務數字公布`}</small></div>
+            ${isCall ? `<div class="market-calendar-period">${marketCalendarEscape(period)}</div>` : `<dl class="market-calendar-metrics"><div><dt>EPS</dt><dd>${marketCalendarNumber(item.epsActual, { maximumFractionDigits: 4 })}</dd></div><div><dt>預估 EPS</dt><dd>${marketCalendarNumber(item.epsEstimated, { maximumFractionDigits: 4 })}</dd></div><div><dt>營收</dt><dd>${marketCalendarNumber(item.revenueActual, { notation: 'compact', maximumFractionDigits: 2 })}</dd></div></dl>`}
+        </article>`;
+    }).join('')}</div>`;
+}
+
+function switchCompanyCalendarView(region, view) {
+    const section = document.querySelector(`.market-calendar-section[data-region="${region}"]`);
+    if (!section) return;
+    section.dataset.calendarView = view;
+    if (companyCalendarState.has(region)) renderCompanyCalendar(region);
+    else loadCompanyCalendar(region, view);
+}
+
+async function loadCompanyCalendar(region = 'US', preferredView = null) {
+    const config = marketCalendarConfig(region);
+    const section = document.querySelector(`.market-calendar-section[data-region="${region}"]`);
+    const container = document.getElementById(`marketCalendarContainer${config?.suffix || ''}`);
+    if (!config || !section || !container) return;
+    if (preferredView) section.dataset.calendarView = preferredView;
+    const symbol = marketCalendarSymbol(region);
+    if (!symbol) {
+        container.innerHTML = companyCalendarEmpty('請先選擇股票', '在上方輸入股票代碼並完成查詢後，行事曆會自動載入。');
+        return;
+    }
+    const range = ensureMarketCalendarDates(region);
+    if (!range) return;
+    container.innerHTML = '<div class="market-calendar-loading"><span></span><p>正在整理公司事件…</p></div>';
+    const params = new URLSearchParams({ symbol, from: range.from, to: range.to, market: config.market });
+    try {
+        const response = await fetch(`${BASE_URL}company-calendar?${params.toString()}`);
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || data.error) throw new Error(data.error || `HTTP ${response.status}`);
+        companyCalendarState.set(region, data);
+        renderCompanyCalendar(region);
+    } catch (error) {
+        console.error('Company calendar load failed:', error);
+        container.innerHTML = `<div class="market-inline-notice market-inline-warning"><strong>行事曆暫時無法載入</strong><small>${marketCalendarEscape(error.message)}</small></div>`;
+    }
+}
+
+// Keep existing inline handlers working while routing all countries through one implementation.
+async function fetchEarningsCallCalendar() { return loadCompanyCalendar('US', 'events'); }
+async function fetch_stock_dividend_calendar() { return loadCompanyCalendar('US', 'dividends'); }
+async function fetchJPEarningsCallCalendar() { return loadCompanyCalendar('JP', 'events'); }
+async function fetchTWEarningsCallCalendar() { return loadCompanyCalendar('TW', 'events'); }
+async function fetchEUEarningsCallCalendar() { return loadCompanyCalendar('EU', 'events'); }
+async function fetchKREarningsCallCalendar() { return loadCompanyCalendar('KR', 'events'); }
+async function fetchHKEarningsCallCalendar() { return loadCompanyCalendar('HK', 'events'); }
+async function fetchCNEarningsCallCalendar() { return loadCompanyCalendar('CN', 'events'); }
 
 function fetchData(apiUrl, callback, containerId) {
     const container = document.getElementById(containerId);
