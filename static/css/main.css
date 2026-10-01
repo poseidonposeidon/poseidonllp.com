@@ -4260,6 +4260,359 @@ body.light-mode .stock-market-workspace .financial-snapshot {
 }
 
 /* =========================================================
+   Minimal AI research workspace
+   ========================================================= */
+#main-deep-dive-container .dd-header {
+    flex: 0 0 auto;
+    display: grid;
+    grid-template-columns: minmax(260px, .8fr) minmax(440px, 1.2fr);
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    align-items: end;
+    gap: 24px 32px;
+    margin: 0 0 18px;
+    padding: clamp(22px, 2.2vw, 34px);
+    position: relative;
+    z-index: 10;
+    box-sizing: border-box;
+    color: #eef5fb;
+    background: linear-gradient(145deg, rgba(15, 22, 30, .98), rgba(11, 16, 23, .98));
+    border: 1px solid rgba(148, 163, 184, .16);
+    border-radius: 16px;
+    box-shadow: 0 18px 46px rgba(0, 0, 0, .2);
+}
+
+.dd-header-intro,
+.dd-primary-action {
+    min-width: 0;
+}
+
+.dd-eyebrow {
+    display: block;
+    color: #56b9f8;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: .16em;
+}
+
+.dd-title-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 7px;
+}
+
+#main-deep-dive-container .dd-title-row h2 {
+    margin: 0;
+    color: #f7fafc;
+    font-size: clamp(24px, 2.2vw, 34px);
+    line-height: 1.15;
+    letter-spacing: -.035em;
+}
+
+.dd-pro-badge {
+    padding: 3px 7px;
+    color: #8acdf8;
+    background: rgba(56, 189, 248, .09);
+    border: 1px solid rgba(56, 189, 248, .24);
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .08em;
+}
+
+.dd-header-intro > p {
+    max-width: 520px;
+    margin: 10px 0 0;
+    color: #91a1b1;
+    font-size: 13px;
+    line-height: 1.65;
+}
+
+.dd-primary-action {
+    display: grid;
+    gap: 7px;
+}
+
+.dd-primary-action > label,
+.dd-tool-group-label {
+    color: #93a4b5;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: .08em;
+}
+
+.dd-search-row {
+    display: grid;
+    grid-template-columns: minmax(220px, 1fr) auto;
+    gap: 9px;
+}
+
+#main-deep-dive-container .dd-search-box {
+    width: 100%;
+    min-width: 0;
+    position: relative;
+}
+
+.dd-search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    z-index: 2;
+    color: #73879a;
+    font-size: 18px;
+    transform: translateY(-50%);
+    pointer-events: none;
+}
+
+#main-deep-dive-container .dd-search-input {
+    width: 100%;
+    height: 48px;
+    box-sizing: border-box;
+    padding: 0 16px 0 42px;
+    color: #edf5fc;
+    background: rgba(5, 11, 17, .74);
+    border: 1px solid rgba(148, 163, 184, .22);
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+    transition: border-color .18s ease, box-shadow .18s ease, background .18s ease;
+}
+
+#main-deep-dive-container .dd-search-input::placeholder { color: #667789; }
+#main-deep-dive-container .dd-search-input:focus {
+    background: #09121b;
+    border-color: #39a9ff;
+    box-shadow: 0 0 0 3px rgba(57, 169, 255, .12);
+}
+
+#main-deep-dive-container .dd-suggestions-list {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 100;
+    width: 100%;
+}
+
+.dd-primary-action > small {
+    color: #708295;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+#main-deep-dive-container .action-btn {
+    min-height: 38px;
+    height: 38px;
+    padding: 0 13px;
+    color: #b8c5d1;
+    background: transparent;
+    border: 1px solid rgba(148, 163, 184, .16);
+    border-radius: 8px;
+    box-shadow: none;
+    font-size: 12px;
+    font-weight: 700;
+    transform: none;
+}
+
+#main-deep-dive-container .action-btn:hover {
+    color: #edf6fd;
+    background: rgba(57, 169, 255, .07);
+    border-color: rgba(57, 169, 255, .34);
+    box-shadow: none;
+    transform: none;
+}
+
+#main-deep-dive-container .btn-analyze {
+    height: 48px;
+    min-height: 48px;
+    padding-inline: 19px;
+    color: #06111a;
+    background: #45b2f7;
+    border-color: #45b2f7;
+    font-size: 13px;
+}
+
+#main-deep-dive-container .btn-analyze:hover {
+    color: #06111a;
+    background: #6dc4fa;
+    border-color: #6dc4fa;
+}
+
+#main-deep-dive-container .action-btn.is-active,
+#main-deep-dive-container .btn-return {
+    color: #85d1ff;
+    background: rgba(57, 169, 255, .12);
+    border-color: rgba(57, 169, 255, .42);
+}
+
+.dd-tool-nav {
+    display: flex;
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    gap: 18px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(148, 163, 184, .11);
+}
+
+.dd-tool-group {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+}
+
+.dd-tool-group-label {
+    margin-right: 4px;
+}
+
+#main-deep-dive-container .dd-empty-state {
+    display: flex;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    text-align: left;
+}
+
+#main-deep-dive-container .sector-explorer {
+    display: grid;
+    grid-template-columns: minmax(220px, .8fr) minmax(0, 1.2fr);
+    width: min(1200px, 100%);
+    align-items: center;
+    gap: 22px;
+    margin: 0 0 24px;
+    padding: 17px 19px;
+    box-sizing: border-box;
+    background: rgba(13, 20, 28, .62);
+    border: 1px solid rgba(148, 163, 184, .12);
+    border-radius: 13px;
+}
+
+.sector-explorer-copy h3 {
+    margin: 5px 0 0;
+    color: #dce7f0;
+    font-size: 15px;
+}
+
+.sector-explorer-copy p {
+    margin: 5px 0 0;
+    color: #718396;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.sector-explorer-actions {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 7px;
+}
+
+#main-deep-dive-container .sector-dropdown {
+    display: block;
+    min-width: 0;
+}
+
+#main-deep-dive-container .sector-btn {
+    display: flex;
+    width: 100%;
+    min-height: 40px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 0 12px;
+    color: #aebdcc;
+    background: rgba(255, 255, 255, .025);
+    border: 1px solid rgba(148, 163, 184, .12);
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    box-shadow: none;
+}
+
+#main-deep-dive-container .sector-dropdown:hover .sector-btn,
+#main-deep-dive-container .sector-dropdown:focus-within .sector-btn {
+    color: #dff3ff;
+    background: rgba(57, 169, 255, .08);
+    border-color: rgba(57, 169, 255, .3);
+    box-shadow: none;
+}
+
+#main-deep-dive-container .sector-dropdown-content {
+    top: calc(100% + 8px);
+    min-width: 210px;
+    padding: 6px;
+    background: rgba(10, 16, 23, .98);
+    border-color: rgba(148, 163, 184, .18);
+    border-radius: 10px;
+    box-shadow: 0 18px 36px rgba(0, 0, 0, .38);
+}
+
+#main-deep-dive-container .sector-dropdown:hover .sector-dropdown-content,
+#main-deep-dive-container .sector-dropdown:focus-within .sector-dropdown-content {
+    display: block;
+}
+
+#main-deep-dive-container .sector-dropdown-content a {
+    padding: 9px 10px;
+    color: #9eafbe;
+    border: 0;
+    border-radius: 6px;
+    font-size: 12px;
+}
+
+#main-deep-dive-container .sector-dropdown-content a strong {
+    color: #68c4fb;
+    font-size: 12px;
+}
+
+#main-deep-dive-container .sector-dropdown-content a:hover {
+    color: #f1f7fb;
+    background: rgba(57, 169, 255, .1);
+}
+
+body.light-mode #main-deep-dive-container .dd-header,
+body.light-mode #main-deep-dive-container .sector-explorer {
+    color: #1f2937;
+    background: #f8fafc;
+    border-color: rgba(51, 65, 85, .14);
+}
+
+body.light-mode #main-deep-dive-container .dd-title-row h2,
+body.light-mode #main-deep-dive-container .sector-explorer-copy h3 { color: #172033; }
+body.light-mode #main-deep-dive-container .dd-search-input {
+    color: #172033;
+    background: #fff;
+    border-color: rgba(51, 65, 85, .2);
+}
+body.light-mode #main-deep-dive-container .action-btn,
+body.light-mode #main-deep-dive-container .sector-btn { color: #475569; }
+
+@media (max-width: 980px) {
+    #main-deep-dive-container .dd-header { grid-template-columns: 1fr; align-items: stretch; }
+    .dd-tool-nav { flex-direction: column; }
+    .dd-tool-group-utility { padding-top: 10px; border-top: 1px solid rgba(148, 163, 184, .1); }
+    #main-deep-dive-container .sector-explorer { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 660px) {
+    #main-deep-dive-container .dd-header { gap: 20px; padding: 20px 16px !important; }
+    .dd-search-row { grid-template-columns: 1fr; }
+    #main-deep-dive-container .btn-analyze { width: 100%; }
+    .dd-tool-group { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .dd-tool-group-label { grid-column: 1 / -1; }
+    #main-deep-dive-container .action-btn { width: 100%; }
+    .sector-explorer-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* =========================================================
    Minimal company calendar: earnings, calls and dividends
    ========================================================= */
 .stock-market-workspace .market-calendar-section > h2 {

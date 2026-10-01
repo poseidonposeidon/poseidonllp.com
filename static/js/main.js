@@ -10344,37 +10344,23 @@ function triggerAnalysis(symbol, event) {
 // 🔘 導覽列按鈕亮燈狀態統一控管
 // ==========================================
 function updateNavButtons(activeButtonId) {
-    // 1. 先把所有按鈕恢復成預設的外觀 (清除 inline CSS)
     const btnIds = ['screener-toggle-btn', 'trump-toggle-btn', 'sentiment-toggle-btn', 'nav-news-btn'];
     btnIds.forEach(id => {
         const btn = document.getElementById(id);
         if (btn) {
             btn.style.background = '';
             btn.style.color = '';
+            btn.classList.toggle('is-active', id === activeButtonId);
         }
     });
 
-    // 2. 確保「語意選股」按鈕的文字恢復成預設狀態
     const screenerBtn = document.getElementById('screener-toggle-btn');
     if (screenerBtn && activeButtonId !== 'screener-toggle-btn') {
-        screenerBtn.innerHTML = '<span style="font-size: 16px;">✨</span> 語意選股';
+        screenerBtn.textContent = 'AI 選股';
     }
 
-    // 3. 把當前點擊的按鈕亮起 (傳入 null 代表回首頁，全都不亮)
-    if (activeButtonId) {
-        const activeBtn = document.getElementById(activeButtonId);
-        if (activeBtn) {
-            if (activeButtonId === 'screener-toggle-btn') {
-                // 語意選股亮黃燈，並改變文字
-                activeBtn.innerHTML = '<span style="font-size: 16px;">🔍</span> 回單股分析';
-                activeBtn.style.background = '#f0b90b';
-                activeBtn.style.color = '#1e1e1e';
-            } else {
-                // 其他功能統一亮藍燈
-                activeBtn.style.background = '#3498db';
-                activeBtn.style.color = 'white';
-            }
-        }
+    if (activeButtonId === 'screener-toggle-btn' && screenerBtn) {
+        screenerBtn.textContent = '返回個股分析';
     }
 }
 
