@@ -5434,6 +5434,8 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
             ]
         },
         options: {
+            responsive: true,
+            maintainAspectRatio: false,
             animation: false,
             parsing: false,
             scales: {
@@ -5496,13 +5498,14 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                     pan: {
                         enabled: true,
                         mode: 'x',
+                        modifierKey: 'shift',
                         onPan: ({chart}) => { // 在平移的每一刻都更新導航器
                             const navigator = chartSync[chart.id]?.navigator;
                             if (navigator) updateNavigator(chart, navigator);
                         }
                     },
                     zoom: {
-                        wheel: { enabled: false },
+                        wheel: { enabled: true, modifierKey: 'ctrl', speed: 0.08 },
                         pinch: { enabled: true },
                         mode: 'x',
                         onZoom: ({chart}) => { // 在縮放的每一刻都更新導航器
@@ -5708,7 +5711,9 @@ function calculatePEData(priceData, epsData) {
 
         // 確保有對應的 EPS 數據，並計算本益比
         if (cumulativeEPS.count === 4 && cumulativeEPS.total > 0) {
-            const peRatio = Number(priceEntry.close) / cumulativeEPS.total;
+            const splitAdjustedPrice = Number(priceEntry.adjClose ?? priceEntry.adjustedClose ?? priceEntry.close);
+            if (!Number.isFinite(splitAdjustedPrice)) return null;
+            const peRatio = splitAdjustedPrice / cumulativeEPS.total;
             return {
                 date: date,
                 peRatio: peRatio,
@@ -5917,8 +5922,8 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     const technicalPanelHtml = techChartId ? `
         <div class="chart-panel chart-panel-wide" id="technicalAnalysisContainer_${techChartId}">
             <div class="panel-header">
-                <div><h2>Technical Analysis</h2><p>Price, volume, MA5 and MA10</p></div>
-                <button id="resetZoomBtn_Tech_${techChartId}">Reset Zoom</button>
+                <div><h2>Technical Analysis</h2><p>Candlestick price, volume, MA5 and MA10</p></div>
+                <div class="chart-view-controls"><span>Ctrl + scroll to zoom · Shift + drag to pan</span><button id="resetZoomBtn_Tech_${techChartId}">Reset view</button></div>
             </div>
             <canvas id="${techChartId}"></canvas>
             <div class="navigator-container"><canvas id="${techChartId}_nav"></canvas></div>
@@ -5948,16 +5953,16 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             <div class="financial-chart-grid">
             <div class="chart-panel" id="operatingChartContainer">
                 <div class="panel-header">
-                    <div><h2>Operating Performance</h2><p>Revenue, costs and operating income with YoY growth</p></div>
-                    <button id="resetZoomBtn_Operating_${operatingChartId}">Reset Zoom</button> 
+                    <div><h2>Operating Performance</h2><p>Revenue, cost structure and operating income with YoY growth</p></div>
+                    <div class="chart-view-controls"><span>Ctrl + scroll to zoom · Shift + drag to pan</span><button id="resetZoomBtn_Operating_${operatingChartId}">Reset view</button></div>
                 </div>
                 <canvas id="${operatingChartId}"></canvas>
             </div>
     
             <div class="chart-panel" id="chartContainer">
                 <div class="panel-header">
-                    <div><h2>Profitability & Growth</h2><p>EPS and key profit margins</p></div>
-                    <button id="resetZoomBtn_Income_${chartId}">Reset Zoom</button> 
+                    <div><h2>Profitability & Growth</h2><p>Diluted EPS, gross, operating and net margins</p></div>
+                    <div class="chart-view-controls"><span>Ctrl + scroll to zoom · Shift + drag to pan</span><button id="resetZoomBtn_Income_${chartId}">Reset view</button></div>
                 </div>
                 <canvas id="${chartId}"></canvas>
             </div>
@@ -5965,9 +5970,10 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     
             <div class="chart-panel" id="peBandContainer">
                 <div class="panel-header">
-                    <div><h2>P/E Ratio History</h2><p>Price divided by trailing four-quarter EPS</p></div>
-                    <button id="resetZoomBtn_PEBand_${peBandCanvasId}">Reset Zoom</button> 
+                    <div><h2>P/E Ratio History</h2><p>Trailing P/E compared with its historical valuation range</p></div>
+                    <div class="chart-view-controls"><span>Ctrl + scroll to zoom · Shift + drag to pan</span><button id="resetZoomBtn_PEBand_${peBandCanvasId}">Reset view</button></div>
                 </div>
+                <div id="${peBandCanvasId}_summary" class="valuation-summary" aria-live="polite"></div>
                 <canvas id="${peBandCanvasId}"></canvas>
             </div>
 
@@ -6086,6 +6092,17 @@ function updateDisplayedYears(data, container, chartId, operatingChartId, period
     displayIncomeStatement(data, container, chartId, operatingChartId, period, yearRange, techChartId);
 }
 
+function compactFinancialAxis(value) {
+    const number = Number(value);
+    if (!Number.isFinite(number)) return value;
+    const absolute = Math.abs(number);
+    if (absolute >= 1e12) return `${(number / 1e12).toFixed(1)}T`;
+    if (absolute >= 1e9) return `${(number / 1e9).toFixed(1)}B`;
+    if (absolute >= 1e6) return `${(number / 1e6).toFixed(1)}M`;
+    if (absolute >= 1e3) return `${(number / 1e3).toFixed(1)}K`;
+    return number.toLocaleString('en-US');
+}
+
 function createOperatingChart(data, chartId) {
     const validData = data.slice().sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -6102,32 +6119,34 @@ function createOperatingChart(data, chartId) {
         data: {
             labels: validData.map(entry => entry.date),
             datasets: [
-                { type: 'bar', label: 'Revenue', data: validData.map(entry => entry.revenue), borderColor: 'rgb(253,206,170,1)', backgroundColor: 'rgb(186,153,130,0.7)', yAxisID: 'y', order: 1 },
-                { type: 'bar', label: 'Cost of Revenue', data: validData.map(entry => entry.costOfRevenue), borderColor: 'rgba(102, 204, 204, 1)', backgroundColor: 'rgba(102, 204, 204, 0.7)', yAxisID: 'y', order: 1 },
-                { type: 'bar', label: 'Operating Expenses', data: validData.map(entry => entry.operatingExpenses), borderColor: 'rgba(153, 204, 255, 1)', backgroundColor: 'rgba(153, 204, 255, 0.7)', yAxisID: 'y', order: 1 },
-                { type: 'bar', label: 'Operating Income', data: validData.map(entry => entry.operatingIncome), borderColor: 'rgba(232, 232, 232, 1)', backgroundColor: 'rgba(232, 232, 232, 0.7)', yAxisID: 'y', order: 1 },
-                { type: 'line', label: 'Growth Rate', data: validData.map(entry => entry.growthRate), borderColor: 'rgba(255, 153, 0, 1)', backgroundColor: 'rgba(255, 153, 0, 0.9)', borderWidth: 3, pointRadius: 5, pointBackgroundColor: 'rgba(255, 153, 0, 1)', pointBorderColor: 'rgba(255, 153, 0, 1)', yAxisID: 'y1', order: 2 }
+                { type: 'bar', label: 'Revenue', data: validData.map(entry => entry.revenue), borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, .72)', yAxisID: 'y', order: 1, borderRadius: 3 },
+                { type: 'bar', label: 'Cost of Revenue', data: validData.map(entry => entry.costOfRevenue), borderColor: '#64748b', backgroundColor: 'rgba(100, 116, 139, .66)', yAxisID: 'y', order: 1, borderRadius: 3 },
+                { type: 'bar', label: 'Operating Expenses', data: validData.map(entry => entry.operatingExpenses), borderColor: '#ef4444', backgroundColor: 'rgba(239, 68, 68, .55)', yAxisID: 'y', order: 1, borderRadius: 3 },
+                { type: 'bar', label: 'Operating Income', data: validData.map(entry => entry.operatingIncome), borderColor: '#10b981', backgroundColor: 'rgba(16, 185, 129, .68)', yAxisID: 'y', order: 1, borderRadius: 3 },
+                { type: 'line', label: 'Revenue YoY', data: validData.map(entry => entry.growthRate), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderWidth: 2.5, pointRadius: 2, pointHoverRadius: 5, pointBackgroundColor: '#fbbf24', yAxisID: 'y1', order: 0, tension: .2 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { title: { display: true, text: 'Date' }, reverse: false },
-                y: { beginAtZero: true, title: { display: true, text: 'Value' }, position: 'left' },
-                y1: { beginAtZero: true, title: { display: true, text: 'Percentage (%)' }, position: 'right', grid: { drawOnChartArea: false } }
+                x: { title: { display: false }, reverse: false, grid: { display: false } },
+                y: { beginAtZero: true, title: { display: true, text: 'Reported value' }, position: 'left', ticks: { callback: compactFinancialAxis }, grid: { color: 'rgba(148, 163, 184, .08)' } },
+                y1: { title: { display: true, text: 'YoY growth' }, position: 'right', ticks: { callback: value => `${value}%` }, grid: { drawOnChartArea: false } }
             },
             // --- 修改處：新增縮放/平移插件配置 ---
             plugins: {
                 zoom: {
-                    pan: { enabled: true, mode: 'x' },
-                    zoom: { wheel: { enabled: false }, pinch: { enabled: true }, mode: 'x' }
+                    pan: { enabled: true, mode: 'x', modifierKey: 'shift' },
+                    zoom: { wheel: { enabled: true, modifierKey: 'ctrl', speed: 0.08 }, pinch: { enabled: true }, mode: 'x' },
+                    limits: { x: { minRange: 2 } }
                 },
+                legend: { labels: { usePointStyle: true, boxWidth: 8 } },
                 tooltip: {
                     callbacks: {
                         label: function (tooltipItem) {
                             const value = tooltipItem.raw;
-                            if (value !== null) { return tooltipItem.dataset.label.includes('Rate') ? value.toFixed(2) + '%' : value.toLocaleString(); }
+                            if (value !== null) { return tooltipItem.dataset.yAxisID === 'y1' ? `${Number(value).toFixed(2)}%` : Number(value).toLocaleString(); }
                             return 'No data';
                         }
                     },
@@ -6152,32 +6171,34 @@ function createIncomeStatementChart(data, chartId) {
         data: {
             labels: validData.map(entry => entry.date),
             datasets: [
-                { type: 'bar', label: 'EPS', data: validData.map(entry => entry.eps), borderColor: 'rgb(253,206,170,1)', backgroundColor: 'rgb(225,167,121,0.7)', yAxisID: 'y' },
-                { type: 'line', label: 'Gross Profit Ratio', data: validData.map(entry => percentOrNull(entry.grossProfitRatio)), borderColor: 'rgba(102, 204, 204, 1)', backgroundColor: 'rgba(102, 204, 204, 0.7)', yAxisID: 'y1' },
-                { type: 'line', label: 'Operating Income Ratio', data: validData.map(entry => percentOrNull(entry.operatingIncomeRatio)), borderColor: 'rgba(153, 204, 255, 1)', backgroundColor: 'rgba(153, 204, 255, 0.7)', yAxisID: 'y1' },
-                { type: 'line', label: 'Net Income Ratio', data: validData.map(entry => percentOrNull(entry.netIncomeRatio)), borderColor: 'rgba(232, 232, 232, 1)', backgroundColor: 'rgba(232, 232, 232, 0.7)', yAxisID: 'y1' },
-                { type: 'line', label: 'Growth Rate', data: validData.map(entry => entry.growthRate), borderColor: 'rgba(255, 153, 0, 1)', backgroundColor: 'rgba(255, 153, 0, 0.9)', yAxisID: 'y1' }
+                { type: 'bar', label: 'Diluted EPS', data: validData.map(entry => entry.epsdiluted ?? entry.eps), borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, .68)', yAxisID: 'y', borderRadius: 3 },
+                { type: 'line', label: 'Gross Margin', data: validData.map(entry => percentOrNull(entry.grossProfitRatio)), borderColor: '#22c55e', backgroundColor: '#22c55e', yAxisID: 'y1', borderWidth: 2.25, pointRadius: 2, tension: .2 },
+                { type: 'line', label: 'Operating Margin', data: validData.map(entry => percentOrNull(entry.operatingIncomeRatio)), borderColor: '#38bdf8', backgroundColor: '#38bdf8', yAxisID: 'y1', borderWidth: 2.25, pointRadius: 2, tension: .2 },
+                { type: 'line', label: 'Net Margin', data: validData.map(entry => percentOrNull(entry.netIncomeRatio)), borderColor: '#e2e8f0', backgroundColor: '#e2e8f0', yAxisID: 'y1', borderWidth: 2.25, pointRadius: 2, tension: .2 },
+                { type: 'line', label: 'Revenue YoY', data: validData.map(entry => entry.growthRate), borderColor: '#fbbf24', backgroundColor: '#fbbf24', borderDash: [6, 5], yAxisID: 'y1', borderWidth: 2, pointRadius: 1, tension: .2 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             scales: {
-                x: { title: { display: true, text: 'Date' }, reverse: false },
-                y: { beginAtZero: true, title: { display: true, text: 'Value' }, position: 'left' },
-                y1: { beginAtZero: true, title: { display: true, text: 'Percentage (%)' }, position: 'right', grid: { drawOnChartArea: false } }
+                x: { title: { display: false }, reverse: false, grid: { display: false } },
+                y: { title: { display: true, text: 'Diluted EPS' }, position: 'left', grid: { color: 'rgba(148, 163, 184, .08)' } },
+                y1: { title: { display: true, text: 'Margin / growth' }, position: 'right', ticks: { callback: value => `${value}%` }, grid: { drawOnChartArea: false } }
             },
             // --- 修改處：新增縮放/平移插件配置 ---
             plugins: {
                 zoom: {
-                    pan: { enabled: true, mode: 'x' },
-                    zoom: { wheel: { enabled: false }, pinch: { enabled: true }, mode: 'x' }
+                    pan: { enabled: true, mode: 'x', modifierKey: 'shift' },
+                    zoom: { wheel: { enabled: true, modifierKey: 'ctrl', speed: 0.08 }, pinch: { enabled: true }, mode: 'x' },
+                    limits: { x: { minRange: 2 } }
                 },
+                legend: { labels: { usePointStyle: true, boxWidth: 8 } },
                 tooltip: {
                     callbacks: {
                         label: function (tooltipItem) {
                             const value = tooltipItem.raw;
-                            if (value !== null) { return tooltipItem.dataset.label.includes('Ratio') ? value.toFixed(2) + '%' : value.toLocaleString(); }
+                            if (value !== null) { return tooltipItem.dataset.yAxisID === 'y1' ? value.toFixed(2) + '%' : Number(value).toFixed(2); }
                             return 'No data';
                         }
                     },
@@ -6195,8 +6216,36 @@ function displayPEBandChart(peData, chartId) {
         return;
     }
     const ctx = canvas.getContext('2d');
-    const dates = peData.map(entry => new Date(entry.date));
-    const peRatios = peData.map(entry => entry.peRatio);
+    const cleanData = peData
+        .map(entry => ({ x: new Date(entry.date), y: Number(entry.peRatio) }))
+        .filter(entry => !Number.isNaN(entry.x.valueOf()) && Number.isFinite(entry.y) && entry.y > 0)
+        .sort((a, b) => a.x - b.x);
+    if (!cleanData.length) return;
+
+    const sortedRatios = cleanData.map(entry => entry.y).sort((a, b) => a - b);
+    const quantile = percentile => {
+        const position = (sortedRatios.length - 1) * percentile;
+        const lower = Math.floor(position);
+        const remainder = position - lower;
+        return sortedRatios[lower + 1] == null
+            ? sortedRatios[lower]
+            : sortedRatios[lower] + remainder * (sortedRatios[lower + 1] - sortedRatios[lower]);
+    };
+    const lowerQuartile = quantile(0.25);
+    const median = quantile(0.5);
+    const upperQuartile = quantile(0.75);
+    const current = cleanData[cleanData.length - 1].y;
+    const relativeLabel = current < lowerQuartile
+        ? 'Below typical range'
+        : current > upperQuartile ? 'Above typical range' : 'Within typical range';
+    const summary = document.getElementById(`${chartId}_summary`);
+    if (summary) {
+        summary.innerHTML = `
+            <div><span>Current P/E</span><strong>${current.toFixed(1)}×</strong></div>
+            <div><span>Historical median</span><strong>${median.toFixed(1)}×</strong></div>
+            <div><span>Middle 50% range</span><strong>${lowerQuartile.toFixed(1)}–${upperQuartile.toFixed(1)}×</strong></div>
+            <div><span>Relative valuation</span><strong>${relativeLabel}</strong></div>`;
+    }
 
     if (peBandChartInstances[chartId]) {
         peBandChartInstances[chartId].destroy();
@@ -6205,26 +6254,85 @@ function displayPEBandChart(peData, chartId) {
     peBandChartInstances[chartId] = new Chart(ctx, {
         type: 'line',
         data: {
-            labels: dates,
-            datasets: [{
-                label: 'P/E Ratio',
-                data: peRatios,
-                borderColor: 'rgba(120, 160, 200, 1)',
-                fill: false,
-            }]
+            datasets: [
+                {
+                    label: 'Trailing P/E',
+                    data: cleanData,
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, .14)',
+                    borderWidth: 2,
+                    pointRadius: context => context.dataIndex === cleanData.length - 1 ? 4 : 0,
+                    pointHoverRadius: 5,
+                    pointBackgroundColor: '#f59e0b',
+                    tension: 0.12,
+                    fill: false
+                },
+                {
+                    label: 'Historical median',
+                    data: cleanData.map(entry => ({ x: entry.x, y: median })),
+                    borderColor: 'rgba(226, 232, 240, .65)',
+                    borderDash: [7, 6],
+                    borderWidth: 1.5,
+                    pointRadius: 0,
+                    fill: false
+                },
+                {
+                    label: 'Upper quartile',
+                    data: cleanData.map(entry => ({ x: entry.x, y: upperQuartile })),
+                    borderColor: 'rgba(148, 163, 184, .22)',
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    fill: false,
+                    _valuationBandBoundary: true
+                },
+                {
+                    label: 'Historical middle 50%',
+                    data: cleanData.map(entry => ({ x: entry.x, y: lowerQuartile })),
+                    borderColor: 'rgba(148, 163, 184, .22)',
+                    backgroundColor: 'rgba(148, 163, 184, .10)',
+                    borderWidth: 1,
+                    pointRadius: 0,
+                    fill: { target: 2 },
+                    _valuationBandBoundary: true
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            parsing: false,
+            interaction: { mode: 'index', intersect: false },
             scales: {
-                x: { type: 'time', time: { unit: 'year', tooltipFormat: 'yyyy-MM-dd' }, title: { display: true, text: 'Date' } },
-                y: { title: { display: true, text: 'P/E Ratio' } }
+                x: {
+                    type: 'time',
+                    time: { unit: 'year', tooltipFormat: 'yyyy-MM-dd' },
+                    title: { display: false },
+                    grid: { color: 'rgba(148, 163, 184, .08)' }
+                },
+                y: {
+                    title: { display: true, text: 'Trailing P/E (×)' },
+                    grace: '8%',
+                    grid: { color: 'rgba(148, 163, 184, .08)' },
+                    ticks: { callback: value => `${Number(value).toFixed(0)}×` }
+                }
             },
-            // --- 修改處：新增縮放/平移插件配置 ---
             plugins: {
+                legend: {
+                    labels: {
+                        usePointStyle: true,
+                        filter: item => !item.text.includes('quartile') && !item.text.includes('middle 50%')
+                    }
+                },
+                tooltip: {
+                    filter: item => !item.dataset._valuationBandBoundary,
+                    callbacks: {
+                        label: context => `${context.dataset.label}: ${Number(context.parsed.y).toFixed(2)}×`
+                    }
+                },
                 zoom: {
-                    pan: { enabled: true, mode: 'x' },
-                    zoom: { wheel: { enabled: false }, pinch: { enabled: true }, mode: 'x' }
+                    pan: { enabled: true, mode: 'x', modifierKey: 'shift' },
+                    zoom: { wheel: { enabled: true, modifierKey: 'ctrl', speed: 0.08 }, pinch: { enabled: true }, mode: 'x' },
+                    limits: { x: { minRange: 1000 * 60 * 60 * 24 * 30 } }
                 }
             }
         },

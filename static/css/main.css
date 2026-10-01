@@ -4273,6 +4273,82 @@ body.light-mode .stock-market-workspace .financial-snapshot {
     box-sizing: border-box;
 }
 
+.stock-market-workspace .financial-chart-grid .chart-panel > canvas {
+    height: 340px !important;
+    max-height: 340px !important;
+}
+
+.stock-market-workspace .chart-panel-wide > canvas,
+.stock-market-workspace #peBandContainer > canvas {
+    height: 420px !important;
+    max-height: 420px !important;
+}
+
+.stock-market-workspace .chart-view-controls {
+    display: flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.stock-market-workspace .chart-view-controls span {
+    color: var(--market-muted);
+    font-size: 11px;
+    line-height: 1.35;
+    white-space: nowrap;
+}
+
+.stock-market-workspace .chart-view-controls button {
+    min-height: 34px;
+    padding: 7px 12px;
+    border-color: rgba(245, 158, 11, .32);
+    background: rgba(245, 158, 11, .10);
+    color: #fbbf24;
+}
+
+.stock-market-workspace .chart-view-controls button:hover {
+    border-color: rgba(245, 158, 11, .58);
+    background: rgba(245, 158, 11, .18);
+    color: #fcd34d;
+}
+
+.stock-market-workspace .valuation-summary {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+    margin: 4px 0 14px;
+}
+
+.stock-market-workspace .valuation-summary:empty {
+    display: none;
+}
+
+.stock-market-workspace .valuation-summary > div {
+    display: grid;
+    gap: 5px;
+    min-width: 0;
+    padding: 10px 12px;
+    border: 1px solid rgba(148, 163, 184, .12);
+    border-radius: 8px;
+    background: rgba(148, 163, 184, .045);
+}
+
+.stock-market-workspace .valuation-summary span {
+    overflow: hidden;
+    color: var(--market-muted);
+    font-size: 10px;
+    letter-spacing: .04em;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.stock-market-workspace .valuation-summary strong {
+    color: var(--market-text);
+    font-size: 14px;
+    line-height: 1.2;
+}
+
 .stock-market-workspace .navigator-container {
     width: 100%;
     height: 76px;
@@ -4294,6 +4370,21 @@ body.light-mode .stock-market-workspace .financial-snapshot {
         height: 280px !important;
         min-height: 0 !important;
         max-height: 280px !important;
+    }
+
+    .stock-market-workspace .financial-chart-grid .chart-panel > canvas,
+    .stock-market-workspace .chart-panel-wide > canvas,
+    .stock-market-workspace #peBandContainer > canvas {
+        height: 300px !important;
+        max-height: 300px !important;
+    }
+
+    .stock-market-workspace .chart-view-controls span {
+        display: none;
+    }
+
+    .stock-market-workspace .valuation-summary {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 
