@@ -5923,7 +5923,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
         <div class="chart-panel chart-panel-wide" id="technicalAnalysisContainer_${techChartId}">
             <div class="panel-header">
                 <div><h2>Technical Analysis</h2><p>Candlestick price, volume, MA5 and MA10</p></div>
-                <div class="chart-view-controls"><span>Ctrl + scroll to zoom · Shift + drag to pan</span><button id="resetZoomBtn_Tech_${techChartId}">Reset view</button></div>
+                <div class="chart-view-controls"><span class="chart-gesture-hint"><b>圖表操作</b><span class="desktop-chart-hint"><kbd>Ctrl</kbd>＋滾輪縮放 <i>·</i> <kbd>Shift</kbd>＋拖曳平移</span><span class="touch-chart-hint">雙指縮放與拖曳</span></span><button id="resetZoomBtn_Tech_${techChartId}">重設視圖</button></div>
             </div>
             <canvas id="${techChartId}"></canvas>
             <div class="navigator-container"><canvas id="${techChartId}_nav"></canvas></div>
@@ -5954,7 +5954,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             <div class="chart-panel" id="operatingChartContainer">
                 <div class="panel-header">
                     <div><h2>Operating Performance</h2><p>Revenue, cost structure and operating income with YoY growth</p></div>
-                    <div class="chart-view-controls"><span>Ctrl + scroll to zoom · Shift + drag to pan</span><button id="resetZoomBtn_Operating_${operatingChartId}">Reset view</button></div>
+                    <div class="chart-view-controls"><span class="chart-gesture-hint"><b>圖表操作</b><span class="desktop-chart-hint"><kbd>Ctrl</kbd>＋滾輪縮放 <i>·</i> <kbd>Shift</kbd>＋拖曳平移</span><span class="touch-chart-hint">雙指縮放與拖曳</span></span><button id="resetZoomBtn_Operating_${operatingChartId}">重設視圖</button></div>
                 </div>
                 <canvas id="${operatingChartId}"></canvas>
             </div>
@@ -5962,7 +5962,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             <div class="chart-panel" id="chartContainer">
                 <div class="panel-header">
                     <div><h2>Profitability & Growth</h2><p>Diluted EPS, gross, operating and net margins</p></div>
-                    <div class="chart-view-controls"><span>Ctrl + scroll to zoom · Shift + drag to pan</span><button id="resetZoomBtn_Income_${chartId}">Reset view</button></div>
+                    <div class="chart-view-controls"><span class="chart-gesture-hint"><b>圖表操作</b><span class="desktop-chart-hint"><kbd>Ctrl</kbd>＋滾輪縮放 <i>·</i> <kbd>Shift</kbd>＋拖曳平移</span><span class="touch-chart-hint">雙指縮放與拖曳</span></span><button id="resetZoomBtn_Income_${chartId}">重設視圖</button></div>
                 </div>
                 <canvas id="${chartId}"></canvas>
             </div>
@@ -5971,7 +5971,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
             <div class="chart-panel" id="peBandContainer">
                 <div class="panel-header">
                     <div><h2>P/E Ratio History</h2><p>Five-year daily trailing P/E · dashed line shows the historical average</p></div>
-                    <div class="chart-view-controls"><span>Ctrl + scroll to zoom · Shift + drag to pan</span><button id="resetZoomBtn_PEBand_${peBandCanvasId}">Reset view</button></div>
+                    <div class="chart-view-controls"><span class="chart-gesture-hint"><b>圖表操作</b><span class="desktop-chart-hint"><kbd>Ctrl</kbd>＋滾輪縮放 <i>·</i> <kbd>Shift</kbd>＋拖曳平移</span><span class="touch-chart-hint">雙指縮放與拖曳</span></span><button id="resetZoomBtn_PEBand_${peBandCanvasId}">重設視圖</button></div>
                 </div>
                 <div id="${peBandCanvasId}_summary" class="valuation-summary" aria-live="polite"></div>
                 <canvas id="${peBandCanvasId}"></canvas>

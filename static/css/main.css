@@ -4293,10 +4293,50 @@ body.light-mode .stock-market-workspace .financial-snapshot {
 }
 
 .stock-market-workspace .chart-view-controls span {
-    color: var(--market-muted);
     font-size: 11px;
     line-height: 1.35;
+}
+
+.stock-market-workspace .chart-gesture-hint {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 10px;
+    border: 1px solid rgba(245, 158, 11, .28);
+    border-radius: 7px;
+    background: rgba(245, 158, 11, .07);
+    color: #cbd5e1;
     white-space: nowrap;
+}
+
+.stock-market-workspace .chart-gesture-hint b {
+    margin-right: 2px;
+    color: #fbbf24;
+    font-size: 10px;
+    letter-spacing: .08em;
+}
+
+.stock-market-workspace .chart-gesture-hint kbd {
+    display: inline-block;
+    min-width: 32px;
+    padding: 2px 5px;
+    border: 1px solid rgba(245, 158, 11, .4);
+    border-bottom-width: 2px;
+    border-radius: 4px;
+    background: rgba(2, 8, 15, .72);
+    color: #fde68a;
+    font: 600 10px/1.2 system-ui, sans-serif;
+    text-align: center;
+}
+
+.stock-market-workspace .chart-gesture-hint i {
+    margin-inline: 2px;
+    color: rgba(245, 158, 11, .65);
+    font-style: normal;
+}
+
+.stock-market-workspace .touch-chart-hint {
+    display: none;
 }
 
 .stock-market-workspace .chart-view-controls button {
@@ -4379,8 +4419,21 @@ body.light-mode .stock-market-workspace .financial-snapshot {
         max-height: 300px !important;
     }
 
-    .stock-market-workspace .chart-view-controls span {
+    .stock-market-workspace .chart-view-controls {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .stock-market-workspace .chart-gesture-hint {
+        white-space: normal;
+    }
+
+    .stock-market-workspace .desktop-chart-hint {
         display: none;
+    }
+
+    .stock-market-workspace .touch-chart-hint {
+        display: inline;
     }
 
     .stock-market-workspace .valuation-summary {
