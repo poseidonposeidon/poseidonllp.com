@@ -4260,6 +4260,44 @@ body.light-mode .stock-market-workspace .financial-snapshot {
 }
 
 /* =========================================================
+   Financial chart stability
+   Chart.js with maintainAspectRatio:false needs a bounded canvas height.
+   A min-height on an auto-height parent creates a ResizeObserver growth loop.
+   ========================================================= */
+.stock-market-workspace .chart-panel > canvas {
+    display: block;
+    width: 100% !important;
+    height: clamp(280px, 30vw, 380px) !important;
+    min-height: 0 !important;
+    max-height: 380px !important;
+    box-sizing: border-box;
+}
+
+.stock-market-workspace .navigator-container {
+    width: 100%;
+    height: 76px;
+    min-height: 76px;
+    max-height: 76px;
+    overflow: hidden;
+}
+
+.stock-market-workspace .navigator-container > canvas {
+    display: block;
+    width: 100% !important;
+    height: 76px !important;
+    min-height: 0 !important;
+    max-height: 76px !important;
+}
+
+@media (max-width: 700px) {
+    .stock-market-workspace .chart-panel > canvas {
+        height: 280px !important;
+        min-height: 0 !important;
+        max-height: 280px !important;
+    }
+}
+
+/* =========================================================
    Minimal AI research workspace
    ========================================================= */
 #main-deep-dive-container .dd-header {

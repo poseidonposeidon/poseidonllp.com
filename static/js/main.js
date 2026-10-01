@@ -708,7 +708,7 @@ function regionalWorkspaceMarkup(region, config) {
         ['balance-sheet', '▥', '資產負債表', 'Balance Sheet'],
         ['cashflow-statement', '⌁', '現金流量表', 'Cash Flow'],
         ['earnings-call-transcript', '◉', '法說會逐字稿', 'Earnings Transcript'],
-        ['earnings-call-calendar', '▦', '財報與法說會', 'Earnings & Calls'],
+        ['earnings-call-calendar', '▦', '財報與法說會行事曆', 'Earnings & Call Calendar'],
         ['dividend-calendar', '◆', '股利行事曆', 'Dividend Calendar']
     ].map(([id, icon, title, english]) => `
         <a class="market-report-link" href="#" data-report="${id}" onclick="loadRegionalSection(event, '${region}', '${id}')">
@@ -5502,7 +5502,7 @@ function createTechnicalAnalysisChart(priceHistory, ma5History, ma10History, cha
                         }
                     },
                     zoom: {
-                        wheel: { enabled: true, speed: 0.1 },
+                        wheel: { enabled: false },
                         pinch: { enabled: true },
                         mode: 'x',
                         onZoom: ({chart}) => { // 在縮放的每一刻都更新導航器
@@ -6121,7 +6121,7 @@ function createOperatingChart(data, chartId) {
             plugins: {
                 zoom: {
                     pan: { enabled: true, mode: 'x' },
-                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
+                    zoom: { wheel: { enabled: false }, pinch: { enabled: true }, mode: 'x' }
                 },
                 tooltip: {
                     callbacks: {
@@ -6171,7 +6171,7 @@ function createIncomeStatementChart(data, chartId) {
             plugins: {
                 zoom: {
                     pan: { enabled: true, mode: 'x' },
-                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
+                    zoom: { wheel: { enabled: false }, pinch: { enabled: true }, mode: 'x' }
                 },
                 tooltip: {
                     callbacks: {
@@ -6224,7 +6224,7 @@ function displayPEBandChart(peData, chartId) {
             plugins: {
                 zoom: {
                     pan: { enabled: true, mode: 'x' },
-                    zoom: { wheel: { enabled: true }, pinch: { enabled: true }, mode: 'x' }
+                    zoom: { wheel: { enabled: false }, pinch: { enabled: true }, mode: 'x' }
                 }
             }
         },
@@ -8503,7 +8503,7 @@ function marketCalendarPanelMarkup(region = 'US', initialView = 'events') {
             <div class="market-calendar-heading">
                 <div><span class="market-eyebrow">COMPANY EVENTS</span><h2>公司行事曆</h2><p>財報公布、法說會與股利事件集中檢視</p></div>
                 <div class="market-calendar-tabs" role="tablist" aria-label="行事曆類型">
-                    <button class="market-calendar-tab${eventsActive}" type="button" onclick="switchCompanyCalendarView('${region}', 'events')">財報與法說會</button>
+                    <button class="market-calendar-tab${eventsActive}" type="button" onclick="switchCompanyCalendarView('${region}', 'events')">財報與法說會行事曆</button>
                     <button class="market-calendar-tab${dividendsActive}" type="button" onclick="switchCompanyCalendarView('${region}', 'dividends')">股利</button>
                 </div>
             </div>
