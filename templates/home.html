@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261001-pro-amber">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261001-news-minimal">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <script defer src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -633,41 +633,39 @@
             </div>
             </div>
         </section>
-        <div style="max-width: 1200px; width: 100%; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px; margin-left: auto; margin-right: auto;">
+        <div class="dd-news-region">
 
 
-        <div id="daily-briefing-section" class="daily-briefing-container" style="background: rgba(20, 20, 20, 0.8); border: 1px solid rgba(52, 152, 219, 0.3); border-radius: 12px; padding: 20px; margin-bottom: 30px; text-align: left; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-            <!-- 標題列 -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;">
-                <h3 style="color: #fff; margin: 0; font-size: 18px; display: flex; align-items: center; gap: 10px;">
-                    🗞️ 全球市場即時新聞 (Market News Feed)
-                </h3>
-
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <input type="text" id="news-search-input" placeholder="搜尋代碼或關鍵字 (如: NVDA, 降息)" style="padding: 6px 12px; border-radius: 6px; border: 1px solid #444; background: #111; color: #fff; font-size: 13px; outline: none; width: 220px; transition: border-color 0.3s;" onfocus="this.style.borderColor='#3498db'" onblur="this.style.borderColor='#444'">
-
-                    <button onclick="executeNewsSearch()" style="background: rgba(52, 152, 219, 0.2); border: 1px solid rgba(52, 152, 219, 0.5); color: #3498db; padding: 5px 12px; border-radius: 4px; font-size: 13px; cursor: pointer; transition: 0.2s;" onmouseover="this.style.background='rgba(52, 152, 219, 0.4)'" onmouseout="this.style.background='rgba(52, 152, 219, 0.2)'">
-                        搜尋
-                    </button>
+        <section id="daily-briefing-section" class="daily-briefing-container" aria-labelledby="market-news-title">
+            <div class="market-news-header">
+                <div class="market-news-heading">
+                    <span class="dd-section-kicker">MARKET INTELLIGENCE</span>
+                    <div class="market-news-title-row">
+                        <h3 id="market-news-title">全球市場快訊</h3>
+                        <span class="market-news-live"><i aria-hidden="true"></i> 即時更新</span>
+                    </div>
+                    <p>彙整美股公司動態、產業消息與重要總經事件，依時間由新到舊排列。</p>
                 </div>
 
-                <span style="background: rgba(52, 152, 219, 0.15); border: 1px solid rgba(52, 152, 219, 0.5); color: #3498db; padding: 3px 8px; border-radius: 4px; font-size: 11px; letter-spacing: 1px;">
-                    LIVE FEED
-                </span>
+                <div class="market-news-search" role="search">
+                    <label for="news-search-input">搜尋新聞</label>
+                    <div class="market-news-search-row">
+                        <input type="search" id="news-search-input" placeholder="輸入股票代碼或關鍵字，例如 NVDA、降息">
+                        <button type="button" onclick="executeNewsSearch()">搜尋</button>
+                    </div>
+                </div>
             </div>
 
-            <!-- 🌟 新聞列表容器 -->
-            <div id="news-list-container" style="color: #ddd; font-size: 14px; line-height: 1.6; min-height: 400px;">
-                <p style="text-align: center; color: #666; margin: 20px 0;"><i class="fas fa-spinner fa-spin"></i> 載入新聞中...</p>
+            <div id="news-list-container" class="market-news-list" aria-live="polite" aria-busy="true">
+                <div class="market-news-state">正在載入最新市場消息…</div>
             </div>
 
-            <!-- 🌟 分頁控制區 -->
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                <button id="news-prev-btn" onclick="changeNewsPage(-1)" style="background: #333; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: 0.2s;" disabled>◀ 上一頁</button>
-                <span id="news-page-info" style="color: #888; font-size: 13px; font-weight: bold;">第 1 頁 / 共 -- 頁</span>
-                <button id="news-next-btn" onclick="changeNewsPage(1)" style="background: #333; color: white; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; transition: 0.2s;">下一頁 ▶</button>
+            <div class="market-news-pagination" aria-label="新聞分頁">
+                <button id="news-prev-btn" type="button" onclick="changeNewsPage(-1)" disabled><span aria-hidden="true">←</span> 上一頁</button>
+                <span id="news-page-info">第 1 頁 / 共 -- 頁</span>
+                <button id="news-next-btn" type="button" onclick="changeNewsPage(1)">下一頁 <span aria-hidden="true">→</span></button>
             </div>
-        </div>
+        </section>
 
         <details style="margin-bottom: 20px; cursor: pointer; text-align: center;">
             <summary style="outline: none; color: #888; font-size: 13px; letter-spacing: 1px; transition: color 0.3s;" onmouseover="this.style.color='#f0b90b';" onmouseout="this.style.color='#888';">
@@ -1382,7 +1380,7 @@
     </div>
 </div>
 
-<script defer src="/static/js/main.js?v=20261001-pro-amber"></script>
+<script defer src="/static/js/main.js?v=20261001-news-minimal"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {

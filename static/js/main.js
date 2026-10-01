@@ -11228,6 +11228,24 @@ let currentNewsPage = 1;
 let totalNewsPages = 1;
 let currentNewsQuery = ''; // 🌟 記住目前的搜尋字詞
 
+function escapeMarketNewsHtml(value) {
+    return String(value ?? '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+}
+
+function safeMarketNewsUrl(value) {
+    try {
+        const url = new URL(String(value || ''), window.location.origin);
+        return ['http:', 'https:'].includes(url.protocol) ? url.href : '#';
+    } catch (_) {
+        return '#';
+    }
+}
+
 async function loadMarketNews(page, query = '') {
     const container = document.getElementById('news-list-container');
     const prevBtn = document.getElementById('news-prev-btn');
@@ -11236,7 +11254,8 @@ async function loadMarketNews(page, query = '') {
 
     if (!container) return;
 
-    container.innerHTML = '<p style="text-align: center; color: #666; margin: 40px 0;"><i class="fas fa-spinner fa-spin"></i> 正在獲取市場最新動態...</p>';
+    container.setAttribute('aria-busy', 'true');
+    container.innerHTML = '<div class="market-news-state">正在取得最新市場消息…</div>';
     prevBtn.disabled = true;
     nextBtn.disabled = true;
 
@@ -11257,34 +11276,41 @@ async function loadMarketNews(page, query = '') {
         if (Array.isArray(data.news) && data.news.length > 0) {
             let html = '';
             data.news.forEach(news => {
-                // 如果有震撼分數，可以給個小火焰圖示
-                let scoreBadge = news.score >= 80 ? '<span style="color:#e74c3c; font-size:12px; margin-left:5px;">🔥 熱門</span>' : '';
+                const symbol = escapeMarketNewsHtml(news.symbol || 'MARKET');
+                const date = escapeMarketNewsHtml(news.date || '時間未提供');
+                const source = escapeMarketNewsHtml(news.source || 'FMP');
+                const title = escapeMarketNewsHtml(news.title || '未命名市場消息');
+                const summary = escapeMarketNewsHtml(news.summary || '暫無摘要');
+                const url = safeMarketNewsUrl(news.url);
+                const scoreBadge = Number(news.score) >= 80 ? '<span class="market-news-priority">重要</span>' : '';
 
                 html += `
-                <div style="margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px dashed rgba(255,255,255,0.08);">
-                    <div style="margin-bottom: 5px; display: flex; align-items: center; gap: 8px;">
-                        <span style="background: #f0b90b; color: #1e1e1e; font-weight: bold; padding: 2px 6px; border-radius: 4px; font-size: 11px;">${news.symbol}</span>
-                        <span style="color: #888; font-size: 12px;">${news.date} | 來源: ${news.source || 'FMP'}</span>
+                <article class="market-news-item">
+                    <div class="market-news-meta">
+                        <span class="market-news-symbol">${symbol}</span>
+                        <time>${date}</time>
+                        <span class="market-news-source">${source}</span>
                         ${scoreBadge}
                     </div>
-                    <a href="${news.url}" target="_blank" style="color: #3498db; text-decoration: none; font-size: 16px; font-weight: bold; display: block; margin-bottom: 6px; transition: color 0.2s;" onmouseover="this.style.color='#2980b9'" onmouseout="this.style.color='#3498db'">${news.title}</a>
-                    <p style="color: #aaa; margin: 0; font-size: 13px;">${news.summary}</p>
-                </div>`;
+                    <h4><a href="${url}" target="_blank" rel="noopener noreferrer">${title}</a></h4>
+                    <p>${summary}</p>
+                </article>`;
             });
             container.innerHTML = html;
         } else {
-            container.innerHTML = `<p style="text-align: center; color: #888; margin: 40px 0;">找不到與「<span style="color:#f0b90b">${query}</span>」相關的新聞。</p>`;
+            const safeQuery = escapeMarketNewsHtml(query);
+            container.innerHTML = `<div class="market-news-state">找不到與「<strong>${safeQuery || '目前條件'}</strong>」相關的新聞。</div>`;
         }
 
         pageInfo.innerText = `第 ${currentNewsPage} 頁 / 共 ${totalNewsPages} 頁`;
         prevBtn.disabled = !data.has_prev;
         nextBtn.disabled = !data.has_next;
-        prevBtn.style.opacity = data.has_prev ? '1' : '0.4';
-        nextBtn.style.opacity = data.has_next ? '1' : '0.4';
 
     } catch (error) {
         console.error('新聞載入失敗:', error);
-        container.innerHTML = '<p style="color: #e74c3c; text-align: center; margin: 40px 0;">新聞載入失敗，請檢查伺服器連線。</p>';
+        container.innerHTML = '<div class="market-news-state market-news-state-error">目前無法載入新聞，請稍後再試。</div>';
+    } finally {
+        container.setAttribute('aria-busy', 'false');
     }
 }
 

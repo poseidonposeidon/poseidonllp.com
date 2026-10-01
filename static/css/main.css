@@ -4871,6 +4871,260 @@ body.light-mode #main-deep-dive-container .sector-btn { color: #475569; }
 }
 
 /* =========================================================
+   Minimal market news feed — aligned with PRO workspace
+   ========================================================= */
+#main-deep-dive-container .dd-news-region {
+    width: min(1200px, 100%);
+    margin-inline: auto;
+    padding-top: 26px;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+
+#main-deep-dive-container .daily-briefing-container {
+    width: 100%;
+    margin: 0 0 28px;
+    padding: 0;
+    box-sizing: border-box;
+    color: #e9e5df;
+    text-align: left;
+    background: #111;
+    border: 1px solid rgba(230, 126, 34, .18);
+    border-radius: 14px;
+    box-shadow: 0 16px 38px rgba(0, 0, 0, .22);
+    overflow: hidden;
+}
+
+.market-news-header {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 430px);
+    align-items: end;
+    gap: 30px;
+    padding: 22px 24px 20px;
+    background: linear-gradient(135deg, rgba(24, 20, 17, .96), rgba(15, 15, 15, .96));
+    border-bottom: 1px solid rgba(255, 255, 255, .08);
+}
+
+.market-news-title-row {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+}
+
+.market-news-heading h3 {
+    margin: 0;
+    color: #f5f2ed;
+    font-size: 19px;
+    letter-spacing: -.015em;
+}
+
+.market-news-heading p {
+    margin: 7px 0 0;
+    color: #8e8983;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.market-news-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: #baafa4;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .04em;
+}
+
+.market-news-live i {
+    width: 6px;
+    height: 6px;
+    background: #e67e22;
+    border-radius: 50%;
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, .12);
+}
+
+.market-news-search {
+    display: grid;
+    gap: 7px;
+}
+
+.market-news-search label {
+    color: #918b84;
+    font-size: 10px;
+    font-weight: 750;
+    letter-spacing: .07em;
+}
+
+.market-news-search-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 8px;
+}
+
+#main-deep-dive-container #news-search-input {
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    padding: 0 13px;
+    color: #eeeae4;
+    background: #0c0c0d;
+    border: 1px solid rgba(255, 255, 255, .12);
+    border-radius: 8px;
+    outline: none;
+    font-size: 12px;
+}
+
+#main-deep-dive-container #news-search-input::placeholder { color: #625f5b; }
+#main-deep-dive-container #news-search-input:focus {
+    border-color: #e67e22;
+    box-shadow: 0 0 0 3px rgba(230, 126, 34, .12);
+}
+
+.market-news-search-row button {
+    min-width: 66px;
+    height: 40px;
+    padding: 0 14px;
+    color: #190e05;
+    background: #e67e22;
+    border: 1px solid #e67e22;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 800;
+}
+.market-news-search-row button:hover { background: #f0933f; border-color: #f0933f; }
+
+.market-news-list {
+    min-height: 360px;
+    padding: 0 24px;
+    color: #ddd8d2;
+}
+
+.market-news-item {
+    position: relative;
+    padding: 18px 4px 17px;
+    border-bottom: 1px solid rgba(255, 255, 255, .07);
+}
+.market-news-item:last-child { border-bottom: 0; }
+.market-news-item::before {
+    content: "";
+    position: absolute;
+    top: 18px;
+    bottom: 17px;
+    left: -24px;
+    width: 2px;
+    background: transparent;
+}
+.market-news-item:hover::before { background: #e67e22; }
+
+.market-news-meta {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 7px;
+    color: #77736e;
+    font-size: 10px;
+}
+
+.market-news-symbol {
+    padding: 2px 6px;
+    color: #f4b06e;
+    background: rgba(230, 126, 34, .1);
+    border: 1px solid rgba(230, 126, 34, .24);
+    border-radius: 5px;
+    font-weight: 800;
+    letter-spacing: .03em;
+}
+
+.market-news-source::before { content: "來源 · "; color: #55524e; }
+.market-news-priority {
+    padding-left: 7px;
+    color: #d68a45;
+    border-left: 1px solid rgba(255, 255, 255, .1);
+    font-weight: 700;
+}
+
+.market-news-item h4 { margin: 7px 0 5px; font-size: 15px; line-height: 1.4; }
+.market-news-item h4 a { color: #eeeae5; text-decoration: none; transition: color .16s ease; }
+.market-news-item h4 a:hover { color: #f0a45d; }
+.market-news-item p {
+    display: -webkit-box;
+    overflow: hidden;
+    margin: 0;
+    color: #96918b;
+    font-size: 12px;
+    line-height: 1.65;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.market-news-state {
+    display: grid;
+    min-height: 260px;
+    place-items: center;
+    color: #77726c;
+    font-size: 12px;
+    text-align: center;
+}
+.market-news-state strong { color: #dc9a5d; }
+.market-news-state-error { color: #c98268; }
+
+.market-news-pagination {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 16px;
+    padding: 14px 24px;
+    background: #0e0e0f;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+}
+.market-news-pagination span { color: #77736e; font-size: 10px; font-weight: 700; }
+.market-news-pagination button {
+    width: max-content;
+    min-height: 34px;
+    padding: 0 11px;
+    color: #b6afa7;
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, .1);
+    border-radius: 7px;
+    cursor: pointer;
+    font-size: 11px;
+    font-weight: 700;
+}
+.market-news-pagination button:last-child { justify-self: end; }
+.market-news-pagination button:hover:not(:disabled) {
+    color: #f2b06f;
+    background: rgba(230, 126, 34, .08);
+    border-color: rgba(230, 126, 34, .3);
+}
+.market-news-pagination button:disabled { cursor: default; opacity: .35; }
+
+body.light-mode .daily-briefing-container { background: #fff; border-color: rgba(180, 92, 20, .18); }
+body.light-mode .market-news-header { background: #faf8f5; }
+body.light-mode .market-news-heading h3,
+body.light-mode .market-news-item h4 a { color: #28231f; }
+body.light-mode .market-news-item p { color: #6f6962; }
+body.light-mode .market-news-pagination { background: #faf8f5; }
+body.light-mode #main-deep-dive-container #news-search-input { color: #28231f; background: #fff; border-color: rgba(60, 50, 40, .18); }
+
+@media (max-width: 820px) {
+    .market-news-header { grid-template-columns: 1fr; align-items: stretch; }
+    .market-news-list { padding-inline: 18px; }
+    .market-news-item::before { left: -18px; }
+}
+
+@media (max-width: 520px) {
+    .market-news-header { padding: 19px 16px 17px; }
+    .market-news-title-row { align-items: flex-start; flex-direction: column; gap: 6px; }
+    .market-news-search-row { grid-template-columns: 1fr; }
+    .market-news-search-row button { width: 100%; }
+    .market-news-list { padding-inline: 16px; }
+    .market-news-item::before { left: -16px; }
+    .market-news-pagination { padding-inline: 16px; }
+    .market-news-pagination button { font-size: 0; }
+    .market-news-pagination button span { font-size: 16px; }
+}
+
+/* =========================================================
    Minimal company calendar: earnings, calls and dividends
    ========================================================= */
 .stock-market-workspace .market-calendar-section > h2 {
