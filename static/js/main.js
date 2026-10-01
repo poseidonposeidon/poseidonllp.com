@@ -9687,8 +9687,8 @@ async function drawMarginsChart(symbol, suffix = '') {
         data: {
             labels: labels,
             datasets: [
-                { label: 'Gross Margin %', data: grossMargin, borderColor: '#00e676', backgroundColor: 'rgba(0, 230, 118, 0.1)', fill: true, tension: 0.3 },
-                { label: 'Net Margin %', data: netMargin, borderColor: '#2979ff', borderDash: [5, 5], tension: 0.3 }
+                { label: '毛利率', data: grossMargin, borderColor: '#f0b90b', backgroundColor: 'rgba(240, 185, 11, 0.08)', fill: true, tension: 0.3 },
+                { label: '淨利率', data: netMargin, borderColor: '#e67e22', borderDash: [5, 5], tension: 0.3 }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { x: { display: true, grid: { display: false }, ticks: { color: '#888', maxRotation: 45, minRotation: 45 } }, y: { grid: { color: '#333' } } }, plugins: { legend: { labels: { color: '#ccc' } } } }
@@ -9716,7 +9716,7 @@ async function drawGrowthChart(symbol, suffix = '') {
         data: {
             labels: labels,
             datasets: [
-                { label: 'Revenue (營收)', data: revenue, backgroundColor: 'rgba(54, 162, 235, 0.5)', borderColor: 'rgba(54, 162, 235, 1)', borderWidth: 1, yAxisID: 'y', order: 2 },
+                { label: 'Revenue (營收)', data: revenue, backgroundColor: 'rgba(230, 126, 34, 0.48)', borderColor: '#e67e22', borderWidth: 1, yAxisID: 'y', order: 2 },
                 { type: 'line', label: 'EPS (每股盈餘)', data: eps, borderColor: '#f0b90b', backgroundColor: '#f0b90b', borderWidth: 2, pointRadius: 3, yAxisID: 'y1', order: 1 }
             ]
         },
@@ -9782,7 +9782,7 @@ async function drawTechChart(symbol, suffix = '') {
             datasets: [
                 { label: 'Stock Price', data: closePrice, borderColor: '#f0b90b', borderWidth: 2, pointRadius: 0, yAxisID: 'y', order: 1 },
                 { label: '20 MA', data: ma20, borderColor: 'rgba(255, 255, 255, 0.6)', borderWidth: 1, borderDash: [5, 5], pointRadius: 0, yAxisID: 'y', order: 2 },
-                { type: 'bar', label: 'Volume', data: volume, backgroundColor: 'rgba(54, 162, 235, 0.3)', borderColor: 'rgba(54, 162, 235, 0)', yAxisID: 'y1', order: 3 }
+                { type: 'bar', label: 'Volume', data: volume, backgroundColor: 'rgba(230, 126, 34, 0.24)', borderColor: 'rgba(230, 126, 34, 0)', yAxisID: 'y1', order: 3 }
             ]
         },
         options: {
@@ -9876,7 +9876,7 @@ async function drawSolvencyChart(symbol, suffix = '') {
             datasets: [
                 { label: 'Total Cash (總現金)', data: totalCash, backgroundColor: 'rgba(46, 204, 113, 0.7)', yAxisID: 'y' },
                 { label: 'Total Debt (總負債)', data: totalDebt, backgroundColor: 'rgba(231, 76, 60, 0.7)', yAxisID: 'y' },
-                { type: 'line', label: 'Net Debt (淨負債)', data: netDebt, borderColor: '#3498db', borderWidth: 2, yAxisID: 'y', fill: false }
+                { type: 'line', label: 'Net Debt (淨負債)', data: netDebt, borderColor: '#f0b90b', borderWidth: 2, yAxisID: 'y', fill: false }
             ]
         },
         options: {
@@ -9968,17 +9968,17 @@ function initDeepDiveChat(symbol, suffix = '') {
 
     chatContainer.innerHTML = `
         <div class="chat-bubble ai">
-            <p>👋 您好，我是**海川 AI 投資長 (CIO)**，您專屬的 <strong>${targetSymbol}</strong> 深度分析智囊。</p>
-            <p>我已為您整合了最新的財報、法說會、內部人動向與即時新聞。您可以這樣問我，讓我為您梳理投資邏輯：</p>
+            <p>我是 <strong>${targetSymbol}</strong> 的研究助理，已載入本頁的財務、估值、法說會、內部人交易與新聞資料。</p>
+            <p>你可以從下列角度繼續驗證投資命題：</p>
             <ul class="chat-list">
-                <li><strong>💰 估值與潛力</strong>："目前的股價算合理嗎？請結合本益比與 DCF 模型幫我評估。"</li>
-                <li><strong>📊 競品對決</strong>："比較 ${targetSymbol} 與 NVDA 的利潤率與營收成長動能。"</li>
-                <li><strong>🛡️ 風險與護城河</strong>："這家公司目前最大的營運風險是什麼？護城河還在嗎？"</li>
-                <li><strong>👀 籌碼與高層動向</strong>："最近半年，公司高層或內部人有在大量倒貨或加碼嗎？"</li>
-                <li><strong>🎙️ 法說會解碼</strong>："最新法說會中，分析師最擔心的問題是什麼？管理層怎麼回應？"</li>
-                <li><strong>🔮 前瞻指引</strong>："根據最新數據與新聞，下半年的營收成長催化劑有哪些？"</li>
+                <li><strong>估值假設</strong>：「目前股價隱含多少營收成長與利潤率改善？」</li>
+                <li><strong>同業比較</strong>：「比較 ${targetSymbol} 與主要競爭對手的成長、利潤率與資本回報。」</li>
+                <li><strong>風險監測</strong>：「哪些財務或營運指標惡化時，應重新檢視投資命題？」</li>
+                <li><strong>內部人動向</strong>：「近半年內部人交易是否形成一致且具意義的訊號？」</li>
+                <li><strong>法說會重點</strong>：「最新法說會中，管理層指引與分析師關切事項有哪些變化？」</li>
+                <li><strong>情境分析</strong>：「整理樂觀、基準與悲觀情境的主要假設及失效條件。」</li>
             </ul>
-            <p>👉 <i>或者，您也可以直接問我：「給我一份 ${targetSymbol} 的多空情境分析報告。」</i></p>
+            <p><small>回答僅根據目前可用資料；若資料缺漏或過期，我會明確標示限制。</small></p>
         </div>
     `;
 }
@@ -10807,15 +10807,15 @@ async function downloadDashboardPDF(event) {
         // 3. 收集所有圖表 Base64
         const chartData = [];
         const canvasIds = [
-            { id: 'dd-valuation-chart', title: 'Valuation Band (本益比河流圖)' },
-            { id: 'dd-insider-chart', title: 'Smart Money (內部人交易)' },
-            { id: 'dd-financial-chart', title: 'Margins Trend (三率趨勢)' },
-            { id: 'dd-growth-chart', title: 'Revenue & EPS Trend (營收與獲利)' },
-            { id: 'dd-cashflow-chart', title: 'Cash Flow Structure (現金流)' },
-            { id: 'dd-tech-chart', title: 'Price & Volume (量價動能)' },
-            { id: 'dd-surprise-chart', title: 'Expectations: Earnings Surprise (財報驚喜與預期落差)' },
-            { id: 'dd-solvency-chart', title: 'Solvency: Debt vs Cash (資產負債健康度)' },
-            { id: 'dd-efficiency-chart', title: 'Efficiency: ROE & ROIC (資本回報與經營效率)' }
+            { id: 'dd-valuation-chart', title: '本益比估值區間' },
+            { id: 'dd-insider-chart', title: '內部人交易趨勢' },
+            { id: 'dd-financial-chart', title: '獲利率趨勢' },
+            { id: 'dd-growth-chart', title: '營收與每股盈餘' },
+            { id: 'dd-cashflow-chart', title: '現金流結構' },
+            { id: 'dd-tech-chart', title: '股價與成交量' },
+            { id: 'dd-surprise-chart', title: '財報預期差' },
+            { id: 'dd-solvency-chart', title: '現金與負債' },
+            { id: 'dd-efficiency-chart', title: '資本回報效率' }
         ];
 
         for (const item of canvasIds) {
@@ -11147,7 +11147,7 @@ function renderRevenueBreakdown(rawData) {
                 labels: labels,
                 datasets: [{
                     data: values,
-                    backgroundColor: ['#3498db', '#9b59b6', '#2ecc71', '#f1c40f', '#e67e22', '#95a5a6'],
+                    backgroundColor: ['#e67e22', '#f0b90b', '#b56b32', '#8c755e', '#6f6256', '#95a5a6'],
                     borderWidth: 1, borderColor: '#1a1a1a'
                 }]
             },
