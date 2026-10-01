@@ -5970,7 +5970,7 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     
             <div class="chart-panel" id="peBandContainer">
                 <div class="panel-header">
-                    <div><h2>P/E Ratio History</h2><p>Trailing P/E compared with its historical valuation range</p></div>
+                    <div><h2>P/E Ratio History</h2><p>Five-year daily trailing P/E · dashed line shows the historical average</p></div>
                     <div class="chart-view-controls"><span>Ctrl + scroll to zoom · Shift + drag to pan</span><button id="resetZoomBtn_PEBand_${peBandCanvasId}">Reset view</button></div>
                 </div>
                 <div id="${peBandCanvasId}_summary" class="valuation-summary" aria-live="polite"></div>
@@ -5987,8 +5987,12 @@ function displayIncomeStatement(data, container, chartId, operatingChartId, peri
     createIncomeStatementChart(filteredDataForChart, chartId);
 
     setTimeout(() => {
+        const peRangeEnd = new Date();
+        const peRangeStart = new Date(peRangeEnd);
+        peRangeStart.setFullYear(peRangeStart.getFullYear() - 5);
+        const peDate = value => value.toISOString().slice(0, 10);
         fetchPEBandData(
-            `${BASE_URL}historical-price-eod/full?symbol=${data[0].symbol}&timeseries=3650`,
+            `${BASE_URL}historical-price-eod/full?symbol=${data[0].symbol}&from=${peDate(peRangeStart)}&to=${peDate(peRangeEnd)}`,
             `${BASE_URL}income-statement?symbol=${data[0].symbol}&limit=40&period=quarter`,
             peBandCanvasId
         );
@@ -6231,25 +6235,58 @@ function displayPEBandChart(peData, chartId) {
             ? sortedRatios[lower]
             : sortedRatios[lower] + remainder * (sortedRatios[lower + 1] - sortedRatios[lower]);
     };
-    const lowerQuartile = quantile(0.25);
-    const median = quantile(0.5);
-    const upperQuartile = quantile(0.75);
+    const average = sortedRatios.reduce((total, value) => total + value, 0) / sortedRatios.length;
     const current = cleanData[cleanData.length - 1].y;
-    const relativeLabel = current < lowerQuartile
-        ? 'Below typical range'
-        : current > upperQuartile ? 'Above typical range' : 'Within typical range';
+    const differenceFromAverage = ((current / average) - 1) * 100;
+    const centralLow = quantile(0.05);
+    const centralHigh = quantile(0.95);
+    const visibleLow = Math.min(centralLow, current, average);
+    const visibleHigh = Math.max(centralHigh, current, average);
+    const axisPadding = Math.max((visibleHigh - visibleLow) * 0.12, 1);
+    const axisMin = Math.max(0, visibleLow - axisPadding);
+    const axisMax = visibleHigh + axisPadding;
+    const chartData = cleanData.map(entry => (
+        entry.y < axisMin || entry.y > axisMax ? { x: entry.x, y: null } : entry
+    ));
+    const relativeLabel = `${differenceFromAverage >= 0 ? '+' : ''}${differenceFromAverage.toFixed(1)}% vs avg`;
     const summary = document.getElementById(`${chartId}_summary`);
     if (summary) {
         summary.innerHTML = `
             <div><span>Current P/E</span><strong>${current.toFixed(1)}×</strong></div>
-            <div><span>Historical median</span><strong>${median.toFixed(1)}×</strong></div>
-            <div><span>Middle 50% range</span><strong>${lowerQuartile.toFixed(1)}–${upperQuartile.toFixed(1)}×</strong></div>
-            <div><span>Relative valuation</span><strong>${relativeLabel}</strong></div>`;
+            <div><span>Historical average</span><strong>${average.toFixed(1)}×</strong></div>
+            <div><span>Visible range</span><strong>${centralLow.toFixed(1)}–${centralHigh.toFixed(1)}×</strong></div>
+            <div><span>Versus average</span><strong>${relativeLabel}</strong></div>`;
     }
 
     if (peBandChartInstances[chartId]) {
         peBandChartInstances[chartId].destroy();
     }
+
+    const endLabelsPlugin = {
+        id: `peEndLabels_${chartId}`,
+        afterDatasetsDraw(chart) {
+            const { ctx: drawingContext, chartArea, scales } = chart;
+            const drawLabel = (value, text, fillColor, yOffset = 0) => {
+                const y = scales.y.getPixelForValue(value) + yOffset;
+                const x = chartArea.right + 8;
+                const height = 22;
+                drawingContext.save();
+                drawingContext.font = '600 11px system-ui, sans-serif';
+                const width = Math.max(66, drawingContext.measureText(text).width + 18);
+                drawingContext.fillStyle = fillColor;
+                drawingContext.beginPath();
+                drawingContext.roundRect(x, y - height / 2, width, height, 4);
+                drawingContext.fill();
+                drawingContext.fillStyle = '#071018';
+                drawingContext.textBaseline = 'middle';
+                drawingContext.fillText(text, x + 9, y);
+                drawingContext.restore();
+            };
+            const closeTogether = Math.abs(scales.y.getPixelForValue(current) - scales.y.getPixelForValue(average)) < 25;
+            drawLabel(current, `${current.toFixed(2)} CURRENT`, '#f59e0b', closeTogether ? -12 : 0);
+            drawLabel(average, `${average.toFixed(2)} AVG`, '#fcd34d', closeTogether ? 12 : 0);
+        }
+    };
 
     peBandChartInstances[chartId] = new Chart(ctx, {
         type: 'line',
@@ -6257,74 +6294,60 @@ function displayPEBandChart(peData, chartId) {
             datasets: [
                 {
                     label: 'Trailing P/E',
-                    data: cleanData,
+                    data: chartData,
                     borderColor: '#f59e0b',
-                    backgroundColor: 'rgba(245, 158, 11, .14)',
-                    borderWidth: 2,
-                    pointRadius: context => context.dataIndex === cleanData.length - 1 ? 4 : 0,
+                    backgroundColor: 'rgba(245, 158, 11, .10)',
+                    borderWidth: 2.25,
+                    pointRadius: context => context.dataIndex === chartData.length - 1 ? 4 : 0,
                     pointHoverRadius: 5,
                     pointBackgroundColor: '#f59e0b',
-                    tension: 0.12,
+                    spanGaps: false,
+                    tension: 0.08,
                     fill: false
                 },
                 {
-                    label: 'Historical median',
-                    data: cleanData.map(entry => ({ x: entry.x, y: median })),
-                    borderColor: 'rgba(226, 232, 240, .65)',
+                    label: 'Historical average',
+                    data: cleanData.map(entry => ({ x: entry.x, y: average })),
+                    borderColor: '#fcd34d',
                     borderDash: [7, 6],
                     borderWidth: 1.5,
                     pointRadius: 0,
                     fill: false
-                },
-                {
-                    label: 'Upper quartile',
-                    data: cleanData.map(entry => ({ x: entry.x, y: upperQuartile })),
-                    borderColor: 'rgba(148, 163, 184, .22)',
-                    borderWidth: 1,
-                    pointRadius: 0,
-                    fill: false,
-                    _valuationBandBoundary: true
-                },
-                {
-                    label: 'Historical middle 50%',
-                    data: cleanData.map(entry => ({ x: entry.x, y: lowerQuartile })),
-                    borderColor: 'rgba(148, 163, 184, .22)',
-                    backgroundColor: 'rgba(148, 163, 184, .10)',
-                    borderWidth: 1,
-                    pointRadius: 0,
-                    fill: { target: 2 },
-                    _valuationBandBoundary: true
                 }
             ]
         },
+        plugins: [endLabelsPlugin],
         options: {
             responsive: true,
             maintainAspectRatio: false,
             parsing: false,
-            interaction: { mode: 'index', intersect: false },
+            interaction: { mode: 'nearest', axis: 'x', intersect: false },
+            layout: { padding: { right: 104 } },
             scales: {
                 x: {
                     type: 'time',
-                    time: { unit: 'year', tooltipFormat: 'yyyy-MM-dd' },
+                    time: { unit: 'year', tooltipFormat: 'yyyy-MM-dd', displayFormats: { year: 'yyyy' } },
                     title: { display: false },
                     grid: { color: 'rgba(148, 163, 184, .08)' }
                 },
                 y: {
-                    title: { display: true, text: 'Trailing P/E (×)' },
-                    grace: '8%',
+                    position: 'right',
+                    title: { display: false },
+                    min: axisMin,
+                    max: axisMax,
                     grid: { color: 'rgba(148, 163, 184, .08)' },
                     ticks: { callback: value => `${Number(value).toFixed(0)}×` }
                 }
             },
             plugins: {
                 legend: {
+                    display: false,
                     labels: {
                         usePointStyle: true,
-                        filter: item => !item.text.includes('quartile') && !item.text.includes('middle 50%')
+                        color: '#cbd5e1'
                     }
                 },
                 tooltip: {
-                    filter: item => !item.dataset._valuationBandBoundary,
                     callbacks: {
                         label: context => `${context.dataset.label}: ${Number(context.parsed.y).toFixed(2)}×`
                     }
