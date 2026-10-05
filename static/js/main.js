@@ -11741,21 +11741,21 @@ async function loadSentimentMatrixData() {
 
             // 填入頂部報價
             document.getElementById('daily-report-date').innerText = latestRecord.date_str;
-            document.getElementById('daily-spy-close').innerText = parseFloat(rawObj['真實收盤價'] || 0).toFixed(2);
+            document.getElementById('daily-spy-close').innerText = Number.isFinite(Number(rawObj['真實收盤價'])) && rawObj['真實收盤價'] != null ? Number(rawObj['真實收盤價']).toFixed(2) : '--';
 
             const changeSpan = document.getElementById('daily-spy-change');
             const changeVal = parseFloat(latestRecord.market_change_pct || 0);
             changeSpan.innerText = (changeVal > 0 ? '+' : '') + latestRecord.market_change_pct;
             changeSpan.style.color = changeVal > 0 ? '#3e7d5c' : '#b0532f';
 
-            if (document.getElementById('daily-spy-ytd') && rawObj['YTD']) {
-                document.getElementById('daily-spy-ytd').innerText = `YTD: ${rawObj['YTD']}`;
-            }
+            document.getElementById('daily-spy-ytd').innerText = `YTD: ${rawObj['YTD'] || '—'}`;
 
-            if (rawObj['市場量能']) document.getElementById('daily-spy-volume').innerText = `成交量: ${rawObj['市場量能']}`;
+            document.getElementById('daily-spy-volume').innerText = `成交量: ${rawObj['市場量能'] || '資料未提供'}`;
             if (rawObj['三大指數']) {
-                document.getElementById('daily-ndx-close').innerText = `Nasdaq: ${parseFloat(rawObj['三大指數']['NASDAQ']).toFixed(2)}`;
-                document.getElementById('daily-vix-close').innerText = `VIX: ${parseFloat(rawObj['三大指數']['VIX']).toFixed(2)}`;
+                const ndx = rawObj['三大指數']['NASDAQ'];
+                const vix = rawObj['三大指數']['VIX'];
+                document.getElementById('daily-ndx-close').innerText = `Nasdaq: ${ndx == null ? '—' : Number(ndx).toFixed(2)}`;
+                document.getElementById('daily-vix-close').innerText = `VIX: ${vix == null ? '—' : Number(vix).toFixed(2)}`;
             }
 
             // ==========================================
@@ -11763,7 +11763,7 @@ async function loadSentimentMatrixData() {
             // ==========================================
             if(document.getElementById('us-regime-status')) {
                 // 後端傳來的格式如："熊市高波 (近30日波動率飆升至 95% 極端高位)"
-                const regimeFull = rawObj['馬爾可夫狀態'] || '--';
+                const regimeFull = rawObj['市場波動狀態'] || rawObj['馬爾可夫狀態'] || '--';
                 const parts = regimeFull.split(' (');
                 const mainText = parts[0]; // 熊市高波
                 const subText = parts[1] ? parts[1].replace(')', '') : '--'; // 近30日波動率...
@@ -11816,7 +11816,7 @@ async function loadSentimentMatrixData() {
             // ==========================================
 
             // 建議持股水位進度條
-            const holdLevel = parseFloat(rawObj['建議持股水位']) || 75;
+            const holdLevel = Number.isFinite(Number(rawObj['建議持股水位'])) ? Number(rawObj['建議持股水位']) : 0;
             const progressBar = document.getElementById('exposure-progress-bar');
             const progressText = document.getElementById('exposure-text');
             if (progressBar && progressText) {
@@ -11832,11 +11832,7 @@ async function loadSentimentMatrixData() {
             renderMag7Performance(rawObj['科技七雄'] || []);
 
             // 渲染板塊輪動 (含預設資料防呆)
-            globalSectorData = (rawObj['板塊輪動'] && rawObj['板塊輪動'].length > 0) ? rawObj['板塊輪動'] : [
-                { sector: "Information Technology (科技)", "1D": "1.25%", "1W": "1.8%", "1M": "4.0%", "YTD": "15.0%" },
-                { sector: "Financials (金融)", "1D": "0.82%", "1W": "1.0%", "1M": "2.5%", "YTD": "8.5%" },
-                { sector: "Health Care (醫療保健)", "1D": "0.45%", "1W": "0.8%", "1M": "1.5%", "YTD": "4.0%" }
-            ];
+            globalSectorData = Array.isArray(rawObj['板塊輪動']) ? rawObj['板塊輪動'] : [];
             drawSectorPerformanceChart(globalSectorData);
 
             // 渲染新聞與散戶溫度
@@ -11888,7 +11884,9 @@ async function loadSentimentMatrixData() {
             // 3. VIX 恐慌水位 (直接抓取三大指數並動態上色)
             const radarVixEl = document.getElementById('radar-vix');
             if (radarVixEl && rawObj['三大指數']) {
-                const vixVal = parseFloat(rawObj['三大指數']['VIX'] || 0).toFixed(2);
+                const vixRaw = rawObj['三大指數']['VIX'];
+                if (vixRaw == null) { radarVixEl.textContent = '資料未提供'; } else {
+                const vixVal = Number(vixRaw).toFixed(2);
                 let vixComment = "(市場承平)";
                 let vixColor = "#3e7d5c";
                 if (vixVal > 25) {
@@ -11899,6 +11897,7 @@ async function loadSentimentMatrixData() {
                     vixColor = "#e67e22";
                 }
                 radarVixEl.innerHTML = `<span style="color: ${vixColor};">${vixVal} ${vixComment}</span>`;
+                }
             }
 
             // 4. AI 建議持股水位 (直接反映多因子模型數字)
@@ -12064,7 +12063,7 @@ function renderSentimentTable(dataArray) {
                     <!-- 🚀 核心升級：新增美股歷史量化指紋 -->
                     <div style="color: #3498db; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📈 總經與流動性特徵</div>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px;">
-                        <div><span style="color:#aaa; font-size:11px;">馬爾可夫狀態:</span><br><b style="color:#ddd;">${(rawObj['馬爾可夫狀態'] || '--').split(' ')[0]}</b></div>
+                        <div><span style="color:#aaa; font-size:11px;">波動狀態:</span><br><b style="color:#ddd;">${(rawObj['市場波動狀態'] || rawObj['馬爾可夫狀態'] || '--').split(' ')[0]}</b></div>
                         <div><span style="color:#aaa; font-size:11px;">巨頭遮罩效應:</span><br><b style="color:#ddd;">${(rawObj['巨頭遮罩效應'] || '--').split(' ')[0]}</b></div>
                         <div><span style="color:#aaa; font-size:11px;">真實波動(HV20):</span><br><b style="color:#ddd;">${rawObj['真實波動率(HV20)'] || '--'}</b></div>
                         <div><span style="color:#aaa; font-size:11px;">國會買盤:</span><br><b style="color:#3498db;">${(rawObj['國會議員買進'] || '--').replace('國會買進: ', '')}</b></div>
@@ -12085,32 +12084,9 @@ let usSentimentGaugeInstance = null;
 function drawBofAGauge(score100) {
     const chartDom = document.getElementById('sentiment-gauge-chart');
     if (!chartDom) return;
-
     if (usSentimentGaugeInstance) usSentimentGaugeInstance.dispose();
-    usSentimentGaugeInstance = echarts.init(chartDom);
-
-    usSentimentGaugeInstance.setOption({
-        series: [{
-            type: 'gauge',
-            startAngle: 180, endAngle: 0,
-            min: 0, max: 10,
-            radius: '100%',
-            center: ['50%', '68%'],         // 🔼 把圓心稍微往上提一點
-            pointer: { width: 4, length: '45%' }, // 📉 縮短指針長度，才不會刺到數字
-            axisLine: { lineStyle: { width: 12, color: [[0.2, '#b0532f'], [0.8, '#d3bd92'], [1, '#3e7d5c']] } },
-            axisTick: { show: false },
-            splitLine: { show: false },
-            axisLabel: { show: false },
-            detail: {
-                formatter: '{value}',
-                fontSize: 16,
-                fontWeight: 'bold',
-                color: '#2b261c',
-                offsetCenter: [0, '20%']    // 🔼 確保數字在畫布範圍內
-            },
-            data: [{ value: (score100 / 10).toFixed(1) }]
-        }]
-    });
+    usSentimentGaugeInstance = null;
+    chartDom.textContent = Number.isFinite(Number(score100)) ? `情緒分數 ${Number(score100).toFixed(0)} / 100` : '情緒分數未提供';
 }
 
 // 5. 🚀 核心升級：對標 PDF 範例的「雙軸混合圖表 (Mixed Chart)」
@@ -12158,9 +12134,7 @@ async function loadAdvancedLiquidityData() {
         drawLiquidityVolumeChart(spyHistory, tnxHistory);
         drawDrawdownStressChart(spyHistory, vixHistory);
 
-        if (data.macro_gdp && data.macro_cpi) {
-            drawMacroEconomicChart(data.macro_gdp, data.macro_cpi);
-        }
+        drawMacroEconomicChart(data.macro_gdp || [], data.macro_cpi || []);
 
     } catch (error) {
         console.error("US Advanced Liquidity Data Error:", error);
@@ -12285,7 +12259,21 @@ function drawDrawdownStressChart(spy, vix) {
 // 5. 畫圖：美國 GDP 規模 vs CPI 通膨趨勢
 function drawMacroEconomicChart(gdpData, cpiData) {
     const canvas = document.getElementById('macro-economic-chart');
-    if (!canvas || !gdpData || gdpData.length === 0) return;
+    if (!canvas) return;
+    if (!gdpData.length) {
+        if (macroChartInstance) macroChartInstance.destroy();
+        canvas.hidden = true;
+        let emptyState = canvas.parentElement.querySelector('.macro-empty-state');
+        if (!emptyState) {
+            emptyState = document.createElement('p');
+            emptyState.className = 'macro-empty-state';
+            emptyState.textContent = 'FMP 暫未提供 GDP 數據。';
+            canvas.parentElement.appendChild(emptyState);
+        }
+        return;
+    }
+    canvas.hidden = false;
+    canvas.parentElement.querySelector('.macro-empty-state')?.remove();
 
     // 🌟 終極解法：不要用 reverse()，直接用 sort() 強制按日期「由舊到新」排序
     const gdp = [...gdpData].sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -12299,10 +12287,10 @@ function drawMacroEconomicChart(gdpData, cpiData) {
             datasets: [
                 {
                     type: 'line',
-                    label: 'CPI (%)',
+                    label: 'CPI 指數',
                     data: gdp.map(g => {
                         // 確保 CPI 能對齊 GDP 的年月
-                        const match = cpi.find(c => c.date.startsWith(g.date.substring(0, 7)));
+                        const match = cpi.filter(c => c.date <= g.date).at(-1);
                         return match ? match.value : null;
                     }),
                     borderColor: '#b0532f',
@@ -12314,7 +12302,7 @@ function drawMacroEconomicChart(gdpData, cpiData) {
                 },
                 {
                     type: 'bar',
-                    label: 'GDP (%)',
+                    label: 'GDP（十億美元）',
                     data: gdp.map(d => d.value),
                     backgroundColor: 'rgba(62, 125, 92, 0.6)',
                     yAxisID: 'y'
@@ -12327,8 +12315,8 @@ function drawMacroEconomicChart(gdpData, cpiData) {
             scales: {
                 x: { grid: { display: false } },
                 // 🌟 順便加上 toFixed(1) 防呆，解決浮點數過長問題
-                y: { position: 'left', ticks: { callback: v => Number(v).toFixed(1) + '%' } },
-                y1: { position: 'right', grid: { display: false }, ticks: { callback: v => Number(v).toFixed(1) + '%' } }
+                y: { position: 'left', ticks: { callback: v => Number(v).toLocaleString() } },
+                y1: { position: 'right', grid: { display: false }, ticks: { callback: v => Number(v).toFixed(1) } }
             }
         }
     });
@@ -12392,26 +12380,22 @@ function renderMag7Performance(mag7Data) {
     }
 
     // 依據漲跌幅大小進行排序 (強者在最上面)
-    const sortedData = [...mag7Data].sort((a, b) => (b.changesPercentage || 0) - (a.changesPercentage || 0));
+    const sortedData = [...mag7Data].sort((a, b) => Number(b.changePercentage ?? b.changesPercentage ?? 0) - Number(a.changePercentage ?? a.changesPercentage ?? 0));
 
     let html = '';
     sortedData.forEach(q => {
-        const changePct = q.changesPercentage || 0;
+        const changePct = Number(q.changePercentage ?? q.changesPercentage);
         const color = changePct > 0 ? '#3e7d5c' : (changePct < 0 ? '#b0532f' : '#6e685c');
         const sign = changePct > 0 ? '+' : '';
 
         // 🚀 AI 級自動短評邏輯：根據漲跌幅給出機構感點評
-        let comment = "表現平穩，跟隨大盤震盪，無明顯獨立行情。";
-        if (changePct > 3) comment = "🔥 強勢吸金！資金湧入充當今日大盤領漲引擎。";
-        else if (changePct > 1) comment = "🟢 穩健上攻，維持多頭排列格局。";
-        else if (changePct < -3) comment = "🚨 賣壓沉重，成為拖累科技板塊的重災區。";
-        else if (changePct < -1) comment = "🔴 遭遇獲利了結壓力，表現弱於大盤。";
+        const comment = !Number.isFinite(changePct) ? '漲跌幅未提供' : changePct > 3 ? '單日漲幅較大' : changePct < -3 ? '單日跌幅較大' : '單日波動';
 
         html += `
             <tr style="border-bottom: 1px solid #f0ebe1; transition: background 0.2s;" onmouseover="this.style.background='rgba(0,0,0,0.03)'" onmouseout="this.style.background='transparent'">
                 <td style="padding: 10px; font-weight: bold; color: #2b261c;">${q.symbol}</td>
-                <td style="padding: 10px; color: #2b261c;">$${parseFloat(q.price).toFixed(2)}</td>
-                <td style="padding: 10px; color: ${color}; font-weight: bold;">${sign}${parseFloat(changePct).toFixed(2)}%</td>
+                <td style="padding: 10px; color: #2b261c;">${Number.isFinite(Number(q.price)) ? '$' + Number(q.price).toFixed(2) : '—'}</td>
+                <td style="padding: 10px; color: ${color}; font-weight: bold;">${Number.isFinite(changePct) ? sign + changePct.toFixed(2) + '%' : '—'}</td>
                 <td style="padding: 10px; color: #6e685c; font-size: 12px; line-height: 1.5;">${comment}</td>
             </tr>
         `;
@@ -12585,39 +12569,31 @@ async function loadTWSentimentMatrixData() {
 
             // 2. 散戶小台多空比
             if(document.getElementById('tw-retail-ratio')) {
-                const ratio = rawData['散戶小台多空比'] || '--';
+                const ratio = '未提供';
                 const ratioEl = document.getElementById('tw-retail-ratio');
                 ratioEl.innerText = ratio;
 
                 // 判斷散戶是否做多 (正數危險，負數安全)
-                const isDanger = !ratio.includes('-') && parseFloat(ratio) > 0;
-                ratioEl.style.color = isDanger ? '#b0532f' : '#3e7d5c';
+                const isDanger = false;
+                ratioEl.style.color = '#9ba6b4';
 
                 const subEl = document.getElementById('tw-retail-sub');
                 if (subEl && ratio !== '--') {
-                    const status = isDanger ? '散戶做多 (籌碼凌亂)' : '散戶做空 (軋空燃料)';
-                    subEl.innerHTML = `↳ 動向: <span style="color: ${isDanger ? '#b0532f' : '#3e7d5c'}">${status}</span>`;
+                    subEl.textContent = '目前沒有可驗證的持倉資料';
                 }
             }
 
             // 3. 融資維持率與斷頭警戒
             if(document.getElementById('tw-margin-ratio')) {
                 // 後端傳來的格式: "152.0% (健康水準)"
-                const marginStr = rawData['估計融資維持率'] || '--';
-                let mainText = marginStr;
-                let subText = "計算中";
-
-                if(marginStr.includes('(')) {
-                    const parts = marginStr.split(' (');
-                    mainText = parts[0]; // "152.0%"
-                    subText = parts[1].replace(')', ''); // "健康水準" 或 "斷頭警戒"
-                }
+                const mainText = rawData['上市融資餘額'] || '資料未提供';
+                const subText = '證交所公開資料，非維持率';
 
                 const marginEl = document.getElementById('tw-margin-ratio');
                 marginEl.innerText = mainText;
 
-                const isWarning = subText.includes('警戒') || subText.includes('斷頭') || subText.includes('過熱');
-                marginEl.style.color = isWarning ? '#b0532f' : '#2b261c';
+                const isWarning = false;
+                marginEl.style.color = '#e88a30';
 
                 const subEl = document.getElementById('tw-margin-sub');
                 if (subEl) {
@@ -12642,7 +12618,7 @@ async function loadTWSentimentMatrixData() {
             }
             // ==========================================
 
-            const holdLevel = rawData['建議持股水位'] || 50;
+            const holdLevel = Number.isFinite(Number(rawData['建議持股水位'])) ? Number(rawData['建議持股水位']) : 0;
             const twProgressText = document.getElementById('tw-exposure-text');
             const twProgressBar = document.getElementById('tw-exposure-progress-bar');
             if(twProgressText && twProgressBar) {
@@ -12880,39 +12856,9 @@ function renderTWHeavyweights(smartMoney) {
 function drawTWSentimentGauge(score, labelText) {
     const dom = document.getElementById('tw-sentiment-gauge-chart');
     if (!dom) return;
-
     if (twSentimentGaugeInstance) twSentimentGaugeInstance.dispose();
-    twSentimentGaugeInstance = echarts.init(dom);
-
-    let colorConfig = [[1, '#b0532f']];
-    if (score >= 60) colorConfig = [[1, '#3e7d5c']];
-    else if (score >= 40) colorConfig = [[1, '#d3bd92']];
-
-    twSentimentGaugeInstance.setOption({
-        series: [{
-            type: 'gauge',
-            startAngle: 180, endAngle: 0,
-            min: 0, max: 100,
-            radius: '100%',
-            center: ['50%', '68%'],         // 🔼 把圓心稍微往上提一點
-            pointer: { width: 4, length: '45%' }, // 📉 縮短指針長度，避開文字
-            axisLine: { lineStyle: { width: 12, color: colorConfig } },
-            axisTick: { show: false },
-            splitLine: { show: false },
-            axisLabel: { show: false },
-            detail: {
-                formatter: function(value) {
-                    return '{score|' + value + '}\n{label|' + labelText + '}';
-                },
-                rich: {
-                    score: { fontSize: 16, color: '#2b261c', fontWeight: 'bold', padding: [0, 0, 2, 0] },
-                    label: { fontSize: 12, color: '#6e685c', fontWeight: 'bold' }
-                },
-                offsetCenter: [0, '35%']    // 🔽 字體剛好掛在指針下方，且不會被切斷
-            },
-            data: [{ value: score }]
-        }]
-    });
+    twSentimentGaugeInstance = null;
+    dom.textContent = Number.isFinite(Number(score)) ? `情緒分數 ${Number(score).toFixed(0)} / 100` : '情緒分數未提供';
 }
 
 // 3. 畫圖：台股專屬雙軸情緒折線圖 (Chart.js)
@@ -12972,8 +12918,8 @@ function renderTWSentimentTable(dataArray) {
                         <!-- 🚀 核心升級：新增歷史量化指紋 -->
                         <div style="color: #e74c3c; font-weight: bold; margin-bottom: 8px; font-size: 14.5px; border-top: 1px dashed #555; padding-top: 10px;">📈 量化與籌碼特徵</div>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 12px; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 4px;">
-                            <div><span style="color:#aaa; font-size:11px;">散戶多空比:</span><br><b style="color:#ddd;">${rawObj['散戶小台多空比'] || '--'}</b></div>
-                            <div><span style="color:#aaa; font-size:11px;">融資維持率:</span><br><b style="color:#ddd;">${(rawObj['估計融資維持率'] || '--').split(' ')[0]}</b></div>
+                            <div><span style="color:#aaa; font-size:11px;">上市融資餘額:</span><br><b style="color:#ddd;">${rawObj['上市融資餘額'] || '未提供'}</b></div>
+                            <div><span style="color:#aaa; font-size:11px;">小台散戶部位:</span><br><b style="color:#ddd;">未提供</b></div>
                             <div><span style="color:#aaa; font-size:11px;">真實波動(HV20):</span><br><b style="color:#ddd;">${rawObj['真實波動率(HV20)'] || '--'}</b></div>
                             <div><span style="color:#aaa; font-size:11px;">外資未平倉:</span><br><b style="color:#ddd;">${rawObj['外資未平倉'] || '--'}</b></div>
                         </div>

@@ -2,6 +2,49 @@ body.modal-open {
     overflow: hidden;
 }
 
+/* Market sentiment: align both reports with the site's dark, amber workspace. */
+#dd-sentiment-content { color: #e8edf3; }
+#dd-sentiment-content .sentiment-reports-grid > div > div {
+    background: #111820 !important;
+    border-color: #2a3440 !important;
+    color: #e8edf3 !important;
+    box-shadow: none !important;
+}
+#dd-sentiment-content .sentiment-reports-grid > div > div > div,
+#dd-sentiment-content .sentiment-reports-grid > div > div > div > div {
+    border-color: #2a3440 !important;
+}
+#dd-sentiment-content [style*="background: white"],
+#dd-sentiment-content [style*="background: #fdfbf7"],
+#dd-sentiment-content [style*="background: #fffdf8"] {
+    background: #18212b !important;
+    border-color: #2a3440 !important;
+    box-shadow: none !important;
+}
+#dd-sentiment-content [style*="color: #2b261c"],
+#dd-sentiment-content [style*="color: #4a4436"] { color: #e8edf3 !important; }
+#dd-sentiment-content [style*="color: #8a6d3f"],
+#dd-sentiment-content [style*="color: #6e685c"] { color: #aeb9c5 !important; }
+#dd-sentiment-content [style*="color: #3498db"] { color: #e88a30 !important; }
+#dd-sentiment-content #cio-trading-desk-card,
+#dd-sentiment-content #tw-cio-trading-desk-card {
+    border-left: 3px solid #e88a30 !important;
+    line-height: 1.8;
+}
+#dd-sentiment-content #sentiment-gauge-chart,
+#dd-sentiment-content #tw-sentiment-gauge-chart {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #aeb9c5;
+    font-size: 12px;
+    white-space: nowrap;
+}
+#dd-sentiment-content .sentiment-reports-grid table { display: block; overflow-x: auto; }
+@media (max-width: 1180px) {
+    #dd-sentiment-content .sentiment-reports-grid { grid-template-columns: 1fr !important; }
+}
+
 .overlay {
     position: fixed;
     top: 0;
