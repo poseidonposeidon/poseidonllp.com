@@ -31,6 +31,9 @@ body.modal-open {
 #dd-sentiment-content [style*="color: #6e685c"] { color: #aeb9c5 !important; }
 #dd-sentiment-content [style*="color: #3498db"] { color: #e88a30 !important; }
 #dd-sentiment-content [style*="color: #b0532f"] { color: #f19a48 !important; }
+#dd-sentiment-content #us-regime-status,
+#dd-sentiment-content #us-breadth-status,
+#dd-sentiment-content #tw-ma { color: #f19a48 !important; }
 #dd-sentiment-content [style*="border-left: 4px solid #3498db"],
 #dd-sentiment-content [style*="border-left: 4px solid #b0532f"] { border-left-color: #e88a30 !important; }
 #dd-sentiment-content .sentiment-reports-grid > div > div > div:first-child {
@@ -57,9 +60,29 @@ body.modal-open {
 }
 #dd-sentiment-content #cio-trading-desk-card,
 #dd-sentiment-content #tw-cio-trading-desk-card {
+    background: #1a2430 !important;
+    border: 1px solid #34404e !important;
     border-left: 3px solid #e88a30 !important;
     line-height: 1.8;
 }
+#dd-sentiment-content #cio-trading-desk-card > div:first-child,
+#dd-sentiment-content #tw-cio-trading-desk-card > div:first-child { color: #f3a65f !important; }
+#dd-sentiment-content #cio-trading-desk-content,
+#dd-sentiment-content #tw-cio-trading-desk-content {
+    color: #e1e8f0 !important;
+    overflow-wrap: anywhere;
+}
+#dd-sentiment-content .sector-btn {
+    background: #202a35 !important;
+    color: #bdc9d6 !important;
+    border: 1px solid #354352 !important;
+}
+#dd-sentiment-content .sector-btn.is-active {
+    background: #503117 !important;
+    color: #ffbc74 !important;
+    border-color: #b96d2a !important;
+}
+#dd-sentiment-content .sector-btn:hover { border-color: #e88a30 !important; }
 #dd-sentiment-content #sentiment-gauge-chart,
 #dd-sentiment-content #tw-sentiment-gauge-chart {
     display: flex;

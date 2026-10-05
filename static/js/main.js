@@ -11687,6 +11687,35 @@ let sectorChartInstance = null;
 let globalSectorData = [];
 let currentSectorTimeframe = '1D';
 
+// Only charts inside the sentiment workspace receive its dark theme.
+if (typeof Chart !== 'undefined') {
+    Chart.register({
+        id: 'sentimentWorkspaceTheme',
+        beforeInit(chart) {
+            if (!chart.canvas?.closest('#dd-sentiment-content')) return;
+            const options = chart.options;
+            options.color = '#c7d2df';
+            options.plugins ??= {};
+            options.plugins.legend ??= {};
+            options.plugins.legend.labels = {...options.plugins.legend.labels, color: '#c7d2df'};
+            Object.values(options.scales || {}).forEach(scale => {
+                scale.ticks = {...scale.ticks, color: '#aebdcb'};
+                scale.grid = {...scale.grid, color: 'rgba(160, 179, 199, 0.13)'};
+                scale.border = {...scale.border, color: '#354352'};
+                if (scale.title) scale.title.color = '#aebdcb';
+            });
+        },
+        beforeUpdate(chart) {
+            if (!chart.canvas?.closest('#dd-sentiment-content')) return;
+            Object.values(chart.scales || {}).forEach(scale => {
+                if (scale.options.ticks) scale.options.ticks.color = '#aebdcb';
+                if (scale.options.grid) scale.options.grid.color = 'rgba(160, 179, 199, 0.13)';
+                if (scale.options.border) scale.options.border.color = '#354352';
+            });
+        }
+    });
+}
+
 let twSentimentGaugeInstance = null;
 let twMixedChartInstance = null;
 
@@ -12101,8 +12130,8 @@ function drawSentimentMixedChart(dataArray) {
         data: {
             labels: reversedData.map(item => item.date_str.substring(5)),
             datasets: [
-                { type: 'line', label: '情緒分數', data: reversedData.map(item => item.sentiment_score), borderColor: '#8a6d3f', yAxisID: 'y' },
-                { type: 'bar', label: '漲跌幅 (%)', data: reversedData.map(item => parseFloat(item.market_change_pct)), backgroundColor: 'rgba(52, 152, 219, 0.5)', yAxisID: 'y1' }
+                { type: 'line', label: '情緒分數', data: reversedData.map(item => item.sentiment_score), borderColor: '#f0a35a', yAxisID: 'y' },
+                { type: 'bar', label: '漲跌幅 (%)', data: reversedData.map(item => parseFloat(item.market_change_pct)), backgroundColor: 'rgba(87, 166, 132, 0.7)', yAxisID: 'y1' }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left', min: 0, max: 100 }, y1: { position: 'right' } } }
@@ -12234,7 +12263,7 @@ function drawDrawdownStressChart(spy, vix) {
                     type: 'line',
                     label: 'VIX 恐慌指數',
                     data: vixData,
-                    borderColor: '#2b261c',
+                    borderColor: '#f0a35a',
                     borderWidth: 2,
                     borderDash: [5, 5],
                     yAxisID: 'y1',
@@ -12436,7 +12465,7 @@ function drawSectorPerformanceChart(sectorData) {
     const values = sortedData.map(s => parseFloat(String(s[currentSectorTimeframe] || 0).replace('%','')));
 
     // 設定漲跌顏色
-    const bgColors = values.map(v => v >= 0 ? 'rgba(62, 125, 92, 0.85)' : 'rgba(176, 83, 47, 0.85)');
+    const bgColors = values.map(v => v >= 0 ? 'rgba(87, 166, 132, 0.9)' : 'rgba(232, 138, 48, 0.9)');
 
     if (sectorChartInstance) sectorChartInstance.destroy();
 
@@ -12469,16 +12498,10 @@ function drawSectorPerformanceChart(sectorData) {
 function updateSectorTimeframe(timeframe) {
     currentSectorTimeframe = timeframe;
 
-    // 1. 更新按鈕的視覺狀態 (深色代表選中，米色代表未選中)
-    const buttons = document.querySelectorAll('.sector-btn');
+    // Use a class so the dark theme remains consistent after switching periods.
+    const buttons = document.querySelectorAll('#dd-sentiment-content .sector-btn');
     buttons.forEach(btn => {
-        if (btn.innerText === timeframe) {
-            btn.style.background = '#2c3e50';
-            btn.style.color = 'white';
-        } else {
-            btn.style.background = '#f0ebe1';
-            btn.style.color = '#6e685c';
-        }
+        btn.classList.toggle('is-active', btn.innerText === timeframe);
     });
 
     // 2. 觸發圖表重新繪製
@@ -12873,8 +12896,8 @@ function drawTWMixedChart(dataArray) {
         data: {
             labels: reversedData.map(item => item.date_str.substring(5)),
             datasets: [
-                { type: 'line', label: '情緒分數', data: reversedData.map(item => item.sentiment_score), borderColor: '#3498db', yAxisID: 'y' },
-                { type: 'bar', label: '漲跌幅 (%)', data: reversedData.map(item => parseFloat(item.market_change_pct)), backgroundColor: 'rgba(231, 76, 60, 0.5)', yAxisID: 'y1' }
+                { type: 'line', label: '情緒分數', data: reversedData.map(item => item.sentiment_score), borderColor: '#f0a35a', yAxisID: 'y' },
+                { type: 'bar', label: '漲跌幅 (%)', data: reversedData.map(item => parseFloat(item.market_change_pct)), backgroundColor: 'rgba(87, 166, 132, 0.7)', yAxisID: 'y1' }
             ]
         },
         options: { responsive: true, maintainAspectRatio: false, scales: { y: { position: 'left', min: 0, max: 100 }, y1: { position: 'right' } } }
