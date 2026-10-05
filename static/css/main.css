@@ -15,6 +15,8 @@ body.modal-open {
     border-color: #2a3440 !important;
 }
 #dd-sentiment-content [style*="background: white"],
+#dd-sentiment-content [style*="background: #f1ede4"],
+#dd-sentiment-content [style*="background: #e8e3d8"],
 #dd-sentiment-content [style*="background: #fdfbf7"],
 #dd-sentiment-content [style*="background: #fffdf8"] {
     background: #18212b !important;
@@ -23,9 +25,36 @@ body.modal-open {
 }
 #dd-sentiment-content [style*="color: #2b261c"],
 #dd-sentiment-content [style*="color: #4a4436"] { color: #e8edf3 !important; }
+#dd-sentiment-content [style*="color: #888"],
+#dd-sentiment-content [style*="color: #aaa"] { color: #9daab9 !important; }
 #dd-sentiment-content [style*="color: #8a6d3f"],
 #dd-sentiment-content [style*="color: #6e685c"] { color: #aeb9c5 !important; }
 #dd-sentiment-content [style*="color: #3498db"] { color: #e88a30 !important; }
+#dd-sentiment-content [style*="color: #b0532f"] { color: #f19a48 !important; }
+#dd-sentiment-content [style*="border-left: 4px solid #3498db"],
+#dd-sentiment-content [style*="border-left: 4px solid #b0532f"] { border-left-color: #e88a30 !important; }
+#dd-sentiment-content .sentiment-reports-grid > div > div > div:first-child {
+    border-bottom-color: #2a3440 !important;
+}
+#dd-sentiment-content #daily-report-date,
+#dd-sentiment-content #tw-daily-report-date {
+    background: #242d38 !important;
+    color: #c3ceda !important;
+}
+#dd-sentiment-content .sentiment-reports-grid table thead tr {
+    background: #202a35 !important;
+    color: #dce6ef !important;
+}
+#dd-sentiment-content .sentiment-reports-grid table tbody tr {
+    background: #111820 !important;
+    border-color: #2a3440 !important;
+}
+#dd-sentiment-content .sentiment-reports-grid table tbody tr:hover {
+    background: #1d2936 !important;
+}
+#dd-sentiment-content .sentiment-reports-grid table tbody td:not([style*="color:"]) {
+    color: #dce6ef;
+}
 #dd-sentiment-content #cio-trading-desk-card,
 #dd-sentiment-content #tw-cio-trading-desk-card {
     border-left: 3px solid #e88a30 !important;
