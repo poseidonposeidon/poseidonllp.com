@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261006-main-restore">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261006-workspace-nav-fix">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <script defer src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -53,6 +53,60 @@
         <img src="/static/img/favicon.ico" alt="Poseidon Capital Ltd." class="logo">
     </a>
     <div class="navbar-links">
+        <details class="workspace-nav">
+            <summary>研究工具 <span aria-hidden="true">⌄</span></summary>
+            <nav aria-label="研究工具">
+                <a href="/workspace/">首頁</a>
+                <a href="/workspace/lab">研究與回測</a>
+                <a href="/workspace/news-center">新聞中心</a>
+                <a href="/workspace/daily-bot">每日選股</a>
+            </nav>
+        </details>
+        <script>
+          const workspaceMenu = document.querySelector('.workspace-nav');
+          document.addEventListener('click', event => {
+            if (!workspaceMenu.contains(event.target)) workspaceMenu.open = false;
+          });
+          document.addEventListener('keydown', event => {
+            if (event.key === 'Escape') workspaceMenu.open = false;
+          });
+          document.querySelectorAll('.workspace-nav nav a').forEach(link => {
+            link.addEventListener('click', async event => {
+              event.preventDefault();
+              const path = link.getAttribute('href');
+              const publicSite = ['poseidonllp.com', 'www.poseidonllp.com'].includes(location.hostname);
+              const workspaceOrigin = publicSite ? 'https://api.poseidonllp.com' : location.origin;
+              const token = localStorage.getItem('authToken');
+              if (!token) {
+                window.location.assign('https://www.poseidonllp.com/#login');
+                return;
+              }
+              if (publicSite) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = `${workspaceOrigin}/api/workspace/enter`;
+                for (const [name, value] of Object.entries({token, next: path})) {
+                  const input = document.createElement('input');
+                  input.type = 'hidden'; input.name = name; input.value = value;
+                  form.appendChild(input);
+                }
+                document.body.appendChild(form);
+                form.submit();
+                return;
+              }
+              try {
+                const response = await fetch('/api/workspace/session', {
+                  method: 'POST', credentials: 'same-origin',
+                  headers: {'Authorization': `Bearer ${token}`}
+                });
+                if (!response.ok) throw new Error('workspace session failed');
+                window.location.assign(`${workspaceOrigin}${path}`);
+              } catch (_error) {
+                window.location.assign('https://www.poseidonllp.com/#login');
+              }
+            });
+          });
+        </script>
         <div class="dropdown-container"> <!-- dropdown-container 定義在這裡 -->
             <div class="dropdown"> <!-- 將 dropdown 放在一個 div 內 -->
                 <a href="#">Stock</a> <!-- 這裡的 a 不需要 dropdown class -->
