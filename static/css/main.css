@@ -2,27 +2,6 @@ body.modal-open {
     overflow: hidden;
 }
 
-.workspace-nav { position: relative; z-index: 1200; align-self: center; }
-.workspace-nav > summary {
-    list-style: none; cursor: pointer; color: #e8edf3; padding: 10px 12px;
-    border: 1px solid transparent; border-radius: 8px; font-weight: 600;
-}
-.workspace-nav > summary::-webkit-details-marker { display: none; }
-.workspace-nav[open] > summary,
-.workspace-nav > summary:hover,
-.workspace-nav > summary:focus-visible { color: #f2a661; border-color: #6a4425; background: #201914; }
-.workspace-nav nav {
-    position: absolute; right: 0; top: calc(100% + 8px); min-width: 180px;
-    padding: 7px; background: #181b20; border: 1px solid #473322;
-    border-radius: 10px; box-shadow: 0 16px 32px rgba(0,0,0,.35);
-}
-.workspace-nav nav a {
-    display: block; padding: 10px 12px; color: #e5e8ee; text-decoration: none;
-    border-radius: 6px; white-space: nowrap;
-}
-.workspace-nav nav a:hover,
-.workspace-nav nav a:focus-visible { background: #2b2119; color: #f2a661; }
-
 /* Market sentiment: align both reports with the site's dark, amber workspace. */
 #dd-sentiment-content { color: #e8edf3; }
 #dd-sentiment-content .sentiment-reports-grid > div > div {
