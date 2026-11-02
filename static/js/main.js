@@ -1,6 +1,6 @@
 const isLocalFlask = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const baseUrl = isLocalFlask ? window.location.origin : 'https://api.poseidonllp.com';
-const POSEIDON_FRONTEND_BUILD = '20261102-tw-history';
+const POSEIDON_FRONTEND_BUILD = '20261102-tw-history-fix2';
 console.info(`[Poseidon] frontend build ${POSEIDON_FRONTEND_BUILD}`);
 const API_KEY = ''; // FMP key is server-side only.
 const BASE_URL = `${baseUrl}/api/fmp/`;
@@ -9519,6 +9519,8 @@ async function loadTaiwanHistory(reset = true) {
         if (container.dataset.researchMarket !== 'TW') return;
         if (reset) list.replaceChildren();
         const taiwanRecords = records.filter(item => /^[1-9]\d{3}(?:\.(?:TW|TWO))?$/.test(item.symbol || ''));
+        const legacyTaiwanNames = {'6257': '矽格', '6223': '旺矽', '1727': '中華化',
+            '2351': '順德', '2330': '台積電', '3167': '大量'};
         if (!taiwanRecords.length && reset) list.textContent = '目前尚無台股分析紀錄。';
         for (const item of taiwanRecords) {
             const row = document.createElement('div');
@@ -9527,6 +9529,7 @@ async function loadTaiwanHistory(reset = true) {
             button.type = 'button';
             button.className = 'dd-taiwan-history-item';
             const symbol = document.createElement('strong');
+            item.company_name = item.company_name || legacyTaiwanNames[item.symbol.split('.')[0]] || '';
             symbol.textContent = [item.symbol, item.company_name].filter(Boolean).join(' · ');
             const date = document.createElement('time');
             date.textContent = `${item.date}（台灣時間）`;
@@ -9565,9 +9568,9 @@ async function deleteTaiwanHistory(item, row) {
     button.disabled = true;
     try {
         const apiRoot = typeof baseUrl !== 'undefined' ? baseUrl : '';
-        const response = await fetch(`${apiRoot}/api/history/${encodeURIComponent(item.id)}`, {
-            method: 'DELETE',
-            headers: {'Authorization': `Bearer ${token}`}
+        const response = await fetch(`${apiRoot}/api/history/${encodeURIComponent(item.id)}/delete`, {
+            method: 'POST',
+            body: new URLSearchParams({token})
         });
         if (!response.ok) {
             const error = await response.json().catch(() => ({}));
@@ -9622,6 +9625,31 @@ async function restoreTaiwanHistory(historyId) {
             note.hidden = false;
         }
         renderCachedTaiwanReport(item.report, report);
+        if (typeof renderPremiumWidgets === 'function') renderPremiumWidgets(item.raw_data);
+        window.deepDiveChartInstances = window.deepDiveChartInstances || {};
+        const chartTasks = [
+            ['dd-valuation-chart', drawValuationChart(item.symbol)],
+            ['dd-financial-chart', drawMarginsChart(item.symbol)],
+            ['dd-growth-chart', drawGrowthChart(item.symbol)],
+            ['dd-cashflow-chart', drawCashflowChart(item.symbol)],
+            ['dd-tech-chart', drawTechChart(item.symbol)],
+            ['dd-solvency-chart', drawSolvencyChart(item.symbol)],
+            ['dd-efficiency-chart', drawEfficiencyChart(item.symbol)]
+        ];
+        const chartResults = await Promise.allSettled(chartTasks.map(([, task]) => task));
+        chartResults.forEach((result, index) => {
+            const canvas = document.getElementById(chartTasks[index][0]);
+            if (!canvas) return;
+            canvas.parentElement?.querySelectorAll('.no-data-msg').forEach(message => message.remove());
+            canvas.style.display = result.status === 'fulfilled' ? '' : 'none';
+            if (result.status === 'rejected') {
+                const message = document.createElement('div');
+                message.className = 'no-data-msg';
+                message.textContent = '這筆歷史報告未保存此圖表所需數據。';
+                canvas.parentElement?.appendChild(message);
+            }
+        });
+        if (typeof attachChartClickListeners === 'function') attachChartClickListeners();
         main?.scrollIntoView({behavior: 'smooth', block: 'start'});
     } catch (error) {
         console.error('Taiwan history restore failed:', error);
@@ -10327,6 +10355,11 @@ async function loadDeepDiveChartRows(symbol, endpoint, field, period, limit) {
 }
 
 async function fetchStockPriceHistory(symbol, limit) {
+    if (isTaiwanDeepDive()) {
+        const rows = window.currentDeepDiveData?.price_history;
+        if (!Array.isArray(rows)) return [];
+        return rows.slice(-limit).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+    }
     const url = `${BASE_URL}historical-price-eod/full?symbol=${encodeURIComponent(symbol)}&timeseries=${limit}`;
     const res = await fetch(url);
     if (!res.ok) throw new Error(`歷史價格 HTTP ${res.status}`);

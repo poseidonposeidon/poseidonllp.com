@@ -3865,12 +3865,10 @@ body.light-mode #info-section .market-report-output input { color: #172033; back
     padding: 7px 10px;
     cursor: pointer;
 }
-#main-deep-dive-container .dd-cached-view .dd-charts-column,
 #main-deep-dive-container .dd-cached-view .dd-bottom-chat-layout,
 #main-deep-dive-container .dd-cached-view #scenario-panel,
 #main-deep-dive-container .dd-cached-view #dd-premium-widgets,
 #main-deep-dive-container .dd-cached-view .dd-export-btn { display: none !important; }
-#main-deep-dive-container .dd-cached-view .dd-report-column { flex: 1 1 100%; }
 @media (max-width: 700px) {
     #main-deep-dive-container .dd-taiwan-history-row { align-items: stretch; }
     #main-deep-dive-container .dd-taiwan-history-item { grid-template-columns: 1fr auto; }
