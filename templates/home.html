@@ -607,6 +607,11 @@
             <h3 id="dd-taiwan-start-title">從台股代碼開始</h3>
             <p>使用 FMP 多季財報，優先分析最新季度；若有本地 Synology 研究 memo，會標示來源並一併參考。</p>
             <div class="dd-taiwan-examples"><button type="button" onclick="triggerTaiwanAnalysis('3167')">3167 大量</button><button type="button" onclick="triggerTaiwanAnalysis('2330')">2330 台積電</button><button type="button" onclick="triggerTaiwanAnalysis('2454')">2454 聯發科</button></div>
+            <div class="dd-taiwan-history">
+                <div class="dd-taiwan-history-heading"><div><span class="dd-eyebrow">SAVED RESEARCH</span><h4>過往台股研究</h4><p>其他使用者已完成的分析；點選可直接閱讀當時報告，不會重新運算。</p></div></div>
+                <div id="dd-taiwan-history-list" class="dd-taiwan-history-list" aria-live="polite">切換至台股後載入紀錄…</div>
+                <button id="dd-taiwan-history-more" class="dd-taiwan-history-more" type="button" onclick="loadTaiwanHistory(false)" hidden>載入更多紀錄</button>
+            </div>
         </section>
 
         <section class="sector-explorer" aria-labelledby="sector-explorer-title">
@@ -918,6 +923,7 @@
                     </div>
                 </div>
 
+                <div id="dd-cached-report-note" class="dd-cached-report-note" hidden></div>
                 <div id="dd-report-container" class="dd-report-area"></div>
             </div>
 

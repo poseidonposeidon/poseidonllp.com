@@ -9483,13 +9483,129 @@ function setDeepDiveMarket(market) {
     const report = document.getElementById('dd-report-container');
     if (report) report.innerHTML = '';
     const main = document.getElementById('dd-main-content');
-    if (main) main.style.display = 'none';
+    if (main) {
+        main.style.display = 'none';
+        main.classList.remove('dd-cached-view');
+    }
+    const cachedNote = document.getElementById('dd-cached-report-note');
+    if (cachedNote) cachedNote.hidden = true;
     const empty = document.getElementById('dd-empty-state');
     if (empty) empty.style.display = 'block';
     const loading = document.getElementById('dd-loading-screen');
     if (loading) loading.style.display = 'none';
     window.currentDeepDiveData = null;
     window.currentReportContent = null;
+    if (taiwan) loadTaiwanHistory(true);
+}
+
+let taiwanHistoryPage = 0;
+async function loadTaiwanHistory(reset = true) {
+    const list = document.getElementById('dd-taiwan-history-list');
+    const more = document.getElementById('dd-taiwan-history-more');
+    const container = document.getElementById('main-deep-dive-container');
+    if (!list || !more || container?.dataset.researchMarket !== 'TW') return;
+    const page = reset ? 1 : taiwanHistoryPage + 1;
+    if (reset) {
+        list.textContent = '正在載入過往研究…';
+        more.hidden = true;
+    }
+    more.disabled = true;
+    try {
+        const apiRoot = typeof baseUrl !== 'undefined' ? baseUrl : '';
+        const response = await fetch(`${apiRoot}/api/history/list?market=TW&page=${page}`, {cache: 'no-store'});
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const records = await response.json();
+        if (!Array.isArray(records)) throw new Error('紀錄格式不正確');
+        if (container.dataset.researchMarket !== 'TW') return;
+        if (reset) list.replaceChildren();
+        if (!records.length && reset) list.textContent = '目前尚無台股分析紀錄。';
+        for (const item of records) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'dd-taiwan-history-item';
+            const symbol = document.createElement('strong');
+            symbol.textContent = item.symbol;
+            const date = document.createElement('time');
+            date.textContent = `${item.date}（台灣時間）`;
+            const arrow = document.createElement('span');
+            arrow.textContent = '閱讀報告 →';
+            button.append(symbol, date, arrow);
+            button.addEventListener('click', () => restoreTaiwanHistory(item.id));
+            list.appendChild(button);
+        }
+        taiwanHistoryPage = page;
+        more.hidden = records.length < 30;
+    } catch (error) {
+        if (reset) list.textContent = '暫時無法載入研究紀錄，請稍後重試。';
+        console.error('Taiwan history load failed:', error);
+    } finally {
+        more.disabled = false;
+    }
+}
+
+async function restoreTaiwanHistory(historyId) {
+    const list = document.getElementById('dd-taiwan-history-list');
+    try {
+        const apiRoot = typeof baseUrl !== 'undefined' ? baseUrl : '';
+        const response = await fetch(`${apiRoot}/api/history/${encodeURIComponent(historyId)}`, {cache: 'no-store'});
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const item = await response.json();
+        if (!/^[1-9]\d{3}\.(?:TW|TWO)$/.test(item.symbol || '') || !item.report) {
+            throw new Error('這筆不是可還原的台股研究報告');
+        }
+        setDeepDiveMarket('TW');
+        document.getElementById('dd-stock-input').value = item.symbol;
+        const main = document.getElementById('dd-main-content');
+        const empty = document.getElementById('dd-empty-state');
+        const note = document.getElementById('dd-cached-report-note');
+        const report = document.getElementById('dd-report-container');
+        window.currentDeepDiveData = item.raw_data || {};
+        window.currentReportContent = item.report;
+        if (empty) empty.style.display = 'none';
+        if (main) {
+            main.classList.add('dd-cached-view');
+            main.style.display = 'block';
+        }
+        if (note) {
+            const description = document.createElement('span');
+            description.textContent = `歷史報告快照 · ${item.date || '時間未記錄'}（台灣時間） · 未重新呼叫 FMP 或 AI；內容反映當時的資料。`;
+            const back = document.createElement('button');
+            back.type = 'button';
+            back.textContent = '返回過往研究';
+            back.addEventListener('click', () => setDeepDiveMarket('TW'));
+            note.replaceChildren(description, back);
+            note.hidden = false;
+        }
+        renderCachedTaiwanReport(item.report, report);
+        main?.scrollIntoView({behavior: 'smooth', block: 'start'});
+    } catch (error) {
+        console.error('Taiwan history restore failed:', error);
+        if (list) list.textContent = `無法載入這筆報告：${error.message}`;
+    }
+}
+
+function renderCachedTaiwanReport(markdown, container) {
+    if (!container) return;
+    const parsed = new DOMParser().parseFromString(marked.parse(markdown), 'text/html');
+    const allowed = new Set(['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'P', 'STRONG', 'EM',
+        'B', 'I', 'UL', 'OL', 'LI', 'PRE', 'CODE', 'BLOCKQUOTE', 'TABLE', 'THEAD',
+        'TBODY', 'TR', 'TH', 'TD', 'HR', 'BR', 'A']);
+    [...parsed.body.querySelectorAll('*')].reverse().forEach(element => {
+        if (!allowed.has(element.tagName)) {
+            element.replaceWith(parsed.createTextNode(element.textContent || ''));
+            return;
+        }
+        const href = element.tagName === 'A' ? element.getAttribute('href') : null;
+        for (const attribute of [...element.attributes]) element.removeAttribute(attribute.name);
+        if (element.tagName === 'A') {
+            if (href && /^https?:\/\//i.test(href)) {
+                element.setAttribute('href', href);
+                element.setAttribute('target', '_blank');
+                element.setAttribute('rel', 'noopener noreferrer');
+            }
+        }
+    });
+    container.replaceChildren(...parsed.body.childNodes);
 }
 
 function triggerTaiwanAnalysis(symbol) {
@@ -9534,6 +9650,9 @@ async function runDeepDive(event) {
     const reportContainer = document.getElementById('dd-report-container');
     const emptyState = document.getElementById('dd-empty-state');
     const mainContent = document.getElementById('dd-main-content');
+    if (mainContent) mainContent.classList.remove('dd-cached-view');
+    const cachedNote = document.getElementById('dd-cached-report-note');
+    if (cachedNote) cachedNote.hidden = true;
     const marketSwitch = document.getElementById('dd-market-switch');
     if (marketSwitch) marketSwitch.disabled = true;
 
