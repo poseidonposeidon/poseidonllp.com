@@ -9593,6 +9593,7 @@ async function runDeepDive(event) {
 
         if (!data) throw new Error('分析等待逾時，請稍後再試');
         const analysisSymbol = data.raw_data?.symbol || symbol;
+        if (market === 'TW') symbolInput.value = analysisSymbol;
 
         // 4. 儲存至全域變數供後續 Chat 或沙盤使用
         window.currentDeepDiveData = data.raw_data;
@@ -9643,6 +9644,10 @@ async function runDeepDive(event) {
 
         // 確保全域圖表實例物件存在，避免重繪疊影
         window.deepDiveChartInstances = window.deepDiveChartInstances || {};
+        document.querySelectorAll('#dd-main-content canvas').forEach(canvas => {
+            canvas.style.display = '';
+            canvas.parentElement?.querySelectorAll('.no-data-msg').forEach(message => message.remove());
+        });
 
         // 7. 平行處理所有圖表繪製 (大幅提升渲染速度)
         const chartResults = await Promise.allSettled([
@@ -9758,6 +9763,7 @@ async function drawValuationChart(symbol, suffix = '') {
     }
 
     const prices = await fetchStockPriceHistory(symbol, 365 * 3);
+    if (!prices.length) throw new Error('FMP 未提供此股票的歷史價格');
     const labels = prices.map(p => p.date);
     const closeData = prices.map(p => p.close);
     const sma200 = calculateSMA(closeData, 200);
@@ -9881,9 +9887,7 @@ async function drawMarginsChart(symbol, suffix = '') {
     const instanceKey = 'financial' + suffix;
     if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
-    const response = await fetch(`${BASE_URL}income-statement?symbol=${symbol}&period=quarter&limit=12`);
-    const data = await response.json();
-    const sortedData = data.reverse();
+    const sortedData = (await loadDeepDiveChartRows(symbol, 'income-statement', 'income', 'quarter', 12)).reverse();
 
     const labels = sortedData.map(d => d.date);
     const grossMargin = sortedData.map(d => (d.grossProfit / d.revenue * 100));
@@ -9910,11 +9914,9 @@ async function drawGrowthChart(symbol, suffix = '') {
     const instanceKey = 'growth' + suffix;
     if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
-    const response = await fetch(`${BASE_URL}income-statement?symbol=${symbol}&period=annual&limit=10`);
-    const data = await response.json();
-    const sortedData = data.reverse();
+    const sortedData = (await loadDeepDiveChartRows(symbol, 'income-statement', 'income', 'annual', 10)).reverse();
 
-    const labels = sortedData.map(d => d.calendarYear);
+    const labels = sortedData.map(d => isTaiwanDeepDive() ? d.date : d.calendarYear);
     const revenue = sortedData.map(d => d.revenue);
     const eps = sortedData.map(d => d.eps);
 
@@ -9947,11 +9949,9 @@ async function drawCashflowChart(symbol, suffix = '') {
     const instanceKey = 'cashflow' + suffix;
     if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
-    const response = await fetch(`${BASE_URL}cash-flow-statement?symbol=${symbol}&period=annual&limit=10`);
-    const data = await response.json();
-    const sortedData = data.reverse();
+    const sortedData = (await loadDeepDiveChartRows(symbol, 'cash-flow-statement', 'cashflow', 'annual', 10)).reverse();
 
-    const labels = sortedData.map(d => d.calendarYear);
+    const labels = sortedData.map(d => isTaiwanDeepDive() ? d.date : d.calendarYear);
     const ocf = sortedData.map(d => d.operatingCashFlow);
     const fcf = sortedData.map(d => d.freeCashFlow);
 
@@ -9977,6 +9977,7 @@ async function drawTechChart(symbol, suffix = '') {
     if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
     const rawData = await fetchStockPriceHistory(symbol, 250);
+    if (!rawData.length) throw new Error('FMP 未提供此股票的歷史價格與成交量');
     const labels = rawData.map(d => d.date);
     const closePrice = rawData.map(d => d.close);
     const volume = rawData.map(d => d.volume);
@@ -10017,10 +10018,13 @@ async function drawSurpriseChart(symbol, suffix = '') {
 
     // 呼叫 FMP 歷史財報日曆 API
     const response = await fetch(`${BASE_URL}earnings?symbol=${symbol}&limit=16`);
+    if (!response.ok) throw new Error(`財報預期資料 HTTP ${response.status}`);
     let data = await response.json();
+    if (!Array.isArray(data) || !data.length) throw new Error('FMP 未提供財報預期資料');
 
     // 過濾掉還沒發布的未來財報，並反轉為由舊到新
     const pastData = data.filter(d => d.eps !== null && d.epsEstimated !== null).reverse();
+    if (!pastData.length) throw new Error('沒有實際與預估 EPS 可比較');
 
     const labels = pastData.map(d => d.date);
     const epsActual = pastData.map(d => d.eps);
@@ -10065,11 +10069,9 @@ async function drawSolvencyChart(symbol, suffix = '') {
     const instanceKey = 'solvency' + suffix;
     if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
-    const response = await fetch(`${BASE_URL}balance-sheet-statement?symbol=${symbol}&period=annual&limit=10`);
-    const data = await response.json();
-    const sortedData = data.reverse();
+    const sortedData = (await loadDeepDiveChartRows(symbol, 'balance-sheet-statement', 'balance', 'annual', 10)).reverse();
 
-    const labels = sortedData.map(d => d.calendarYear);
+    const labels = sortedData.map(d => isTaiwanDeepDive() ? d.date : d.calendarYear);
     // 總現金 = 現金 + 短期投資
     const totalCash = sortedData.map(d => (d.cashAndCashEquivalents + (d.shortTermInvestments || 0)));
     const totalDebt = sortedData.map(d => d.totalDebt);
@@ -10108,12 +10110,9 @@ async function drawEfficiencyChart(symbol, suffix = '') {
     const instanceKey = 'efficiency' + suffix;
     if (window.deepDiveChartInstances[instanceKey]) window.deepDiveChartInstances[instanceKey].destroy();
 
-    const [ratiosResponse, metricsResponse] = await Promise.all([
-        fetch(`${BASE_URL}ratios?symbol=${symbol}&period=annual&limit=10`),
-        fetch(`${BASE_URL}key-metrics?symbol=${symbol}&period=annual&limit=10`)
-    ]);
     const [ratiosData, metricsData] = await Promise.all([
-        ratiosResponse.json(), metricsResponse.json()
+        loadDeepDiveChartRows(symbol, 'ratios', 'ratios', 'annual', 10),
+        loadDeepDiveChartRows(symbol, 'key-metrics', 'metrics', 'annual', 10)
     ]);
     const metricsByDate = new Map(metricsData.map(item => [item.date, item]));
     const sortedData = ratiosData.map(item => ({
@@ -10146,11 +10145,30 @@ async function drawEfficiencyChart(symbol, suffix = '') {
 }
 
 // 輔助函式
+function isTaiwanDeepDive() {
+    return window.currentDeepDiveData?.market === 'TW';
+}
+
+async function loadDeepDiveChartRows(symbol, endpoint, field, period, limit) {
+    if (isTaiwanDeepDive()) {
+        const rows = window.currentDeepDiveData?.financials?.[field];
+        if (!Array.isArray(rows) || !rows.length) throw new Error('台股財報沒有此圖表所需資料');
+        return rows.slice(0, limit);
+    }
+    const response = await fetch(`${BASE_URL}${endpoint}?symbol=${encodeURIComponent(symbol)}&period=${period}&limit=${limit}`);
+    if (!response.ok) throw new Error(`FMP ${endpoint}: HTTP ${response.status}`);
+    const rows = await response.json();
+    if (!Array.isArray(rows) || !rows.length) throw new Error(`${endpoint} 沒有可用資料`);
+    return rows;
+}
+
 async function fetchStockPriceHistory(symbol, limit) {
-    const url = `${BASE_URL}historical-price-eod/full?symbol=${symbol}&timeseries=${limit}`;
+    const url = `${BASE_URL}historical-price-eod/full?symbol=${encodeURIComponent(symbol)}&timeseries=${limit}`;
     const res = await fetch(url);
+    if (!res.ok) throw new Error(`歷史價格 HTTP ${res.status}`);
     const data = await res.json();
-    return data.historical.reverse();
+    if (!Array.isArray(data.historical) || !data.historical.length) return [];
+    return data.historical.slice().reverse();
 }
 
 function calculateSMA(data, window) {
