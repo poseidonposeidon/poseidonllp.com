@@ -3808,8 +3808,10 @@ body.light-mode #info-section .market-report-output input { color: #172033; back
 #main-deep-dive-container .dd-taiwan-history h4 { margin: 6px 0 0; color: #f3ede6; font-size: 17px; }
 #main-deep-dive-container .dd-taiwan-history-heading p { margin: 6px 0 16px; font-size: 12px; }
 #main-deep-dive-container .dd-taiwan-history-list { display: grid; gap: 8px; color: #a8a09a; font-size: 13px; }
+#main-deep-dive-container .dd-taiwan-history-row { display: flex; gap: 8px; min-width: 0; }
 #main-deep-dive-container .dd-taiwan-history-item {
-    width: 100%;
+    flex: 1 1 auto;
+    min-width: 0;
     display: grid;
     grid-template-columns: minmax(110px, 1fr) minmax(180px, 1.5fr) auto;
     align-items: center;
@@ -3826,6 +3828,18 @@ body.light-mode #info-section .market-report-output input { color: #172033; back
 #main-deep-dive-container .dd-taiwan-history-item span { color: #e8a363; font-size: 12px; }
 #main-deep-dive-container .dd-taiwan-history-item:hover,
 #main-deep-dive-container .dd-taiwan-history-item:focus-visible { border-color: #e67e22; outline: none; }
+#main-deep-dive-container .dd-taiwan-history-delete {
+    flex: 0 0 auto;
+    padding: 0 14px;
+    color: #d0a294;
+    background: #1b1917;
+    border: 1px solid #574039;
+    border-radius: 9px;
+    cursor: pointer;
+}
+#main-deep-dive-container .dd-taiwan-history-delete:hover,
+#main-deep-dive-container .dd-taiwan-history-delete:focus-visible { color: #fff; border-color: #c6654e; outline: none; }
+#main-deep-dive-container .dd-taiwan-history-delete:disabled { opacity: .5; cursor: wait; }
 #main-deep-dive-container .dd-taiwan-history-more { margin-top: 14px; }
 #main-deep-dive-container .dd-taiwan-history-more[hidden],
 #main-deep-dive-container .dd-cached-report-note[hidden] { display: none; }
@@ -3858,9 +3872,11 @@ body.light-mode #info-section .market-report-output input { color: #172033; back
 #main-deep-dive-container .dd-cached-view .dd-export-btn { display: none !important; }
 #main-deep-dive-container .dd-cached-view .dd-report-column { flex: 1 1 100%; }
 @media (max-width: 700px) {
+    #main-deep-dive-container .dd-taiwan-history-row { align-items: stretch; }
     #main-deep-dive-container .dd-taiwan-history-item { grid-template-columns: 1fr auto; }
     #main-deep-dive-container .dd-taiwan-history-item time { grid-column: 1 / -1; grid-row: 2; }
     #main-deep-dive-container .dd-taiwan-history-item span { grid-column: 2; grid-row: 1; }
+    #main-deep-dive-container .dd-taiwan-history-delete { padding: 0 10px; }
 }
 
 /* =========================================================

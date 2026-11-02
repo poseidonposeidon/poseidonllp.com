@@ -1,6 +1,6 @@
 const isLocalFlask = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const baseUrl = isLocalFlask ? window.location.origin : 'https://api.poseidonllp.com';
-const POSEIDON_FRONTEND_BUILD = '20260930-transcript2';
+const POSEIDON_FRONTEND_BUILD = '20261102-tw-history';
 console.info(`[Poseidon] frontend build ${POSEIDON_FRONTEND_BUILD}`);
 const API_KEY = ''; // FMP key is server-side only.
 const BASE_URL = `${baseUrl}/api/fmp/`;
@@ -9518,20 +9518,30 @@ async function loadTaiwanHistory(reset = true) {
         if (!Array.isArray(records)) throw new Error('紀錄格式不正確');
         if (container.dataset.researchMarket !== 'TW') return;
         if (reset) list.replaceChildren();
-        if (!records.length && reset) list.textContent = '目前尚無台股分析紀錄。';
-        for (const item of records) {
+        const taiwanRecords = records.filter(item => /^[1-9]\d{3}(?:\.(?:TW|TWO))?$/.test(item.symbol || ''));
+        if (!taiwanRecords.length && reset) list.textContent = '目前尚無台股分析紀錄。';
+        for (const item of taiwanRecords) {
+            const row = document.createElement('div');
+            row.className = 'dd-taiwan-history-row';
             const button = document.createElement('button');
             button.type = 'button';
             button.className = 'dd-taiwan-history-item';
             const symbol = document.createElement('strong');
-            symbol.textContent = item.symbol;
+            symbol.textContent = [item.symbol, item.company_name].filter(Boolean).join(' · ');
             const date = document.createElement('time');
             date.textContent = `${item.date}（台灣時間）`;
             const arrow = document.createElement('span');
             arrow.textContent = '閱讀報告 →';
             button.append(symbol, date, arrow);
             button.addEventListener('click', () => restoreTaiwanHistory(item.id));
-            list.appendChild(button);
+            const remove = document.createElement('button');
+            remove.type = 'button';
+            remove.className = 'dd-taiwan-history-delete';
+            remove.textContent = '刪除';
+            remove.setAttribute('aria-label', `刪除 ${symbol.textContent} 於 ${item.date} 的報告`);
+            remove.addEventListener('click', () => deleteTaiwanHistory(item, row));
+            row.append(button, remove);
+            list.appendChild(row);
         }
         taiwanHistoryPage = page;
         more.hidden = records.length < 30;
@@ -9543,6 +9553,40 @@ async function loadTaiwanHistory(reset = true) {
     }
 }
 
+async function deleteTaiwanHistory(item, row) {
+    const label = [item.symbol, item.company_name].filter(Boolean).join(' · ');
+    if (!window.confirm(`確定刪除 ${label}（${item.date}）這筆歷史報告？刪除後無法復原。`)) return;
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+        alert('請先登入，才能刪除歷史報告。');
+        return;
+    }
+    const button = row.querySelector('.dd-taiwan-history-delete');
+    button.disabled = true;
+    try {
+        const apiRoot = typeof baseUrl !== 'undefined' ? baseUrl : '';
+        const response = await fetch(`${apiRoot}/api/history/${encodeURIComponent(item.id)}`, {
+            method: 'DELETE',
+            headers: {'Authorization': `Bearer ${token}`}
+        });
+        if (!response.ok) {
+            const error = await response.json().catch(() => ({}));
+            throw new Error(error.error || `HTTP ${response.status}`);
+        }
+        row.remove();
+        if (!document.querySelector('#dd-taiwan-history-list .dd-taiwan-history-row')) {
+            document.getElementById('dd-taiwan-history-list').textContent = '目前尚無台股分析紀錄。';
+        }
+        if (window.currentTaiwanHistoryId === item.id) {
+            window.currentTaiwanHistoryId = null;
+            setDeepDiveMarket('TW');
+        }
+    } catch (error) {
+        alert(`刪除失敗：${error.message}`);
+        button.disabled = false;
+    }
+}
+
 async function restoreTaiwanHistory(historyId) {
     const list = document.getElementById('dd-taiwan-history-list');
     try {
@@ -9550,7 +9594,7 @@ async function restoreTaiwanHistory(historyId) {
         const response = await fetch(`${apiRoot}/api/history/${encodeURIComponent(historyId)}`, {cache: 'no-store'});
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const item = await response.json();
-        if (!/^[1-9]\d{3}\.(?:TW|TWO)$/.test(item.symbol || '') || !item.report) {
+        if (!/^[1-9]\d{3}(?:\.(?:TW|TWO))?$/.test(item.symbol || '') || !item.report) {
             throw new Error('這筆不是可還原的台股研究報告');
         }
         setDeepDiveMarket('TW');
@@ -9561,6 +9605,7 @@ async function restoreTaiwanHistory(historyId) {
         const report = document.getElementById('dd-report-container');
         window.currentDeepDiveData = item.raw_data || {};
         window.currentReportContent = item.report;
+        window.currentTaiwanHistoryId = item.id;
         if (empty) empty.style.display = 'none';
         if (main) {
             main.classList.add('dd-cached-view');
