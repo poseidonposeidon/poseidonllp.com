@@ -550,7 +550,7 @@
 
 <div class="overlay"></div>
 <!--/////////////////////////////////body資料/////////////////////////////////-->
-<div class="body-container" id="main-deep-dive-container" style="padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 95%; margin: 0 auto;">
+<div class="body-container" id="main-deep-dive-container" data-research-market="US" style="padding: 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; width: 100%; max-width: 95%; margin: 0 auto;">
     <div id="dd-loading-screen" class="dd-loading">
         <div class="loader">
             <div></div><div></div><div></div>
@@ -566,20 +566,21 @@
                 <h2 id="dd-workspace-title">美股研究工作台</h2>
                 <span class="dd-pro-badge">PRO</span>
             </div>
-            <p>輸入股票代碼，快速整合財務、估值、籌碼、情緒與新聞資訊。</p>
+            <p id="dd-market-description">整合美股最新財報、法說會逐字稿與市場資料，產出研究報告。</p>
+            <button id="dd-market-switch" class="dd-market-switch" type="button" onclick="setDeepDiveMarket('TW')" aria-label="切換至台股研究">切換至台股 <span aria-hidden="true">→</span></button>
         </div>
 
         <div class="dd-primary-action">
-            <label for="dd-stock-input">股票代碼</label>
+            <label id="dd-symbol-label" for="dd-stock-input">美股股票代碼</label>
             <div class="dd-search-row">
                 <div class="dd-search-box">
                     <span class="dd-search-icon" aria-hidden="true">⌕</span>
-                    <input type="text" id="dd-stock-input" class="dd-search-input" placeholder="輸入代碼，例如 AAPL" autocomplete="off" spellcheck="false">
+                    <input type="text" id="dd-stock-input" class="dd-search-input" placeholder="例如 AAPL" autocomplete="off" spellcheck="false">
                     <div id="dd-suggestions" class="dd-suggestions-list"></div>
                 </div>
                 <button onclick="runDeepDive()" class="action-btn btn-analyze" type="button">開始分析 <span aria-hidden="true">→</span></button>
             </div>
-            <small>分析結果包含財務趨勢、估值區間、技術面與 AI 重點摘要。</small>
+            <small id="dd-market-hint">以最新季度財報與法說會逐字稿為主，並參照歷史資料。</small>
         </div>
 
         <nav class="dd-tool-nav" aria-label="研究工具">
@@ -600,6 +601,13 @@
     </header>
 
     <div id="dd-empty-state" class="dd-empty-state">
+
+        <section class="dd-taiwan-start" aria-labelledby="dd-taiwan-start-title">
+            <span class="dd-eyebrow">TAIWAN RESEARCH</span>
+            <h3 id="dd-taiwan-start-title">從台股代碼開始</h3>
+            <p>使用 FMP 多季財報，優先分析最新季度；若有本地 Synology 研究 memo，會標示來源並一併參考。</p>
+            <div class="dd-taiwan-examples"><button type="button" onclick="triggerTaiwanAnalysis('3167')">3167 大量</button><button type="button" onclick="triggerTaiwanAnalysis('2330')">2330 台積電</button><button type="button" onclick="triggerTaiwanAnalysis('2454')">2454 聯發科</button></div>
+        </section>
 
         <section class="sector-explorer" aria-labelledby="sector-explorer-title">
             <div class="sector-explorer-copy">

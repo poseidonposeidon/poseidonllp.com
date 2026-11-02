@@ -3755,6 +3755,55 @@ body.light-mode #info-section .market-report-output input { color: #172033; back
     #info-section .market-report-output { margin-bottom: 12px; }
 }
 
+/* Keep the two research markets separate; US is the default workspace. */
+#main-deep-dive-container .dd-market-switch {
+    margin-top: 14px;
+    padding: 8px 12px;
+    color: #f0ae70;
+    background: rgba(230, 126, 34, .08);
+    border: 1px solid rgba(230, 126, 34, .38);
+    border-radius: 8px;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+}
+#main-deep-dive-container .dd-market-switch:hover,
+#main-deep-dive-container .dd-market-switch:focus-visible {
+    color: #fff;
+    border-color: #e67e22;
+    outline: none;
+}
+#main-deep-dive-container .dd-market-switch:disabled { opacity: .5; cursor: wait; }
+#main-deep-dive-container .dd-taiwan-start { display: none; }
+#main-deep-dive-container[data-research-market="TW"] .dd-taiwan-start {
+    display: block;
+    width: 100%;
+    max-width: 900px;
+    margin: 20px auto;
+    padding: 28px;
+    color: #f3ede6;
+    background: #12110f;
+    border: 1px solid rgba(230, 126, 34, .22);
+    border-radius: 14px;
+}
+#main-deep-dive-container .dd-taiwan-start h3 { margin: 8px 0; font-size: 22px; }
+#main-deep-dive-container .dd-taiwan-start p { color: #aaa39b; line-height: 1.7; }
+#main-deep-dive-container .dd-taiwan-examples { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+#main-deep-dive-container .dd-taiwan-examples button {
+    padding: 9px 14px;
+    color: #f0ae70;
+    background: #1c1916;
+    border: 1px solid #4c3421;
+    border-radius: 8px;
+    cursor: pointer;
+}
+#main-deep-dive-container .dd-taiwan-examples button:hover { border-color: #e67e22; }
+#main-deep-dive-container[data-research-market="TW"] .sector-explorer,
+#main-deep-dive-container[data-research-market="TW"] .dd-news-region,
+#main-deep-dive-container[data-research-market="TW"] #dd-empty-state > details,
+#main-deep-dive-container[data-research-market="TW"] .dd-tool-nav { display: none !important; }
+
 /* =========================================================
    Unified global stock workspaces (JP / TW / EU / KR / HK / CN)
    ========================================================= */

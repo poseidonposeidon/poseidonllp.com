@@ -9456,6 +9456,48 @@ function closeDeepDiveModal() {
 }
 
 // ✅ 支援 suffix 參數 (例如 '-main')
+function setDeepDiveMarket(market) {
+    const container = document.getElementById('main-deep-dive-container');
+    if (!container) return;
+    const next = market === 'TW' ? 'TW' : 'US';
+    container.dataset.researchMarket = next;
+    const taiwan = next === 'TW';
+    document.getElementById('dd-workspace-title').textContent = taiwan ? '台股研究工作台' : '美股研究工作台';
+    document.getElementById('dd-market-description').textContent = taiwan
+        ? '以台股最新財報為主，對照多季趨勢與本地研究 memo。'
+        : '整合美股最新財報、法說會逐字稿與市場資料，產出研究報告。';
+    document.getElementById('dd-symbol-label').textContent = taiwan ? '台股股票代碼' : '美股股票代碼';
+    document.getElementById('dd-market-hint').textContent = taiwan
+        ? '輸入四位代碼；自動辨識上市／上櫃。可用的 Synology memo 會標示來源。'
+        : '以最新季度財報與法說會逐字稿為主，並參照歷史資料。';
+    const button = document.getElementById('dd-market-switch');
+    button.innerHTML = taiwan ? '切換至美股 <span aria-hidden="true">→</span>' : '切換至台股 <span aria-hidden="true">→</span>';
+    button.setAttribute('aria-label', taiwan ? '切換至美股研究' : '切換至台股研究');
+    button.onclick = () => setDeepDiveMarket(taiwan ? 'US' : 'TW');
+    const input = document.getElementById('dd-stock-input');
+    input.value = '';
+    input.placeholder = taiwan ? '例如 3167' : '例如 AAPL';
+    const suggestions = document.getElementById('dd-suggestions');
+    suggestions.innerHTML = '';
+    suggestions.classList.remove('active');
+    const report = document.getElementById('dd-report-container');
+    if (report) report.innerHTML = '';
+    const main = document.getElementById('dd-main-content');
+    if (main) main.style.display = 'none';
+    const empty = document.getElementById('dd-empty-state');
+    if (empty) empty.style.display = 'block';
+    const loading = document.getElementById('dd-loading-screen');
+    if (loading) loading.style.display = 'none';
+    window.currentDeepDiveData = null;
+    window.currentReportContent = null;
+}
+
+function triggerTaiwanAnalysis(symbol) {
+    setDeepDiveMarket('TW');
+    document.getElementById('dd-stock-input').value = symbol;
+    runDeepDive();
+}
+
 async function runDeepDive(event) {
     // 1. 防止表單重整與基礎檢查
     if (event) {
@@ -9472,8 +9514,17 @@ async function runDeepDive(event) {
     if (!symbolInput) return;
 
     const symbol = symbolInput.value.trim().toUpperCase();
+    const market = document.getElementById('main-deep-dive-container')?.dataset.researchMarket || 'US';
     if (!symbol) {
         alert("請輸入股票代碼！");
+        return;
+    }
+    if (market === 'TW' && !/^[1-9]\d{3}(?:\.(?:TW|TWO))?$/.test(symbol)) {
+        alert('台股模式請輸入四位股票代碼，例如 3167。');
+        return;
+    }
+    if (market === 'US' && (!/^[A-Z][A-Z0-9.\-]{0,19}$/.test(symbol) || /\.(?:TW|TWO)$/.test(symbol))) {
+        alert('美股模式請輸入美股代碼，例如 AAPL。');
         return;
     }
 
@@ -9483,12 +9534,16 @@ async function runDeepDive(event) {
     const reportContainer = document.getElementById('dd-report-container');
     const emptyState = document.getElementById('dd-empty-state');
     const mainContent = document.getElementById('dd-main-content');
+    const marketSwitch = document.getElementById('dd-market-switch');
+    if (marketSwitch) marketSwitch.disabled = true;
 
     if (emptyState) emptyState.style.display = 'none';
     if (mainContent) mainContent.style.display = 'block';
 
     if (loadingScreen) loadingScreen.style.display = 'flex';
-    if (loadingText) loadingText.innerText = "正在調用 FMP API 獲取：估值模型、內部人交易、法說會逐字稿...";
+    if (loadingText) loadingText.innerText = market === 'TW'
+        ? "正在取得 FMP 台股多季財報，並核對 Synology 研究 memo..."
+        : "正在調用 FMP API 獲取：估值模型、內部人交易、法說會逐字稿...";
     if (reportContainer) reportContainer.innerHTML = "";
 
     try {
@@ -9501,7 +9556,7 @@ async function runDeepDive(event) {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ symbol: symbol })
+            body: JSON.stringify({ symbol: symbol, market: market })
         });
 
         if (!startResponse.ok) {
@@ -9537,6 +9592,7 @@ async function runDeepDive(event) {
         }
 
         if (!data) throw new Error('分析等待逾時，請稍後再試');
+        const analysisSymbol = data.raw_data?.symbol || symbol;
 
         // 4. 儲存至全域變數供後續 Chat 或沙盤使用
         window.currentDeepDiveData = data.raw_data;
@@ -9589,21 +9645,38 @@ async function runDeepDive(event) {
         window.deepDiveChartInstances = window.deepDiveChartInstances || {};
 
         // 7. 平行處理所有圖表繪製 (大幅提升渲染速度)
-        await Promise.all([
-            drawValuationChart(symbol),
-            drawInsiderChart(data.raw_data.insider_transactions),
-            drawMarginsChart(symbol),
-            drawGrowthChart(symbol),
-            drawCashflowChart(symbol),
-            drawTechChart(symbol),
-            drawSurpriseChart(symbol),
-            drawSolvencyChart(symbol),
-            drawEfficiencyChart(symbol)
+        const chartResults = await Promise.allSettled([
+            drawValuationChart(analysisSymbol),
+            drawInsiderChart(data.raw_data.insider_transactions, '', data.raw_data.market),
+            drawMarginsChart(analysisSymbol),
+            drawGrowthChart(analysisSymbol),
+            drawCashflowChart(analysisSymbol),
+            drawTechChart(analysisSymbol),
+            drawSurpriseChart(analysisSymbol),
+            drawSolvencyChart(analysisSymbol),
+            drawEfficiencyChart(analysisSymbol)
         ]);
+        const chartIds = ['dd-valuation-chart', 'dd-insider-chart', 'dd-financial-chart',
+            'dd-growth-chart', 'dd-cashflow-chart', 'dd-tech-chart', 'dd-surprise-chart',
+            'dd-solvency-chart', 'dd-efficiency-chart'];
+        chartResults.forEach((result, index) => {
+            if (result.status !== 'rejected') return;
+            console.warn(`Chart ${chartIds[index]} unavailable`, result.reason);
+            const canvas = document.getElementById(chartIds[index]);
+            if (!canvas) return;
+            canvas.style.display = 'none';
+            const wrapper = canvas.parentElement;
+            if (wrapper && !wrapper.querySelector('.no-data-msg')) {
+                const message = document.createElement('div');
+                message.className = 'no-data-msg';
+                message.textContent = '此圖表所需資料目前無法取得；不影響上方研究報告。';
+                wrapper.appendChild(message);
+            }
+        });
 
         // 8. 綁定其他交互功能
         if (typeof attachChartClickListeners === 'function') attachChartClickListeners();
-        initDeepDiveChat(symbol);
+        initDeepDiveChat(analysisSymbol);
 
     } catch (error) {
         console.error("Deep Dive Error:", error);
@@ -9613,6 +9686,7 @@ async function runDeepDive(event) {
     } finally {
         // 9. 無論成功或失敗，最終一定要隱藏 Loading 畫面
         if (loadingScreen) loadingScreen.style.display = 'none';
+        if (marketSwitch) marketSwitch.disabled = false;
     }
 }
 
@@ -9710,7 +9784,7 @@ async function drawValuationChart(symbol, suffix = '') {
     });
 }
 
-function drawInsiderChart(insiderData, suffix = '') {
+function drawInsiderChart(insiderData, suffix = '', market = 'US') {
     const canvas = document.getElementById('dd-insider-chart' + suffix);
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -9735,7 +9809,9 @@ function drawInsiderChart(insiderData, suffix = '') {
             noDataDiv.className = 'no-data-msg';
             // 使用 Flexbox 完美置中
             noDataDiv.style.cssText = 'color: #888; display: flex; flex-direction: column; justify-content: center; align-items: center; height: 100%; min-height: 150px; font-size: 14px; text-align: center;';
-            noDataDiv.innerHTML = '<span>No Recent Insider Trading Data</span><span style="font-size: 12px; margin-top: 4px;">(近期無內部人交易)</span>';
+            noDataDiv.textContent = market === 'TW'
+                ? '台股內部人交易資料尚未接入；不能據此判定沒有交易。'
+                : '近期沒有可用的內部人交易資料。';
             wrapper.appendChild(noDataDiv);
         }
         return; // 提早結束，不執行畫圖
@@ -10244,13 +10320,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 suggestionsBox.classList.add('active');
 
                 // 呼叫 FMP API 抓取資料 (請確保 API_KEY 在全域有宣告)
-                const url = `${BASE_URL}search-symbol?query=${encodeURIComponent(query)}&limit=10&exchange=NASDAQ,NYSE`;
+                const market = e.target.id === 'dd-stock-input'
+                    ? (document.getElementById('main-deep-dive-container')?.dataset.researchMarket || 'US') : 'US';
+                const url = market === 'TW'
+                    ? `${BASE_URL}search-symbol?query=${encodeURIComponent(query)}&limit=10&market=TW`
+                    : `${BASE_URL}search-symbol?query=${encodeURIComponent(query)}&limit=10&exchange=NASDAQ,NYSE`;
                 const response = await fetch(url);
                 if (!response.ok) throw new Error("API Error");
                 const data = await response.json();
+                if (e.target.value.trim().toUpperCase() !== query ||
+                    (e.target.id === 'dd-stock-input' && document.getElementById('main-deep-dive-container')?.dataset.researchMarket !== market)) return;
 
                 // 渲染推薦選單
-                renderDDSuggestions(data, suggestionsBox, e.target);
+                renderDDSuggestions(market === 'TW'
+                    ? data.filter(item => /\.TW$|\.TWO$/.test(item.symbol || '')) : data, suggestionsBox, e.target);
             } catch (error) {
                 console.error("Search Suggestion Error:", error);
                 suggestionsBox.classList.remove('active');
@@ -10465,6 +10548,7 @@ function triggerAnalysis(symbol, event) {
         event.preventDefault();
     }
 
+    setDeepDiveMarket('US');
     const input = document.getElementById('dd-stock-input');
     if (input) {
         input.value = symbol; // 自動把股票代碼填入上方搜尋框
