@@ -9652,12 +9652,12 @@ async function runDeepDive(event) {
         // 7. 平行處理所有圖表繪製 (大幅提升渲染速度)
         const chartResults = await Promise.allSettled([
             drawValuationChart(analysisSymbol),
-            drawInsiderChart(data.raw_data.insider_transactions, '', data.raw_data.market),
+            market === 'TW' ? Promise.resolve() : drawInsiderChart(data.raw_data.insider_transactions, '', data.raw_data.market),
             drawMarginsChart(analysisSymbol),
             drawGrowthChart(analysisSymbol),
             drawCashflowChart(analysisSymbol),
             drawTechChart(analysisSymbol),
-            drawSurpriseChart(analysisSymbol),
+            market === 'TW' ? Promise.resolve() : drawSurpriseChart(analysisSymbol),
             drawSolvencyChart(analysisSymbol),
             drawEfficiencyChart(analysisSymbol)
         ]);
@@ -9773,8 +9773,8 @@ async function drawValuationChart(symbol, suffix = '') {
         data: {
             labels: labels,
             datasets: [
-                { label: 'Stock Price', data: closeData, borderColor: '#f0b90b', borderWidth: 1.5, pointRadius: 0 },
-                { label: '200 MA (Valuation Baseline)', data: sma200, borderColor: 'rgba(255, 255, 255, 0.5)', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
+                { label: '收盤價', data: closeData, borderColor: '#f0b90b', borderWidth: 1.5, pointRadius: 0 },
+                { label: '200 日均線', data: sma200, borderColor: 'rgba(255, 255, 255, 0.5)', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
             ]
         },
         options: {
@@ -11040,7 +11040,7 @@ async function downloadDashboardPDF(event) {
         // 3. 收集所有圖表 Base64
         const chartData = [];
         const canvasIds = [
-            { id: 'dd-valuation-chart', title: '本益比估值區間' },
+            { id: 'dd-valuation-chart', title: '股價與 200 日均線' },
             { id: 'dd-insider-chart', title: '內部人交易趨勢' },
             { id: 'dd-financial-chart', title: '獲利率趨勢' },
             { id: 'dd-growth-chart', title: '營收與每股盈餘' },
@@ -11053,7 +11053,9 @@ async function downloadDashboardPDF(event) {
 
         for (const item of canvasIds) {
             const canvas = document.getElementById(item.id);
-            if (canvas && canvas.toDataURL) {
+            const card = canvas?.closest('.dd-chart-card');
+            if (canvas && canvas.toDataURL && canvas.style.display !== 'none' &&
+                (!card || getComputedStyle(card).display !== 'none')) {
                 chartData.push({
                     title: item.title,
                     image: canvas.toDataURL('image/png')

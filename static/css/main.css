@@ -3803,6 +3803,7 @@ body.light-mode #info-section .market-report-output input { color: #172033; back
 #main-deep-dive-container[data-research-market="TW"] .dd-news-region,
 #main-deep-dive-container[data-research-market="TW"] #dd-empty-state > details,
 #main-deep-dive-container[data-research-market="TW"] .dd-tool-nav { display: none !important; }
+#main-deep-dive-container[data-research-market="TW"] .dd-us-only-chart { display: none !important; }
 
 /* =========================================================
    Unified global stock workspaces (JP / TW / EU / KR / HK / CN)
