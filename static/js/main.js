@@ -9495,6 +9495,7 @@ function setDeepDiveMarket(market) {
     if (loading) loading.style.display = 'none';
     window.currentDeepDiveData = null;
     window.currentReportContent = null;
+    window.currentTaiwanHistoryId = null;
     if (taiwan) loadTaiwanHistory(true);
 }
 
@@ -9622,6 +9623,7 @@ async function restoreTaiwanHistory(historyId) {
             back.textContent = '返回過往研究';
             back.addEventListener('click', () => setDeepDiveMarket('TW'));
             note.replaceChildren(description, back);
+            delete note.dataset.priceBackfilled;
             note.hidden = false;
         }
         renderCachedTaiwanReport(item.report, report);
@@ -9790,6 +9792,7 @@ async function runDeepDive(event) {
         // 4. 儲存至全域變數供後續 Chat 或沙盤使用
         window.currentDeepDiveData = data.raw_data;
         window.currentReportContent = data.report;
+        window.currentTaiwanHistoryId = null;
 
         if (loadingText) loadingText.innerText = "AI 正在排版分析報告與財務雷達...";
 
@@ -10357,8 +10360,45 @@ async function loadDeepDiveChartRows(symbol, endpoint, field, period, limit) {
 async function fetchStockPriceHistory(symbol, limit) {
     if (isTaiwanDeepDive()) {
         const rows = window.currentDeepDiveData?.price_history;
-        if (!Array.isArray(rows)) return [];
-        return rows.slice(-limit).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+        if (Array.isArray(rows) && rows.length) {
+            return rows.slice(-limit).sort((a, b) => String(a.date).localeCompare(String(b.date)));
+        }
+        // Reports produced by a still-running older server have no saved price
+        // series. Recover the chart without rerunning the AI analysis.
+        const currentData = window.currentDeepDiveData;
+        window.taiwanPriceHistoryRequests ||= new Map();
+        let pending = window.taiwanPriceHistoryRequests.get(symbol);
+        if (!pending) {
+            const url = `${BASE_URL}historical-price-eod/full?symbol=${encodeURIComponent(symbol)}&timeseries=1095`;
+            pending = fetch(url, {cache: 'no-store'}).then(async response => {
+                if (!response.ok) throw new Error(`台股歷史股價 HTTP ${response.status}`);
+                const payload = await response.json();
+                const historical = Array.isArray(payload.historical) ? payload.historical : [];
+                if (!historical.length) throw new Error('FMP 未提供台股歷史股價');
+                return historical.sort((a, b) => String(a.date).localeCompare(String(b.date)));
+            });
+            window.taiwanPriceHistoryRequests.set(symbol, pending);
+        }
+        let sorted;
+        try {
+            sorted = await pending;
+        } finally {
+            if (window.taiwanPriceHistoryRequests.get(symbol) === pending) {
+                window.taiwanPriceHistoryRequests.delete(symbol);
+            }
+        }
+        if (window.currentDeepDiveData === currentData &&
+            (!Array.isArray(currentData.price_history) || !currentData.price_history.length)) {
+            currentData.price_history = sorted;
+        }
+        if (window.currentTaiwanHistoryId && window.currentDeepDiveData === currentData) {
+            const note = document.getElementById('dd-cached-report-note');
+            if (note && !note.dataset.priceBackfilled) {
+                note.append(' · 股價圖表為開啟時補取得，非原報告快照。');
+                note.dataset.priceBackfilled = 'true';
+            }
+        }
+        return sorted.slice(-limit);
     }
     const url = `${BASE_URL}historical-price-eod/full?symbol=${encodeURIComponent(symbol)}&timeseries=${limit}`;
     const res = await fetch(url);
