@@ -1,6 +1,6 @@
 const isLocalFlask = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const baseUrl = isLocalFlask ? window.location.origin : 'https://api.poseidonllp.com';
-const POSEIDON_FRONTEND_BUILD = '20261103-tw-news-preview';
+const POSEIDON_FRONTEND_BUILD = '20261103-tw-news-search-type';
 console.info(`[Poseidon] frontend build ${POSEIDON_FRONTEND_BUILD}`);
 const API_KEY = ''; // FMP key is server-side only.
 const BASE_URL = `${baseUrl}/api/fmp/`;
@@ -9497,6 +9497,10 @@ function setDeepDiveMarket(market) {
     window.currentReportContent = null;
     window.currentTaiwanHistoryId = null;
     if (taiwan) {
+        const newsQuery = document.getElementById('dd-taiwan-news-query');
+        if (newsQuery) newsQuery.value = '';
+        const newsReset = document.getElementById('dd-taiwan-news-reset');
+        if (newsReset) newsReset.hidden = true;
         loadTaiwanHistory(true);
         loadTaiwanNewsPreview();
     }
@@ -9524,22 +9528,36 @@ document.addEventListener('DOMContentLoaded', () => {
         // Reuse the existing cross-domain workspace login flow in the main navigation.
         document.querySelector('.workspace-nav nav a[href="/workspace/news-center"]')?.click();
     });
+    document.getElementById('dd-taiwan-news-search')?.addEventListener('submit', event => {
+        event.preventDefault();
+        const query = document.getElementById('dd-taiwan-news-query')?.value.trim() || '';
+        document.getElementById('dd-taiwan-news-reset').hidden = !query;
+        loadTaiwanNewsPreview(query);
+    });
+    document.getElementById('dd-taiwan-news-reset')?.addEventListener('click', () => {
+        document.getElementById('dd-taiwan-news-query').value = '';
+        document.getElementById('dd-taiwan-news-reset').hidden = true;
+        loadTaiwanNewsPreview();
+    });
 });
 
-async function loadTaiwanNewsPreview() {
+let taiwanNewsRequestId = 0;
+async function loadTaiwanNewsPreview(query = '') {
     const list = document.getElementById('dd-taiwan-news-list');
     const container = document.getElementById('main-deep-dive-container');
     if (!list || container?.dataset.researchMarket !== 'TW') return;
-    list.textContent = '正在讀取新聞中心的已保存消息…';
+    const requestId = ++taiwanNewsRequestId;
+    list.textContent = query ? `正在搜尋「${query}」的已保存新聞…` : '正在讀取新聞中心的已保存消息…';
     try {
-        const response = await fetch(`${baseUrl}/api/taiwan_research_news`, {cache: 'no-store'});
+        const params = query ? `?q=${encodeURIComponent(query)}` : '';
+        const response = await fetch(`${baseUrl}/api/taiwan_research_news${params}`, {cache: 'no-store'});
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         const payload = await response.json();
         if (!Array.isArray(payload.articles)) throw new Error('新聞格式不正確');
-        if (container.dataset.researchMarket !== 'TW') return;
+        if (requestId !== taiwanNewsRequestId || container.dataset.researchMarket !== 'TW') return;
         list.replaceChildren();
         if (!payload.articles.length) {
-            list.textContent = '目前沒有已保存的新聞；可到新聞中心查看來源狀態。';
+            list.textContent = query ? `找不到「${query}」相關的已保存新聞。` : '目前沒有已保存的新聞；可到新聞中心查看來源狀態。';
             return;
         }
         for (const item of payload.articles) {
@@ -9569,7 +9587,7 @@ async function loadTaiwanNewsPreview() {
             list.appendChild(card);
         }
     } catch (error) {
-        if (container.dataset.researchMarket === 'TW') {
+        if (requestId === taiwanNewsRequestId && container.dataset.researchMarket === 'TW') {
             list.textContent = '新聞摘要暫時無法載入；完整內容仍可從新聞中心查看。';
         }
         console.error('Taiwan news preview failed:', error);

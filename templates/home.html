@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261103-tw-news-preview">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261103-tw-news-search-type">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <script defer src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -616,6 +616,7 @@
             </details>
             <section class="dd-taiwan-news" aria-labelledby="dd-taiwan-news-title">
                 <div class="dd-taiwan-news-heading"><div><span class="dd-eyebrow">TAIWAN MARKET NEWS</span><h4 id="dd-taiwan-news-title">台股投資者優先新聞</h4><p>取自新聞中心的已保存內容；顯示來源與時間，新聞不代表投資建議。</p></div><button id="dd-taiwan-news-full" type="button">前往新聞中心 <span aria-hidden="true">↗</span></button></div>
+                <form id="dd-taiwan-news-search" class="dd-taiwan-news-search" role="search"><label for="dd-taiwan-news-query">搜尋公司名稱或股票代號</label><div><input id="dd-taiwan-news-query" name="q" type="search" maxlength="60" placeholder="例如 台積電、2330、半導體"><button type="submit">搜尋</button><button id="dd-taiwan-news-reset" type="button" hidden>清除</button></div></form>
                 <div id="dd-taiwan-news-list" class="dd-taiwan-news-list" aria-live="polite">切換至台股後載入新聞…</div>
             </section>
         </section>
@@ -1441,7 +1442,7 @@
     </div>
 </div>
 
-<script defer src="/static/js/main.js?v=20261103-tw-news-preview"></script>
+<script defer src="/static/js/main.js?v=20261103-tw-news-search-type"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
