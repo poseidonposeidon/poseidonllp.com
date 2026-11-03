@@ -3776,6 +3776,8 @@ body.light-mode #info-section .market-report-output input { color: #172033; back
 }
 #main-deep-dive-container .dd-market-switch:disabled { opacity: .5; cursor: wait; }
 #main-deep-dive-container .dd-taiwan-start { display: none; }
+#main-deep-dive-container .dd-us-history { width: 100%; box-sizing: border-box; margin: 24px 0 0; }
+#main-deep-dive-container[data-research-market="TW"] .dd-us-history { display: none; }
 #main-deep-dive-container[data-research-market="TW"] .dd-taiwan-start {
     display: block;
     width: 100%;
@@ -5353,10 +5355,11 @@ body.light-mode #main-deep-dive-container .sector-btn { color: #475569; }
    Minimal market news feed — aligned with PRO workspace
    ========================================================= */
 #main-deep-dive-container .dd-news-region {
-    width: min(1200px, 100%);
+    width: 100%;
+    box-sizing: border-box;
     margin-inline: auto;
-    padding-top: 26px;
-    border-top: 1px solid rgba(255, 255, 255, .08);
+    padding-top: 20px;
+    border-top: 0;
 }
 
 #main-deep-dive-container .daily-briefing-container {
@@ -5534,6 +5537,24 @@ body.light-mode #main-deep-dive-container .sector-btn { color: #475569; }
     line-height: 1.65;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
+}
+
+/* Keep the US feed readable at the same full width as the research header. */
+@media (min-width: 1100px) {
+    #main-deep-dive-container .dd-news-region .market-news-list:has(.market-news-item) {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        padding: 18px 24px;
+    }
+    #main-deep-dive-container .dd-news-region .market-news-item {
+        padding: 17px 18px;
+        background: #1b1917;
+        border: 1px solid #39312a;
+        border-radius: 9px;
+    }
+    #main-deep-dive-container .dd-news-region .market-news-item::before { display: none; }
+    #main-deep-dive-container .dd-news-region .market-news-state { grid-column: 1 / -1; }
 }
 
 .market-news-state {

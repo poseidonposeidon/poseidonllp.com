@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261103-tw-wide-layout">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261103-us-wide-layout">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <script defer src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -617,78 +617,14 @@
             </section>
         </section>
 
-        <section class="sector-explorer" aria-labelledby="sector-explorer-title">
-            <div class="sector-explorer-copy">
-                <span class="dd-eyebrow">QUICK START</span>
-                <h3 id="sector-explorer-title">從熱門產業開始探索</h3>
-                <p>還沒有特定股票？選擇產業後可直接分析代表公司。</p>
-            </div>
-            <div class="sector-explorer-actions">
-
-            <div class="sector-dropdown">
-                <button type="button" class="sector-btn" aria-haspopup="true">科技與半導體 <span aria-hidden="true">⌄</span></button>
-                <div class="sector-dropdown-content">
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('NVDA')"><strong>NVDA</strong> 輝達</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('AAPL')"><strong>AAPL</strong> 蘋果</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('MSFT')"><strong>MSFT</strong> 微軟</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('GOOGL')"><strong>GOOGL</strong> 谷歌</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('META')"><strong>META</strong> 臉書</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('AVGO')"><strong>AVGO</strong> 博通</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('TSM')"><strong>TSM</strong> 台積電 ADR</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('AMD')"><strong>AMD</strong> 超微</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('ORCL')"><strong>ORCL</strong> 甲骨文</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('CRM')"><strong>CRM</strong> 賽富時</a>
+        <section class="dd-us-history" aria-label="過往美股研究">
+            <details class="dd-taiwan-history" open>
+                <summary class="dd-taiwan-history-heading"><span class="dd-taiwan-history-heading-copy"><span class="dd-eyebrow">SAVED RESEARCH</span><strong>過往美股研究</strong><small>點選股票即可閱讀其他使用者保存的完整分析，不需重新運算。</small></span><span class="dd-taiwan-history-summary-action"><span id="dd-us-history-count">讀取中</span><span class="dd-taiwan-history-chevron" aria-hidden="true">⌄</span></span></summary>
+                <div class="dd-taiwan-history-content">
+                    <div id="dd-us-history-list" class="dd-taiwan-history-list" aria-live="polite">正在載入過往研究…</div>
+                    <div class="dd-taiwan-history-actions"><button id="dd-us-history-expand" type="button" hidden>顯示更多研究</button></div>
                 </div>
-            </div>
-
-            <div class="sector-dropdown">
-                <button type="button" class="sector-btn" aria-haspopup="true">消費與零售 <span aria-hidden="true">⌄</span></button>
-                <div class="sector-dropdown-content">
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('AMZN')"><strong>AMZN</strong> 亞馬遜</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('TSLA')"><strong>TSLA</strong> 特斯拉</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('WMT')"><strong>WMT</strong> 沃爾瑪</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('COST')"><strong>COST</strong> 好市多</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('PG')"><strong>PG</strong> 寶僑</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('HD')"><strong>HD</strong> 家得寶</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('KO')"><strong>KO</strong> 可口可樂</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('MCD')"><strong>MCD</strong> 麥當勞</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('NKE')"><strong>NKE</strong> 耐吉</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('SBUX')"><strong>SBUX</strong> 星巴克</a>
-                </div>
-            </div>
-
-            <div class="sector-dropdown">
-                <button type="button" class="sector-btn" aria-haspopup="true">醫療與生技 <span aria-hidden="true">⌄</span></button>
-                <div class="sector-dropdown-content">
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('LLY')"><strong>LLY</strong> 禮來</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('UNH')"><strong>UNH</strong> 聯合健康</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('JNJ')"><strong>JNJ</strong> 嬌生</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('MRK')"><strong>MRK</strong> 默克</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('ABBV')"><strong>ABBV</strong> 艾伯維</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('TMO')"><strong>TMO</strong> 賽默飛世爾</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('ISRG')"><strong>ISRG</strong> 直覺外科</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('PFE')"><strong>PFE</strong> 輝瑞</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('SYK')"><strong>SYK</strong> 史賽克</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('VRTX')"><strong>VRTX</strong> 福泰製藥</a>
-                </div>
-            </div>
-
-            <div class="sector-dropdown">
-                <button type="button" class="sector-btn" aria-haspopup="true">金融與支付 <span aria-hidden="true">⌄</span></button>
-                <div class="sector-dropdown-content">
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('JPM')"><strong>JPM</strong> 摩根大通</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('V')"><strong>V</strong> Visa</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('MA')"><strong>MA</strong> 萬事達卡</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('BAC')"><strong>BAC</strong> 美國銀行</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('WFC')"><strong>WFC</strong> 富國銀行</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('MS')"><strong>MS</strong> 摩根士丹利</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('GS')"><strong>GS</strong> 高盛</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('AXP')"><strong>AXP</strong> 美國運通</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('BLK')"><strong>BLK</strong> 貝萊德</a>
-                    <a href="javascript:void(0);" onclick="triggerAnalysis('SCHW')"><strong>SCHW</strong> 嘉信理財</a>
-                </div>
-            </div>
-            </div>
+            </details>
         </section>
         <div class="dd-news-region">
 
@@ -1438,7 +1374,7 @@
     </div>
 </div>
 
-<script defer src="/static/js/main.js?v=20261103-tw-news-search-type"></script>
+<script defer src="/static/js/main.js?v=20261103-us-history-layout"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {

@@ -9503,8 +9503,76 @@ function setDeepDiveMarket(market) {
         if (newsReset) newsReset.hidden = true;
         loadTaiwanHistory(true);
         loadTaiwanNewsPreview();
+    } else {
+        loadUSHistory();
     }
 }
+
+let usHistoryPage = 0;
+async function loadUSHistory(reset = true) {
+    const list = document.getElementById('dd-us-history-list');
+    const count = document.getElementById('dd-us-history-count');
+    const expand = document.getElementById('dd-us-history-expand');
+    const container = document.getElementById('main-deep-dive-container');
+    if (!list || !count || !expand || container?.dataset.researchMarket !== 'US') return;
+    const page = reset ? 1 : usHistoryPage + 1;
+    if (reset) {
+        list.textContent = '正在載入過往研究…';
+        list.classList.remove('is-expanded');
+    }
+    expand.disabled = true;
+    try {
+        const apiRoot = typeof baseUrl !== 'undefined' ? baseUrl : '';
+        const response = await fetch(`${apiRoot}/api/history/list?market=US&page=${page}`, {cache: 'no-store'});
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const records = await response.json();
+        if (!Array.isArray(records)) throw new Error('紀錄格式不正確');
+        if (container.dataset.researchMarket !== 'US') return;
+        if (reset) list.replaceChildren();
+        if (!records.length && reset) list.textContent = '目前尚無美股分析紀錄。';
+        for (const item of records) {
+            const row = document.createElement('div');
+            row.className = 'dd-taiwan-history-row';
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.className = 'dd-taiwan-history-item';
+            const symbol = document.createElement('strong');
+            symbol.textContent = item.symbol || '未提供代碼';
+            const date = document.createElement('time');
+            date.textContent = `${item.date}（台灣時間）`;
+            const arrow = document.createElement('span');
+            arrow.textContent = '閱讀報告 →';
+            button.append(symbol, date, arrow);
+            button.addEventListener('click', () => restoreFromHistory(item.id));
+            row.appendChild(button);
+            list.appendChild(row);
+        }
+        usHistoryPage = page;
+        const rows = list.querySelectorAll('.dd-taiwan-history-row');
+        count.textContent = rows.length ? `已載入 ${rows.length} 筆 · 點擊展開／收合` : '點擊展開／收合';
+        expand.hidden = list.classList.contains('is-expanded') ? records.length < 30 : rows.length <= 3;
+        expand.textContent = list.classList.contains('is-expanded') ? '載入更早紀錄' : `顯示更多研究（${rows.length} 筆）`;
+    } catch (error) {
+        if (reset) list.textContent = '暫時無法載入研究紀錄，請稍後重試。';
+        console.error('US history load failed:', error);
+    } finally {
+        expand.disabled = false;
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const expand = document.getElementById('dd-us-history-expand');
+    expand?.addEventListener('click', () => {
+        const list = document.getElementById('dd-us-history-list');
+        if (!list.classList.contains('is-expanded')) {
+            list.classList.add('is-expanded');
+            expand.textContent = '載入更早紀錄';
+        } else {
+            loadUSHistory(false);
+        }
+    });
+    loadUSHistory(true);
+});
 
 let taiwanHistoryPage = 0;
 function updateTaiwanHistoryControls() {
