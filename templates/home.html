@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261102-tw-history-fix2">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261103-tw-news-preview">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <script defer src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -607,11 +607,17 @@
             <h3 id="dd-taiwan-start-title">從台股代碼開始</h3>
             <p>使用 FMP 多季財報，優先分析最新季度；若有本地 Synology 研究 memo，會標示來源並一併參考。</p>
             <div class="dd-taiwan-examples"><button type="button" onclick="triggerTaiwanAnalysis('3167')">3167 大量</button><button type="button" onclick="triggerTaiwanAnalysis('2330')">2330 台積電</button><button type="button" onclick="triggerTaiwanAnalysis('2454')">2454 聯發科</button></div>
-            <div class="dd-taiwan-history">
-                <div class="dd-taiwan-history-heading"><div><span class="dd-eyebrow">SAVED RESEARCH</span><h4>過往台股研究</h4><p>其他使用者已完成的分析；點選可直接閱讀當時報告，不會重新運算。</p></div></div>
-                <div id="dd-taiwan-history-list" class="dd-taiwan-history-list" aria-live="polite">切換至台股後載入紀錄…</div>
-                <button id="dd-taiwan-history-more" class="dd-taiwan-history-more" type="button" onclick="loadTaiwanHistory(false)" hidden>載入更多紀錄</button>
-            </div>
+            <details class="dd-taiwan-history" open>
+                <summary class="dd-taiwan-history-heading"><span class="dd-taiwan-history-heading-copy"><span class="dd-eyebrow">SAVED RESEARCH</span><strong>過往台股研究</strong><small>點選股票即可閱讀其他使用者保存的完整分析，不需重新運算。</small></span><span class="dd-taiwan-history-summary-action"><span id="dd-taiwan-history-count">讀取中</span><span class="dd-taiwan-history-chevron" aria-hidden="true">⌄</span></span></summary>
+                <div class="dd-taiwan-history-content">
+                    <div id="dd-taiwan-history-list" class="dd-taiwan-history-list" aria-live="polite">切換至台股後載入紀錄…</div>
+                    <div class="dd-taiwan-history-actions"><button id="dd-taiwan-history-expand" type="button" hidden>顯示更多研究</button><button id="dd-taiwan-history-more" class="dd-taiwan-history-more" type="button" onclick="loadTaiwanHistory(false)" hidden>載入更早紀錄</button></div>
+                </div>
+            </details>
+            <section class="dd-taiwan-news" aria-labelledby="dd-taiwan-news-title">
+                <div class="dd-taiwan-news-heading"><div><span class="dd-eyebrow">TAIWAN MARKET NEWS</span><h4 id="dd-taiwan-news-title">台股投資者優先新聞</h4><p>取自新聞中心的已保存內容；顯示來源與時間，新聞不代表投資建議。</p></div><button id="dd-taiwan-news-full" type="button">前往新聞中心 <span aria-hidden="true">↗</span></button></div>
+                <div id="dd-taiwan-news-list" class="dd-taiwan-news-list" aria-live="polite">切換至台股後載入新聞…</div>
+            </section>
         </section>
 
         <section class="sector-explorer" aria-labelledby="sector-explorer-title">
@@ -1435,7 +1441,7 @@
     </div>
 </div>
 
-<script defer src="/static/js/main.js?v=20261103-markdown-emphasis"></script>
+<script defer src="/static/js/main.js?v=20261103-tw-news-preview"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {

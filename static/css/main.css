@@ -3843,6 +3843,61 @@ body.light-mode #info-section .market-report-output input { color: #172033; back
 #main-deep-dive-container .dd-taiwan-history-more { margin-top: 14px; }
 #main-deep-dive-container .dd-taiwan-history-more[hidden],
 #main-deep-dive-container .dd-cached-report-note[hidden] { display: none; }
+#main-deep-dive-container .dd-taiwan-history {
+    padding: 0;
+    border: 1px solid rgba(230, 126, 34, .22);
+    border-radius: 11px;
+    overflow: hidden;
+}
+#main-deep-dive-container .dd-taiwan-history-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px;
+    cursor: pointer;
+    list-style: none;
+}
+#main-deep-dive-container .dd-taiwan-history-heading::-webkit-details-marker { display: none; }
+#main-deep-dive-container .dd-taiwan-history-heading:hover,
+#main-deep-dive-container .dd-taiwan-history-heading:focus-visible { background: rgba(230, 126, 34, .06); outline: none; }
+#main-deep-dive-container .dd-taiwan-history-heading-copy { display: grid; gap: 5px; min-width: 0; }
+#main-deep-dive-container .dd-taiwan-history-heading-copy strong { color: #f3ede6; font-size: 18px; }
+#main-deep-dive-container .dd-taiwan-history-heading-copy small { color: #aaa39b; font-size: 12px; line-height: 1.5; }
+#main-deep-dive-container .dd-taiwan-history-summary-action { display: flex; align-items: center; gap: 10px; color: #e8a363; font-size: 12px; white-space: nowrap; }
+#main-deep-dive-container .dd-taiwan-history-chevron { font-size: 20px; transition: transform .2s ease; }
+#main-deep-dive-container .dd-taiwan-history[open] .dd-taiwan-history-chevron { transform: rotate(180deg); }
+#main-deep-dive-container .dd-taiwan-history-content { padding: 0 18px 18px; }
+#main-deep-dive-container .dd-taiwan-history-list:not(.is-expanded) .dd-taiwan-history-row:nth-child(n+4) { display: none; }
+#main-deep-dive-container .dd-taiwan-history-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 13px; }
+#main-deep-dive-container .dd-taiwan-history-actions button,
+#main-deep-dive-container .dd-taiwan-news-heading button {
+    padding: 8px 12px;
+    color: #e8a363;
+    background: #1b1917;
+    border: 1px solid #4c3421;
+    border-radius: 7px;
+    font: inherit;
+    font-size: 12px;
+    cursor: pointer;
+}
+#main-deep-dive-container .dd-taiwan-history-actions button[hidden] { display: none; }
+#main-deep-dive-container .dd-taiwan-history-actions button:hover,
+#main-deep-dive-container .dd-taiwan-news-heading button:hover { color: #fff; border-color: #e67e22; }
+#main-deep-dive-container .dd-taiwan-history-more { margin-top: 0; }
+#main-deep-dive-container .dd-taiwan-history-actions .dd-taiwan-history-more:not([hidden]) { display: none; }
+#main-deep-dive-container .dd-taiwan-history-list.is-expanded + .dd-taiwan-history-actions .dd-taiwan-history-more:not([hidden]) { display: inline-block; }
+#main-deep-dive-container .dd-taiwan-news { margin-top: 24px; padding-top: 22px; border-top: 1px solid rgba(230, 126, 34, .18); }
+#main-deep-dive-container .dd-taiwan-news-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+#main-deep-dive-container .dd-taiwan-news-heading h4 { margin: 6px 0; color: #f3ede6; font-size: 18px; }
+#main-deep-dive-container .dd-taiwan-news-heading p { margin: 4px 0 0; color: #aaa39b; font-size: 12px; }
+#main-deep-dive-container .dd-taiwan-news-heading button { flex: 0 0 auto; }
+#main-deep-dive-container .dd-taiwan-news-list { display: grid; gap: 9px; margin-top: 17px; color: #aaa39b; font-size: 13px; }
+#main-deep-dive-container .dd-taiwan-news-card { padding: 14px 16px; background: #1b1917; border: 1px solid #39312a; border-radius: 9px; }
+#main-deep-dive-container .dd-taiwan-news-meta { color: #e8a363; font-size: 11px; }
+#main-deep-dive-container .dd-taiwan-news-card h5 { margin: 7px 0; color: #f3ede6; font-size: 14px; line-height: 1.45; }
+#main-deep-dive-container .dd-taiwan-news-card p { margin: 0 0 7px; color: #aaa39b; font-size: 12px; line-height: 1.6; }
+#main-deep-dive-container .dd-taiwan-news-card a { color: #e8a363; font-size: 12px; }
 #main-deep-dive-container .dd-cached-report-note {
     display: flex;
     align-items: center;
@@ -3870,6 +3925,9 @@ body.light-mode #info-section .market-report-output input { color: #172033; back
 #main-deep-dive-container .dd-cached-view #dd-premium-widgets,
 #main-deep-dive-container .dd-cached-view .dd-export-btn { display: none !important; }
 @media (max-width: 700px) {
+    #main-deep-dive-container .dd-taiwan-history-heading,
+    #main-deep-dive-container .dd-taiwan-news-heading { align-items: flex-start; flex-direction: column; }
+    #main-deep-dive-container .dd-taiwan-history-summary-action { white-space: normal; }
     #main-deep-dive-container .dd-taiwan-history-row { align-items: stretch; }
     #main-deep-dive-container .dd-taiwan-history-item { grid-template-columns: 1fr auto; }
     #main-deep-dive-container .dd-taiwan-history-item time { grid-column: 1 / -1; grid-row: 2; }

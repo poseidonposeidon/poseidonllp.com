@@ -1,6 +1,6 @@
 const isLocalFlask = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const baseUrl = isLocalFlask ? window.location.origin : 'https://api.poseidonllp.com';
-const POSEIDON_FRONTEND_BUILD = '20261103-markdown-emphasis';
+const POSEIDON_FRONTEND_BUILD = '20261103-tw-news-preview';
 console.info(`[Poseidon] frontend build ${POSEIDON_FRONTEND_BUILD}`);
 const API_KEY = ''; // FMP key is server-side only.
 const BASE_URL = `${baseUrl}/api/fmp/`;
@@ -9496,10 +9496,86 @@ function setDeepDiveMarket(market) {
     window.currentDeepDiveData = null;
     window.currentReportContent = null;
     window.currentTaiwanHistoryId = null;
-    if (taiwan) loadTaiwanHistory(true);
+    if (taiwan) {
+        loadTaiwanHistory(true);
+        loadTaiwanNewsPreview();
+    }
 }
 
 let taiwanHistoryPage = 0;
+function updateTaiwanHistoryControls() {
+    const list = document.getElementById('dd-taiwan-history-list');
+    const count = document.getElementById('dd-taiwan-history-count');
+    const expand = document.getElementById('dd-taiwan-history-expand');
+    if (!list || !count || !expand) return;
+    const rows = list.querySelectorAll('.dd-taiwan-history-row');
+    count.textContent = rows.length ? `已載入 ${rows.length} 筆 · 點擊展開／收合` : '點擊展開／收合';
+    expand.hidden = rows.length <= 3;
+    expand.textContent = list.classList.contains('is-expanded') ? '收起至最近 3 筆' : `顯示更多研究（${rows.length} 筆）`;
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const expand = document.getElementById('dd-taiwan-history-expand');
+    expand?.addEventListener('click', () => {
+        document.getElementById('dd-taiwan-history-list')?.classList.toggle('is-expanded');
+        updateTaiwanHistoryControls();
+    });
+    document.getElementById('dd-taiwan-news-full')?.addEventListener('click', () => {
+        // Reuse the existing cross-domain workspace login flow in the main navigation.
+        document.querySelector('.workspace-nav nav a[href="/workspace/news-center"]')?.click();
+    });
+});
+
+async function loadTaiwanNewsPreview() {
+    const list = document.getElementById('dd-taiwan-news-list');
+    const container = document.getElementById('main-deep-dive-container');
+    if (!list || container?.dataset.researchMarket !== 'TW') return;
+    list.textContent = '正在讀取新聞中心的已保存消息…';
+    try {
+        const response = await fetch(`${baseUrl}/api/taiwan_research_news`, {cache: 'no-store'});
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const payload = await response.json();
+        if (!Array.isArray(payload.articles)) throw new Error('新聞格式不正確');
+        if (container.dataset.researchMarket !== 'TW') return;
+        list.replaceChildren();
+        if (!payload.articles.length) {
+            list.textContent = '目前沒有已保存的新聞；可到新聞中心查看來源狀態。';
+            return;
+        }
+        for (const item of payload.articles) {
+            const card = document.createElement('article');
+            card.className = 'dd-taiwan-news-card';
+            const meta = document.createElement('div');
+            meta.className = 'dd-taiwan-news-meta';
+            const time = item.published_at ? new Date(item.published_at) : null;
+            const published = time && !Number.isNaN(time.getTime())
+                ? time.toLocaleString('zh-TW', {timeZone: 'Asia/Taipei', hour12: false}) : '時間未提供';
+            meta.textContent = [item.priority_category, item.provider, published].filter(Boolean).join(' · ');
+            const title = document.createElement('h5');
+            title.textContent = item.title || '未提供標題';
+            const summary = document.createElement('p');
+            summary.textContent = (item.summary || '來源未提供摘要。').slice(0, 200);
+            card.append(meta, title, summary);
+            let url;
+            try { url = new URL(item.url); } catch (_) { /* No verified source link. */ }
+            if (url && ['http:', 'https:'].includes(url.protocol)) {
+                const link = document.createElement('a');
+                link.href = url.href;
+                link.target = '_blank';
+                link.rel = 'noopener noreferrer';
+                link.textContent = '查看原始來源 ↗';
+                card.appendChild(link);
+            }
+            list.appendChild(card);
+        }
+    } catch (error) {
+        if (container.dataset.researchMarket === 'TW') {
+            list.textContent = '新聞摘要暫時無法載入；完整內容仍可從新聞中心查看。';
+        }
+        console.error('Taiwan news preview failed:', error);
+    }
+}
+
 async function loadTaiwanHistory(reset = true) {
     const list = document.getElementById('dd-taiwan-history-list');
     const more = document.getElementById('dd-taiwan-history-more');
@@ -9508,6 +9584,7 @@ async function loadTaiwanHistory(reset = true) {
     const page = reset ? 1 : taiwanHistoryPage + 1;
     if (reset) {
         list.textContent = '正在載入過往研究…';
+        list.classList.remove('is-expanded');
         more.hidden = true;
     }
     more.disabled = true;
@@ -9549,6 +9626,7 @@ async function loadTaiwanHistory(reset = true) {
         }
         taiwanHistoryPage = page;
         more.hidden = records.length < 30;
+        updateTaiwanHistoryControls();
     } catch (error) {
         if (reset) list.textContent = '暫時無法載入研究紀錄，請稍後重試。';
         console.error('Taiwan history load failed:', error);
@@ -9578,6 +9656,7 @@ async function deleteTaiwanHistory(item, row) {
             throw new Error(error.error || `HTTP ${response.status}`);
         }
         row.remove();
+        updateTaiwanHistoryControls();
         if (!document.querySelector('#dd-taiwan-history-list .dd-taiwan-history-row')) {
             document.getElementById('dd-taiwan-history-list').textContent = '目前尚無台股分析紀錄。';
         }
