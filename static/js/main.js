@@ -1,6 +1,6 @@
 const isLocalFlask = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const baseUrl = isLocalFlask ? window.location.origin : 'https://api.poseidonllp.com';
-const POSEIDON_FRONTEND_BUILD = '20261102-tw-history-fix2';
+const POSEIDON_FRONTEND_BUILD = '20261103-markdown-emphasis';
 console.info(`[Poseidon] frontend build ${POSEIDON_FRONTEND_BUILD}`);
 const API_KEY = ''; // FMP key is server-side only.
 const BASE_URL = `${baseUrl}/api/fmp/`;
@@ -9659,9 +9659,15 @@ async function restoreTaiwanHistory(historyId) {
     }
 }
 
+function normalizeReportEmphasis(markdown) {
+    // CommonMark does not close ** after punctuation when CJK text follows immediately.
+    // Add a separator without changing the saved report or its meaning.
+    return String(markdown || '').replace(/(\*\*[^*\r\n]+[：。；，、!?！？]\*\*)(?=\S)/g, '$1 ');
+}
+
 function renderCachedTaiwanReport(markdown, container) {
     if (!container) return;
-    const parsed = new DOMParser().parseFromString(marked.parse(markdown), 'text/html');
+    const parsed = new DOMParser().parseFromString(marked.parse(normalizeReportEmphasis(markdown)), 'text/html');
     const allowed = new Set(['H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'P', 'STRONG', 'EM',
         'B', 'I', 'UL', 'OL', 'LI', 'PRE', 'CODE', 'BLOCKQUOTE', 'TABLE', 'THEAD',
         'TBODY', 'TR', 'TH', 'TD', 'HR', 'BR', 'A']);
@@ -9898,7 +9904,7 @@ function renderDeepDiveMarkdown(text, container, raw_data = null) {
     if (!container) return;
 
     // 1. 使用 marked.js 將 AI 報告轉換為 HTML
-    const html = marked.parse(text);
+    const html = marked.parse(normalizeReportEmphasis(text));
 
     // 2. 🛡️ 繪製視覺化財報雷達徽章 (Anomaly Detection Radar)
     let healthBadgeHTML = '';
