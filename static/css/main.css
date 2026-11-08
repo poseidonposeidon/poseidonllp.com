@@ -5625,6 +5625,53 @@ body.light-mode #main-deep-dive-container #news-search-input { color: #28231f; b
     .market-news-pagination button span { font-size: 16px; }
 }
 
+/* Research landing: three quiet visual zones, shared by US and Taiwan. */
+#main-deep-dive-container .dd-header {
+    position: relative;
+    overflow: visible;
+    background: linear-gradient(112deg, #1b1510 0%, #11100f 42%, #0c0c0d 100%);
+    border-color: rgba(230, 126, 34, .32);
+    box-shadow: inset 3px 0 #d98738, 0 20px 52px rgba(0, 0, 0, .32);
+}
+#main-deep-dive-container .dd-taiwan-history {
+    background: linear-gradient(110deg, #15191e 0%, #111316 54%, #101112 100%);
+    border-color: rgba(139, 164, 187, .27);
+    box-shadow: inset 3px 0 #8299ae, 0 14px 32px rgba(0, 0, 0, .15);
+}
+#main-deep-dive-container .dd-taiwan-history .dd-eyebrow,
+#main-deep-dive-container .dd-taiwan-history-summary-action { color: #a9c0d2; }
+#main-deep-dive-container .dd-taiwan-history-heading:hover,
+#main-deep-dive-container .dd-taiwan-history-heading:focus-visible {
+    background: rgba(139, 164, 187, .08);
+}
+#main-deep-dive-container .dd-taiwan-news,
+#main-deep-dive-container .daily-briefing-container {
+    background: linear-gradient(110deg, #111a19 0%, #101413 52%, #101111 100%);
+    border-color: rgba(113, 167, 151, .28);
+    box-shadow: inset 3px 0 #77a998, 0 14px 32px rgba(0, 0, 0, .15);
+}
+#main-deep-dive-container .dd-taiwan-news .dd-eyebrow,
+#main-deep-dive-container .daily-briefing-container .dd-section-kicker { color: #a0c9b9; }
+#main-deep-dive-container .daily-briefing-container .market-news-header {
+    background: linear-gradient(110deg, rgba(22, 33, 30, .97), rgba(16, 21, 20, .97));
+    border-bottom-color: rgba(113, 167, 151, .16);
+}
+body.light-mode #main-deep-dive-container .dd-header {
+    background: linear-gradient(110deg, #fff9f2, #f8fafc);
+}
+body.light-mode #main-deep-dive-container .dd-taiwan-history {
+    background: linear-gradient(110deg, #f2f6fa, #fff);
+}
+body.light-mode #main-deep-dive-container .dd-taiwan-news,
+body.light-mode #main-deep-dive-container .daily-briefing-container,
+body.light-mode #main-deep-dive-container .daily-briefing-container .market-news-header {
+    background: linear-gradient(110deg, #f1f8f5, #fff);
+}
+body.light-mode #main-deep-dive-container .dd-taiwan-history .dd-eyebrow,
+body.light-mode #main-deep-dive-container .dd-taiwan-history-summary-action { color: #496b83; }
+body.light-mode #main-deep-dive-container .dd-taiwan-news .dd-eyebrow,
+body.light-mode #main-deep-dive-container .daily-briefing-container .dd-section-kicker { color: #397765; }
+
 /* =========================================================
    Minimal company calendar: earnings, calls and dividends
    ========================================================= */
