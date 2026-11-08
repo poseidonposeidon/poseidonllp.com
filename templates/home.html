@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261103-us-wide-layout">
+    <link rel="stylesheet" type="text/css" href="/static/css/main.css?v=20261107-smart-symbol-search">
     <link href="/static/img/favicon.ico" rel="shortcut icon"/>
     <script defer src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8/hammer.min.js"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -575,7 +575,7 @@
             <div class="dd-search-row">
                 <div class="dd-search-box">
                     <span class="dd-search-icon" aria-hidden="true">⌕</span>
-                    <input type="text" id="dd-stock-input" class="dd-search-input" placeholder="例如 AAPL" autocomplete="off" spellcheck="false">
+                    <input type="text" id="dd-stock-input" class="dd-search-input" placeholder="輸入美股代號或公司名稱，例如 AAPL、Apple" autocomplete="off" spellcheck="false" aria-label="搜尋股票代號或公司名稱">
                     <div id="dd-suggestions" class="dd-suggestions-list"></div>
                 </div>
                 <button onclick="runDeepDive()" class="action-btn btn-analyze" type="button">開始分析 <span aria-hidden="true">→</span></button>
@@ -1374,7 +1374,7 @@
     </div>
 </div>
 
-<script defer src="/static/js/main.js?v=20261103-us-history-layout"></script>
+<script defer src="/static/js/main.js?v=20261108-us-one-letter-index"></script>
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {

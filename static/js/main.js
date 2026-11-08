@@ -1,6 +1,6 @@
 const isLocalFlask = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 const baseUrl = isLocalFlask ? window.location.origin : 'https://api.poseidonllp.com';
-const POSEIDON_FRONTEND_BUILD = '20261103-tw-news-search-type';
+const POSEIDON_FRONTEND_BUILD = '20261108-us-one-letter-index';
 console.info(`[Poseidon] frontend build ${POSEIDON_FRONTEND_BUILD}`);
 const API_KEY = ''; // FMP key is server-side only.
 const BASE_URL = `${baseUrl}/api/fmp/`;
@@ -10746,8 +10746,22 @@ function debounce(func, delay) {
 /* ==========================================================================
    2. 搜尋輸入框邏輯 (包含自動修正拼寫錯誤)
    ========================================================================== */
+const ddSuggestionCache = new Map();
+let usCompanyIndex = [];
 document.addEventListener('DOMContentLoaded', () => {
     const searchInputs = document.querySelectorAll('.dd-search-input');
+    if (document.getElementById('dd-stock-input')) fetch('/static/data/us_company_index.json?v=20261108', {cache: 'force-cache'})
+        .then(response => response.ok ? response.json() : null)
+        .then(data => {
+            if (!Array.isArray(data?.companies)) return;
+            usCompanyIndex = data.companies;
+            ddSuggestionCache.clear();
+            const input = document.getElementById('dd-stock-input');
+            if (input?.value.trim() && document.getElementById('main-deep-dive-container')?.dataset.researchMarket === 'US') {
+                input.dispatchEvent(new Event('input', {bubbles: true}));
+            }
+        })
+        .catch(() => { /* The popular-company list and live search still work. */ });
     searchInputs.forEach(input => {
         let timer;
         let controller;
@@ -10766,11 +10780,25 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const market = input.id === 'dd-stock-input'
                     ? (document.getElementById('main-deep-dive-container')?.dataset.researchMarket || 'US') : 'US';
+            const cacheKey = `${market}:${query.toUpperCase()}`;
+            const cached = ddSuggestionCache.get(cacheKey);
             const instant = market === 'US' ? findInstantUSSuggestions(query) : [];
+            if (cached && cached.expires > Date.now()) {
+                if (cached.rows.length) renderDDSuggestions(cached.rows, suggestionsBox, input);
+                else {
+                    suggestionsBox.textContent = '找不到符合的公司，請試試股票代號或完整名稱。';
+                    suggestionsBox.classList.add('active');
+                }
+                return;
+            }
             if (instant.length) renderDDSuggestions(instant, suggestionsBox, input);
             else {
                 suggestionsBox.textContent = '搜尋中…';
                 suggestionsBox.classList.add('active');
+            }
+            if (market === 'US' && query.length <= 2 && usCompanyIndex.length) {
+                ddSuggestionCache.set(cacheKey, {rows: instant, expires: Date.now() + 30 * 60_000});
+                return;
             }
             timer = setTimeout(async () => {
                 controller = new AbortController();
@@ -10789,6 +10817,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         seen.add(symbol);
                         return true;
                     });
+                    ddSuggestionCache.set(cacheKey, {rows: merged.slice(0, 12), expires: Date.now() + (merged.length ? 30 * 60_000 : 30_000)});
+                    if (ddSuggestionCache.size > 200) ddSuggestionCache.delete(ddSuggestionCache.keys().next().value);
                     renderDDSuggestions(merged.slice(0, 12), suggestionsBox, input);
                     if (!merged.length) {
                         suggestionsBox.textContent = '找不到符合的公司，請試試股票代號或完整名稱。';
@@ -10841,10 +10871,21 @@ const instantUSCompanies = [
 ];
 function findInstantUSSuggestions(query) {
     const needle = query.toUpperCase().replace(/\s+/g, '');
-    return instantUSCompanies
+    const popular = instantUSCompanies
         .filter(([symbol, name]) => symbol.includes(needle) || name.toUpperCase().replace(/\s+/g, '').includes(needle))
         .sort((a, b) => Number(!a[0].startsWith(needle)) - Number(!b[0].startsWith(needle)))
         .slice(0, 8).map(([symbol, name]) => ({symbol, name}));
+    const indexed = usCompanyIndex
+        .filter(item => item.symbol.includes(needle) || item.name.toUpperCase().replace(/\s+/g, '').includes(needle))
+        .sort((a, b) => Number(!a.symbol.startsWith(needle)) - Number(!b.symbol.startsWith(needle)) ||
+            Number(!a.name.toUpperCase().startsWith(needle)) - Number(!b.name.toUpperCase().startsWith(needle)))
+        .slice(0, 12);
+    const seen = new Set();
+    return [...popular, ...indexed].filter(item => {
+        if (seen.has(item.symbol)) return false;
+        seen.add(item.symbol);
+        return true;
+    }).slice(0, 12);
 }
 
 // 負責將推薦資料畫到 HTML 上的函數
@@ -10875,6 +10916,7 @@ function renderDDSuggestions(data, suggestionsBox, inputElement) {
 
         suggestionsBox.appendChild(div);
     });
+    suggestionsBox.classList.add('active');
 }
 /**/
 document.addEventListener('DOMContentLoaded', () => {
