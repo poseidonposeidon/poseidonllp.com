@@ -9476,7 +9476,7 @@ function setDeepDiveMarket(market) {
     button.onclick = () => setDeepDiveMarket(taiwan ? 'US' : 'TW');
     const input = document.getElementById('dd-stock-input');
     input.value = '';
-    input.placeholder = taiwan ? '例如 3167' : '例如 AAPL';
+    input.placeholder = taiwan ? '輸入台股代號或公司名稱，例如 2330、台積電' : '輸入美股代號或公司名稱，例如 AAPL、Apple';
     const suggestions = document.getElementById('dd-suggestions');
     suggestions.innerHTML = '';
     suggestions.classList.remove('active');
@@ -9875,11 +9875,36 @@ async function runDeepDive(event) {
     const symbolInput = document.getElementById('dd-stock-input');
     if (!symbolInput) return;
 
-    const symbol = symbolInput.value.trim().toUpperCase();
+    let symbol = symbolInput.value.trim().toUpperCase();
     const market = document.getElementById('main-deep-dive-container')?.dataset.researchMarket || 'US';
     if (!symbol) {
         alert("請輸入股票代碼！");
         return;
+    }
+    if (market === 'US') {
+        const company = instantUSCompanies.find(([code, name]) => code !== symbol &&
+            name.toUpperCase().split(' ')[0] === symbol);
+        if (company) {
+            symbol = company[0];
+            symbolInput.value = symbol;
+        }
+    }
+    const validCode = market === 'TW'
+        ? /^[1-9]\d{3}(?:\.(?:TW|TWO))?$/.test(symbol)
+        : /^[A-Z][A-Z0-9.\-]{0,19}$/.test(symbol) && !/\.(?:TW|TWO)$/.test(symbol);
+    if (!validCode) {
+        try {
+            const apiRoot = typeof baseUrl !== 'undefined' ? baseUrl : '';
+            const response = await fetch(`${apiRoot}/api/research/symbol-suggest?market=${market}&q=${encodeURIComponent(symbolInput.value.trim())}`);
+            const matches = response.ok ? await response.json() : [];
+            const exact = matches.find(item => String(item.name || '').toUpperCase() === symbol);
+            const prefix = matches.find(item => String(item.name || '').toUpperCase().startsWith(symbol));
+            const selected = exact || (matches.length === 1 ? matches[0] : prefix);
+            if (selected?.symbol) {
+                symbol = String(selected.symbol).toUpperCase();
+                symbolInput.value = symbol;
+            }
+        } catch (_) { /* The validation below explains how to continue. */ }
     }
     if (market === 'TW' && !/^[1-9]\d{3}(?:\.(?:TW|TWO))?$/.test(symbol)) {
         alert('台股模式請輸入四位股票代碼，例如 3167。');
@@ -10722,49 +10747,79 @@ function debounce(func, delay) {
    2. 搜尋輸入框邏輯 (包含自動修正拼寫錯誤)
    ========================================================================== */
 document.addEventListener('DOMContentLoaded', () => {
-    // 抓取畫面上所有的 deep dive 搜尋框 (透過 class 綁定，完美兼容 Modal 與主畫面)
     const searchInputs = document.querySelectorAll('.dd-search-input');
-
     searchInputs.forEach(input => {
-        input.addEventListener('input', debounce(async (e) => {
-            let query = e.target.value.trim().toUpperCase();
-
-            // 自動尋找目前輸入框旁邊的建議清單容器
-            const suggestionsBox = e.target.parentElement.querySelector('.dd-suggestions-list');
+        let timer;
+        let controller;
+        let requestId = 0;
+        input.addEventListener('input', () => {
+            const query = input.value.trim();
+            const suggestionsBox = input.parentElement.querySelector('.dd-suggestions-list');
             if (!suggestionsBox) return;
-
-            // 如果被清空，就收起推薦框
-            if (query.length < 1) {
+            clearTimeout(timer);
+            controller?.abort();
+            const currentRequest = ++requestId;
+            if (!query) {
                 suggestionsBox.classList.remove('active');
-                suggestionsBox.innerHTML = '';
+                suggestionsBox.replaceChildren();
                 return;
             }
-
-            try {
-                // 顯示 Loading
-                suggestionsBox.innerHTML = '<div style="padding:10px; color:#aaa;">Loading...</div>';
-                suggestionsBox.classList.add('active');
-
-                // 呼叫 FMP API 抓取資料 (請確保 API_KEY 在全域有宣告)
-                const market = e.target.id === 'dd-stock-input'
+            const market = input.id === 'dd-stock-input'
                     ? (document.getElementById('main-deep-dive-container')?.dataset.researchMarket || 'US') : 'US';
-                const url = market === 'TW'
-                    ? `${BASE_URL}search-symbol?query=${encodeURIComponent(query)}&limit=10&market=TW`
-                    : `${BASE_URL}search-symbol?query=${encodeURIComponent(query)}&limit=10&exchange=NASDAQ,NYSE`;
-                const response = await fetch(url);
-                if (!response.ok) throw new Error("API Error");
-                const data = await response.json();
-                if (e.target.value.trim().toUpperCase() !== query ||
-                    (e.target.id === 'dd-stock-input' && document.getElementById('main-deep-dive-container')?.dataset.researchMarket !== market)) return;
-
-                // 渲染推薦選單
-                renderDDSuggestions(market === 'TW'
-                    ? data.filter(item => /\.TW$|\.TWO$/.test(item.symbol || '')) : data, suggestionsBox, e.target);
-            } catch (error) {
-                console.error("Search Suggestion Error:", error);
-                suggestionsBox.classList.remove('active');
+            const instant = market === 'US' ? findInstantUSSuggestions(query) : [];
+            if (instant.length) renderDDSuggestions(instant, suggestionsBox, input);
+            else {
+                suggestionsBox.textContent = '搜尋中…';
+                suggestionsBox.classList.add('active');
             }
-        }, 300)); // 延遲 300 毫秒避免 API 呼叫過度頻繁
+            timer = setTimeout(async () => {
+                controller = new AbortController();
+                try {
+                    const apiRoot = typeof baseUrl !== 'undefined' ? baseUrl : '';
+                    const url = `${apiRoot}/api/research/symbol-suggest?market=${market}&q=${encodeURIComponent(query)}`;
+                    const response = await fetch(url, {signal: controller.signal});
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    const data = await response.json();
+                    if (currentRequest !== requestId || input.value.trim() !== query ||
+                        (input.id === 'dd-stock-input' && document.getElementById('main-deep-dive-container')?.dataset.researchMarket !== market)) return;
+                    const seen = new Set();
+                    const merged = [...instant, ...data].filter(item => {
+                        const symbol = String(item.symbol || '').toUpperCase();
+                        if (!symbol || seen.has(symbol)) return false;
+                        seen.add(symbol);
+                        return true;
+                    });
+                    renderDDSuggestions(merged.slice(0, 12), suggestionsBox, input);
+                    if (!merged.length) {
+                        suggestionsBox.textContent = '找不到符合的公司，請試試股票代號或完整名稱。';
+                        suggestionsBox.classList.add('active');
+                    }
+                } catch (error) {
+                    if (error.name === 'AbortError' || currentRequest !== requestId) return;
+                    if (!instant.length) {
+                        suggestionsBox.textContent = '搜尋暫時無法使用；仍可直接輸入股票代號。';
+                        suggestionsBox.classList.add('active');
+                    }
+                }
+            }, market === 'TW' ? 100 : 180);
+        });
+        input.addEventListener('keydown', event => {
+            const box = input.parentElement.querySelector('.dd-suggestions-list');
+            const options = [...(box?.querySelectorAll('.dd-suggestion-item') || [])];
+            if (!box?.classList.contains('active') || !options.length) return;
+            let active = options.findIndex(option => option.classList.contains('is-active'));
+            if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+                event.preventDefault();
+                active = (active + (event.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length;
+                options.forEach((option, index) => option.classList.toggle('is-active', index === active));
+                options[active].scrollIntoView({block: 'nearest'});
+            } else if (event.key === 'Enter' && active >= 0) {
+                event.preventDefault();
+                options[active].click();
+            } else if (event.key === 'Escape') {
+                box.classList.remove('active');
+            }
+        });
     });
 
     // 點擊畫面其他空白處時，關閉所有的推薦框
@@ -10777,9 +10832,24 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
+const instantUSCompanies = [
+    ['AAPL', 'Apple 蘋果'], ['MSFT', 'Microsoft 微軟'], ['NVDA', 'NVIDIA 輝達'],
+    ['GOOGL', 'Alphabet Google 谷歌'], ['AMZN', 'Amazon 亞馬遜'],
+    ['META', 'Meta 臉書'], ['TSLA', 'Tesla 特斯拉'], ['AMD', 'Advanced Micro Devices 超微'],
+    ['AVGO', 'Broadcom 博通'], ['TSM', 'Taiwan Semiconductor 台積電 ADR'],
+    ['PLTR', 'Palantir'], ['ORCL', 'Oracle 甲骨文'], ['JPM', 'JPMorgan 摩根大通']
+];
+function findInstantUSSuggestions(query) {
+    const needle = query.toUpperCase().replace(/\s+/g, '');
+    return instantUSCompanies
+        .filter(([symbol, name]) => symbol.includes(needle) || name.toUpperCase().replace(/\s+/g, '').includes(needle))
+        .sort((a, b) => Number(!a[0].startsWith(needle)) - Number(!b[0].startsWith(needle)))
+        .slice(0, 8).map(([symbol, name]) => ({symbol, name}));
+}
+
 // 負責將推薦資料畫到 HTML 上的函數
 function renderDDSuggestions(data, suggestionsBox, inputElement) {
-    suggestionsBox.innerHTML = '';
+    suggestionsBox.replaceChildren();
     if (!data || data.length === 0) {
         suggestionsBox.classList.remove('active');
         return;
@@ -10788,9 +10858,14 @@ function renderDDSuggestions(data, suggestionsBox, inputElement) {
     data.forEach(item => {
         const div = document.createElement('div');
         div.className = 'dd-suggestion-item';
-
-        // 顯示出 代碼 與 公司全名
-        div.innerHTML = `<span class="dd-suggestion-symbol">${item.symbol}</span> <span class="dd-suggestion-name">${item.name}</span>`;
+        div.setAttribute('role', 'option');
+        const symbol = document.createElement('span');
+        symbol.className = 'dd-suggestion-symbol';
+        symbol.textContent = item.symbol;
+        const name = document.createElement('span');
+        name.className = 'dd-suggestion-name';
+        name.textContent = item.name || '';
+        div.append(symbol, name);
 
         // 點擊選項時的動作
         div.onclick = () => {

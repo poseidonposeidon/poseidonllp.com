@@ -2136,7 +2136,8 @@ body.light-mode {
     border-bottom: none;
 }
 
-.dd-suggestion-item:hover {
+.dd-suggestion-item:hover,
+.dd-suggestion-item.is-active {
     background-color: #3a3a3a;
 }
 
